@@ -6,7 +6,7 @@ import {
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import { escape } from '@microsoft/sp-lodash-subset';
 
-import styles from './SubmitArInvoiceWebPart.module.scss';
+import './MyO365.scss';
 import * as strings from 'SubmitArInvoiceWebPartStrings';
 
 export interface ISubmitArInvoiceWebPartProps {
@@ -16,21 +16,7 @@ export interface ISubmitArInvoiceWebPartProps {
 export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart <ISubmitArInvoiceWebPartProps> {
 
   public render(): void {
-    this.domElement.innerHTML = `
-      <div class="${ styles.submitArInvoice }">
-    <div class="${ styles.container }">
-      <div class="${ styles.row }">
-        <div class="${ styles.column }">
-          <span class="${ styles.title }">Welcome to SharePoint!</span>
-  <p class="${ styles.subTitle }">Customize SharePoint experiences using Web Parts.</p>
-    <p class="${ styles.description }">${escape(this.properties.description)}</p>
-      <a href="https://aka.ms/spfx" class="${ styles.button }">
-        <span class="${ styles.label }">Learn more</span>
-          </a>
-          </div>
-          </div>
-          </div>
-          </div>`;
+    this.domElement.innerHTML = `Loading....`;
   }
 
   protected get dataVersion(): Version {
