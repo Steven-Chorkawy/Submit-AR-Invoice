@@ -6,7 +6,7 @@ import { Input } from '@progress/kendo-react-inputs'
 
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 
-import { FormInput } from './MyFormComponents';
+import * as MyFormComponents from './MyFormComponents';
 
 
 export class MyForm extends React.Component {
@@ -18,20 +18,54 @@ export class MyForm extends React.Component {
 
   }
 
+  handleSubmit = (dataItem) => {
+    console.log(dataItem);
+    alert("Form Submit!");
+  }
+
   render() {
     return (
-      <div>
-        <h1>This is my form.</h1>
+      <div style={{padding:'5px'}}>
         <Form
-          onSubmit={
-            () => {
-              alert("Form Submit!");
-            }
-          }
+          onSubmit={this.handleSubmit}
 
           render={(formRenderProps) => (
-            <FormElement>
-              <h2>Hello world</h2>
+            <FormElement >
+
+              <legend className={'k-form-legend'}>ACCOUNTS RECEIVABLE - INVOICE REQUISITION </legend>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Field
+                  id="Department"
+                  name="Department"
+                  label="Department"
+                  wrapperStyle={{ width: '50%', marginRight: '18px' }}
+                  data={[
+                    'Administration',
+                    'Clerks Department',
+                    'Community Service',
+                    'Corporate Services Department',
+                    'Emergency Services',
+                    'Engineering Services',
+                    'Finance',
+                    'Legal Services Department',
+                    'Mayor & Council',
+                    'Operations',
+                    'Planning Services'
+                  ]}
+                  component={MyFormComponents.FormDropDownList}
+                />
+
+                <Field
+                  id={'Date'}
+                  name={'Date'}
+                  label={'Date'}
+                  component={MyFormComponents.FormDatePicker}
+                  defaultValue={new Date()}
+                  // validator={arrivalDateValidator}
+                  wrapperStyle={{ width: '50%'}}
+                />
+              </div>
             </FormElement>
           )} />
       </div>
