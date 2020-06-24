@@ -4,12 +4,7 @@ import { Card, CardTitle, CardBody, CardActions } from '@progress/kendo-react-la
 import { IMyCustomerProps } from '../components/IMyCustomerProps';
 import { IMyCustomerState } from '../components/IMyCustomerState';
 
-interface ICustomer {
-  Title: string;
-}
-
 export class MyCustomerCardComponent extends React.Component<IMyCustomerProps, IMyCustomerState> {
-  customer: ICustomer;
 
   /**
    *
@@ -18,9 +13,6 @@ export class MyCustomerCardComponent extends React.Component<IMyCustomerProps, I
     super(props);
     console.log("MyCustomerCardComponent");
     console.log(props);
-    this.customer = props.selectedCustomer;
-    console.log("Customer");
-    console.log(this.customer);
 
     this.state = {
       selectedCustomer: props.selectedCustomer
@@ -28,14 +20,13 @@ export class MyCustomerCardComponent extends React.Component<IMyCustomerProps, I
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log("Customer Will Rec");
-    console.log(nextProps);
     this.setState({ ...nextProps });
   }
 
   render() {
     console.log("Before Render");
     console.log(this.state.selectedCustomer);
+
     if (this.state.selectedCustomer == undefined) {
       return (<div key="123">Select a Customer</div>);
     }
