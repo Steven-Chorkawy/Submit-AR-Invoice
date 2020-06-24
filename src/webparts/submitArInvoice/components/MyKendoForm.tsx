@@ -5,14 +5,18 @@ import { Error } from '@progress/kendo-react-labels';
 import { Input } from '@progress/kendo-react-inputs'
 import { Button } from '@progress/kendo-react-buttons';
 
+
+
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 
 import * as MyFormComponents from './MyFormComponents';
 import { IMyFormProps } from './IMyFormProps';
+import { IMyFormState } from './IMyFormState';
 import * as MyValidators from './validators.jsx'
+import {MyCustomerCardComponent} from './MyCustomerCardComponent';
 
 
-export class MyForm extends React.Component<IMyFormProps> {
+export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
   /**
    *
    */
@@ -21,9 +25,16 @@ export class MyForm extends React.Component<IMyFormProps> {
     console.log("MyForm CTOR");
     console.log(props);
 
-    this.state = { ...props }
+    this.state = {
+      selectedCustomer: undefined,
+      ...props
+    }
   }
 
+  /**
+   * Form Submit Event
+   * @param dataItem Data from form
+   */
   handleSubmit = (dataItem) => {
     console.log(dataItem);
     alert(JSON.stringify(dataItem, null, 2));
@@ -44,7 +55,7 @@ export class MyForm extends React.Component<IMyFormProps> {
                 <Field
                   id="Department"
                   name="Department"
-                  label="Department"
+                  label="* Department"
                   wrapperStyle={{ width: '50%', marginRight: '18px' }}
                   data={[
                     'Administration',
@@ -66,7 +77,7 @@ export class MyForm extends React.Component<IMyFormProps> {
                 <Field
                   id={'Date'}
                   name={'Date'}
-                  label={'Date'}
+                  label={'* Date'}
                   component={MyFormComponents.FormDatePicker}
                   defaultValue={new Date()}
                   validator={MyValidators.dateValidator}
@@ -75,10 +86,10 @@ export class MyForm extends React.Component<IMyFormProps> {
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Field
+                <Field
                   id="RequestedBy"
                   name="RequestedBy"
-                  label="Requested By"
+                  label="* Requested By"
                   wrapperStyle={{ width: '50%', marginRight: '18px' }}
                   data={this.props.siteUsers}
                   dataItemKey="Email"
@@ -86,9 +97,56 @@ export class MyForm extends React.Component<IMyFormProps> {
                   validator={MyValidators.requestedByValidator}
                   component={MyFormComponents.FormComboBox}
                 />
+
+                <Field
+                  id="RequiresAuthorizationBy"
+                  name="RequiresAuthorizationBy"
+                  label="* Requires Authorization By"
+                  wrapperStyle={{ width: '50%' }}
+                  data={this.props.siteUsers}
+                  dataItemKey="Email"
+                  textField="Title"
+                  validator={MyValidators.requiresApprovalFrom}
+                  component={MyFormComponents.FormComboBox}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Field
+                  id="Urgent"
+                  name="Urgent"
+                  label="Urgent"
+                  onLabel="Yes"
+                  offLabel="No"
+                  component={MyFormComponents.FormSwitch}
+                />
               </div>
 
 
+                <Field
+                  id="Customer"
+                  name="Customer"
+                  label="* Customer"
+                  wrapperStyle={{ width: '100%' }}
+                  data={this.props.customerList}
+                  dataItemKey="ID"
+                  textField="Company"
+                  //validator={MyValidators.requiresApprovalFrom}
+                  component={MyFormComponents.FormComboBox}
+                  onChange={
+                    (event) => {
+                      console.log("Customer Changed");
+                      console.log(event.target.value);
+                      // TODO: Do I need to add '...this.state' as well?
+                      this.setState({
+                        selectedCustomer: event.target.value
+                      });
+                    }
+                  }
+                />
+                <div style={{width:'100%'}}>
+                  <MyCustomerCardComponent selectedCustomer={this.state.selectedCustomer}/>
+                </div>
 
 
               <div className="k-form-buttons">

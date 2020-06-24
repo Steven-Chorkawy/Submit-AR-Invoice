@@ -11,6 +11,8 @@ import { escape } from '@microsoft/sp-lodash-subset';
 
 import { sp } from "@pnp/sp";
 import "@pnp/sp/webs";
+import "@pnp/sp/lists";
+import "@pnp/sp/items";
 import "@pnp/sp/site-users/web";
 
 import './MyO365.scss';
@@ -32,27 +34,23 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
     return siteUsers.filter(user => user.Email != "");
   }
 
+  private getCustomers = async () => {
+    let customers = await sp.web.lists.getByTitle('Customers').items.get();
+    console.log("Customer Data");
+    console.log(customers);
+    return customers;
+  }
 
-  // public async getFormProps() {
-
-  //   Promise.all([this.getSiteUsers()])
-  //     .then((values) => {
-  //       console.log("getFormProps done!");
-  //       console.log(values);
-
-  //       this.myFormProps.siteUsers = values[0];
-  //     });
-
-  // }
 
 
   public render(): void {
-    Promise.all([this.getSiteUsers()])
+    Promise.all([this.getSiteUsers(), this.getCustomers()])
       .then((values) => {
         console.log("getFormProps done!");
         console.log(values);
 
         this.myFormProps.siteUsers = values[0];
+        this.myFormProps.customerList = values[1];
       })
       .then(_ => {
         console.log("Loading Form");
