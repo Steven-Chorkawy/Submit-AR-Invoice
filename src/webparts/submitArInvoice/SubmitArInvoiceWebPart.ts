@@ -1,3 +1,6 @@
+import * as React from 'react';
+import * as ReactDom from 'react-dom';
+
 import { Version } from '@microsoft/sp-core-library';
 import {
   IPropertyPaneConfiguration,
@@ -6,56 +9,48 @@ import {
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import { escape } from '@microsoft/sp-lodash-subset';
 
-import styles from './SubmitArInvoiceWebPart.module.scss';
+import './MyO365.scss';
 import * as strings from 'SubmitArInvoiceWebPartStrings';
+
+import { MyForm } from './components/MyKendoForm'
 
 export interface ISubmitArInvoiceWebPartProps {
   description: string;
 }
 
-export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart <ISubmitArInvoiceWebPartProps> {
+export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmitArInvoiceWebPartProps> {
 
   public render(): void {
-    this.domElement.innerHTML = `
-      <div class="${ styles.submitArInvoice }">
-    <div class="${ styles.container }">
-      <div class="${ styles.row }">
-        <div class="${ styles.column }">
-          <span class="${ styles.title }">Welcome to SharePoint!</span>
-  <p class="${ styles.subTitle }">Customize SharePoint experiences using Web Parts.</p>
-    <p class="${ styles.description }">${escape(this.properties.description)}</p>
-      <a href="https://aka.ms/spfx" class="${ styles.button }">
-        <span class="${ styles.label }">Learn more</span>
-          </a>
-          </div>
-          </div>
-          </div>
-          </div>`;
+    const element: React.ReactElement = React.createElement(
+      MyForm
+    );
+
+    ReactDom.render(element, this.domElement);
   }
 
   protected get dataVersion(): Version {
-  return Version.parse('1.0');
-}
+    return Version.parse('1.0');
+  }
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
-  return {
-    pages: [
-      {
-        header: {
-          description: strings.PropertyPaneDescription
-        },
-        groups: [
-          {
-            groupName: strings.BasicGroupName,
-            groupFields: [
-              PropertyPaneTextField('description', {
-                label: strings.DescriptionFieldLabel
-              })
-            ]
-          }
-        ]
-      }
-    ]
-  };
-}
+    return {
+      pages: [
+        {
+          header: {
+            description: strings.PropertyPaneDescription
+          },
+          groups: [
+            {
+              groupName: strings.BasicGroupName,
+              groupFields: [
+                PropertyPaneTextField('description', {
+                  label: strings.DescriptionFieldLabel
+                })
+              ]
+            }
+          ]
+        }
+      ]
+    };
+  }
 }
