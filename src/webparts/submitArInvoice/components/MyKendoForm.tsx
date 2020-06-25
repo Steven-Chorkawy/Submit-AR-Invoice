@@ -130,7 +130,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                   wrapperStyle={{ width: '100%' }}
                   data={this.props.customerList}
                   dataItemKey="ID"
-                  textField="Company"
+                  textField="Title"
                   //validator={MyValidators.requiresApprovalFrom}
                   component={MyFormComponents.FormComboBox}
                   onChange={
