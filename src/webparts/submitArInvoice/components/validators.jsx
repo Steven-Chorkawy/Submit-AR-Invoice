@@ -43,6 +43,8 @@ export const dateValidator = (value) => value ? "" : "Date is required";
 export const departmentValidator = (value) => value ? "" : "Department is required";
 export const requestedByValidator = (value) => value ? "" : "Requested By is required";
 export const requiresApprovalFrom = (value) => value ? "" : "Requires Approval From is required";
+export const requiresCustomer = (value) => value ? "" : "Customer is required";
+export const requiresCustomerPONUmber = (value) => value ? "" : "Customer PO Number is required";
 
 
 const userNameGetter = getter('username');

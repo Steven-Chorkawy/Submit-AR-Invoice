@@ -13,7 +13,7 @@ import * as MyFormComponents from './MyFormComponents';
 import { IMyFormProps } from './IMyFormProps';
 import { IMyFormState } from './IMyFormState';
 import * as MyValidators from './validators.jsx'
-import {MyCustomerCardComponent} from './MyCustomerCardComponent';
+import { MyCustomerCardComponent } from './MyCustomerCardComponent';
 
 
 export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
@@ -112,7 +112,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Field
+                <Field
                   id="Urgent"
                   name="Urgent"
                   label="Urgent"
@@ -121,32 +121,76 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                   component={MyFormComponents.FormSwitch}
                 />
               </div>
+              <Field
+                id="Customer"
+                name="Customer"
+                label="* Customer"
+                wrapperStyle={{ width: '100%' }}
+                data={this.props.customerList}
+                dataItemKey="ID"
+                textField="Title"
+                validator={MyValidators.requiresCustomer}
+                component={MyFormComponents.FormComboBox}
+                // onChange={
+                //   (event) => {
+                //     console.log("Customer Changed");
+                //     console.log(event.target.value);
+                //     // TODO: Do I need to add '...this.state' as well?
+                //     this.setState({
+                //       selectedCustomer: event.target.value
+                //     });
+                //   }
+                // }
+              />
+              <div style={{ width: '100%' }}>
+                <MyCustomerCardComponent selectedCustomer={this.state.selectedCustomer} />
+              </div>
 
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Field
+                  id="CustomerPONumber"
+                  name="CustomerPONumber"
+                  label="* Customer PO Number"
+                  validator={MyValidators.requiresCustomerPONUmber}
+                  component={MyFormComponents.FormInput}
+                />
 
                 <Field
-                  id="Customer"
-                  name="Customer"
-                  label="* Customer"
-                  wrapperStyle={{ width: '100%' }}
-                  data={this.props.customerList}
-                  dataItemKey="ID"
-                  textField="Title"
-                  //validator={MyValidators.requiresApprovalFrom}
-                  component={MyFormComponents.FormComboBox}
-                  onChange={
-                    (event) => {
-                      console.log("Customer Changed");
-                      console.log(event.target.value);
-                      // TODO: Do I need to add '...this.state' as well?
-                      this.setState({
-                        selectedCustomer: event.target.value
-                      });
-                    }
-                  }
+                  id="StandardTerms"
+                  name="StandardTerms"
+                  label="Standard Terms"
+                  wrapperStyle={{ width: '50%', marginRight: '18px' }}
+                  defaultValue='NET 30, 1% INTEREST CHARGED'
+                  data={[
+                    'NET 30, 1% INTEREST CHARGED'
+                  ]}
+                  component={MyFormComponents.FormDropDownList}
                 />
-                <div style={{width:'100%'}}>
-                  <MyCustomerCardComponent selectedCustomer={this.state.selectedCustomer}/>
-                </div>
+              </div>
+
+              <Field
+                id="Comment"
+                name="Comment"
+                label="Comments"
+                component={MyFormComponents.FormTextArea}
+              />
+
+              <Field
+                id="InvoiceDetails"
+                name="InvoiceDetails"
+                label="Invoice Details"
+                component={MyFormComponents.FormTextArea}
+              />
+
+              <Field
+                id="InvoiceAttachments"
+                name="InvoiceAttachments"
+                label="Upload Attachments"
+                batch={false}
+                multiple={true}
+                component={MyFormComponents.FormUpload}
+              />
+
 
 
               <div className="k-form-buttons">
