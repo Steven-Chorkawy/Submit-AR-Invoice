@@ -48,7 +48,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     console.log(dataItem);
     alert(JSON.stringify(dataItem, null, 2));
 
-    // First Upload the attached files.
+    // ! For testing only.  This will need to be a loop for production.
     let thisFile = dataItem.InvoiceAttachments[0];
     let web = Web(this._siteUrl);
 
