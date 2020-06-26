@@ -5,7 +5,11 @@ import { Error } from '@progress/kendo-react-labels';
 import { Input } from '@progress/kendo-react-inputs'
 import { Button } from '@progress/kendo-react-buttons';
 
-
+import { sp } from "@pnp/sp";
+import { Web } from "@pnp/sp/webs";
+import "@pnp/sp/webs";
+import "@pnp/sp/files";
+import "@pnp/sp/folders";
 
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 
@@ -17,6 +21,8 @@ import { MyCustomerCardComponent } from './MyCustomerCardComponent';
 
 
 export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
+  _siteUrl: string;
+
   /**
    *
    */
@@ -24,6 +30,9 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     super(props);
     console.log("MyForm CTOR");
     console.log(props);
+
+    this._siteUrl = props.ctx.pageContext.web.absoluteUrl;
+    console.log("Site: " + this._siteUrl);
 
     this.state = {
       selectedCustomer: undefined,
@@ -38,6 +47,18 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
   handleSubmit = (dataItem) => {
     console.log(dataItem);
     alert(JSON.stringify(dataItem, null, 2));
+
+    // First Upload the attached files.
+    let thisFile = dataItem.InvoiceAttachments[0];
+    let web = Web(this._siteUrl);
+
+    web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/')
+      .files
+      .add(thisFile.name, thisFile.getRawFile(), true)
+      .then((data) => {
+        console.log("File Upload!!");
+        console.log(data);
+      });
   }
 
   render() {
@@ -45,6 +66,12 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
       <div style={{ padding: '5px' }}>
         <Form
           onSubmit={this.handleSubmit}
+
+          initialValues={{
+            Date: new Date(),
+            Urgent: false,
+            StandardTerms: 'NET 30, 1% INTEREST CHARGED'
+          }}
 
           render={(formRenderProps) => (
             <FormElement >
@@ -79,7 +106,6 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                   name={'Date'}
                   label={'* Date'}
                   component={MyFormComponents.FormDatePicker}
-                  defaultValue={new Date()}
                   validator={MyValidators.dateValidator}
                   wrapperStyle={{ width: '50%' }}
                 />
