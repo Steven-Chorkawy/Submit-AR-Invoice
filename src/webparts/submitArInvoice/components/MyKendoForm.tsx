@@ -1,9 +1,10 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { Form, Field, FormElement, FieldWrapper } from '@progress/kendo-react-form';
+import { Form, Field, FormElement, FieldWrapper, FieldArray } from '@progress/kendo-react-form';
 import { Error } from '@progress/kendo-react-labels';
-import { Input } from '@progress/kendo-react-inputs'
+import { Input, MaskedTextBox } from '@progress/kendo-react-inputs'
 import { Button } from '@progress/kendo-react-buttons';
+import { Grid, GridColumn, GridToolbar } from '@progress/kendo-react-grid';
 
 import { sp } from "@pnp/sp";
 import { Web } from "@pnp/sp/webs";
@@ -18,6 +19,7 @@ import { IMyFormProps } from './IMyFormProps';
 import { IMyFormState } from './IMyFormState';
 import * as MyValidators from './validators.jsx'
 import { MyCustomerCardComponent } from './MyCustomerCardComponent';
+import { MyGLAccountComponent } from './MyGLAccountComponent';
 
 
 export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
@@ -70,7 +72,8 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
           initialValues={{
             Date: new Date(),
             Urgent: false,
-            StandardTerms: 'NET 30, 1% INTEREST CHARGED'
+            StandardTerms: 'NET 30, 1% INTEREST CHARGED',
+            GLAccounts: [],
           }}
 
           render={(formRenderProps) => (
@@ -78,7 +81,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
 
               <legend className={'k-form-legend'}>ACCOUNTS RECEIVABLE - INVOICE REQUISITION </legend>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              {/* <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
                   id="Department"
                   name="Department"
@@ -157,16 +160,16 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                 textField="Title"
                 validator={MyValidators.requiresCustomer}
                 component={MyFormComponents.FormComboBox}
-                // onChange={
-                //   (event) => {
-                //     console.log("Customer Changed");
-                //     console.log(event.target.value);
-                //     // TODO: Do I need to add '...this.state' as well?
-                //     this.setState({
-                //       selectedCustomer: event.target.value
-                //     });
-                //   }
-                // }
+              // onChange={
+              //   (event) => {
+              //     console.log("Customer Changed");
+              //     console.log(event.target.value);
+              //     // TODO: Do I need to add '...this.state' as well?
+              //     this.setState({
+              //       selectedCustomer: event.target.value
+              //     });
+              //   }
+              // }
               />
               <div style={{ width: '100%' }}>
                 <MyCustomerCardComponent selectedCustomer={this.state.selectedCustomer} />
@@ -215,9 +218,14 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                 batch={false}
                 multiple={true}
                 component={MyFormComponents.FormUpload}
-              />
+              /> */}
 
-
+              <div style={{ width: '100%' }}>
+              <FieldArray
+                        name="GLAccounts"
+                        component={MyGLAccountComponent}
+                    />
+              </div>
 
               <div className="k-form-buttons">
                 <Button
@@ -232,5 +240,4 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
       </div>
     )
   }
-
 }
