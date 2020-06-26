@@ -31,7 +31,7 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
 
   private getSiteUsers = async () => {
     const siteUsers = await sp.web.siteUsers();
-    return siteUsers.filter(user => user.Email != "");
+    return siteUsers.filter(user => user.UserPrincipalName != null);
   }
 
   private getCustomers = async () => {

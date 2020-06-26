@@ -46,7 +46,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
    */
   handleSubmit = (dataItem) => {
     console.log(dataItem);
-    // alert(JSON.stringify(dataItem, null, 2));
+    alert(JSON.stringify(dataItem, null, 2));
 
     // First Upload the attached files.
     let thisFile = dataItem.InvoiceAttachments[0];
@@ -67,12 +67,18 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
         <Form
           onSubmit={this.handleSubmit}
 
+          initialValues={{
+            Date: new Date(),
+            Urgent: false,
+            StandardTerms: 'NET 30, 1% INTEREST CHARGED'
+          }}
+
           render={(formRenderProps) => (
             <FormElement >
 
               <legend className={'k-form-legend'}>ACCOUNTS RECEIVABLE - INVOICE REQUISITION </legend>
 
-              {/* <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
                   id="Department"
                   name="Department"
@@ -100,7 +106,6 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                   name={'Date'}
                   label={'* Date'}
                   component={MyFormComponents.FormDatePicker}
-                  defaultValue={new Date()}
                   validator={MyValidators.dateValidator}
                   wrapperStyle={{ width: '50%' }}
                 />
@@ -201,7 +206,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                 name="InvoiceDetails"
                 label="Invoice Details"
                 component={MyFormComponents.FormTextArea}
-              /> */}
+              />
 
               <Field
                 id="InvoiceAttachments"
