@@ -473,8 +473,6 @@ export const FormAutoComplete = (fieldRenderProps) => {
 };
 
 export const CustomerComboBox = (fieldRenderProps) => {
-  console.log("CustomerComboBox");
-  console.log(fieldRenderProps);
   const { validationMessage, touched, label, id, valid, disabled, hint, wrapperStyle, ...others } = fieldRenderProps;
   const editorRef = React.useRef(null);
 

@@ -50,9 +50,6 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
   public render(): void {
     Promise.all([this.getSiteUsers(), this.getCustomers()])
       .then((values) => {
-        console.log("getFormProps done!");
-        console.log(values);
-
         this.myFormProps.siteUsers = values[0];
         this.myFormProps.customerList = values[1];
       })

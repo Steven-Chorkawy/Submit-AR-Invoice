@@ -44,20 +44,40 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
    * @param dataItem Data from form
    */
   handleSubmit = (dataItem) => {
-    console.log(dataItem);
-    alert(JSON.stringify(dataItem, null, 2));
+    // Users are allowed to submit this form without any attachments.
+    // First I'm going to check if there are any attachments, if not I will upload a blank file and record the metadata they provided.
+    if (!dataItem.hasOwnProperty('InvoiceAttachments')) {
+      this.uploadNewFileAndSetMetadata(dataItem, "EmptyFile", null);
+    }
+    else {
+      // 1 or more attachments are present.
+      for (let index = 0; index < dataItem.InvoiceAttachments.length; index++) {
+        const element = dataItem.InvoiceAttachments[index];
+        this.uploadNewFileAndSetMetadata(dataItem, element.name, element.getRawFile());
+      }
+    }
+  }
 
-    // ! For testing only.  This will need to be a loop for production.
-    let thisFile = dataItem.InvoiceAttachments[0];
+  /**
+   * Upload a file to the document library and set its Metadata.
+   * @param dataItem Data from form.
+   */
+  uploadNewFileAndSetMetadata = async (dataItem, fileName, rawFile) => {
     let web = Web(this._siteUrl);
+    console.log("Uploading new File");
+    console.log(dataItem);
 
-    web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/')
+    // Uploads the file to the document library.
+    let uploadRes = await web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/')
       .files
-      .add(thisFile.name, thisFile.getRawFile(), true)
-      .then((data) => {
-        console.log("File Upload!!");
-        console.log(data);
-      });
+      .add(fileName, rawFile, true);
+
+    console.log(uploadRes);
+
+    // Gets the file that we just uploaded.  This will be used later to update the metadata.
+    let file = await uploadRes.file.getItem();
+
+    console.log(file);
   }
 
   render() {
