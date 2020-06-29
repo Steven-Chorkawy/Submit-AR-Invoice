@@ -78,6 +78,16 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     let file = await uploadRes.file.getItem();
 
     console.log(file);
+
+    const myData = {
+      Department: dataItem.Department,
+      Date: dataItem.Date,
+      Requested_x0020_ById: dataItem.RequestedBy.Id
+    }
+
+    console.log("Updating with this data");
+    console.log(myData);
+    await file.update(myData);
   }
 
   render() {

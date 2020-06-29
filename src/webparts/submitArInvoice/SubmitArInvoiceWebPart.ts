@@ -13,6 +13,7 @@ import { sp } from "@pnp/sp";
 import "@pnp/sp/webs";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
+import "@pnp/sp/fields";
 import "@pnp/sp/site-users/web";
 
 import './MyO365.scss';
@@ -47,9 +48,14 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
   }
 
 
+
   public render(): void {
-    Promise.all([this.getSiteUsers(), this.getCustomers()])
+
+    Promise.all([this.getSiteUsers(), this.getCustomers(), sp.web.lists.getByTitle('AR Invoices').fields.filter(`Hidden eq false`).get()])
       .then((values) => {
+        console.log("Fields for lib");
+        console.log(values[2]);
+
         this.myFormProps.siteUsers = values[0];
         this.myFormProps.customerList = values[1];
       })
