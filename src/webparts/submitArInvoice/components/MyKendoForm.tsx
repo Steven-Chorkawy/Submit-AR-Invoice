@@ -81,7 +81,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
 
               <legend className={'k-form-legend'}>ACCOUNTS RECEIVABLE - INVOICE REQUISITION </legend>
 
-              {/* <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
                   id="Department"
                   name="Department"
@@ -159,22 +159,8 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                 dataItemKey="ID"
                 textField="Title"
                 validator={MyValidators.requiresCustomer}
-                component={MyFormComponents.FormComboBox}
-              // onChange={
-              //   (event) => {
-              //     console.log("Customer Changed");
-              //     console.log(event.target.value);
-              //     // TODO: Do I need to add '...this.state' as well?
-              //     this.setState({
-              //       selectedCustomer: event.target.value
-              //     });
-              //   }
-              // }
+                component={MyFormComponents.CustomerComboBox}
               />
-              <div style={{ width: '100%' }}>
-                <MyCustomerCardComponent selectedCustomer={this.state.selectedCustomer} />
-              </div>
-
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
                   id="CustomerPONumber"
@@ -218,13 +204,13 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                 batch={false}
                 multiple={true}
                 component={MyFormComponents.FormUpload}
-              /> */}
+              />
 
               <div style={{ width: '100%' }}>
-              <FieldArray
-                        name="GLAccounts"
-                        component={MyGLAccountComponent}
-                    />
+                <FieldArray
+                  name="GLAccounts"
+                  component={MyGLAccountComponent}
+                />
               </div>
 
               <div className="k-form-buttons">
