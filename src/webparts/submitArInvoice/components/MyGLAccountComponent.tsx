@@ -2,20 +2,18 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Form, Field, FieldArray, FieldArrayRenderProps, FormElement } from '@progress/kendo-react-form';
 import { Error } from '@progress/kendo-react-labels';
-import { Input, MaskedTextBox, NumericTextBox, Switch } from '@progress/kendo-react-inputs';
+import { Input, MaskedTextBox, NumericTextBox, Switch, Checkbox } from '@progress/kendo-react-inputs';
 import { Grid, GridColumn, GridToolbar } from '@progress/kendo-react-grid';
 
+/**
+   * Calculate HST this current row.
+   *
+   * @param props Grid properties.
+   */
+const CalculateHSTAmmount = (props) => {
+  return (props.dataItem.HSTTaxable == true) ? props.dataItem.Ammount * 0.13 : 0
+}
 
-const nameCell = (props) => {
-  return (
-    <td>
-      <Field
-        component={Input}
-        name={`GLAccounts[${props.dataIndex}].${props.field}`}
-      />
-    </td>
-  );
-};
 
 const glCodeCell = (props) => {
   return (
@@ -29,6 +27,11 @@ const glCodeCell = (props) => {
   );
 };
 
+
+/**
+ * Ammount before HST.
+ * @param props Grid properties.
+ */
 const ammountCell = (props) => {
   return (
     <td>
@@ -41,18 +44,52 @@ const ammountCell = (props) => {
   );
 }
 
-const hstTaxableCell = (props) => {
+
+/**
+ * Total Ammount including HST.
+ * Ammount + HST Ammount
+ * @param props Grid properties.
+ */
+const totalInvoiceCell = (props) => {
   return (
     <td>
       <Field
-        component={Switch}
-        name={`GLAccounts[${props.dataIndex}].${props.field}`}
-        value={false}
+        format="c2"
+        component={NumericTextBox}
+        name='TotalInvoice'
+        readonly={true}
+        disabled={true}
+        value={
+          (props.dataItem.Ammount == null) ? 0 : CalculateHSTAmmount(props) + props.dataItem.Ammount
+        }
       />
     </td>
   );
 }
 
+
+/**
+ * Boolean, Does HST Apply?
+ * @param props Grid Properties
+ */
+const hstTaxableCell = (props) => {
+  return (
+    <td>
+      <Field
+        component={Checkbox}
+        name={`GLAccounts[${props.dataIndex}].${props.field}`}
+      />
+    </td>
+  );
+}
+
+
+/**
+ * HST Calculated from Ammount.
+ * HST = Ammount * 0.13
+ * EX: $1,000 * 0.13 = $130
+ * @param props Grid Properties
+ */
 const hstCell = (props) => {
   return (
     <td>
@@ -62,11 +99,12 @@ const hstCell = (props) => {
         name="HST"
         readonly={true}
         disabled={true}
-        value={(props.dataItem.HSTTaxable == true) ? props.dataItem.ammount * 0.13 : 0}
+        value={CalculateHSTAmmount(props)}
       />
     </td>
   );
 }
+
 
 const commandCell = (onRemove) => (props) => {
   const onClick = React.useCallback(
@@ -86,54 +124,58 @@ const commandCell = (onRemove) => (props) => {
   );
 };
 
+
 export const MyGLAccountComponent = (fieldArrayRenderProps) => {
   const { validationMessage, visited } = fieldArrayRenderProps;
+
   const onAdd = React.useCallback(
     (e) => {
       e.preventDefault();
       fieldArrayRenderProps.onUnshift({
         value: {
-          glCode: '',
-          ammount: '',
+          GLCode: '',
+          Ammount: '',
           HSTTaxable: false
         }
       });
     },
     [fieldArrayRenderProps.onUnshift]
   );
+
   const onRemove = React.useCallback(
     (cellProps) => fieldArrayRenderProps.onRemove({ index: cellProps.dataIndex }),
     [fieldArrayRenderProps.onRemove]
   );
 
   return (
-    <div>
-      {
-        visited && validationMessage &&
-        (<Error>{validationMessage}</Error>)
-      }
+    <div key={fieldArrayRenderProps.value}>
       <Grid
         data={fieldArrayRenderProps.value}
-        // resizable={true}
+        resizable={true}
       >
+
         <GridToolbar>
           <button title="Add new" className="k-button k-primary" onClick={onAdd} >Add new Account</button>
         </GridToolbar>
 
         <GridColumn
-          field="glCode"
+          field="GLCode"
           title="G/L Account #"
           cell={glCodeCell}
           width="200px"
         />
 
-        <GridColumn field="ammount" title="Ammount" cell={ammountCell} />
+        <GridColumn
+          field="Ammount"
+          title="Ammount"
+          cell={ammountCell}
+        />
 
         <GridColumn
           field="HSTTaxable"
           title="HST"
           cell={hstTaxableCell}
-          width="100px"
+          width="60px"
         />
 
         <GridColumn
@@ -142,7 +184,13 @@ export const MyGLAccountComponent = (fieldArrayRenderProps) => {
           cell={hstCell}
         />
 
-        <GridColumn cell={commandCell(onRemove)} width="100px" />
+        <GridColumn
+          field="TotalInvoice"
+          title="Total Invoice"
+          cell={totalInvoiceCell}
+        />
+
+        <GridColumn cell={commandCell(onRemove)} width="95px" />
       </Grid>
     </div>
   );
