@@ -47,7 +47,6 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
   }
 
 
-
   public render(): void {
     Promise.all([this.getSiteUsers(), this.getCustomers()])
       .then((values) => {
@@ -65,8 +64,6 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
 
         ReactDom.render(element, this.domElement);
       });
-
-
   }
 
 

@@ -30,11 +30,8 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
    */
   constructor(props) {
     super(props);
-    console.log("MyForm CTOR");
-    console.log(props);
 
     this._siteUrl = props.ctx.pageContext.web.absoluteUrl;
-    console.log("Site: " + this._siteUrl);
 
     this.state = {
       selectedCustomer: undefined,
