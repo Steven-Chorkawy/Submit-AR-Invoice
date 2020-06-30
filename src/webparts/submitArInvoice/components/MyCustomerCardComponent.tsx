@@ -28,6 +28,7 @@ export class MyCustomerCardComponent extends React.Component<IMyCustomerProps, I
     }
     else {
       return (
+        // TODO: Design this better! This is just for the first round of review.
         <Card key={this.state.selectedCustomer.ID} type="info">
           <CardBody>
             <CardTitle>{this.state.selectedCustomer.Title}</CardTitle>

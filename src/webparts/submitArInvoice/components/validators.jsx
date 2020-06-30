@@ -47,8 +47,10 @@ export const requiresCustomer = (value) => value ? "" : "Customer is required";
 export const requiresCustomerPONUmber = (value) => value ? "" : "Customer PO Number is required";
 
 // GL/Accounts
-export const glCodeValidator = (value) => value ? "" : "G/L Account # is required";
-
+export const glCodeValidator = (value) => value ? "" : "G/L Account # is required.";
+export const accountAmountValidator = (value) => !value ?
+  "Amount is required." :
+  value == 0 ? "Amount cannot be $0.00" : "";
 /** End My Stuff */
 
 

@@ -43,7 +43,8 @@ const amountCell = (props) => {
     <td>
       <Field
         format="c2"
-        component={NumericTextBox}
+        component={MyFormComponents.FormNumericTextBox}
+        validator={MyValidators.accountAmountValidator}
         name={`GLAccounts[${props.dataIndex}].${props.field}`}
       />
     </td>
@@ -166,14 +167,14 @@ export const MyGLAccountComponent = (fieldArrayRenderProps) => {
 
         <GridColumn
           field="GLCode"
-          title="G/L Account #"
+          title="* G/L Account #"
           cell={glCodeCell}
           width="200px"
         />
 
         <GridColumn
           field="Amount"
-          title="Amount"
+          title="* Amount"
           cell={amountCell}
         />
 
