@@ -21,6 +21,24 @@ import * as MyValidators from './validators.jsx'
 import { MyCustomerCardComponent } from './MyCustomerCardComponent';
 import { MyGLAccountComponent } from './MyGLAccountComponent';
 
+export interface IARFormModel {
+  Department: string;
+  Date: Date;
+  Requested_x0020_ById: number;
+  Requires_x0020_Authorization_x0020_ById: any;
+  Comment: string;
+  Invoice_x0020_Details: string;
+  // // ? What value do we pass for a Lookup?
+  // //Customer: string;
+  Standard_x0020_Terms: string;
+  Urgent: boolean;
+}
+
+export interface IARAccountDetails {
+  GLCode: string;
+  Amount: number;
+  HSTTaxable: boolean;
+}
 
 export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
   _siteUrl: string;
@@ -52,8 +70,8 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     else {
       // 1 or more attachments are present.
       for (let index = 0; index < dataItem.InvoiceAttachments.length; index++) {
-        const element = dataItem.InvoiceAttachments[index];
-        this.uploadNewFileAndSetMetadata(dataItem, element.name, element.getRawFile());
+        const attachedFile = dataItem.InvoiceAttachments[index];
+        this.uploadNewFileAndSetMetadata(dataItem, attachedFile.name, attachedFile.getRawFile());
       }
     }
   }
@@ -68,10 +86,12 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     console.log(dataItem);
 
     // Uploads the file to the document library.
+    // TODO: Remove this hard coded value! Can we possibly get this from the web parts properties window? That would allow this web part to be used in multiple locations.
     let uploadRes = await web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/')
       .files
       .add(fileName, rawFile, true);
 
+    console.log("Upload Res");
     console.log(uploadRes);
 
     // Gets the file that we just uploaded.  This will be used later to update the metadata.
@@ -79,11 +99,20 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
 
     console.log(file);
 
-    const myData = {
+    const myData: IARFormModel = {
       Department: dataItem.Department,
       Date: dataItem.Date,
-      Requested_x0020_ById: dataItem.RequestedBy.Id
+      Requested_x0020_ById: dataItem.RequestedBy.Id,
+      Requires_x0020_Authorization_x0020_ById: {
+        'results': dataItem.RequiresAuthorizationBy.map((user) => { return user.Id })
+      },
+      Comment: dataItem.Comment,
+      Invoice_x0020_Details: dataItem.InvoiceDetails,
+      Standard_x0020_Terms: dataItem.StandardTerms,
+      Urgent: dataItem.Urgent
     }
+
+    const accounts: IARAccountDetails = { ...dataItem.GLAccounts }
 
     console.log("Updating with this data");
     console.log(myData);
@@ -163,7 +192,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                   dataItemKey="Email"
                   textField="Title"
                   validator={MyValidators.requiresApprovalFrom}
-                  component={MyFormComponents.FormComboBox}
+                  component={MyFormComponents.FormMultiSelect}
                 />
               </div>
 
