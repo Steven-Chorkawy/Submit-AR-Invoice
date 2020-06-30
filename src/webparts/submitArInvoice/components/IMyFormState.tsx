@@ -1,3 +1,4 @@
 export interface IMyFormState {
-  selectedCustomer:any;
+  submitSuccess: boolean;
+  submitFailed: boolean;
 }

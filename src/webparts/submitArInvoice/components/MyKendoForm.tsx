@@ -28,8 +28,7 @@ export interface IARFormModel {
   Requires_x0020_Authorization_x0020_ById: any;
   Comment: string;
   Invoice_x0020_Details: string;
-  // // ? What value do we pass for a Lookup?
-  // //Customer: string;
+  CustomerId: number;
   Standard_x0020_Terms: string;
   Urgent: boolean;
 }
@@ -39,6 +38,8 @@ export interface IARAccountDetails {
   Amount: number;
   HSTTaxable: boolean;
 }
+
+
 
 export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
   _siteUrl: string;
@@ -52,7 +53,6 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     this._siteUrl = props.ctx.pageContext.web.absoluteUrl;
 
     this.state = {
-      selectedCustomer: undefined,
       ...props
     }
   }
@@ -65,13 +65,42 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     // Users are allowed to submit this form without any attachments.
     // First I'm going to check if there are any attachments, if not I will upload a blank file and record the metadata they provided.
     if (!dataItem.hasOwnProperty('InvoiceAttachments')) {
-      this.uploadNewFileAndSetMetadata(dataItem, "EmptyFile", null);
+      this.uploadNewFileAndSetMetadata(dataItem, "EmptyFile", null)
+        .then(file => {
+
+          alert("It worked!");
+          console.log(`New File:` + file + ``)
+          file.file.get().then(f => {
+            console.log(f);
+          });
+
+        })
+        .catch((error) => {
+
+          alert("Something went wrong!");
+          console.log(error);
+
+        });
     }
     else {
       // 1 or more attachments are present.
       for (let index = 0; index < dataItem.InvoiceAttachments.length; index++) {
         const attachedFile = dataItem.InvoiceAttachments[index];
-        this.uploadNewFileAndSetMetadata(dataItem, attachedFile.name, attachedFile.getRawFile());
+        this.uploadNewFileAndSetMetadata(dataItem, attachedFile.name, attachedFile.getRawFile())
+          .then(file => {
+
+            console.log("After upload");
+            console.log(file);
+            console.log(file.data);
+            file.file.get().then(f => {
+              console.log(f);
+            });
+
+          })
+          .catch((error) => {
+            alert("Something went wrong!");
+            console.log(error);
+          })
       }
     }
   }
@@ -106,6 +135,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
       Requires_x0020_Authorization_x0020_ById: {
         'results': dataItem.RequiresAuthorizationBy.map((user) => { return user.Id })
       },
+      CustomerId: dataItem.Customer.Id,
       Comment: dataItem.Comment,
       Invoice_x0020_Details: dataItem.InvoiceDetails,
       Standard_x0020_Terms: dataItem.StandardTerms,
@@ -116,8 +146,12 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
 
     console.log("Updating with this data");
     console.log(myData);
-    await file.update(myData);
+
+
+    return await (await file.update(myData)).item;
   }
+
+
 
   render() {
     return (
