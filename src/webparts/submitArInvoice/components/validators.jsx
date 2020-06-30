@@ -46,6 +46,11 @@ export const requiresApprovalFrom = (value) => value ? "" : "Requires Approval F
 export const requiresCustomer = (value) => value ? "" : "Customer is required";
 export const requiresCustomerPONUmber = (value) => value ? "" : "Customer PO Number is required";
 
+// GL/Accounts
+export const glCodeValidator = (value) => value ? "" : "G/L Account # is required";
+
+/** End My Stuff */
+
 
 const userNameGetter = getter('username');
 const emailGetter = getter('email');

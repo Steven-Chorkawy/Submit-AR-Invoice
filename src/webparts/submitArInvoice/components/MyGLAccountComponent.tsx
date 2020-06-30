@@ -5,6 +5,11 @@ import { Error } from '@progress/kendo-react-labels';
 import { Input, MaskedTextBox, NumericTextBox, Switch, Checkbox } from '@progress/kendo-react-inputs';
 import { Grid, GridColumn, GridToolbar } from '@progress/kendo-react-grid';
 
+
+import * as MyValidators from './validators.jsx'
+import * as MyFormComponents from './MyFormComponents';
+import { MyForm } from './MyKendoForm.js';
+
 /**
    * Calculate HST this current row.
    *
@@ -20,7 +25,8 @@ const glCodeCell = (props) => {
     <td>
       <Field
         mask="000-00-000-00000-0000"
-        component={MaskedTextBox}
+        component={MyFormComponents.FormMaskedTextBox}
+        validator={MyValidators.glCodeValidator}
         name={`GLAccounts[${props.dataIndex}].${props.field}`}
       />
     </td>
