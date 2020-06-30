@@ -4,6 +4,7 @@ import { Form, Field, FormElement, FieldWrapper, FieldArray } from '@progress/ke
 import { Error } from '@progress/kendo-react-labels';
 import { Input, MaskedTextBox } from '@progress/kendo-react-inputs'
 import { Button } from '@progress/kendo-react-buttons';
+import { Card, CardTitle, CardBody, CardActions } from '@progress/kendo-react-layout';
 import { Grid, GridColumn, GridToolbar } from '@progress/kendo-react-grid';
 
 import { sp } from "@pnp/sp";
@@ -11,15 +12,18 @@ import { Web } from "@pnp/sp/webs";
 import "@pnp/sp/webs";
 import "@pnp/sp/files";
 import "@pnp/sp/folders";
+import "@pnp/sp/lists";
+import "@pnp/sp/items";
 
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 
 import * as MyFormComponents from './MyFormComponents';
 import { IMyFormProps } from './IMyFormProps';
-import { IMyFormState } from './IMyFormState';
+import { IMyFormState, IUploadingFile } from './IMyFormState';
 import * as MyValidators from './validators.jsx'
 import { MyCustomerCardComponent } from './MyCustomerCardComponent';
 import { MyGLAccountComponent } from './MyGLAccountComponent';
+
 
 export interface IARFormModel {
   Department: string;
@@ -33,12 +37,13 @@ export interface IARFormModel {
   Urgent: boolean;
 }
 
-export interface IARAccountDetails {
-  GLCode: string;
-  Amount: number;
-  HSTTaxable: boolean;
-}
 
+export interface IARAccountDetails {
+  AR_x0020_InvoiceId: number;   //ID of Invoice
+  Account_x0020_Code: string; // GL Code
+  Amount: number;             // Amount for account
+  HST_x0020_Taxable: boolean; // Is amount taxable?
+}
 
 
 export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
@@ -53,33 +58,51 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     this._siteUrl = props.ctx.pageContext.web.absoluteUrl;
 
     this.state = {
+      MyFiles: [],
       ...props
     }
   }
+
 
   /**
    * Form Submit Event
    * @param dataItem Data from form
    */
   handleSubmit = (dataItem) => {
+    // We will use this to update states later.
+    let currentFiles: IUploadingFile[] = this.state.MyFiles;
+
     // Users are allowed to submit this form without any attachments.
     // First I'm going to check if there are any attachments, if not I will upload a blank file and record the metadata they provided.
     if (!dataItem.hasOwnProperty('InvoiceAttachments')) {
       this.uploadNewFileAndSetMetadata(dataItem, "EmptyFile", null)
         .then(file => {
-
-          alert("It worked!");
-          console.log(`New File:` + file + ``)
           file.file.get().then(f => {
-            console.log(f);
-          });
+            currentFiles.push({
+              FileName: f.Name,
+              UploadSuccessful: true,
+              ErrorMessage: null
+            });
 
+            this.setState({
+              MyFiles: currentFiles
+            })
+          });
         })
         .catch((error) => {
 
           alert("Something went wrong!");
           console.log(error);
 
+          currentFiles.push({
+            FileName: "get file name",
+            UploadSuccessful: false,
+            ErrorMessage: error
+          });
+
+          this.setState({
+            MyFiles: currentFiles
+          })
         });
     }
     else {
@@ -88,18 +111,32 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
         const attachedFile = dataItem.InvoiceAttachments[index];
         this.uploadNewFileAndSetMetadata(dataItem, attachedFile.name, attachedFile.getRawFile())
           .then(file => {
-
-            console.log("After upload");
-            console.log(file);
-            console.log(file.data);
             file.file.get().then(f => {
-              console.log(f);
+              currentFiles.push({
+                FileName: f.Name,
+                UploadSuccessful: true,
+                ErrorMessage: null
+              });
+
+              this.setState({
+                MyFiles: currentFiles
+              })
             });
 
           })
           .catch((error) => {
             alert("Something went wrong!");
             console.log(error);
+
+            currentFiles.push({
+              FileName: "get file name",
+              UploadSuccessful: false,
+              ErrorMessage: error
+            });
+
+            this.setState({
+              MyFiles: currentFiles
+            })
           })
       }
     }
@@ -111,8 +148,6 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
    */
   uploadNewFileAndSetMetadata = async (dataItem, fileName, rawFile) => {
     let web = Web(this._siteUrl);
-    console.log("Uploading new File");
-    console.log(dataItem);
 
     // Uploads the file to the document library.
     // TODO: Remove this hard coded value! Can we possibly get this from the web parts properties window? That would allow this web part to be used in multiple locations.
@@ -120,15 +155,14 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
       .files
       .add(fileName, rawFile, true);
 
-    console.log("Upload Res");
-    console.log(uploadRes);
-
     // Gets the file that we just uploaded.  This will be used later to update the metadata.
     let file = await uploadRes.file.getItem();
 
-    console.log(file);
 
-    const myData: IARFormModel = {
+
+
+    // Set the data for the invoice
+    let myData: IARFormModel = {
       Department: dataItem.Department,
       Date: dataItem.Date,
       Requested_x0020_ById: dataItem.RequestedBy.Id,
@@ -141,16 +175,56 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
       Standard_x0020_Terms: dataItem.StandardTerms,
       Urgent: dataItem.Urgent
     }
-
     const accounts: IARAccountDetails = { ...dataItem.GLAccounts }
 
-    console.log("Updating with this data");
-    console.log(myData);
+    var output = await (await file.update(myData)).item;
 
+    output.get().then(innerFile => {
+      // Set the data for the account details.
+      let accountDetails: IARAccountDetails[] = [];
+      dataItem.GLAccounts.map(account => {
+        accountDetails.push({
+          AR_x0020_InvoiceId: innerFile.ID,
+          Account_x0020_Code: account.GLCode,
+          HST_x0020_Taxable: account.HSTTaxable,
+          Amount: account.Amount
+        });
+      });
 
-    return await (await file.update(myData)).item;
+      this.addAccountCodes(accountDetails);
+    })
+
+    return output;
   }
 
+
+  /**
+   * Create the accounts for this invoice.
+   *
+   * @param accountDetails IARAccountDetails
+   */
+  addAccountCodes = async (accountDetails: IARAccountDetails[]) => {
+    accountDetails.map(account =>{
+      sp.web.lists.getByTitle('AR Invoice Accounts').items.add(account);
+    });
+  }
+
+  UploadStatusCard = () => {
+    let output = [];
+
+    this.state.MyFiles.map(f => {
+      output.push(
+        <Card type={f.UploadSuccessful ? 'success' : 'error'} style={{ margin: '2px' }}>
+          <CardBody>
+            <CardTitle>{f.FileName} - {f.UploadSuccessful ? 'Success!' : 'Error'}</CardTitle>
+            <p>{f.ErrorMessage}</p>
+          </CardBody>
+        </Card>
+      );
+    });
+
+    return output;
+  }
 
 
   render() {
@@ -308,9 +382,11 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                   primary={true}
                   type={'submit'}
                 // disabled={!formRenderProps.allowSubmit}
-                >Send Reservation Request</Button>
-                <Button onClick={formRenderProps.onFormReset}>Clear</Button>
+                >Send AR Invoice Request</Button>
+                <Button onClick={() => { formRenderProps.onFormReset }}>Clear</Button>
               </div>
+
+              {(this.state.MyFiles.length > 0) && this.UploadStatusCard()}
             </FormElement>
           )} />
       </div>
