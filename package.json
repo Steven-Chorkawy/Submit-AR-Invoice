@@ -17,6 +17,7 @@
     "@microsoft/sp-office-ui-fabric-core": "1.10.0",
     "@microsoft/sp-property-pane": "1.10.0",
     "@microsoft/sp-webpart-base": "1.10.0",
+    "@pnp/sp": "^2.0.6",
     "@progress/kendo-data-query": "^1.5.4",
     "@progress/kendo-drawing": "^1.7.0",
     "@progress/kendo-react-data-tools": "^3.14.0",
@@ -28,6 +29,9 @@
     "@progress/kendo-react-inputs": "^3.14.0",
     "@progress/kendo-react-intl": "^3.14.0",
     "@progress/kendo-react-labels": "^3.14.0",
+    "@progress/kendo-react-layout": "^3.14.0",
+    "@progress/kendo-react-progressbars": "^3.14.0",
+    "@progress/kendo-react-upload": "^3.14.0",
     "@types/es6-promise": "0.0.33",
     "@types/webpack-env": "1.13.1"
   },
