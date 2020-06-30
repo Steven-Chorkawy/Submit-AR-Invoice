@@ -6,8 +6,10 @@ import {
   IPropertyPaneConfiguration,
   PropertyPaneTextField
 } from '@microsoft/sp-property-pane';
+
+// ? What is this for ?
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
-import { escape } from '@microsoft/sp-lodash-subset';
+
 
 import { sp } from "@pnp/sp";
 import "@pnp/sp/webs";
@@ -17,6 +19,8 @@ import "@pnp/sp/fields";
 import "@pnp/sp/site-users/web";
 
 import './MyO365.scss';
+
+// ? What is this for ?
 import * as strings from 'SubmitArInvoiceWebPartStrings';
 
 import { MyForm } from './components/MyKendoForm';

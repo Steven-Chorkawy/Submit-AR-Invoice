@@ -10,8 +10,8 @@ import { Grid, GridColumn, GridToolbar } from '@progress/kendo-react-grid';
    *
    * @param props Grid properties.
    */
-const CalculateHSTAmmount = (props) => {
-  return (props.dataItem.HSTTaxable == true) ? props.dataItem.Ammount * 0.13 : 0
+const CalculateHSTAmount = (props) => {
+  return (props.dataItem.HSTTaxable == true) ? props.dataItem.Amount * 0.13 : 0
 }
 
 
@@ -29,10 +29,10 @@ const glCodeCell = (props) => {
 
 
 /**
- * Ammount before HST.
+ * Amount before HST.
  * @param props Grid properties.
  */
-const ammountCell = (props) => {
+const amountCell = (props) => {
   return (
     <td>
       <Field
@@ -46,8 +46,8 @@ const ammountCell = (props) => {
 
 
 /**
- * Total Ammount including HST.
- * Ammount + HST Ammount
+ * Total Amount including HST.
+ * Amount + HST Amount
  * @param props Grid properties.
  */
 const totalInvoiceCell = (props) => {
@@ -60,7 +60,7 @@ const totalInvoiceCell = (props) => {
         readonly={true}
         disabled={true}
         value={
-          (props.dataItem.Ammount == null) ? 0 : CalculateHSTAmmount(props) + props.dataItem.Ammount
+          (props.dataItem.Amount == null) ? 0 : CalculateHSTAmount(props) + props.dataItem.Amount
         }
       />
     </td>
@@ -85,8 +85,8 @@ const hstTaxableCell = (props) => {
 
 
 /**
- * HST Calculated from Ammount.
- * HST = Ammount * 0.13
+ * HST Calculated from Amount.
+ * HST = Amount * 0.13
  * EX: $1,000 * 0.13 = $130
  * @param props Grid Properties
  */
@@ -99,7 +99,7 @@ const hstCell = (props) => {
         name="HST"
         readonly={true}
         disabled={true}
-        value={CalculateHSTAmmount(props)}
+        value={CalculateHSTAmount(props)}
       />
     </td>
   );
@@ -134,7 +134,7 @@ export const MyGLAccountComponent = (fieldArrayRenderProps) => {
       fieldArrayRenderProps.onUnshift({
         value: {
           GLCode: '',
-          Ammount: '',
+          Amount: '',
           HSTTaxable: false
         }
       });
@@ -166,9 +166,9 @@ export const MyGLAccountComponent = (fieldArrayRenderProps) => {
         />
 
         <GridColumn
-          field="Ammount"
-          title="Ammount"
-          cell={ammountCell}
+          field="Amount"
+          title="Amount"
+          cell={amountCell}
         />
 
         <GridColumn
@@ -180,7 +180,7 @@ export const MyGLAccountComponent = (fieldArrayRenderProps) => {
 
         <GridColumn
           field="HST"
-          title="HST Ammount"
+          title="HST Amount"
           cell={hstCell}
         />
 

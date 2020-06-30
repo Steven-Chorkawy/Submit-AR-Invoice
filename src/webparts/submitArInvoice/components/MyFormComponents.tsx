@@ -485,7 +485,6 @@ export const CustomerComboBox = (fieldRenderProps) => {
 
   return (
     <div>
-      <p>Hello World</p>
       <FieldWrapper style={wrapperStyle}>
         <Label id={labelId} editorRef={editorRef} editorId={id} editorValid={valid} editorDisabled={disabled}>
           {label}
