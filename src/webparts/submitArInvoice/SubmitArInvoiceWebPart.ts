@@ -66,7 +66,7 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
   private getARInvoices = async () => {
     let arInvoices = await sp.web.lists.getByTitle('Ar Invoices')
     .items
-    .select('Id, Date, Department, Type_x0020_of_x0020_Request, FileRef')
+    .select('Id, Title, Date, Department, Type_x0020_of_x0020_Request, FileRef')
     .get();
     return arInvoices;
   }
