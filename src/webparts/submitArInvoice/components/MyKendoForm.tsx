@@ -54,6 +54,8 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
    */
   constructor(props) {
     super(props);
+    console.log("MyForm CTOR");
+    console.log(this.props);
 
     this._siteUrl = props.ctx.pageContext.web.absoluteUrl;
 
