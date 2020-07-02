@@ -24,12 +24,15 @@ export const phoneValidator = (value) => !value ?
 export const cardValidator = (value) => !value ?
             "Credit card number is required. " :
             ccardRegex.test(value) ? "" : "Not a valid credit card number format.";
+
 export const cvcValidator = (value) => !value ?
             "CVC code is required," :
             cvcRegex.test(value) || value.length !== 3 ? "" : "Not a valid CVC code format.";
+
 export const guestsValidator = (value) => !value ?
             "Number of guests is required" :
             value < 5 ? "" : "Maximum 5 guests";
+
 export const nightsValidator = (value) => value ? "" : "Number of Nights is required";
 
 export const colorValidator = (value) => value ? "" : "Color is required.";
@@ -47,7 +50,17 @@ export const requiresCustomer = (value) => value ? "" : "Customer is required";
 export const requiresCustomerPONUmber = (value) => value ? "" : "Customer PO Number is required";
 
 // GL/Accounts
-export const glCodeValidator = (value) => value ? "" : "G/L Account # is required.";
+/**
+ * 'value' is the masked input from the form.
+ * Initially it will be null.  After the user has made any change to value it will be '___-__-___-_____-____'
+ * As the user enters their GL Code the '_' characters will be replaced with their numbers.
+ *
+ * We cannot check the length of the input to validate it without stripping away all the '-' characters.
+ * Instead to validate the GL Code for length I'm going on the assumption that once all '_' characters are gone the user has entered the entire code.
+ */
+export const glCodeValidator = (value) => !value ?  "G/L Account # is required." :
+  value.includes('_') ? "G/L Account # is too short." : "";
+
 export const accountAmountValidator = (value) => !value ?
   "Amount is required." :
   value == 0 ? "Amount cannot be $0.00" : "";
