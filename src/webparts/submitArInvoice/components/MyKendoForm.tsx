@@ -390,16 +390,17 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                 multiple={true}
                 component={MyFormComponents.FormUpload}
               />
-
+              <hr />
 
 
               <div className="k-form-buttons">
                 <Button
                   primary={true}
                   type={'submit'}
+                  icon="save"
                 // disabled={!formRenderProps.allowSubmit}
                 >Send AR Invoice Request</Button>
-                <Button onClick={() => { formRenderProps.onFormReset }}>Clear</Button>
+                <Button onClick={formRenderProps.onFormReset}>Clear</Button>
               </div>
 
               {(this.state.MyFiles.length > 0) && this.UploadStatusCard()}

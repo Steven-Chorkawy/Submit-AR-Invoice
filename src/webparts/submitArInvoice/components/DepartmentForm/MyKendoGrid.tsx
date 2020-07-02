@@ -11,6 +11,8 @@ import {
   GridDetailRow
 } from '@progress/kendo-react-grid'
 
+import { Button } from '@progress/kendo-react-buttons'
+
 //PnPjs Imports
 import { sp } from "@pnp/sp";
 import { Web } from "@pnp/sp/webs";
@@ -22,6 +24,7 @@ import "@pnp/sp/items";
 
 // Import my stuff.
 import IARInvoice from '../IARInvoice';
+import { filterBy } from '@progress/kendo-data-query';
 
 
 type MyKendoGridProps = {
@@ -29,7 +32,9 @@ type MyKendoGridProps = {
 }
 
 type MyKendoGridState = {
-  data: IARInvoice[]
+  data: IARInvoice[];
+  filter: any;
+  sort:any;
 }
 
 
@@ -55,7 +60,9 @@ class CustomCell extends React.Component<GridCellProps> {
   render() {
     return (
       <td>
-        <a href={this.props.dataItem.FileRef} target='_blank'>View Invoice</a>
+        <a href={this.props.dataItem.FileRef} target='_blank'>
+          <Button primary={true} /*icon="hyperlink-open"*/ icon="folder"></Button>
+        </a>
       </td>
     );
   }
@@ -72,7 +79,12 @@ export class MyKendoGrid extends React.Component<MyKendoGridProps, MyKendoGridSt
     console.log(props);
 
     this.state = {
-      data: props.data
+      data: props.data,
+      filter: {
+        logic: "",
+        filters: []
+      },
+      sort: []
     }
   }
 
@@ -82,21 +94,44 @@ export class MyKendoGrid extends React.Component<MyKendoGridProps, MyKendoGridSt
     return (
       <Grid
         style={{ height: '400px' }}
-        data={this.state.data}
+
+        data={filterBy(this.state.data, this.state.filter)}
+
         detail={DetailComponent}
         expandField="expanded"
         onExpandChange={(event) => {
           event.dataItem.expanded = !event.dataItem.expanded;
           this.forceUpdate();
         }}
+
+        filterable
+        filter={this.state.filter}
+        onFilterChange={
+          (e) => {
+            this.setState({
+              filter: e.filter
+            });
+          }
+        }
+
+        sortable
+        sort={this.state.sort}
+        onSortChange={
+          (e) => {
+            this.setState({
+              sort: e.sort
+            });
+          }
+        }
       >
-        <Column field="ID" title="ID" width="40px" />
-        <Column field="Date" title="Date" width="250px" />
+        <Column field="ID" title="ID" width="40px" filterable={false} sortable={false} />
+        <Column field="Date" title="Date" width="250px" filter="date" format="{0:MMM yyyy}" />
         <Column field="Department" title="Department" />
-        <Column field="Type_x0020_of_x0020_Request" title="Request Type" />
         <Column
           field="FileRef"
           title="Link to File"
+          filterable={false}
+          sortable={false}
           cell={this.MyCustomCell} />
 
       </Grid>
