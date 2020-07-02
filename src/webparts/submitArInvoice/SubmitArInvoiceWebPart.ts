@@ -37,6 +37,7 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
    * Get Users who have access to this site.  These users will be used to populate dropdown lists.
    *
    * TODO: Get users who are in the groups and return a list of ALL users who have access to this site.
+   * * As seen here https://github.com/pnp/pnpjs/issues/1024 this is a feature that can be achieved through PnPjs Graph.
    */
   private getSiteUsers = async () => {
     const siteUsers = await sp.web.siteUsers();
@@ -52,13 +53,10 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
   }
 
 
-
   public render(): void {
 
-    Promise.all([this.getSiteUsers(), this.getCustomers(), sp.web.lists.getByTitle('AR Invoices').fields.filter(`Hidden eq false`).get()])
+    Promise.all([this.getSiteUsers(), this.getCustomers()])
       .then((values) => {
-        console.log("Fields for lib");
-        console.log(values[2]);
 
         this.myFormProps.siteUsers = values[0];
         this.myFormProps.customerList = values[1];
@@ -75,6 +73,8 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
 
 
   protected get dataVersion(): Version {
+    //sp.web.lists.getByTitle('AR Invoices').fields.filter(`Hidden eq false`).get()
+
     return Version.parse('1.0');
   }
 

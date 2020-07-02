@@ -204,7 +204,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
    * @param accountDetails IARAccountDetails
    */
   addAccountCodes = async (accountDetails: IARAccountDetails[]) => {
-    accountDetails.map(account =>{
+    accountDetails.map(account => {
       sp.web.lists.getByTitle('AR Invoice Accounts').items.add(account);
     });
   }
@@ -361,6 +361,16 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                 component={MyFormComponents.FormTextArea}
               />
 
+
+              <div style={{ width: '100%' }}>
+                <FieldArray
+                  name="GLAccounts"
+                  component={MyGLAccountComponent}
+                />
+              </div>
+
+              <hr />
+
               <Field
                 id="InvoiceAttachments"
                 name="InvoiceAttachments"
@@ -370,12 +380,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                 component={MyFormComponents.FormUpload}
               />
 
-              <div style={{ width: '100%' }}>
-                <FieldArray
-                  name="GLAccounts"
-                  component={MyGLAccountComponent}
-                />
-              </div>
+
 
               <div className="k-form-buttons">
                 <Button
