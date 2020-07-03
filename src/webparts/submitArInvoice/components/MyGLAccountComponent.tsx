@@ -4,7 +4,7 @@ import { Form, Field, FieldArray, FieldArrayRenderProps, FormElement } from '@pr
 import { Error } from '@progress/kendo-react-labels';
 import { Input, MaskedTextBox, NumericTextBox, Switch, Checkbox } from '@progress/kendo-react-inputs';
 import { Grid, GridColumn, GridToolbar } from '@progress/kendo-react-grid';
-
+import { Button } from '@progress/kendo-react-buttons'
 
 import * as MyValidators from './validators.jsx'
 import * as MyFormComponents from './MyFormComponents';
@@ -123,10 +123,11 @@ const commandCell = (onRemove) => (props) => {
   );
   return (
     <td>
-      <button
+      <Button
         className="k-button k-grid-remove-command"
+        icon="delete"
         onClick={onClick}
-      >Remove</button>
+      ></Button>
     </td>
   );
 };
@@ -162,7 +163,7 @@ export const MyGLAccountComponent = (fieldArrayRenderProps) => {
       >
 
         <GridToolbar>
-          <button title="Add new" className="k-button k-primary" onClick={onAdd} >Add new Account</button>
+          <Button title="Add new" className="k-button k-primary" icon="plus" onClick={onAdd} >Add new Account</Button>
         </GridToolbar>
 
         <GridColumn
@@ -197,7 +198,7 @@ export const MyGLAccountComponent = (fieldArrayRenderProps) => {
           cell={totalInvoiceCell}
         />
 
-        <GridColumn cell={commandCell(onRemove)} width="95px" />
+        <GridColumn cell={commandCell(onRemove)} width="90px" />
       </Grid>
     </div>
   );

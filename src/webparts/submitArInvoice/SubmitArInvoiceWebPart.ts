@@ -4,7 +4,8 @@ import * as ReactDom from 'react-dom';
 import { Version } from '@microsoft/sp-core-library';
 import {
   IPropertyPaneConfiguration,
-  PropertyPaneTextField
+  PropertyPaneTextField,
+  PropertyPaneDropdown
 } from '@microsoft/sp-property-pane';
 
 // ? What is this for ?
@@ -24,11 +25,21 @@ import './MyO365.scss';
 import * as strings from 'SubmitArInvoiceWebPartStrings';
 
 import { MyForm } from './components/MyKendoForm';
+import { MyKendoGrid } from './components/DepartmentForm/MyKendoGrid';
 import { IMyFormProps } from './components/IMyFormProps';
 
 export interface ISubmitArInvoiceWebPartProps {
   description: string;
+  ActiveDisplay: ActiveDisplay
 }
+
+
+export enum ActiveDisplay {
+  CreateARForm = 1,
+  DepartmentForm = 2,
+  FinanceForm = 3
+}
+
 
 export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmitArInvoiceWebPartProps> {
   myFormProps = {} as IMyFormProps;
@@ -52,29 +63,56 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
     return customers;
   }
 
+  private getARInvoices = async () => {
+    let arInvoices = await sp.web.lists.getByTitle('Ar Invoices')
+    .items
+    .select('Id, Title, Date, Department, Type_x0020_of_x0020_Request, FileRef')
+    .get();
+    return arInvoices;
+  }
+
 
   public render(): void {
 
-    Promise.all([this.getSiteUsers(), this.getCustomers()])
-      .then((values) => {
+    switch (this.properties.ActiveDisplay) {
+      case ActiveDisplay.CreateARForm:
+        Promise.all([this.getSiteUsers(), this.getCustomers()])
+          .then((values) => {
+            this.myFormProps.siteUsers = values[0];
+            this.myFormProps.customerList = values[1];
+          })
+          .then(_ => {
+            const element: React.ReactElement<IMyFormProps> = React.createElement(
+              MyForm,
+              { ctx: this.context, properties: this.properties, ...this.myFormProps }
+            );
+            ReactDom.render(element, this.domElement);
+          });
+        break;
 
-        this.myFormProps.siteUsers = values[0];
-        this.myFormProps.customerList = values[1];
-      })
-      .then(_ => {
-        const element: React.ReactElement<IMyFormProps> = React.createElement(
-          MyForm,
-          { ctx:this.context, ...this.myFormProps }
-        );
+      case ActiveDisplay.DepartmentForm:
+        Promise.all([this.getARInvoices()])
+          .then((values) => {
+            const element: React.ReactElement = React.createElement(
+              MyKendoGrid,
+              { properties: this.properties, data: values[0] }
+            );
 
-        ReactDom.render(element, this.domElement);
-      });
+            ReactDom.render(element, this.domElement);
+          })
+        break;
+
+      case ActiveDisplay.FinanceForm:
+
+        break;
+
+      default:
+        break;
+    }
   }
 
 
   protected get dataVersion(): Version {
-    //sp.web.lists.getByTitle('AR Invoices').fields.filter(`Hidden eq false`).get()
-
     return Version.parse('1.0');
   }
 
@@ -83,15 +121,28 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
       pages: [
         {
           header: {
-            description: strings.PropertyPaneDescription
+            description: "Configure Properties"
           },
           groups: [
             {
-              groupName: strings.BasicGroupName,
+              groupName: "Web Part Display",
               groupFields: [
-                PropertyPaneTextField('description', {
-                  label: strings.DescriptionFieldLabel
-                })
+                PropertyPaneDropdown('ActiveDisplay', {
+                  label: 'Select Active Component',
+                  options: [
+                    { key: ActiveDisplay.CreateARForm, text: 'Create AR Form' },
+                    { key: ActiveDisplay.DepartmentForm, text: 'Departments Form' },
+                    { key: ActiveDisplay.FinanceForm, text: 'Finance Form' }
+                  ]
+                }),
+              ]
+            },
+            {
+              groupName: "Create AR Form",
+              groupFields: [
+                PropertyPaneTextField('description2', {
+                  label: 'Description 2'
+                }),
               ]
             }
           ]

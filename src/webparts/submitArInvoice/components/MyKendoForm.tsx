@@ -26,6 +26,7 @@ import { MyGLAccountComponent } from './MyGLAccountComponent';
 
 
 export interface IARFormModel {
+  Title: string;
   Department: string;
   Date: Date;
   Requested_x0020_ById: number;
@@ -54,6 +55,8 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
    */
   constructor(props) {
     super(props);
+    console.log("MyForm CTOR");
+    console.log(this.props);
 
     this._siteUrl = props.ctx.pageContext.web.absoluteUrl;
 
@@ -142,6 +145,10 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     }
   }
 
+  S4 = () => {
+    return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+  }
+
   /**
    * Upload a file to the document library and set its Metadata.
    * @param dataItem Data from form.
@@ -158,11 +165,15 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     // Gets the file that we just uploaded.  This will be used later to update the metadata.
     let file = await uploadRes.file.getItem();
 
-
-
+    // Title = "Current year"-AR-"GUID"
+    // 2020-AR-66d07df6-40a8-45e0-04c9-1b485ebc3aca
+    let currentYear = new Date().getFullYear();
+    debugger;
+    const newARTitle = currentYear + "-AR-" + (this.S4() + this.S4() + "-" + this.S4() + "-4" + this.S4().substr(0,3) + "-" + this.S4() + "-" + this.S4() + this.S4() + this.S4()).toLowerCase();
 
     // Set the data for the invoice
     let myData: IARFormModel = {
+      Title: newARTitle,
       Department: dataItem.Department,
       Date: dataItem.Date,
       Requested_x0020_ById: dataItem.RequestedBy.Id,
@@ -379,16 +390,17 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                 multiple={true}
                 component={MyFormComponents.FormUpload}
               />
-
+              <hr />
 
 
               <div className="k-form-buttons">
                 <Button
                   primary={true}
                   type={'submit'}
+                  icon="save"
                 // disabled={!formRenderProps.allowSubmit}
                 >Send AR Invoice Request</Button>
-                <Button onClick={() => { formRenderProps.onFormReset }}>Clear</Button>
+                <Button onClick={formRenderProps.onFormReset}>Clear</Button>
               </div>
 
               {(this.state.MyFiles.length > 0) && this.UploadStatusCard()}
