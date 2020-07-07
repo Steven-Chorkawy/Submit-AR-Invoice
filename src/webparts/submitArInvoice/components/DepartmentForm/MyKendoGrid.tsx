@@ -10,8 +10,8 @@ import {
   GridCellProps,
   GridDetailRow
 } from '@progress/kendo-react-grid'
-
 import { Button } from '@progress/kendo-react-buttons'
+import { process } from '@progress/kendo-data-query';
 
 //PnPjs Imports
 import { sp } from "@pnp/sp";
@@ -24,7 +24,7 @@ import "@pnp/sp/items";
 
 // Import my stuff.
 import IARInvoice from '../IARInvoice';
-import { filterBy } from '@progress/kendo-data-query';
+import { filterBy, orderBy, groupBy } from '@progress/kendo-data-query';
 
 
 type MyKendoGridProps = {
@@ -34,7 +34,10 @@ type MyKendoGridProps = {
 type MyKendoGridState = {
   data: IARInvoice[];
   filter: any;
-  sort:any;
+  sort: any;
+  group: any;
+  result?: any;
+  dataState?: any;
 }
 
 
@@ -75,59 +78,70 @@ export class MyKendoGrid extends React.Component<MyKendoGridProps, MyKendoGridSt
   constructor(props) {
     super(props);
 
-    console.log("MyKendoGrid Props");
-    console.log(props);
-
     this.state = {
       data: props.data,
       filter: {
-        logic: "",
         filters: []
       },
-      sort: []
-    }
+      sort: [],
+      group: []
+    };
+
+    this.state = this.createAppState({ ...this.state });
+    console.log("State after ctor");
+    console.log(this.state);
   }
 
   MyCustomCell = (props) => <CustomCell {...props} />
 
+  createAppState = (dataState) => {
+    var output = {
+      result: process(this.state.data, dataState),
+      dataState: dataState,
+      ...dataState
+    };
+
+    return output;
+  }
+
+  dataStateChange = (event) => {
+    var appSate = this.createAppState(event.data);
+    this.setState(appSate);
+  }
+
+  expandChange = (event) => {
+    event.dataItem[event.target.props.expandField] = event.value;
+    this.setState({
+      result: Object.assign({}, this.state.result),
+      dataState: this.state.dataState
+    });
+  }
+
   render() {
     return (
       <Grid
-        style={{ height: '400px' }}
+        style={{ height: '520px' }}
+        resizable={true}
+        reorderable={true}
+        filterable={true}
+        sortable={true}
+        pageable={{ pageSizes: true }}
+        groupable={true}
 
-        data={filterBy(this.state.data, this.state.filter)}
+        data={this.state.result}
+        onDataStateChange={this.dataStateChange}
+        {...this.state.dataState}
+
+        onExpandChange={this.expandChange}
+        expandField="expanded"
 
         detail={DetailComponent}
-        expandField="expanded"
-        onExpandChange={(event) => {
-          event.dataItem.expanded = !event.dataItem.expanded;
-          this.forceUpdate();
-        }}
-
-        filterable
-        filter={this.state.filter}
-        onFilterChange={
-          (e) => {
-            this.setState({
-              filter: e.filter
-            });
-          }
-        }
-
-        sortable
-        sort={this.state.sort}
-        onSortChange={
-          (e) => {
-            this.setState({
-              sort: e.sort
-            });
-          }
-        }
       >
         <Column field="ID" title="ID" width="40px" filterable={false} sortable={false} />
         <Column field="Date" title="Date" width="250px" filter="date" format="{0:MMM yyyy}" />
-        <Column field="Department" title="Department" />
+        <Column field="Department" width="250px" title="Department" />
         <Column
+          width="75px"
           field="FileRef"
           title="Link to File"
           filterable={false}
