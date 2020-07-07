@@ -168,7 +168,6 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     // Title = "Current year"-AR-"GUID"
     // 2020-AR-66d07df6-40a8-45e0-04c9-1b485ebc3aca
     let currentYear = new Date().getFullYear();
-    debugger;
     const newARTitle = currentYear + "-AR-" + (this.S4() + this.S4() + "-" + this.S4() + "-4" + this.S4().substr(0,3) + "-" + this.S4() + "-" + this.S4() + this.S4() + this.S4()).toLowerCase();
 
     // Set the data for the invoice
@@ -188,6 +187,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     }
     const accounts: IARAccountDetails = { ...dataItem.GLAccounts }
 
+    // This updates the item.
     var output = await (await file.update(myData)).item;
 
     output.get().then(innerFile => {
@@ -202,7 +202,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
         });
       });
 
-      this.addAccountCodes(accountDetails);
+      this.addAccountCodes(accountDetails, file);
     })
 
     return output;
@@ -214,9 +214,16 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
    *
    * @param accountDetails IARAccountDetails
    */
-  addAccountCodes = async (accountDetails: IARAccountDetails[]) => {
+  addAccountCodes = async (accountDetails: IARAccountDetails[], file) => {
     accountDetails.map(account => {
-      sp.web.lists.getByTitle('AR Invoice Accounts').items.add(account);
+      sp.web.lists.getByTitle('AR Invoice Accounts').items.add(account).then(f => {
+        // Connect the account to the document list.
+        file.update({
+          AccountDetailsId: {
+            results: [f.data.ID]
+          }
+        });
+      });
     });
   }
 

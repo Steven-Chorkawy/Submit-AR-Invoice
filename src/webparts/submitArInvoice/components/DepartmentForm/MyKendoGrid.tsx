@@ -116,6 +116,9 @@ class DetailComponent extends GridDetailRow {
           <p>... add more details here...</p>
           {/* <p><strong>Category:</strong> {dataItem.Category.CategoryName} - {dataItem.Category.Description}</p> */}
         </section>
+        <section>
+
+        </section>
       </div>
     );
   }
