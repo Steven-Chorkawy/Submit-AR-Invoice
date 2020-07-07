@@ -28,6 +28,7 @@ import * as strings from 'SubmitArInvoiceWebPartStrings';
 import { MyForm } from './components/MyKendoForm';
 import { MyKendoGrid } from './components/DepartmentForm/MyKendoGrid';
 import { IMyFormProps } from './components/IMyFormProps';
+// import { Promise } from 'es6-promise';
 
 export interface ISubmitArInvoiceWebPartProps {
   description: string;
@@ -64,6 +65,8 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
     return customers;
   }
 
+
+
   private getARInvoices = async () => {
 
     let arInvoices = await sp.web.lists.getByTitle('Ar Invoices')
@@ -71,9 +74,25 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
     .select(`*, FileRef,
     Customer/Title,
     AccountDetails/Account_x0020_Code,
-    AccountDetails/Amount`)
+    AccountDetails/Amount,
+    AccountDetails/ID`)
     .expand('Customer, AccountDetails')
     .get();
+
+
+    let accounts = await sp.web.lists.getByTitle("AR Invoice Accounts")
+    .items
+    .get();
+
+    // This is how we can get additional data since the .select() method only include Dependent Lookups
+    // https://github.com/pnp/pnpjs/issues/1258 <--- see my open ticket here.
+    arInvoices.map(invoice => {
+      for (let index = 0; index < invoice.AccountDetails.length; index++) {
+        const element = invoice.AccountDetails[index];
+        var newAccount = accounts.find(a => a.ID == element.ID);
+        invoice.AccountDetails[index] = newAccount
+      }
+    });
 
     return arInvoices;
   }

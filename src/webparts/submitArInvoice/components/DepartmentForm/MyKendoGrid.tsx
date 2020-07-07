@@ -48,24 +48,51 @@ const MyItemRender = props => {
   console.log("MyItemRender");
   console.log(props);
   return (
-    <div>
-      <div className='row w-100 no-gutters'>
-        <div className='col-sm-3'>
+    <div style={{ width: "90%" }}>
+      <div className='row' style={{ marginBottom: "1px" }}>
+        <div className='col-sm-6'>
           <MaskedTextBox
             mask="000-00-000-00000-0000"
+            title="Account Code"
             defaultValue={props.dataItem.Account_x0020_Code}
             readonly={true}
-            />
+          />
         </div>
-        <div className='col-sm-2'>
+        <div className='col-sm-6' title="Amount Before HST">
           <NumericTextBox
-                    defaultValue={props.dataItem.Amount}
-                    format="c2"
-                    disabled={true}
-                    min={0}
-                />
+            defaultValue={props.dataItem.Amount}
+            format="c2"
+            disabled={true}
+            min={0}
+          />
         </div>
       </div>
+
+      <div className='row' style={{ marginBottom: "5px" }}>
+        <div className='col-sm-2' title="HST Applied">
+          HST: {props.dataItem.HST_x0020_Taxable ? 'Yes' : 'No'}
+        </div>
+
+        <div className='col-sm-4' title="HST">
+          <NumericTextBox
+            defaultValue={Number(props.dataItem.HST)}
+            format="c2"
+            disabled={true}
+            min={0}
+          />
+        </div>
+
+        <div className='col-sm-6' title="Amount After HST">
+          <NumericTextBox
+            defaultValue={Number(props.dataItem.Total_x0020_Invoice)}
+            format="c2"
+            disabled={true}
+            min={0}
+          />
+        </div>
+      </div>
+
+      <hr />
     </div>
   );
 }
@@ -80,15 +107,13 @@ class DetailComponent extends GridDetailRow {
           <ListView
             data={dataItem.AccountDetails}
             item={MyItemRender}
-            style={{ width: "45%" }}
+            style={{ width: "40%" }}
           />
           <hr />
         </section>
         <section>
-          <p><strong>In Stock:</strong> {dataItem.Title} </p>
-          <p><strong>On Order:</strong> {dataItem.Type_x0020_of_x0020_Request} </p>
-          <p><strong>Reorder Level:</strong> {dataItem.Department} </p>
-          <p><strong>Discontinued:</strong> {dataItem.Date}</p>
+          <h2>Details</h2>
+          <p>... add more details here...</p>
           {/* <p><strong>Category:</strong> {dataItem.Category.CategoryName} - {dataItem.Category.Description}</p> */}
         </section>
       </div>
