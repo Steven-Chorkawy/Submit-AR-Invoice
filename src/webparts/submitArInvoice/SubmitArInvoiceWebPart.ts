@@ -20,6 +20,7 @@ import "@pnp/sp/fields";
 import "@pnp/sp/site-users/web";
 
 import './MyO365.scss';
+import './bootstrap.min.css';
 
 // ? What is this for ?
 import * as strings from 'SubmitArInvoiceWebPartStrings';
@@ -64,10 +65,16 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
   }
 
   private getARInvoices = async () => {
+
     let arInvoices = await sp.web.lists.getByTitle('Ar Invoices')
     .items
-    .select('Id, Title, Date, Department, Type_x0020_of_x0020_Request, FileRef')
+    .select(`*, FileRef,
+    Customer/Title,
+    AccountDetails/Account_x0020_Code,
+    AccountDetails/Amount`)
+    .expand('Customer, AccountDetails')
     .get();
+
     return arInvoices;
   }
 
