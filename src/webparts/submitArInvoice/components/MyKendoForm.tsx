@@ -89,7 +89,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
 
             this.setState({
               MyFiles: currentFiles
-            })
+            });
           });
         })
         .catch((error) => {
@@ -123,7 +123,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
 
               this.setState({
                 MyFiles: currentFiles
-              })
+              });
             });
 
           })
@@ -145,6 +145,9 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     }
   }
 
+  /**
+   * Don't touch my spaghetti!
+   */
   S4 = () => {
     return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
   }
@@ -165,10 +168,11 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     // Gets the file that we just uploaded.  This will be used later to update the metadata.
     let file = await uploadRes.file.getItem();
 
+
+
     // Title = "Current year"-AR-"GUID"
     // 2020-AR-66d07df6-40a8-45e0-04c9-1b485ebc3aca
     let currentYear = new Date().getFullYear();
-    debugger;
     const newARTitle = currentYear + "-AR-" + (this.S4() + this.S4() + "-" + this.S4() + "-4" + this.S4().substr(0,3) + "-" + this.S4() + "-" + this.S4() + this.S4() + this.S4()).toLowerCase();
 
     // Set the data for the invoice
@@ -188,9 +192,12 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     }
     const accounts: IARAccountDetails = { ...dataItem.GLAccounts }
 
+    // This updates the item.
     var output = await (await file.update(myData)).item;
 
     output.get().then(innerFile => {
+      debugger;
+      this.uploadRelatedFiles(dataItem, innerFile);
       // Set the data for the account details.
       let accountDetails: IARAccountDetails[] = [];
       dataItem.GLAccounts.map(account => {
@@ -202,10 +209,37 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
         });
       });
 
-      this.addAccountCodes(accountDetails);
+      this.addAccountCodes(accountDetails, file);
     })
 
     return output;
+  }
+
+
+  uploadRelatedFiles = async (inputData, mainFile) => {
+    debugger;
+    let web = Web(this._siteUrl);
+
+    for (let index = 0; index < inputData.RelatedAttachments.length; index++) {
+      const element = inputData.RelatedAttachments[index];
+
+      let uploadRes = await web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/')
+        .files
+        .add(element.name, element.getRawFile(), true)
+        .then(({file}) => file.getItem()
+          .then((item:any) =>{
+            debugger;
+            return item.update({
+              ARInvoiceId: mainFile.Id
+            })
+          })
+        );
+
+      // let updateThisFile = await uploadRes.file.getItem();
+      // debugger;
+      // var res = await updateThisFile.update({ARInvoiceId: mainFile.ID});
+      // debugger;
+    }
   }
 
 
@@ -214,9 +248,16 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
    *
    * @param accountDetails IARAccountDetails
    */
-  addAccountCodes = async (accountDetails: IARAccountDetails[]) => {
+  addAccountCodes = async (accountDetails: IARAccountDetails[], file) => {
     accountDetails.map(account => {
-      sp.web.lists.getByTitle('AR Invoice Accounts').items.add(account);
+      sp.web.lists.getByTitle('AR Invoice Accounts').items.add(account).then(f => {
+        // Connect the account to the document list.
+        file.update({
+          AccountDetailsId: {
+            results: [f.data.ID]
+          }
+        });
+      });
     });
   }
 
@@ -385,7 +426,17 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
               <Field
                 id="InvoiceAttachments"
                 name="InvoiceAttachments"
-                label="Upload Attachments"
+                label="Primary Attachment"
+                batch={false}
+                multiple={false}
+                component={MyFormComponents.FormUpload}
+              />
+              <hr />
+
+              <Field
+                id="RelatedAttachments"
+                name="RelatedAttachments"
+                label="Related Attachment"
                 batch={false}
                 multiple={true}
                 component={MyFormComponents.FormUpload}
