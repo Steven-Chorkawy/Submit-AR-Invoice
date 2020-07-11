@@ -266,7 +266,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
             )}
           </GridToolbar>
 
-          <GridColumn field="ID" title="ID" width={this._columnWidth} />
+          <GridColumn field="ID" title="ID" width={this._columnWidth} editable={false} />
           <GridColumn field="Type_x0020_of_x0020_Request" title="Type" width={this._columnWidth} />
           <GridColumn field="Invoice_x0020_Status" title="Status" width={this._columnWidth} />
           <GridColumn field="Invoice_x0020_Number" title="Invoice #" width={this._columnWidth} />

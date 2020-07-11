@@ -31,16 +31,45 @@ class InvoiceDataProvider extends React.Component<any, any> {
 
     this.pending = toODataString(this.props.dataState);
 
+
     sp.web.lists.getByTitle('AR Invoices')
       .items
+      .select("*, AccountDetails/Account_x0020_Code")
+      .expand('AccountDetails')
       .getAll()
-      .then(response => {
+      .then(async response => {
         console.log("AR Invoice Found");
         console.log(response);
+
         this.lastSuccess = this.pending;
         this.pending = '';
+        var processedResponse = process(response, this.props.dataState);
+        var accountDetailIds = [];
+        response.map(r => {
+          accountDetailIds.push(`AR_x0020_InvoiceId eq ${r.ID}`);
+        });
+
+        //#region Query the required invoice attachments.
+
+        debugger;
+        var accountDetailFilter = `${accountDetailIds.join(' or ')}`;
+
+        var accountDetails = await sp.web.lists.getByTitle('AR Invoice Accounts')
+          .items
+          .filter(accountDetailFilter)
+          .get();
+
+        debugger;
+
+        response.map(invoice => {
+          invoice.AccountDetails = accountDetails.filter(f => Number(f.AR_x0020_InvoiceId) === invoice.ID);
+        });
+        //#endregion
+
+
+
         if (toODataString(this.props.dataState) === this.lastSuccess) {
-          this.props.onDataReceived.call(undefined, process(response, this.props.dataState));
+          this.props.onDataReceived.call(undefined, processedResponse);
         } else {
           this.requestDataIfNeeded();
         }
