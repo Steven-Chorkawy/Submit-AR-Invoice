@@ -66,7 +66,8 @@ class MyFinanceForm extends React.Component<any, any> {
     console.log(invoices);
     this.setState({
       ...this.state,
-      invoices: invoices
+      invoices: invoices,
+      receivedData: invoices
     });
   };
 
@@ -92,16 +93,30 @@ class MyFinanceForm extends React.Component<any, any> {
   itemChange = (event) => {
     console.log("itemChange");
     console.log(event);
-    throw "Not Implemented yet!";
+    const data = this.state.invoices.data.map(item =>
+      item.ID === event.dataItem.ID ? { ...item, [event.field]: event.value } : item
+    );
+
+    this.setState({ data });
   };
 
+  /**
+   * Grid Edit button click event.
+   * @param dataItem Invoice that will be sent to edit mode.
+   */
   enterEdit = (dataItem) => {
     console.log("enterEdit");
     console.log(dataItem);
     this.setState({
-      data: this.state.data.map(item =>
-        item.ID === dataItem.ID ? { ...item, inEdit: true } : item
-      )
+      invoices: {
+        // Set any other properties of state.invoices
+        ...this.state.invoices,
+        // Update the data property.
+        // data property is where the invoice objects are held.
+        data: this.state.invoices.data.map(item =>
+          item.ID === dataItem.ID ? { ...item, inEdit: true } : item
+        )
+      }
     });
   }
 
@@ -109,12 +124,12 @@ class MyFinanceForm extends React.Component<any, any> {
     dataItem.inEdit = undefined;
 
     this.setState({
-      data: [...this.state.data]
+      data: [...this.state.invoices.data]
     });
   }
 
   update = (dataItem) => {
-    const data = [...this.state.data];
+    const data = [...this.state.invoices.data];
     const updatedItem = { ...dataItem, inEdit: undefined };
 
     this.updateItem(data, updatedItem);
@@ -132,31 +147,50 @@ class MyFinanceForm extends React.Component<any, any> {
   //TODO: Change ID.
   cancel = (dataItem) => {
     const originalItem = this.state.invoices.data.find(p => p.ID === dataItem.ID);
-    const data = this.state.data.map(item => item.ID === originalItem.ID ? originalItem : item);
+    const data = this.state.invoices.data.map(item => item.ID === originalItem.ID ? originalItem : item);
 
     this.setState({ data });
   }
 
   discard = (dataItem) => {
-    const data = [...this.state.data];
+    const data = [...this.state.invoices.data];
+    this.removeItem(data, dataItem);
+
+    this.setState({
+      invoices: {
+        ...this.state.invoices,
+        data: data
+      }
+    });
+  }
+
+  remove = (dataItem) => {
+    const data = [...this.state.invoices.data];
     this.removeItem(data, dataItem);
 
     this.setState({ data });
   }
 
-  remove = (dataItem) => {
-    const data = [...this.state.data];
-    this.removeItem(data, dataItem);
+  addNew = () => {
+    const newDataItem = { inEdit: true, Discontinued: false };
 
-    this.setState({ data });
+    this.setState({
+      data: [newDataItem, ...this.state.invoices.data]
+    });
+  }
+
+  cancelCurrentChanges = () => {
+    // reset everything back.
+    this.setState({ data: [...this.state.receivedData.data] });
   }
   //#endregion end CRUD Methods
 
   render() {
+
+    const hasEditedItem = this.state.invoices.data.some(p => p.inEdit);
     return (
       <div>
         <Grid
-          // onItemChange={this.itemChange}
           filterable={true}
           sortable={true}
           pageable={true}
@@ -164,9 +198,26 @@ class MyFinanceForm extends React.Component<any, any> {
           {...this.state.dataState}
           {...this.state.invoices}
           onDataStateChange={this.dataStateChange}
+          onItemChange={this.itemChange}
+          editField={this.editField}
         >
           <GridToolbar>
-            tool bar here...
+            <button
+              title="Add new"
+              className="k-button k-primary"
+              onClick={this.addNew}
+            >
+              Add new
+                    </button>
+            {hasEditedItem && (
+              <button
+                title="Cancel current changes"
+                className="k-button"
+                onClick={this.cancelCurrentChanges}
+              >
+                Cancel current changes
+              </button>
+            )}
           </GridToolbar>
 
           <GridColumn field="ID" title="ID" width="100px" />

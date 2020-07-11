@@ -7,7 +7,7 @@ export function MyCommandCell({ edit, remove, add, update, discard, cancel, edit
         render() {
             const { dataItem } = this.props;
             const inEdit = dataItem[editField];
-            const isNewItem = dataItem.ProductID === undefined;
+            const isNewItem = dataItem.ID === undefined;
 
             return inEdit ? (
                 <td className={this.props.className + " k-command-cell row row-no-gutters"} style={this.props.style}>
