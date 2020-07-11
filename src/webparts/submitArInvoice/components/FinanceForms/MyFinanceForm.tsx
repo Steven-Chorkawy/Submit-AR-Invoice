@@ -5,16 +5,10 @@ import * as ReactDom from 'react-dom';
 import {
   Grid,
   GridColumn,
-  GridCell,
-  GridColumnProps,
-  GridCellProps,
-  GridDetailRow,
   GridToolbar
-} from '@progress/kendo-react-grid'
-import { NumericTextBox, MaskedTextBox } from '@progress/kendo-react-inputs'
-import { Button } from '@progress/kendo-react-buttons'
+} from '@progress/kendo-react-grid';
 
-import { ListView, ListViewHeader, ListViewFooter } from '@progress/kendo-react-listview';
+
 
 //PnPjs Imports
 import { sp } from "@pnp/sp";
@@ -33,13 +27,13 @@ interface IMyFinanceFormState {
   invoices: IInvoicesDataState;
   receivedData: IInvoicesDataState;
   dataState: any;
-};
+}
 
 interface IInvoicesDataState {
   //TODO: Change Array<any> to Array<IInvoice>
   data: Array<any>;
   total: number;
-};
+}
 
 
 class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
@@ -51,7 +45,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       // Same as invoices but this object is used to restore data to it's original state.
       receivedData: { data: [], total: 0 },
       dataState: { take: 10, skip: 0 }
-    };
+    }
 
     this.CommandCell = MyCommandCell({
       edit: this.enterEdit,
@@ -86,7 +80,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       invoices: invoices,
       receivedData: invoices
     });
-  };
+  }
 
   dataStateChange = (e) => {
     console.log("dataStateChange");
@@ -119,7 +113,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         data: data
       }
     });
-  };
+  }
 
   /**
    * Grid Edit button click event.
@@ -290,7 +284,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         />
       </div>
     );
-  };
+  }
 }
 
-export { MyFinanceForm };
+export { MyFinanceForm }
