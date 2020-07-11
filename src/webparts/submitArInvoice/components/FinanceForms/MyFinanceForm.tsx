@@ -97,7 +97,12 @@ class MyFinanceForm extends React.Component<any, any> {
       item.ID === event.dataItem.ID ? { ...item, [event.field]: event.value } : item
     );
 
-    this.setState({ data });
+    this.setState({
+      invoices: {
+        ...this.state.invoices,
+        data: data
+      }
+    });
   };
 
   /**
@@ -134,7 +139,12 @@ class MyFinanceForm extends React.Component<any, any> {
 
     this.updateItem(data, updatedItem);
 
-    this.setState({ data });
+    this.setState({
+      invoices: {
+        ...this.state.invoices,
+        data: data
+      }
+    });
   }
 
   updateItem = (data, item) => {
@@ -149,7 +159,12 @@ class MyFinanceForm extends React.Component<any, any> {
     const originalItem = this.state.invoices.data.find(p => p.ID === dataItem.ID);
     const data = this.state.invoices.data.map(item => item.ID === originalItem.ID ? originalItem : item);
 
-    this.setState({ data });
+    this.setState({
+      invoices: {
+        ...this.state.invoices,
+        data: data
+      }
+    });
   }
 
   discard = (dataItem) => {
@@ -168,7 +183,12 @@ class MyFinanceForm extends React.Component<any, any> {
     const data = [...this.state.invoices.data];
     this.removeItem(data, dataItem);
 
-    this.setState({ data });
+    this.setState({
+      invoices: {
+        ...this.state.invoices,
+        data: data
+      }
+    });
   }
 
   addNew = () => {
