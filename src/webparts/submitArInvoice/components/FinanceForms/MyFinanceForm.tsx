@@ -63,12 +63,14 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       update: this.update,
       cancel: this.cancel,
 
-      editField: this.editField
+      editField: this._editField
     });
   }
 
   //#region Variables
-  private editField: string = "inEdit";
+  private _editField: string = "inEdit";
+  private _columnWidth: string = "150px";
+
   //#endregion
 
   //#region Custom Components
@@ -242,7 +244,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   //#endregion end CRUD Methods
 
   render() {
-
     const hasEditedItem = this.state.invoices.data.some(p => p.inEdit);
     return (
       <div>
@@ -255,7 +256,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           {...this.state.invoices}
           onDataStateChange={this.dataStateChange}
           onItemChange={this.itemChange}
-          editField={this.editField}
+          editField={this._editField}
         >
           <GridToolbar>
             {hasEditedItem && (
@@ -269,18 +270,18 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
             )}
           </GridToolbar>
 
-          <GridColumn field="ID" title="ID" width="100px" />
-          <GridColumn field="Type_x0020_of_x0020_Request" title="Type" width="100px" />
-          <GridColumn field="Invoice_x0020_Status" title="Status" width="100px" />
-          <GridColumn field="Invoice_x0020_Number" title="Invoice #" width="100px" />
-          <GridColumn field="Batch_x0020_Number" title="Batch #" width="100px" />
-          <GridColumn field="Department" title="Department" width="100px" />
-          <GridColumn field="Date" title="Date" width="100px" />
-          <GridColumn field="Urgent" title="Urgent" width="100px" />
-          <GridColumn field="Customer" title="Customer" width="100px" />
-          <GridColumn field="Customer_x0020_PO_x0020_Number" title="Customer PO #" width="100px" />
+          <GridColumn field="ID" title="ID" width={this._columnWidth} />
+          <GridColumn field="Type_x0020_of_x0020_Request" title="Type" width={this._columnWidth} />
+          <GridColumn field="Invoice_x0020_Status" title="Status" width={this._columnWidth} />
+          <GridColumn field="Invoice_x0020_Number" title="Invoice #" width={this._columnWidth} />
+          <GridColumn field="Batch_x0020_Number" title="Batch #" width={this._columnWidth} />
+          <GridColumn field="Department" title="Department" width={this._columnWidth} />
+          <GridColumn field="Date" title="Date" width={this._columnWidth} />
+          <GridColumn field="Urgent" title="Urgent" width={this._columnWidth} />
+          <GridColumn field="Customer" title="Customer" width={this._columnWidth} />
+          <GridColumn field="Customer_x0020_PO_x0020_Number" title="Customer PO #" width={this._columnWidth} />
 
-          <GridColumn cell={this.CommandCell} width="100px" locked={true} resizable={false} filterable={false} sortable={false} />
+          <GridColumn cell={this.CommandCell} width={this._columnWidth} locked={true} resizable={false} filterable={false} sortable={false} />
         </Grid>
 
         <InvoiceDataProvider
