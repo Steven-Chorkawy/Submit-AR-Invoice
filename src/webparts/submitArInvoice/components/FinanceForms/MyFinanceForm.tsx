@@ -83,7 +83,7 @@ class MyFinanceForm extends React.Component<any, any> {
 
   //#region CRUD Methods
   removeItem(data, item) {
-    let index = data.findIndex(p => p === item || (item.ProductID && p.ProductID === item.ProductID));
+    let index = data.findIndex(p => p === item || (item.ID && p.ID === item.ID));
     if (index >= 0) {
       data.splice(index, 1);
     }
@@ -96,10 +96,11 @@ class MyFinanceForm extends React.Component<any, any> {
   };
 
   enterEdit = (dataItem) => {
+    console.log("enterEdit");
+    console.log(dataItem);
     this.setState({
       data: this.state.data.map(item =>
-        item.ProductID === dataItem.ProductID ?
-          { ...item, inEdit: true } : item
+        item.ID === dataItem.ID ? { ...item, inEdit: true } : item
       )
     });
   }
@@ -122,16 +123,16 @@ class MyFinanceForm extends React.Component<any, any> {
   }
 
   updateItem = (data, item) => {
-    let index = data.findIndex(p => p === item || (item.ProductID && p.ProductID === item.ProductID));
+    let index = data.findIndex(p => p === item || (item.ID && p.ID === item.ID));
     if (index >= 0) {
       data[index] = { ...item };
     }
   }
 
-  //TODO: Change ProductID.
+  //TODO: Change ID.
   cancel = (dataItem) => {
-    const originalItem = this.state.invoices.data.find(p => p.ProductID === dataItem.ProductID);
-    const data = this.state.data.map(item => item.ProductID === originalItem.ProductID ? originalItem : item);
+    const originalItem = this.state.invoices.data.find(p => p.ID === dataItem.ID);
+    const data = this.state.data.map(item => item.ID === originalItem.ID ? originalItem : item);
 
     this.setState({ data });
   }
