@@ -34,40 +34,36 @@ class InvoiceDataProvider extends React.Component<any, any> {
 
     sp.web.lists.getByTitle('AR Invoices')
       .items
-      .select("*, AccountDetails/Account_x0020_Code")
-      .expand('AccountDetails')
       .getAll()
       .then(async response => {
-        console.log("AR Invoice Found");
-        console.log(response);
-
         this.lastSuccess = this.pending;
         this.pending = '';
+
+        // Apply Kendo grids filters.
         var processedResponse = process(response, this.props.dataState);
-        var accountDetailIds = [];
+
+        //#region Query the required account details for this invoice.
+        // Hold the list of invoice IDs that will be used to pull related accounts.
+        var invoiceIds = [];
         response.map(r => {
-          accountDetailIds.push(`AR_x0020_InvoiceId eq ${r.ID}`);
+          invoiceIds.push(`AR_x0020_InvoiceId eq ${r.ID}`);
         });
 
-        //#region Query the required invoice attachments.
+        // Join each of the invoiceIds together with and or.
+        // this will be our final filter string that we send the SharePoint.
+        var accountDetailFilter = `${invoiceIds.join(' or ')}`;
 
-        debugger;
-        var accountDetailFilter = `${accountDetailIds.join(' or ')}`;
-
+        // Using the filter string that we've worked so hard to build we will now get our SharePoint data.
         var accountDetails = await sp.web.lists.getByTitle('AR Invoice Accounts')
           .items
           .filter(accountDetailFilter)
           .get();
 
-        debugger;
-
-        response.map(invoice => {
-          invoice.AccountDetails = accountDetails.filter(f => Number(f.AR_x0020_InvoiceId) === invoice.ID);
-        });
+        // Using each of the accounts that we found we will not attach them to the invoice object.
+        response.map(invoice => { invoice.AccountDetails = accountDetails.filter(f => Number(f.AR_x0020_InvoiceId) === invoice.ID); });
         //#endregion
 
-
-
+        // This is something from Kendo demos.
         if (toODataString(this.props.dataState) === this.lastSuccess) {
           this.props.onDataReceived.call(undefined, processedResponse);
         } else {
