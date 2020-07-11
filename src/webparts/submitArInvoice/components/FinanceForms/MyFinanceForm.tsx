@@ -68,7 +68,9 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   //#endregion
 
   //#region Custom Components
-  CommandCell
+
+  //this.CommandCell is set in this classes constructor.
+  private CommandCell;
   //#endregion
 
   //#region Methods
@@ -275,7 +277,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           <GridColumn field="Customer" title="Customer" width={this._columnWidth} />
           <GridColumn field="Customer_x0020_PO_x0020_Number" title="Customer PO #" width={this._columnWidth} />
 
-          <GridColumn cell={this.CommandCell} width={this._columnWidth} locked={true} resizable={false} filterable={false} sortable={false} />
+          <GridColumn cell={this.CommandCell} width={"85px"} locked={true} resizable={false} filterable={false} sortable={false} />
         </Grid>
 
         <InvoiceDataProvider

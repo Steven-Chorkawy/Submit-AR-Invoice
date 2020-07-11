@@ -29,17 +29,15 @@ export function MyCommandCell({ edit, remove, add, update, discard, cancel, edit
             <button
               className="k-primary k-button k-grid-edit-command col-sm-12"
               onClick={() => edit(dataItem)}
-            >
-              Edit
-                    </button>
+              style={{ "marginBottom": "5px" }}
+            >Edit</button>
             <button
               className="k-button k-grid-remove-command col-sm-12"
               onClick={() => confirm('Confirm deleting: ' + dataItem.ProductName) &&
                 remove(dataItem)
               }
-            >
-              Remove
-                    </button>
+              style={{ "marginBottom": "5px" }}
+            >Remove</button>
           </td>
         );
     }
