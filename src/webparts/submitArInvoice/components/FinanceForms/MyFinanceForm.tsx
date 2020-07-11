@@ -29,12 +29,27 @@ import "@pnp/sp/items";
 import { InvoiceDataProvider } from '../InvoiceDataProvider';
 import { MyCommandCell } from './MyCommandCell';
 
-class MyFinanceForm extends React.Component<any, any> {
+interface IMyFinanceFormState {
+  invoices: IInvoicesDataState;
+  receivedData: IInvoicesDataState;
+  dataState: any;
+};
+
+interface IInvoicesDataState {
+  //TODO: Change Array<any> to Array<IInvoice>
+  data: Array<any>;
+  total: number;
+};
+
+
+class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   constructor(props) {
     super(props);
 
     this.state = {
       invoices: { data: [], total: 0 },
+      // Same as invoices but this object is used to restore data to it's original state.
+      receivedData: { data: [], total: 0 },
       dataState: { take: 10, skip: 0 }
     };
 
@@ -70,7 +85,6 @@ class MyFinanceForm extends React.Component<any, any> {
       receivedData: invoices
     });
   };
-
 
   dataStateChange = (e) => {
     console.log("dataStateChange");
@@ -125,11 +139,20 @@ class MyFinanceForm extends React.Component<any, any> {
     });
   }
 
+
+  /**
+   * Add/Save new invoice.
+   * @param dataItem New Invoice
+   */
   add = (dataItem) => {
     dataItem.inEdit = undefined;
 
+    // TODO: Call method that adds dataItem to the SP List.
+
     this.setState({
-      data: [...this.state.invoices.data]
+      invoices: {
+        ...this.state.invoices
+      }
     });
   }
 
@@ -154,11 +177,13 @@ class MyFinanceForm extends React.Component<any, any> {
     }
   }
 
-  //TODO: Change ID.
+  /**
+   * Cancel and discard all changes made to the current edit.
+   * @param dataItem Invoice item that we are no longer editing.
+   */
   cancel = (dataItem) => {
-    const originalItem = this.state.invoices.data.find(p => p.ID === dataItem.ID);
+    const originalItem = this.state.receivedData.data.find(p => p.ID === dataItem.ID);
     const data = this.state.invoices.data.map(item => item.ID === originalItem.ID ? originalItem : item);
-
     this.setState({
       invoices: {
         ...this.state.invoices,
@@ -191,17 +216,28 @@ class MyFinanceForm extends React.Component<any, any> {
     });
   }
 
+  //TODO: Remove this method.  We should not be allowed to add new items in this form.
+  /**
+   * Create a new row on the grid.
+   * This new row is where we can enter new invoices.
+   */
   addNew = () => {
-    const newDataItem = { inEdit: true, Discontinued: false };
+    throw "Don't let this happen.";
+    // const newDataItem = { inEdit: true, Discontinued: false };
 
-    this.setState({
-      data: [newDataItem, ...this.state.invoices.data]
-    });
+    // this.setState({
+    //   data: [newDataItem, ...this.state.invoices.data]
+    // });
   }
 
+  /**
+   * Cancel all changes made.
+   */
   cancelCurrentChanges = () => {
     // reset everything back.
-    this.setState({ data: [...this.state.receivedData.data] });
+    this.setState({
+      invoices: {...this.state.receivedData}
+    });
   }
   //#endregion end CRUD Methods
 
@@ -222,13 +258,6 @@ class MyFinanceForm extends React.Component<any, any> {
           editField={this.editField}
         >
           <GridToolbar>
-            <button
-              title="Add new"
-              className="k-button k-primary"
-              onClick={this.addNew}
-            >
-              Add new
-                    </button>
             {hasEditedItem && (
               <button
                 title="Cancel current changes"
