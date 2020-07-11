@@ -2,6 +2,8 @@
 import * as React from 'react';
 import { GridCell } from '@progress/kendo-react-grid';
 
+import { Button } from '@progress/kendo-react-buttons';
+
 export function MyCommandCell({ edit, remove, add, update, discard, cancel, editField }) {
   return class extends GridCell {
     render() {
@@ -11,33 +13,37 @@ export function MyCommandCell({ edit, remove, add, update, discard, cancel, edit
 
       return inEdit ? (
         <td className={this.props.className + " k-command-cell row row-no-gutters"} style={this.props.style}>
-          <button
+          <Button
             className="k-button k-grid-save-command col-sm-12"
+            icon="save"
             onClick={() => isNewItem ? add(dataItem) : update(dataItem)}
           >
-            {isNewItem ? 'Add' : 'Update'}
-          </button>
-          <button
+            {isNewItem ? 'Add' : 'Save'}
+          </Button>
+          <Button
             className="k-button k-grid-cancel-command col-sm-12"
+            icon="cancel"
             onClick={() => isNewItem ? discard(dataItem) : cancel(dataItem)}
           >
             {isNewItem ? 'Discard' : 'Cancel'}
-          </button>
+          </Button>
         </td>
       ) : (
           <td className={this.props.className + " k-command-cell"} style={this.props.style}>
-            <button
+            <Button
               className="k-primary k-button k-grid-edit-command col-sm-12"
               onClick={() => edit(dataItem)}
+              icon="edit"
               style={{ "marginBottom": "5px" }}
-            >Edit</button>
-            <button
+            >Edit</Button>
+            <Button
               className="k-button k-grid-remove-command col-sm-12"
               onClick={() => confirm('Confirm deleting: ' + dataItem.ProductName) &&
                 remove(dataItem)
               }
+              icon="delete"
               style={{ "marginBottom": "5px" }}
-            >Remove</button>
+            >Delete</Button>
           </td>
         );
     }

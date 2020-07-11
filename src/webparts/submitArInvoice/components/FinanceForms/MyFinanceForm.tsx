@@ -5,8 +5,11 @@ import * as ReactDom from 'react-dom';
 import {
   Grid,
   GridColumn,
-  GridToolbar
+  GridToolbar,
+  GridDetailRow
 } from '@progress/kendo-react-grid';
+import { Button } from '@progress/kendo-react-buttons';
+
 
 
 
@@ -22,6 +25,7 @@ import "@pnp/sp/items";
 // Custom Imports
 import { InvoiceDataProvider } from '../InvoiceDataProvider';
 import { MyCommandCell } from './MyCommandCell';
+import { Input } from '@progress/kendo-react-inputs';
 
 interface IMyFinanceFormState {
   invoices: IInvoicesDataState;
@@ -92,6 +96,12 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       dataState: e.data
     });
   }
+
+  expandChange = (event) => {
+    event.dataItem.expanded = !event.dataItem.expanded;
+    event.myFunction = this.itemChange;
+    this.forceUpdate();
+  }
   //#endregion End Methods
 
   //#region CRUD Methods
@@ -103,6 +113,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   itemChange = (event) => {
+
     console.log("itemChange");
     console.log(event);
     const data = this.state.invoices.data.map(item =>
@@ -234,7 +245,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   cancelCurrentChanges = () => {
     // reset everything back.
     this.setState({
-      invoices: {...this.state.receivedData}
+      invoices: { ...this.state.receivedData }
     });
   }
   //#endregion end CRUD Methods
@@ -253,16 +264,21 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           onDataStateChange={this.dataStateChange}
           onItemChange={this.itemChange}
           editField={this._editField}
+
+          detail={InvoiceDetailComponent}
+          expandField="expanded"
+          onExpandChange={this.expandChange}
         >
           <GridToolbar>
             {hasEditedItem && (
-              <button
+              <Button
                 title="Cancel current changes"
                 className="k-button"
+                icon="cancel"
                 onClick={this.cancelCurrentChanges}
               >
-                Cancel current changes
-              </button>
+                Cancel Current Changes
+              </Button>
             )}
           </GridToolbar>
 
@@ -277,7 +293,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           <GridColumn field="Customer" title="Customer" width={this._columnWidth} />
           <GridColumn field="Customer_x0020_PO_x0020_Number" title="Customer PO #" width={this._columnWidth} />
 
-          <GridColumn cell={this.CommandCell} width={"85px"} locked={true} resizable={false} filterable={false} sortable={false} />
+          <GridColumn cell={this.CommandCell} width={"110px"} locked={true} resizable={false} filterable={false} sortable={false} />
         </Grid>
 
         <InvoiceDataProvider
@@ -286,6 +302,36 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         />
       </div>
     );
+  }
+}
+
+class InvoiceDetailComponent extends GridDetailRow {
+
+  private itemChangeEvent
+
+  constructor(props) {
+
+    console.log("InvoiceDetailComponent");
+    console.log(props);
+    super(props);
+  }
+
+
+
+  render() {
+    return this.props.dataItem.inEdit ?
+      // Return Edit Mode
+      (
+        <div>
+          <Input value={this.props.dataItem.Standard_x0020_Terms} onChange={(e) => this.itemChangeEvent} />
+        </div>
+      ) :
+      // Return View Mode
+      (
+        <div>
+          <p>{this.props.dataItem.Standard_x0020_Terms}</p>
+        </div>
+      );
   }
 }
 
