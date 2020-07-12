@@ -13,6 +13,7 @@ import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import { Input, NumericTextBox } from '@progress/kendo-react-inputs';
 import { Form, Field, FormElement } from '@progress/kendo-react-form';
 import { Window } from '@progress/kendo-react-dialogs';
+import { Upload, UploadFileStatus } from '@progress/kendo-react-upload';
 
 
 
@@ -38,6 +39,7 @@ interface IMyFinanceFormState {
   dataState: any;
   productInEdit: any;
   statusData: any;
+  siteUsersData: any;
 }
 
 interface IInvoicesDataState {
@@ -57,7 +59,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       receivedData: { data: [], total: 0 },
       dataState: { take: 10, skip: 0 },
       productInEdit: undefined,
-      statusData: []
+      statusData: [],
+      siteUsersData: []
     }
 
     this.CommandCell = MyCommandCell({
@@ -98,12 +101,20 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   statusDataReceived = (status) => {
-
     console.log('statusDataReceived');
     console.log(status);
     this.setState({
       ...this.state,
       statusData: status
+    });
+  }
+
+  siteUserDataReceived = (users) => {
+    console.log('siteUserDataReceived');
+    console.log(users);
+    this.setState({
+      ...this.state,
+      siteUsersData: users
     });
   }
 
@@ -221,6 +232,9 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     const invoices = this.state.invoices.data.slice();
     // const isNewProduct = dataItem.ProductID === undefined;
     const isNewProduct = false; // TODO: Add this if we plan on letting users create from this form.
+
+    console.log("Saving the following invoice");
+    console.log(dataItem);
 
     if (isNewProduct) {
       //products.unshift(this.newProduct(dataItem));
@@ -365,6 +379,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           <InvoiceEditForm
             dataItem={this.state.productInEdit}
             statusData={this.state.statusData}
+            siteUsersData={this.state.siteUsersData}
             save={this.saveEditForm}
             cancel={this.cancelEditForm}
           />
@@ -376,6 +391,9 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
           statusDataState={this.state.statusData}
           onStatusDataReceived={this.statusDataReceived}
+
+          siteUsersDataState={this.state.siteUsersData}
+          onSiteUsersDataReceived={this.siteUserDataReceived}
         />
       </div>
     );
@@ -419,7 +437,7 @@ class InvoiceEditForm extends React.Component<any, any> {
     console.log(props);
     this.state = {
       productInEdit: this.props.dataItem || null,
-      visible: false
+      visible: false,
     }
     console.log(this.state);
   }
@@ -445,18 +463,15 @@ class InvoiceEditForm extends React.Component<any, any> {
     });
   }
 
-
   render() {
     return (
       <Dialog onClose={this.props.cancel} title={"Edit AR Invoice"} minWidth="200px" width="50%" >
-
         <Form
           onSubmit={this.handleSubmit}
-
           render={(formRenderProps) => (
             <FormElement style={{ width: '100%' }}>
               <fieldset className={'k-form-fieldset'}>
-                <div style={{marginBottom:"2px"}}>
+                <div style={{ marginBottom: "2px" }}>
                   <Field
                     id={'Invoice_x0020_Status'}
                     name={'Invoice_x0020_Status'}
@@ -467,7 +482,21 @@ class InvoiceEditForm extends React.Component<any, any> {
                     component={MyFormComponents.FormDropDownList}
                   />
                 </div>
-                <div style={{marginBottom:"2px"}}>
+                <div style={{ marginBottom: "2px" }}>
+                  <Field
+                    id="Requires_x0020_Accountant_x0020_ApprovalId"
+                    name="Requires_x0020_Accountant_x0020_ApprovalId"
+                    label="Requires Approval From Accountant"
+                    data={this.props.siteUsersData}
+                    dataItemKey="Id"
+                    textField="Title"
+                    value={this.state.productInEdit.Requires_x0020_Accountant_x0020_ApprovalId}
+                    onChange={this.onDialogInputChange}
+                    disabled={this.state.productInEdit.Invoice_x0020_Status !== 'Accountant Approval Required'}
+                    component={MyFormComponents.FormComboBox}
+                  />
+                </div>
+                <div style={{ marginBottom: "2px" }}>
                   <Field
                     id={'Invoice_x0020_Number'}
                     name={'Invoice_x0020_Number'}
@@ -477,7 +506,7 @@ class InvoiceEditForm extends React.Component<any, any> {
                     component={MyFormComponents.FormInput}
                   />
                 </div>
-                <div style={{marginBottom:"2px"}}>
+                <div style={{ marginBottom: "2px" }}>
                   <Field
                     id={'Batch_x0020_Number'}
                     name={'Batch_x0020_Number'}
@@ -487,11 +516,20 @@ class InvoiceEditForm extends React.Component<any, any> {
                     component={MyFormComponents.FormInput}
                   />
                 </div>
+                <div style={{ marginBottom: "2px" }}>
+                  <Field
+                    id="InvoiceAttachments"
+                    name="InvoiceAttachments"
+                    label="Upload Attachments"
+                    batch={false}
+                    multiple={true}
+                    component={MyFormComponents.FormUpload}
+                  />
+                </div>
               </fieldset>
             </FormElement>
           )}
         />
-
         <DialogActionsBar>
           <Button
             className="k-button k-primary"

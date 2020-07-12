@@ -75,7 +75,7 @@ class InvoiceDataProvider extends React.Component<any, any> {
 
   requestStatusData = () => {
 
-    if(this.props.statusDataState.length > 0) {
+    if (this.props.statusDataState.length > 0) {
       return;
     }
 
@@ -97,10 +97,23 @@ class InvoiceDataProvider extends React.Component<any, any> {
       });
   }
 
+  requestSiteUsers = () => {
+    if(this.props.siteUsersDataState.length > 0) {
+      return;
+    }
+
+    sp.web.siteUsers()
+      .then(siteUsers => {
+        // siteUsers() returns a list of users and groups.
+        // by filtering out "users" who do not have a UserPrincipalName I can return a list of only users and no groups.
+        this.props.onSiteUsersDataReceived.call(undefined, siteUsers.filter(user => user.UserPrincipalName != null));
+      });
+  }
   render() {
     // Query any methods required here.
     this.requestDataIfNeeded();
     this.requestStatusData();
+    this.requestSiteUsers();
 
     return this.pending && <LoadingPanel />
   };
