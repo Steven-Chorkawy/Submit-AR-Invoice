@@ -9,6 +9,8 @@ import {
   GridDetailRow
 } from '@progress/kendo-react-grid';
 import { Button } from '@progress/kendo-react-buttons';
+import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
+import { Input, NumericTextBox } from '@progress/kendo-react-inputs';
 
 
 
@@ -25,12 +27,13 @@ import "@pnp/sp/items";
 // Custom Imports
 import { InvoiceDataProvider } from '../InvoiceDataProvider';
 import { MyCommandCell } from './MyCommandCell';
-import { Input } from '@progress/kendo-react-inputs';
+
 
 interface IMyFinanceFormState {
   invoices: IInvoicesDataState;
   receivedData: IInvoicesDataState;
   dataState: any;
+  productInEdit: any;
 }
 
 interface IInvoicesDataState {
@@ -48,11 +51,12 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       invoices: { data: [], total: 0 },
       // Same as invoices but this object is used to restore data to it's original state.
       receivedData: { data: [], total: 0 },
-      dataState: { take: 10, skip: 0 }
+      dataState: { take: 10, skip: 0 },
+      productInEdit: undefined
     }
 
     this.CommandCell = MyCommandCell({
-      edit: this.enterEdit,
+      edit: this.edit,
       remove: this.remove,
 
       add: this.add,
@@ -102,6 +106,10 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     event.myFunction = this.itemChange;
     this.forceUpdate();
   }
+
+  cloneProduct(product) {
+    return Object.assign({}, product);
+  }
   //#endregion End Methods
 
   //#region CRUD Methods
@@ -150,6 +158,15 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
 
   /**
+   * Edit form edit event.
+   * @param dataItem Invoice to edit.
+   */
+  edit = (dataItem) => {
+    debugger;
+    this.setState({ productInEdit: this.cloneProduct(dataItem) });
+  }
+
+  /**
    * Add/Save new invoice.
    * @param dataItem New Invoice
    */
@@ -165,6 +182,10 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     });
   }
 
+  /**
+   * Inline Update method
+   * @param dataItem Invoice
+   */
   update = (dataItem) => {
     const data = [...this.state.invoices.data];
     const updatedItem = { ...dataItem, inEdit: undefined };
@@ -176,6 +197,29 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         ...this.state.invoices,
         data: data
       }
+    });
+  }
+
+  saveEditForm = () => {
+    debugger;
+    const dataItem = this.state.productInEdit;
+    const invoices = this.state.invoices.data.slice();
+    // const isNewProduct = dataItem.ProductID === undefined;
+    const isNewProduct = false; // TODO: Add this if we plan on letting users create from this form.
+
+    if (isNewProduct) {
+      //products.unshift(this.newProduct(dataItem));
+    } else {
+      const index = invoices.findIndex(p => p.ID === dataItem.ID);
+      invoices.splice(index, 1, dataItem);
+    }
+
+    this.setState({
+      invoices: {
+        data: invoices,
+        total: invoices.length
+      },
+      productInEdit: undefined
     });
   }
 
@@ -197,8 +241,13 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       invoices: {
         ...this.state.invoices,
         data: data
-      }
+      },
+      productInEdit: undefined
     });
+  }
+
+  cancelEditForm = () => {
+    this.setState({ productInEdit: undefined });
   }
 
   discard = (dataItem) => {
@@ -296,6 +345,15 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           <GridColumn cell={this.CommandCell} width={"110px"} locked={true} resizable={false} filterable={false} sortable={false} />
         </Grid>
 
+        {
+          this.state.productInEdit &&
+          <InvoiceEditForm
+            dataItem={this.state.productInEdit}
+            save={this.saveEditForm}
+            cancel={this.cancelEditForm}
+          />
+        }
+
         <InvoiceDataProvider
           dataState={this.state.dataState}
           onDataReceived={this.dataReceived}
@@ -332,6 +390,58 @@ class InvoiceDetailComponent extends GridDetailRow {
           <p>{this.props.dataItem.Standard_x0020_Terms}</p>
         </div>
       );
+  }
+}
+
+class InvoiceEditForm extends React.Component<any, any> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      productInEdit: this.props.dataItem || null
+    }
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+  }
+
+  onDialogInputChange = (event) => {
+    debugger;
+    let target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.props ? target.props.name : target.name;
+
+    const edited = this.state.productInEdit;
+    edited[name] = value;
+
+    this.setState({
+      productInEdit: edited
+    });
+  }
+
+  render() {
+    return (
+      <Dialog onClose={this.props.cancel} minWidth="200px" width="50%">
+
+        <form onSubmit={this.handleSubmit}>
+          hello world
+        </form>
+
+        <DialogActionsBar>
+        <Button
+            className="k-button k-primary"
+            icon="save"
+            primary={true}
+            onClick={this.props.save}
+          >Save</Button>
+          <Button
+            className="k-button"
+            icon="cancel"
+            onClick={this.props.cancel}
+          >Cancel</Button>
+        </DialogActionsBar>
+      </Dialog>
+    );
   }
 }
 
