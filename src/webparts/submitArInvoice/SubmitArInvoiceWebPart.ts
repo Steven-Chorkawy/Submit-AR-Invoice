@@ -21,6 +21,8 @@ import "@pnp/sp/site-users/web";
 
 import './MyO365.scss';
 import './bootstrap.min.css';
+import './custom.css';
+
 
 // ? What is this for ?
 import * as strings from 'SubmitArInvoiceWebPartStrings';

@@ -11,6 +11,8 @@ import {
 import { Button } from '@progress/kendo-react-buttons';
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import { Input, NumericTextBox } from '@progress/kendo-react-inputs';
+import { Form, Field, FormElement } from '@progress/kendo-react-form';
+import { Window } from '@progress/kendo-react-dialogs';
 
 
 
@@ -27,6 +29,7 @@ import "@pnp/sp/items";
 // Custom Imports
 import { InvoiceDataProvider } from '../InvoiceDataProvider';
 import { MyCommandCell } from './MyCommandCell';
+import * as MyFormComponents from '../MyFormComponents';
 
 
 interface IMyFinanceFormState {
@@ -34,6 +37,7 @@ interface IMyFinanceFormState {
   receivedData: IInvoicesDataState;
   dataState: any;
   productInEdit: any;
+  statusData: any;
 }
 
 interface IInvoicesDataState {
@@ -52,7 +56,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       // Same as invoices but this object is used to restore data to it's original state.
       receivedData: { data: [], total: 0 },
       dataState: { take: 10, skip: 0 },
-      productInEdit: undefined
+      productInEdit: undefined,
+      statusData: []
     }
 
     this.CommandCell = MyCommandCell({
@@ -89,6 +94,16 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       ...this.state,
       invoices: invoices,
       receivedData: invoices
+    });
+  }
+
+  statusDataReceived = (status) => {
+
+    console.log('statusDataReceived');
+    console.log(status);
+    this.setState({
+      ...this.state,
+      statusData: status
     });
   }
 
@@ -162,7 +177,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * @param dataItem Invoice to edit.
    */
   edit = (dataItem) => {
-    debugger;
+
     this.setState({ productInEdit: this.cloneProduct(dataItem) });
   }
 
@@ -201,7 +216,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   saveEditForm = () => {
-    debugger;
+
     const dataItem = this.state.productInEdit;
     const invoices = this.state.invoices.data.slice();
     // const isNewProduct = dataItem.ProductID === undefined;
@@ -349,6 +364,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           this.state.productInEdit &&
           <InvoiceEditForm
             dataItem={this.state.productInEdit}
+            statusData={this.state.statusData}
             save={this.saveEditForm}
             cancel={this.cancelEditForm}
           />
@@ -357,6 +373,9 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         <InvoiceDataProvider
           dataState={this.state.dataState}
           onDataReceived={this.dataReceived}
+
+          statusDataState={this.state.statusData}
+          onStatusDataReceived={this.statusDataReceived}
         />
       </div>
     );
@@ -396,9 +415,13 @@ class InvoiceDetailComponent extends GridDetailRow {
 class InvoiceEditForm extends React.Component<any, any> {
   constructor(props) {
     super(props);
+    console.log('InvoiceEditForm ctor');
+    console.log(props);
     this.state = {
-      productInEdit: this.props.dataItem || null
+      productInEdit: this.props.dataItem || null,
+      visible: false
     }
+    console.log(this.state);
   }
 
   handleSubmit(event) {
@@ -406,10 +429,13 @@ class InvoiceEditForm extends React.Component<any, any> {
   }
 
   onDialogInputChange = (event) => {
-    debugger;
+
     let target = event.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
-    const name = target.props ? target.props.name : target.name;
+    // kendo form does not pass name so instead we will use id.
+    //const name = target.props ? target.props.name : target.name;
+
+    const name = (target.props && target.props.name !== undefined) ? target.props.name : (target.name !== undefined) ? target.name : target.props.id;
 
     const edited = this.state.productInEdit;
     edited[name] = value;
@@ -419,16 +445,55 @@ class InvoiceEditForm extends React.Component<any, any> {
     });
   }
 
+
   render() {
     return (
-      <Dialog onClose={this.props.cancel} minWidth="200px" width="50%">
+      <Dialog onClose={this.props.cancel} title={"Edit AR Invoice"} minWidth="200px" width="50%" >
 
-        <form onSubmit={this.handleSubmit}>
-          hello world
-        </form>
+        <Form
+          onSubmit={this.handleSubmit}
+
+          render={(formRenderProps) => (
+            <FormElement style={{ width: '100%' }}>
+              <fieldset className={'k-form-fieldset'}>
+                <div style={{marginBottom:"2px"}}>
+                  <Field
+                    id={'Invoice_x0020_Status'}
+                    name={'Invoice_x0020_Status'}
+                    label={'Status'}
+                    value={this.state.productInEdit.Invoice_x0020_Status}
+                    data={this.props.statusData}
+                    onChange={this.onDialogInputChange}
+                    component={MyFormComponents.FormDropDownList}
+                  />
+                </div>
+                <div style={{marginBottom:"2px"}}>
+                  <Field
+                    id={'Invoice_x0020_Number'}
+                    name={'Invoice_x0020_Number'}
+                    label={'Invoice Number'}
+                    value={this.state.productInEdit.Invoice_x0020_Number}
+                    onChange={this.onDialogInputChange}
+                    component={MyFormComponents.FormInput}
+                  />
+                </div>
+                <div style={{marginBottom:"2px"}}>
+                  <Field
+                    id={'Batch_x0020_Number'}
+                    name={'Batch_x0020_Number'}
+                    label={'Batch Number'}
+                    value={this.state.productInEdit.Batch_x0020_Number}
+                    onChange={this.onDialogInputChange}
+                    component={MyFormComponents.FormInput}
+                  />
+                </div>
+              </fieldset>
+            </FormElement>
+          )}
+        />
 
         <DialogActionsBar>
-        <Button
+          <Button
             className="k-button k-primary"
             icon="save"
             primary={true}

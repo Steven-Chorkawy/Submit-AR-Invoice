@@ -59,6 +59,7 @@ class InvoiceDataProvider extends React.Component<any, any> {
           .filter(accountDetailFilter)
           .get();
 
+
         // Using each of the accounts that we found we will not attach them to the invoice object.
         response.map(invoice => { invoice.AccountDetails = accountDetails.filter(f => Number(f.AR_x0020_InvoiceId) === invoice.ID); });
         //#endregion
@@ -72,9 +73,34 @@ class InvoiceDataProvider extends React.Component<any, any> {
       });
   };
 
+  requestStatusData = () => {
+
+    if(this.props.statusDataState.length > 0) {
+      return;
+    }
+
+    sp.web.lists
+      .getByTitle('AR Invoices')
+      .fields
+      .getByInternalNameOrTitle('Invoice_x0020_Status')
+      .select('Choices')
+      .get()
+      .then(response => {
+        let output: any = response;
+
+        if (output.hasOwnProperty('Choices')) {
+          this.props.onStatusDataReceived.call(undefined, output.Choices)
+        }
+        else {
+          this.props.onStatusDataReceived.call(undefined, []);
+        }
+      });
+  }
+
   render() {
     // Query any methods required here.
     this.requestDataIfNeeded();
+    this.requestStatusData();
 
     return this.pending && <LoadingPanel />
   };
