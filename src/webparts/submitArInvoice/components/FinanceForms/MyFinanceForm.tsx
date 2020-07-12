@@ -250,6 +250,17 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       },
       productInEdit: undefined
     });
+
+    var updateObject = {
+      Invoice_x0020_Status: dataItem.Invoice_x0020_Status,
+      Invoice_x0020_Number: dataItem.Invoice_x0020_Number,
+      Batch_x0020_Number: dataItem.Batch_x0020_Number,
+      Requires_x0020_Accountant_x0020_ApprovalId: dataItem.Requires_x0020_Accountant_x0020_ApprovalId ? dataItem.Requires_x0020_Accountant_x0020_ApprovalId.Id : null
+    }
+
+    console.log(updateObject);
+
+    sp.web.lists.getByTitle('AR Invoices').items.getById(dataItem.ID).update(updateObject);
   }
 
   updateItem = (data, item) => {
