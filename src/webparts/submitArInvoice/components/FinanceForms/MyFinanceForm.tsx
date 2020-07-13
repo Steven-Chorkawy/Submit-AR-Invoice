@@ -119,8 +119,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   dataStateChange = (e) => {
-    console.log("dataStateChange");
-    console.log(e);
     this.setState({
       ...this.state,
       dataState: e.data
@@ -147,9 +145,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   itemChange = (event) => {
-
-    console.log("itemChange");
-    console.log(event);
     const data = this.state.invoices.data.map(item =>
       item.ID === event.dataItem.ID ? { ...item, [event.field]: event.value } : item
     );
@@ -167,8 +162,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * @param dataItem Invoice that will be sent to edit mode.
    */
   enterEdit = (dataItem) => {
-    console.log("enterEdit");
-    console.log(dataItem);
     this.setState({
       invoices: {
         // Set any other properties of state.invoices
@@ -258,21 +251,16 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       Requires_x0020_Accountant_x0020_ApprovalId: dataItem.Requires_x0020_Accountant_x0020_ApprovalId ? dataItem.Requires_x0020_Accountant_x0020_ApprovalId.Id : null
     }
 
-    console.log(updateObject);
-
     sp.web.lists.getByTitle('AR Invoices').items.getById(dataItem.ID).update(updateObject);
 
     // Check to see if there is a file that we can update.
     for (let index = 0; index < dataItem.InvoiceAttachments.length; index++) {
       const element = dataItem.InvoiceAttachments[index];
-      debugger;
       const newFileName = dataItem.Title + element.extension;
 
       sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/').files
         .add(newFileName, element.getRawFile(), true)
         .then(fileResult => {
-          console.log("File Upload Result");
-          console.log(fileResult);
           // Title is cleared when file uploads? Don't know why but we need it so yeah.
           sp.web.lists.getByTitle('AR Invoices').items.getById(dataItem.ID).update({ Title: dataItem.Title });
         });
@@ -432,13 +420,8 @@ class InvoiceDetailComponent extends GridDetailRow {
   private itemChangeEvent
 
   constructor(props) {
-
-    console.log("InvoiceDetailComponent");
-    console.log(props);
     super(props);
   }
-
-
 
   render() {
     return this.props.dataItem.inEdit ?
@@ -461,13 +444,10 @@ class InvoiceDetailComponent extends GridDetailRow {
 class InvoiceEditForm extends React.Component<any, any> {
   constructor(props) {
     super(props);
-    console.log('InvoiceEditForm ctor');
-    console.log(props);
     this.state = {
       productInEdit: this.props.dataItem || null,
       visible: false,
     }
-    console.log(this.state);
   }
 
   handleSubmit(event) {
@@ -547,7 +527,6 @@ class InvoiceEditForm extends React.Component<any, any> {
                     multiple={false}
                     myOnChange={this.onDialogInputChange}
                     component={MyFormComponents.FormUpload}
-
                   />
                 </div>
               </fieldset>

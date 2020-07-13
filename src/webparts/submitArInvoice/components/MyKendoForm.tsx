@@ -55,8 +55,6 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
    */
   constructor(props) {
     super(props);
-    console.log("MyForm CTOR");
-    console.log(this.props);
 
     this._siteUrl = props.ctx.pageContext.web.absoluteUrl;
 
@@ -72,7 +70,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
    * @param dataItem Data from form
    */
   handleSubmit = async (dataItem) => {
-    debugger;
+
     // We will use this to update states later.
     let currentFiles: IUploadingFile[] = this.state.MyFiles;
 
@@ -89,7 +87,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
 
     // Gets the file that we just uploaded.  This will be used later to update the metadata.
     let newUploadedFile = await uploadRes.file.getItem();
-    debugger;
+
 
     // Set the data for the invoice
     let myData: IARFormModel = {
@@ -127,16 +125,12 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
 
       for (let index = 0; index < dataItem.RelatedInvoiceAttachments.length; index++) {
         const element = dataItem.RelatedInvoiceAttachments[index];
-        console.log("New File Upload");
-        console.log(element);
-        debugger;
         web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/')
           .files
           .add(element.name, element.getRawFile(), true)
           .then(uploadRes => {
             uploadRes.file.getItem()
               .then(item => {
-                debugger;
                 item.update({
                   ARInvoiceId: innerFile.ID
                 });
@@ -144,7 +138,6 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
           });
       }
     })
-    debugger;
 
     output.file.get().then(f => {
       currentFiles.push({
@@ -157,8 +150,6 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
         MyFiles: currentFiles
       })
     });
-
-
   }
 
   S4 = () => {
