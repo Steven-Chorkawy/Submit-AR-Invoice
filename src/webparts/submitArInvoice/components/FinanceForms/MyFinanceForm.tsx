@@ -267,6 +267,13 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       const element = dataItem.InvoiceAttachments[index];
       debugger;
 
+      //! Need to change element.name to the current documents name.  That way we will be replacing the current document with the new content.
+      sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/').files
+      .add(element.name, element.getRawFile(), true)
+        .then(fileResult => {
+          console.log("File Upload Result");
+          console.log(fileResult);
+        });
     }
   }
 
