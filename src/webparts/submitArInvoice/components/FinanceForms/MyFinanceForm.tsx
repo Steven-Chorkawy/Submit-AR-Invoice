@@ -269,7 +269,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
       //! Need to change element.name to the current documents name.  That way we will be replacing the current document with the new content.
       sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/').files
-      .add(element.name, element.getRawFile(), true)
+      .add(dataItem.Title, element.getRawFile(), true)
         .then(fileResult => {
           console.log("File Upload Result");
           console.log(fileResult);

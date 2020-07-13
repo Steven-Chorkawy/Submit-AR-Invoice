@@ -158,15 +158,17 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     // Title = "Current year"-AR-"GUID"
     // 2020-AR-66d07df6-40a8-45e0-04c9-1b485ebc3aca
     let currentYear = new Date().getFullYear();
+    let fileExt = fileName.slice((fileName.lastIndexOf(".") - 1 >>> 0) + 2);
     debugger;
-    const newARTitle = currentYear + "-AR-" + (this.S4() + this.S4() + "-" + this.S4() + "-4" + this.S4().substr(0,3) + "-" + this.S4() + "-" + this.S4() + this.S4() + this.S4()).toLowerCase();
 
+    const newARTitle = currentYear + "-AR-" + (this.S4() + this.S4() + "-" + this.S4() + "-4" + this.S4().substr(0,3) + "-" + this.S4() + "-" + this.S4() + this.S4() + this.S4()).toLowerCase();
+    let finalFileName = (fileExt != '') ? newARTitle + '.' + fileExt : newARTitle;
 
     // Uploads the file to the document library.
     // TODO: Remove this hard coded value! Can we possibly get this from the web parts properties window? That would allow this web part to be used in multiple locations.
     let uploadRes = await web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/')
       .files
-      .add(newARTitle, rawFile, true);
+      .add(finalFileName, rawFile, true);
 
     // Gets the file that we just uploaded.  This will be used later to update the metadata.
     let file = await uploadRes.file.getItem();
