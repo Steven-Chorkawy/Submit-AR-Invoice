@@ -261,6 +261,13 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     console.log(updateObject);
 
     sp.web.lists.getByTitle('AR Invoices').items.getById(dataItem.ID).update(updateObject);
+
+    // Check to see if there is a file that we can update.
+    for (let index = 0; index < dataItem.InvoiceAttachments.length; index++) {
+      const element = dataItem.InvoiceAttachments[index];
+      debugger;
+
+    }
   }
 
   updateItem = (data, item) => {
@@ -458,17 +465,11 @@ class InvoiceEditForm extends React.Component<any, any> {
   }
 
   onDialogInputChange = (event) => {
-
     let target = event.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
-    // kendo form does not pass name so instead we will use id.
-    //const name = target.props ? target.props.name : target.name;
-
     const name = (target.props && target.props.name !== undefined) ? target.props.name : (target.name !== undefined) ? target.name : target.props.id;
-
     const edited = this.state.productInEdit;
     edited[name] = value;
-
     this.setState({
       productInEdit: edited
     });
@@ -533,8 +534,10 @@ class InvoiceEditForm extends React.Component<any, any> {
                     name="InvoiceAttachments"
                     label="Upload Attachments"
                     batch={false}
-                    multiple={true}
+                    multiple={false}
+                    myOnChange={this.onDialogInputChange}
                     component={MyFormComponents.FormUpload}
+
                   />
                 </div>
               </fieldset>
