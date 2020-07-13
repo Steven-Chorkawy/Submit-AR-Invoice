@@ -266,13 +266,15 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     for (let index = 0; index < dataItem.InvoiceAttachments.length; index++) {
       const element = dataItem.InvoiceAttachments[index];
       debugger;
+      const newFileName = dataItem.Title + element.extension;
 
-      //! Need to change element.name to the current documents name.  That way we will be replacing the current document with the new content.
       sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/').files
-      .add(dataItem.Title, element.getRawFile(), true)
+        .add(newFileName, element.getRawFile(), true)
         .then(fileResult => {
           console.log("File Upload Result");
           console.log(fileResult);
+          // Title is cleared when file uploads? Don't know why but we need it so yeah.
+          sp.web.lists.getByTitle('AR Invoices').items.getById(dataItem.ID).update({ Title: dataItem.Title });
         });
     }
   }
@@ -449,6 +451,7 @@ class InvoiceDetailComponent extends GridDetailRow {
       // Return View Mode
       (
         <div>
+          <h5>Sample data for UAT.  We can add invoice data more here.</h5>
           <p>{this.props.dataItem.Standard_x0020_Terms}</p>
         </div>
       );

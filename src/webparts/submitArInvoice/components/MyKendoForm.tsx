@@ -71,108 +71,25 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
    * Form Submit Event
    * @param dataItem Data from form
    */
-  handleSubmit = (dataItem) => {
+  handleSubmit = async (dataItem) => {
+    debugger;
     // We will use this to update states later.
     let currentFiles: IUploadingFile[] = this.state.MyFiles;
 
-    // Users are allowed to submit this form without any attachments.
-    // First I'm going to check if there are any attachments, if not I will upload a blank file and record the metadata they provided.
-    if (!dataItem.hasOwnProperty('InvoiceAttachments')) {
-      this.uploadNewFileAndSetMetadata(dataItem, "EmptyFile", null)
-        .then(file => {
-          file.file.get().then(f => {
-            currentFiles.push({
-              FileName: f.Name,
-              UploadSuccessful: true,
-              ErrorMessage: null
-            });
 
-            this.setState({
-              MyFiles: currentFiles
-            })
-          });
-        })
-        .catch((error) => {
-
-          alert("Something went wrong!");
-          console.log(error);
-
-          currentFiles.push({
-            FileName: "get file name",
-            UploadSuccessful: false,
-            ErrorMessage: error
-          });
-
-          this.setState({
-            MyFiles: currentFiles
-          })
-        });
-    }
-    else {
-      // 1 or more attachments are present.
-      for (let index = 0; index < dataItem.InvoiceAttachments.length; index++) {
-        const attachedFile = dataItem.InvoiceAttachments[index];
-        this.uploadNewFileAndSetMetadata(dataItem, attachedFile.name, attachedFile.getRawFile())
-          .then(file => {
-            file.file.get().then(f => {
-              currentFiles.push({
-                FileName: f.Name,
-                UploadSuccessful: true,
-                ErrorMessage: null
-              });
-
-              this.setState({
-                MyFiles: currentFiles
-              })
-            });
-
-          })
-          .catch((error) => {
-            alert("Something went wrong!");
-            console.log(error);
-
-            currentFiles.push({
-              FileName: "get file name",
-              UploadSuccessful: false,
-              ErrorMessage: error
-            });
-
-            this.setState({
-              MyFiles: currentFiles
-            })
-          })
-      }
-    }
-  }
-
-  S4 = () => {
-    return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
-  }
-
-  /**
-   * Upload a file to the document library and set its Metadata.
-   * @param dataItem Data from form.
-   */
-  uploadNewFileAndSetMetadata = async (dataItem, fileName, rawFile) => {
     let web = Web(this._siteUrl);
-    // Title = "Current year"-AR-"GUID"
-    // 2020-AR-66d07df6-40a8-45e0-04c9-1b485ebc3aca
     let currentYear = new Date().getFullYear();
-    let fileExt = fileName.slice((fileName.lastIndexOf(".") - 1 >>> 0) + 2);
-    debugger;
-
-    const newARTitle = currentYear + "-AR-" + (this.S4() + this.S4() + "-" + this.S4() + "-4" + this.S4().substr(0,3) + "-" + this.S4() + "-" + this.S4() + this.S4() + this.S4()).toLowerCase();
-    let finalFileName = (fileExt != '') ? newARTitle + '.' + fileExt : newARTitle;
-
-    // Uploads the file to the document library.
+    const newARTitle = currentYear + "-AR-" + (this.S4() + this.S4() + "-" + this.S4() + "-4" + this.S4().substr(0, 3) + "-" + this.S4() + "-" + this.S4() + this.S4() + this.S4()).toLowerCase();
+    let finalFileName = newARTitle + '.pdf'; // .pdf because GP exports pdf files.  Finance will replace this place holder file in the future.
     // TODO: Remove this hard coded value! Can we possibly get this from the web parts properties window? That would allow this web part to be used in multiple locations.
+    //? Can i upload a string as file content?
     let uploadRes = await web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/')
       .files
-      .add(finalFileName, rawFile, true);
+      .add(finalFileName, "Placeholder file until invoice from GP is uploaded", true);
 
     // Gets the file that we just uploaded.  This will be used later to update the metadata.
-    let file = await uploadRes.file.getItem();
-
+    let newUploadedFile = await uploadRes.file.getItem();
+    debugger;
 
     // Set the data for the invoice
     let myData: IARFormModel = {
@@ -191,7 +108,8 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     }
     const accounts: IARAccountDetails = { ...dataItem.GLAccounts }
 
-    var output = await (await file.update(myData)).item;
+    var output = await (await newUploadedFile.update(myData)).item;
+
 
     output.get().then(innerFile => {
       // Set the data for the account details.
@@ -206,10 +124,47 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
       });
 
       this.addAccountCodes(accountDetails);
-    })
 
-    return output;
+      for (let index = 0; index < dataItem.RelatedInvoiceAttachments.length; index++) {
+        const element = dataItem.RelatedInvoiceAttachments[index];
+        console.log("New File Upload");
+        console.log(element);
+        debugger;
+        web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/')
+          .files
+          .add(element.name, element.getRawFile(), true)
+          .then(uploadRes => {
+            uploadRes.file.getItem()
+              .then(item => {
+                debugger;
+                item.update({
+                  ARInvoiceId: innerFile.ID
+                });
+              })
+          });
+      }
+    })
+    debugger;
+
+    output.file.get().then(f => {
+      currentFiles.push({
+        FileName: f.Name,
+        UploadSuccessful: true,
+        ErrorMessage: null
+      });
+
+      this.setState({
+        MyFiles: currentFiles
+      })
+    });
+
+
   }
+
+  S4 = () => {
+    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+  }
+
 
 
   /**
@@ -386,8 +341,8 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
               <hr />
 
               <Field
-                id="InvoiceAttachments"
-                name="InvoiceAttachments"
+                id="RelatedInvoiceAttachments"
+                name="RelatedInvoiceAttachments"
                 label="Upload Attachments"
                 batch={false}
                 multiple={true}
