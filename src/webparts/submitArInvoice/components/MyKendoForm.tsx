@@ -345,6 +345,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                 dataItemKey="ID"
                 textField="Title"
                 validator={MyValidators.requiresCustomer}
+                allowCustom={true}
                 component={MyFormComponents.CustomerComboBox}
               //onchange={this.onDialogInputChange}
               />

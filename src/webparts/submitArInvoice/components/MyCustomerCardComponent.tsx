@@ -11,6 +11,8 @@ export class MyCustomerCardComponent extends React.Component<IMyCustomerProps, I
    */
   constructor(props) {
     super(props);
+    console.log("MyCustomerCard");
+    console.log(props);
 
     this.state = {
       selectedCustomer: props.selectedCustomer
@@ -22,10 +24,17 @@ export class MyCustomerCardComponent extends React.Component<IMyCustomerProps, I
   }
 
   render() {
-
+    console.log("MyCustomCardRender");
+    console.log(this.state);
+    // Nothing is selected.
     if (this.state.selectedCustomer == undefined) {
       return (<div key="0">Select a Customer</div>);
     }
+    // Custom value is entered.
+    else if(!this.state.selectedCustomer.hasOwnProperty('ID')) {
+      return(<h4>TODO: Create a form here to get custom customer info.</h4>);
+    }
+    // existing value is selected.
     else {
       return (
         // TODO: Design this better! This is just for the first round of review.
@@ -42,7 +51,6 @@ export class MyCustomerCardComponent extends React.Component<IMyCustomerProps, I
               <p>Telephone Number: {this.state.selectedCustomer.WorkPhone}</p>
               <p>Mailing Address: {this.state.selectedCustomer.WorkAddress}</p>
             </div>
-
             <p>Notes: {this.state.selectedCustomer.Comments}</p>
           </CardBody>
         </Card>
