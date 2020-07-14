@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Form, Field, FormElement, FieldWrapper, FieldArray } from '@progress/kendo-react-form';
 import { Error } from '@progress/kendo-react-labels';
-import { Input, MaskedTextBox } from '@progress/kendo-react-inputs'
+import { Input, MaskedTextBox } from '@progress/kendo-react-inputs';
 import { Button } from '@progress/kendo-react-buttons';
 import { Card, CardTitle, CardBody, CardActions } from '@progress/kendo-react-layout';
 import { Grid, GridColumn, GridToolbar } from '@progress/kendo-react-grid';
@@ -20,7 +20,7 @@ import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import * as MyFormComponents from './MyFormComponents';
 import { IMyFormProps } from './IMyFormProps';
 import { IMyFormState, IUploadingFile } from './IMyFormState';
-import * as MyValidators from './validators.jsx'
+import * as MyValidators from './validators.jsx';
 import { MyCustomerCardComponent } from './MyCustomerCardComponent';
 import { MyGLAccountComponent } from './MyGLAccountComponent';
 
@@ -48,7 +48,7 @@ export interface IARAccountDetails {
 
 
 export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
-  _siteUrl: string;
+  private _siteUrl: string;
 
   /**
    *
@@ -61,7 +61,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     this.state = {
       MyFiles: [],
       ...props
-    }
+    };
   }
 
 
@@ -69,10 +69,15 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
    * Form Submit Event
    * @param dataItem Data from form
    */
-  handleSubmit = async (dataItem) => {
+  public handleSubmit = async (dataItem) => {
+    console.log("handleSubmit");
+    console.log(dataItem);
+
 
     // We will use this to update states later.
     let currentFiles: IUploadingFile[] = this.state.MyFiles;
+
+
     debugger;
 
     let web = Web(this._siteUrl);
@@ -96,14 +101,15 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
       Date: dataItem.Date,
       Requested_x0020_ById: dataItem.RequestedBy.Id,
       Requires_x0020_Authorization_x0020_ById: {
-        'results': dataItem.RequiresAuthorizationBy.map((user) => { return user.Id })
+        'results': dataItem.RequiresAuthorizationBy.map((user) => { return user.Id; })
       },
       CustomerId: dataItem.Customer.Id,
       Comment: dataItem.Comment,
       Invoice_x0020_Details: dataItem.InvoiceDetails,
       Standard_x0020_Terms: dataItem.StandardTerms,
       Urgent: dataItem.Urgent
-    }
+    };
+
     const accounts: IARAccountDetails = { ...dataItem.GLAccounts }
 
     var output = await (await newUploadedFile.update(myData)).item;
@@ -130,8 +136,8 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
           web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/')
             .files
             .add(element.name, element.getRawFile(), true)
-            .then(uploadRes => {
-              uploadRes.file.getItem()
+            .then(uploadResponse => {
+              uploadResponse.file.getItem()
                 .then(item => {
                   item.update({
                     ARInvoiceId: innerFile.ID
@@ -140,7 +146,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
             });
         }
       }
-    })
+    });
 
     output.file.get().then(f => {
       currentFiles.push({
@@ -151,17 +157,17 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
 
       this.setState({
         MyFiles: currentFiles
-      })
+      });
     });
   }
 
-  S4 = () => {
+  private S4 = () => {
     return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
   }
 
 
 
-  uploadRelatedFiles = async (inputData, mainFile) => {
+  public uploadRelatedFiles = async (inputData, mainFile) => {
 
     let web = Web(this._siteUrl);
 
@@ -175,7 +181,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
           .then((item: any) => {
             return item.update({
               ARInvoiceId: mainFile.Id
-            })
+            });
           })
         );
     }
@@ -187,7 +193,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
    *
    * @param accountDetails IARAccountDetails
    */
-  addAccountCodes = async (accountDetails: IARAccountDetails[], file) => {
+  public addAccountCodes = async (accountDetails: IARAccountDetails[], file) => {
     accountDetails.map(account => {
       sp.web.lists.getByTitle('AR Invoice Accounts').items.add(account)
         .then(f => {
@@ -201,7 +207,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     });
   }
 
-  UploadStatusCard = () => {
+  public UploadStatusCard = () => {
     let output = [];
 
     this.state.MyFiles.map(f => {
@@ -219,7 +225,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
   }
 
 
-  render() {
+  public render() {
     return (
       <div style={{ padding: '5px' }}>
         <Form
@@ -387,6 +393,6 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
             </FormElement>
           )} />
       </div>
-    )
+    );
   }
 }
