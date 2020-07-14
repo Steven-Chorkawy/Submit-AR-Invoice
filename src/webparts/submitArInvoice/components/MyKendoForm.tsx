@@ -73,7 +73,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
 
     // We will use this to update states later.
     let currentFiles: IUploadingFile[] = this.state.MyFiles;
-
+    debugger;
 
     let web = Web(this._siteUrl);
     let currentYear = new Date().getFullYear();
