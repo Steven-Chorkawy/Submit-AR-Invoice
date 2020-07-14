@@ -352,8 +352,8 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                 <Field
                   id="CustomerPONumber"
                   name="CustomerPONumber"
-                  label="* Customer PO Number"
-                  validator={MyValidators.requiresCustomerPONUmber}
+                  label="Customer PO Number"
+                  //validator={MyValidators.requiresCustomerPONUmber}
                   component={MyFormComponents.FormInput}
                 //onchange={this.onDialogInputChange}
                 />
