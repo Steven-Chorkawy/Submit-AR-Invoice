@@ -143,12 +143,16 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
             .then(uploadResponse => {
               uploadResponse.file.getItem()
                 .then(item => {
-                  console.log("Updating related file");
-                  console.log(item);
-                  console.log(innerFile.ID);
-                  item.update({
+                  const itemProxy: any = Object.assign({}, item);
+                  sp.web.lists.getByTitle('AR Invoices').items.getById(itemProxy.ID).update({
                     ARInvoiceId: innerFile.ID
                   });
+                  // console.log("Updating related file");
+                  // console.log(item);
+                  // console.log(innerFile.ID);
+                  // item.update({
+                  //   ARInvoiceId: innerFile.ID
+                  // });
                 });
             });
         }
