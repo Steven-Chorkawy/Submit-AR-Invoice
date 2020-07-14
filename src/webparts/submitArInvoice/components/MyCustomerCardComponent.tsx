@@ -31,6 +31,7 @@ export class MyCustomerCardComponent extends React.Component<IMyCustomerProps, I
       return (<div key="0">Select a Customer</div>);
     }
     // Custom value is entered.
+    // If id isn't present that means the user has given us a custom value.
     else if(!this.state.selectedCustomer.hasOwnProperty('ID')) {
       return(<h4>TODO: Create a form here to get custom customer info.</h4>);
     }
