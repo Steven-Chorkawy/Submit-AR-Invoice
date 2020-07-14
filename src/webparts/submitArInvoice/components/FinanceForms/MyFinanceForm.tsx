@@ -12,8 +12,6 @@ import { Button } from '@progress/kendo-react-buttons';
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import { Input, NumericTextBox } from '@progress/kendo-react-inputs';
 import { Form, Field, FormElement } from '@progress/kendo-react-form';
-import { Window } from '@progress/kendo-react-dialogs';
-import { Upload, UploadFileStatus } from '@progress/kendo-react-upload';
 
 
 
@@ -90,7 +88,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   //#endregion
 
   //#region Methods
-  dataReceived = (invoices) => {
+  public dataReceived = (invoices) => {
     console.log("dataReceived");
     console.log(invoices);
     this.setState({
@@ -100,7 +98,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     });
   }
 
-  statusDataReceived = (status) => {
+  public statusDataReceived = (status) => {
     console.log('statusDataReceived');
     console.log(status);
     this.setState({
@@ -109,7 +107,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     });
   }
 
-  siteUserDataReceived = (users) => {
+  public siteUserDataReceived = (users) => {
     console.log('siteUserDataReceived');
     console.log(users);
     this.setState({
@@ -118,33 +116,33 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     });
   }
 
-  dataStateChange = (e) => {
+  public dataStateChange = (e) => {
     this.setState({
       ...this.state,
       dataState: e.data
     });
   }
 
-  expandChange = (event) => {
+  public expandChange = (event) => {
     event.dataItem.expanded = !event.dataItem.expanded;
     event.myFunction = this.itemChange;
     this.forceUpdate();
   }
 
-  cloneProduct(product) {
+  public cloneProduct(product) {
     return Object.assign({}, product);
   }
   //#endregion End Methods
 
   //#region CRUD Methods
-  removeItem(data, item) {
+  public removeItem(data, item) {
     let index = data.findIndex(p => p === item || (item.ID && p.ID === item.ID));
     if (index >= 0) {
       data.splice(index, 1);
     }
   }
 
-  itemChange = (event) => {
+  public itemChange = (event) => {
     const data = this.state.invoices.data.map(item =>
       item.ID === event.dataItem.ID ? { ...item, [event.field]: event.value } : item
     );
@@ -161,7 +159,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * Grid Edit button click event.
    * @param dataItem Invoice that will be sent to edit mode.
    */
-  enterEdit = (dataItem) => {
+  public enterEdit = (dataItem) => {
     this.setState({
       invoices: {
         // Set any other properties of state.invoices
@@ -180,7 +178,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * Edit form edit event.
    * @param dataItem Invoice to edit.
    */
-  edit = (dataItem) => {
+  public edit = (dataItem) => {
 
     this.setState({ productInEdit: this.cloneProduct(dataItem) });
   }
@@ -189,7 +187,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * Add/Save new invoice.
    * @param dataItem New Invoice
    */
-  add = (dataItem) => {
+  public add = (dataItem) => {
     dataItem.inEdit = undefined;
 
     // TODO: Call method that adds dataItem to the SP List.
@@ -205,7 +203,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * Inline Update method
    * @param dataItem Invoice
    */
-  update = (dataItem) => {
+  public update = (dataItem) => {
     const data = [...this.state.invoices.data];
     const updatedItem = { ...dataItem, inEdit: undefined };
 
@@ -219,7 +217,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     });
   }
 
-  saveEditForm = () => {
+  public saveEditForm = () => {
 
     const dataItem = this.state.productInEdit;
     const invoices = this.state.invoices.data.slice();
@@ -287,7 +285,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     }
   }
 
-  updateItem = (data, item) => {
+  public updateItem = (data, item) => {
     let index = data.findIndex(p => p === item || (item.ID && p.ID === item.ID));
     if (index >= 0) {
       data[index] = { ...item };
@@ -298,7 +296,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * Cancel and discard all changes made to the current edit.
    * @param dataItem Invoice item that we are no longer editing.
    */
-  cancel = (dataItem) => {
+  public cancel = (dataItem) => {
     const originalItem = this.state.receivedData.data.find(p => p.ID === dataItem.ID);
     const data = this.state.invoices.data.map(item => item.ID === originalItem.ID ? originalItem : item);
     this.setState({
@@ -310,11 +308,11 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     });
   }
 
-  cancelEditForm = () => {
+  public cancelEditForm = () => {
     this.setState({ productInEdit: undefined });
   }
 
-  discard = (dataItem) => {
+  public discard = (dataItem) => {
     const data = [...this.state.invoices.data];
     this.removeItem(data, dataItem);
 
@@ -326,7 +324,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     });
   }
 
-  remove = (dataItem) => {
+  public remove = (dataItem) => {
     const data = [...this.state.invoices.data];
     this.removeItem(data, dataItem);
 
@@ -343,7 +341,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * Create a new row on the grid.
    * This new row is where we can enter new invoices.
    */
-  addNew = () => {
+  public addNew = () => {
     throw "Don't let this happen.";
     // const newDataItem = { inEdit: true, Discontinued: false };
 
@@ -355,7 +353,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   /**
    * Cancel all changes made.
    */
-  cancelCurrentChanges = () => {
+  public cancelCurrentChanges = () => {
     // reset everything back.
     this.setState({
       invoices: { ...this.state.receivedData }
@@ -363,7 +361,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
   //#endregion end CRUD Methods
 
-  render() {
+  public render() {
     const hasEditedItem = this.state.invoices.data.some(p => p.inEdit);
     return (
       <div>
@@ -443,7 +441,7 @@ class InvoiceDetailComponent extends GridDetailRow {
     super(props);
   }
 
-  render() {
+  public render() {
     return this.props.dataItem.inEdit ?
       // Return Edit Mode
       (
@@ -470,11 +468,11 @@ class InvoiceEditForm extends React.Component<any, any> {
     }
   }
 
-  handleSubmit(event) {
+  public handleSubmit(event) {
     event.preventDefault();
   }
 
-  onDialogInputChange = (event) => {
+  public onDialogInputChange = (event) => {
     let target = event.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = (target.props && target.props.name !== undefined) ? target.props.name : (target.name !== undefined) ? target.name : target.props.id;
@@ -485,7 +483,7 @@ class InvoiceEditForm extends React.Component<any, any> {
     });
   }
 
-  render() {
+  public render() {
     return (
       <Dialog onClose={this.props.cancel} title={"Edit AR Invoice"} minWidth="200px" width="50%" >
         <Form

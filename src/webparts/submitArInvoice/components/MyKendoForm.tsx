@@ -121,6 +121,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
 
     output.get().then(innerFile => {
       console.log("innerFile1");
+      console.log(innerFile);
       // Set the data for the account details.
       let accountDetails: IARAccountDetails[] = [];
       dataItem.GLAccounts.map(account => {
@@ -164,11 +165,13 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
         UploadSuccessful: true,
         ErrorMessage: null
       });
-      console.log("handleSubmit7");
+      console.log("set final status");
       this.setState({
         MyFiles: currentFiles
       });
     });
+
+    console.log("handleSubmit7");
   }
 
   private S4 = () => {
