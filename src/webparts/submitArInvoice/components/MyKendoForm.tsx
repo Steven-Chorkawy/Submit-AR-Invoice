@@ -121,21 +121,24 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
         });
       });
 
-      this.addAccountCodes(accountDetails);
 
-      for (let index = 0; index < dataItem.RelatedInvoiceAttachments.length; index++) {
-        const element = dataItem.RelatedInvoiceAttachments[index];
-        web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/')
-          .files
-          .add(element.name, element.getRawFile(), true)
-          .then(uploadRes => {
-            uploadRes.file.getItem()
-              .then(item => {
-                item.update({
-                  ARInvoiceId: innerFile.ID
+      this.addAccountCodes(accountDetails, output);
+
+      if (dataItem.RelatedInvoiceAttachments) {
+        for (let index = 0; index < dataItem.RelatedInvoiceAttachments.length; index++) {
+          const element = dataItem.RelatedInvoiceAttachments[index];
+          web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/')
+            .files
+            .add(element.name, element.getRawFile(), true)
+            .then(uploadRes => {
+              uploadRes.file.getItem()
+                .then(item => {
+                  item.update({
+                    ARInvoiceId: innerFile.ID
+                  });
                 });
-              });
-          });
+            });
+        }
       }
     })
 
@@ -159,7 +162,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
 
 
   uploadRelatedFiles = async (inputData, mainFile) => {
-    debugger;
+
     let web = Web(this._siteUrl);
 
     for (let index = 0; index < inputData.RelatedAttachments.length; index++) {
@@ -168,19 +171,13 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
       let uploadRes = await web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/')
         .files
         .add(element.name, element.getRawFile(), true)
-        .then(({file}) => file.getItem()
-          .then((item:any) =>{
-            debugger;
+        .then(({ file }) => file.getItem()
+          .then((item: any) => {
             return item.update({
               ARInvoiceId: mainFile.Id
             })
           })
         );
-
-      // let updateThisFile = await uploadRes.file.getItem();
-      // debugger;
-      // var res = await updateThisFile.update({ARInvoiceId: mainFile.ID});
-      // debugger;
     }
   }
 
@@ -192,14 +189,15 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
    */
   addAccountCodes = async (accountDetails: IARAccountDetails[], file) => {
     accountDetails.map(account => {
-      sp.web.lists.getByTitle('AR Invoice Accounts').items.add(account).then(f => {
-        // Connect the account to the document list.
-        file.update({
-          AccountDetailsId: {
-            results: [f.data.ID]
-          }
+      sp.web.lists.getByTitle('AR Invoice Accounts').items.add(account)
+        .then(f => {
+          // Connect the account to the document list.
+          file.update({
+            AccountDetailsId: {
+              results: [f.data.ID]
+            }
+          });
         });
-      });
     });
   }
 
@@ -368,7 +366,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
               <Field
                 id="RelatedInvoiceAttachments"
                 name="RelatedInvoiceAttachments"
-                label="Upload Attachments"
+                label="Upload Related Attachments"
                 batch={false}
                 multiple={true}
                 component={MyFormComponents.FormUpload}
