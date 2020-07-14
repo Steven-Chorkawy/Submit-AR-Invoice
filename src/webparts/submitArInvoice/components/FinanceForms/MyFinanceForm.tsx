@@ -218,7 +218,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   public saveEditForm = () => {
-
     const dataItem = this.state.productInEdit;
     const invoices = this.state.invoices.data.slice();
     // const isNewProduct = dataItem.ProductID === undefined;
