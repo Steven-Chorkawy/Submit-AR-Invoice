@@ -253,17 +253,37 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
     sp.web.lists.getByTitle('AR Invoices').items.getById(dataItem.ID).update(updateObject);
 
-    // Check to see if there is a file that we can update.
-    for (let index = 0; index < dataItem.InvoiceAttachments.length; index++) {
-      const element = dataItem.InvoiceAttachments[index];
-      const newFileName = dataItem.Title + element.extension;
+    debugger;
 
-      sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/').files
-        .add(newFileName, element.getRawFile(), true)
-        .then(fileResult => {
-          // Title is cleared when file uploads? Don't know why but we need it so yeah.
-          sp.web.lists.getByTitle('AR Invoices').items.getById(dataItem.ID).update({ Title: dataItem.Title });
-        });
+    // Check to see if there is a file that we can update.
+    if (dataItem.InvoiceAttachments) {
+      for (let index = 0; index < dataItem.InvoiceAttachments.length; index++) {
+        const element = dataItem.InvoiceAttachments[index];
+        const newFileName = dataItem.Title + element.extension;
+
+        sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/').files
+          .add(newFileName, element.getRawFile(), true)
+          .then(fileResult => {
+            // Title is cleared when file uploads? Don't know why but we need it so yeah.
+            sp.web.lists.getByTitle('AR Invoices').items.getById(dataItem.ID).update({ Title: dataItem.Title });
+          });
+      }
+    }
+
+    if (dataItem.RelatedInvoiceAttachments) {
+      for (let index = 0; index < dataItem.RelatedInvoiceAttachments.length; index++) {
+        const element = dataItem.RelatedInvoiceAttachments[index];
+        sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/').files
+          .add(element.name, element.getRawFile(), true)
+          .then(fileRes => {
+            fileRes.file.getItem()
+              .then(item => {
+                item.update({
+                  ARInvoiceId: dataItem.ID
+                });
+              });
+          });
+      }
     }
   }
 
@@ -525,6 +545,17 @@ class InvoiceEditForm extends React.Component<any, any> {
                     label="Upload Attachments"
                     batch={false}
                     multiple={false}
+                    myOnChange={this.onDialogInputChange}
+                    component={MyFormComponents.FormUpload}
+                  />
+                </div>
+                <div style={{ marginBottom: "2px" }}>
+                  <Field
+                    id="RelatedInvoiceAttachments"
+                    name="RelatedInvoiceAttachments"
+                    label="Upload Related Attachments"
+                    batch={false}
+                    multiple={true}
                     myOnChange={this.onDialogInputChange}
                     component={MyFormComponents.FormUpload}
                   />

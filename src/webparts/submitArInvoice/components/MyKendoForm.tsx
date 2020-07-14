@@ -134,7 +134,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                 item.update({
                   ARInvoiceId: innerFile.ID
                 });
-              })
+              });
           });
       }
     })
