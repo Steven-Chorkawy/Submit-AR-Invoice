@@ -144,15 +144,9 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
               uploadResponse.file.getItem()
                 .then(item => {
                   const itemProxy: any = Object.assign({}, item);
-                  sp.web.lists.getByTitle('AR Invoices').items.getById(itemProxy.ID).update({
+                  sp.web.lists.getByTitle('RelatedInvoiceAttachments').items.getById(itemProxy.ID).update({
                     ARInvoiceId: innerFile.ID
                   });
-                  // console.log("Updating related file");
-                  // console.log(item);
-                  // console.log(innerFile.ID);
-                  // item.update({
-                  //   ARInvoiceId: innerFile.ID
-                  // });
                 });
             });
         }
