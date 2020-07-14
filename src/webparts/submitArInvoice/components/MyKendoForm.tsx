@@ -74,12 +74,13 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     debugger;
     console.log("handleSubmit");
     console.log(dataItem);
-    console.log(this.state.productInEdit);
+    Object.keys(dataItem).length
 
-    if(Object.keys(dataItem).length === 0) {
+    if (!dataItem.hasOwnProperty('RequestedBy')) {
       console.log("Empty Object.");
       return;
     }
+
 
     // We will use this to update states later.
     let currentFiles: IUploadingFile[] = this.state.MyFiles;
@@ -100,7 +101,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     console.log("handleSubmit1");
     // Gets the file that we just uploaded.  This will be used later to update the metadata.
     let newUploadedFile = await uploadRes.file.getItem();
-    const uploadedFile:any = Object.assign({}, newUploadedFile);
+    const uploadedFile: any = Object.assign({}, newUploadedFile);
     console.log("handleSubmit2");
 
     console.log(uploadedFile);
@@ -306,7 +307,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                   ]}
                   validator={MyValidators.departmentValidator}
                   component={MyFormComponents.FormDropDownList}
-                  //onchange={this.onDialogInputChange}
+                //onchange={this.onDialogInputChange}
                 />
 
                 <Field
@@ -316,7 +317,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                   component={MyFormComponents.FormDatePicker}
                   validator={MyValidators.dateValidator}
                   wrapperStyle={{ width: '50%' }}
-                  //onchange={this.onDialogInputChange}
+                //onchange={this.onDialogInputChange}
                 />
               </div>
 
@@ -331,7 +332,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                   textField="Title"
                   validator={MyValidators.requestedByValidator}
                   component={MyFormComponents.FormComboBox}
-                  //onchange={this.onDialogInputChange}
+                //onchange={this.onDialogInputChange}
                 />
 
                 <Field
@@ -344,7 +345,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                   textField="Title"
                   validator={MyValidators.requiresApprovalFrom}
                   component={MyFormComponents.FormMultiSelect}
-                  //onchange={this.onDialogInputChange}
+                //onchange={this.onDialogInputChange}
                 />
               </div>
 
@@ -356,7 +357,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                   onLabel="Yes"
                   offLabel="No"
                   component={MyFormComponents.FormSwitch}
-                  //onchange={this.onDialogInputChange}
+                //onchange={this.onDialogInputChange}
                 />
               </div>
               <Field
@@ -369,7 +370,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                 textField="Title"
                 validator={MyValidators.requiresCustomer}
                 component={MyFormComponents.CustomerComboBox}
-                //onchange={this.onDialogInputChange}
+              //onchange={this.onDialogInputChange}
               />
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
@@ -378,7 +379,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                   label="* Customer PO Number"
                   validator={MyValidators.requiresCustomerPONUmber}
                   component={MyFormComponents.FormInput}
-                  //onchange={this.onDialogInputChange}
+                //onchange={this.onDialogInputChange}
                 />
 
                 <Field
@@ -391,7 +392,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                     'NET 30, 1% INTEREST CHARGED'
                   ]}
                   component={MyFormComponents.FormDropDownList}
-                  //onchange={this.onDialogInputChange}
+                //onchange={this.onDialogInputChange}
                 />
               </div>
 
@@ -400,7 +401,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                 name="Comment"
                 label="Comments"
                 component={MyFormComponents.FormTextArea}
-                //onchange={this.onDialogInputChange}
+              //onchange={this.onDialogInputChange}
               />
 
               <Field
@@ -408,7 +409,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                 name="InvoiceDetails"
                 label="Invoice Details"
                 component={MyFormComponents.FormTextArea}
-                //onchange={this.onDialogInputChange}
+              //onchange={this.onDialogInputChange}
               />
 
 
@@ -416,7 +417,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                 <FieldArray
                   name="GLAccounts"
                   component={MyGLAccountComponent}
-                  //onchange={this.onDialogInputChange}
+                //onchange={this.onDialogInputChange}
                 />
               </div>
 
@@ -429,7 +430,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                 batch={false}
                 multiple={true}
                 component={MyFormComponents.FormUpload}
-                //onchange={this.onDialogInputChange}
+              //onchange={this.onDialogInputChange}
               />
               <hr />
 
