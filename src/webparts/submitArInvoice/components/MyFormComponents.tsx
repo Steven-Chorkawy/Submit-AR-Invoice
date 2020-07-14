@@ -353,14 +353,6 @@ export const FormUpload = (fieldRenderProps) => {
 
   const onChangeHandler = (event) => {
     fieldRenderProps.onChange({ value: event.newState });
-    if (fieldRenderProps.myOnChange) {
-      fieldRenderProps.myOnChange.call(undefined, {
-        target: {
-          value: event.newState,
-          props: event.target.props
-        }
-      });
-    }
   };
   const onRemoveHandler = (event) => {
     fieldRenderProps.onChange({ value: event.newState });

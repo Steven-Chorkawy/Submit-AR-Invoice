@@ -55,6 +55,8 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
    */
   constructor(props) {
     super(props);
+    console.log("MyForm CTOR");
+    console.log(this.props);
 
     this._siteUrl = props.ctx.pageContext.web.absoluteUrl;
 
@@ -69,8 +71,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
    * Form Submit Event
    * @param dataItem Data from form
    */
-  handleSubmit = async (dataItem) => {
-
+  handleSubmit = (dataItem) => {
     // We will use this to update states later.
     let currentFiles: IUploadingFile[] = this.state.MyFiles;
 
@@ -157,17 +158,17 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
    */
   uploadNewFileAndSetMetadata = async (dataItem, fileName, rawFile) => {
     let web = Web(this._siteUrl);
-    let currentYear = new Date().getFullYear();
-    const newARTitle = currentYear + "-AR-" + (this.S4() + this.S4() + "-" + this.S4() + "-4" + this.S4().substr(0, 3) + "-" + this.S4() + "-" + this.S4() + this.S4() + this.S4()).toLowerCase();
-    let finalFileName = newARTitle + '.pdf'; // .pdf because GP exports pdf files.  Finance will replace this place holder file in the future.
+
+    // Uploads the file to the document library.
     // TODO: Remove this hard coded value! Can we possibly get this from the web parts properties window? That would allow this web part to be used in multiple locations.
-    //? Can i upload a string as file content?
     let uploadRes = await web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/')
       .files
-      .add(finalFileName, "Placeholder file until invoice from GP is uploaded", true);
+      .add(fileName, rawFile, true);
 
     // Gets the file that we just uploaded.  This will be used later to update the metadata.
-    let newUploadedFile = await uploadRes.file.getItem();
+    let file = await uploadRes.file.getItem();
+
+
 
     // Title = "Current year"-AR-"GUID"
     // 2020-AR-66d07df6-40a8-45e0-04c9-1b485ebc3aca
@@ -191,9 +192,8 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     }
     const accounts: IARAccountDetails = { ...dataItem.GLAccounts }
 
-
-    var output = await (await newUploadedFile.update(myData)).item;
-
+    // This updates the item.
+    var output = await (await file.update(myData)).item;
 
     output.get().then(innerFile => {
       debugger;
@@ -209,44 +209,11 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
         });
       });
 
-      this.addAccountCodes(accountDetails);
-
-      for (let index = 0; index < dataItem.RelatedInvoiceAttachments.length; index++) {
-        const element = dataItem.RelatedInvoiceAttachments[index];
-        web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/')
-          .files
-          .add(element.name, element.getRawFile(), true)
-          .then(uploadRes => {
-            uploadRes.file.getItem()
-              .then(item => {
-                item.update({
-                  ARInvoiceId: innerFile.ID
-                });
-              });
-          });
-      }
-
       this.addAccountCodes(accountDetails, file);
-
     })
 
-    output.file.get().then(f => {
-      currentFiles.push({
-        FileName: f.Name,
-        UploadSuccessful: true,
-        ErrorMessage: null
-      });
-
-      this.setState({
-        MyFiles: currentFiles
-      })
-    });
+    return output;
   }
-
-  S4 = () => {
-    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-  }
-
 
 
   uploadRelatedFiles = async (inputData, mainFile) => {
@@ -457,16 +424,24 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
               <hr />
 
               <Field
-
-                id="RelatedInvoiceAttachments"
-                name="RelatedInvoiceAttachments"
-                label="Upload Attachments"
+                id="InvoiceAttachments"
+                name="InvoiceAttachments"
+                label="Primary Attachment"
                 batch={false}
                 multiple={false}
                 component={MyFormComponents.FormUpload}
               />
               <hr />
 
+              <Field
+                id="RelatedAttachments"
+                name="RelatedAttachments"
+                label="Related Attachment"
+                batch={false}
+                multiple={true}
+                component={MyFormComponents.FormUpload}
+              />
+              <hr />
 
 
               <div className="k-form-buttons">

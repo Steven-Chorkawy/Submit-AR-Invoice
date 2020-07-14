@@ -21,14 +21,11 @@ import "@pnp/sp/site-users/web";
 
 import './MyO365.scss';
 import './bootstrap.min.css';
-import './custom.css';
-
 
 // ? What is this for ?
 import * as strings from 'SubmitArInvoiceWebPartStrings';
 
 import { MyForm } from './components/MyKendoForm';
-import { MyFinanceForm } from './components/FinanceForms/MyFinanceForm';
 import { MyKendoGrid } from './components/DepartmentForm/MyKendoGrid';
 import { IMyFormProps } from './components/IMyFormProps';
 // import { Promise } from 'es6-promise';
@@ -132,12 +129,7 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
         break;
 
       case ActiveDisplay.FinanceForm:
-          const element: React.ReactElement = React.createElement(
-            MyFinanceForm,
-            {}
-          );
 
-          ReactDom.render(element, this.domElement);
         break;
 
       default:
