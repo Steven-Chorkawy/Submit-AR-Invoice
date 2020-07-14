@@ -90,8 +90,10 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
       .files
       .add(finalFileName, "Placeholder file until invoice from GP is uploaded", true);
 
+    console.log("handleSubmit1");
     // Gets the file that we just uploaded.  This will be used later to update the metadata.
     let newUploadedFile = await uploadRes.file.getItem();
+    console.log("handleSubmit2");
 
 
     // Set the data for the invoice
@@ -110,9 +112,10 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
       Urgent: dataItem.Urgent
     };
 
-    const accounts: IARAccountDetails = { ...dataItem.GLAccounts }
+    const accounts: IARAccountDetails = { ...dataItem.GLAccounts };
 
     var output = await (await newUploadedFile.update(myData)).item;
+    console.log("handleSubmit3");
 
 
     output.get().then(innerFile => {
@@ -127,8 +130,12 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
         });
       });
 
+      console.log("handleSubmit4");
+
 
       this.addAccountCodes(accountDetails, output);
+
+      console.log("handleSubmit5");
 
       if (dataItem.RelatedInvoiceAttachments) {
         for (let index = 0; index < dataItem.RelatedInvoiceAttachments.length; index++) {
@@ -147,14 +154,14 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
         }
       }
     });
-
+    console.log("handleSubmit6");
     output.file.get().then(f => {
       currentFiles.push({
         FileName: f.Name,
         UploadSuccessful: true,
         ErrorMessage: null
       });
-
+      console.log("handleSubmit7");
       this.setState({
         MyFiles: currentFiles
       });
