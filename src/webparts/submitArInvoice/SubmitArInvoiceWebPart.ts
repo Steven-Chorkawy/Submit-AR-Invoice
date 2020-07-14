@@ -31,7 +31,6 @@ import { MyForm } from './components/MyKendoForm';
 import { MyFinanceForm } from './components/FinanceForms/MyFinanceForm';
 import { MyKendoGrid } from './components/DepartmentForm/MyKendoGrid';
 import { IMyFormProps } from './components/IMyFormProps';
-// import { Promise } from 'es6-promise';
 
 export interface ISubmitArInvoiceWebPartProps {
   description: string;
@@ -48,6 +47,21 @@ export enum ActiveDisplay {
 
 export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmitArInvoiceWebPartProps> {
   myFormProps = {} as IMyFormProps;
+
+  protected async onInit(): Promise<void> {
+    await super.onInit()
+      .then(_ => {
+        sp.setup({
+          spfxContext: this.context,
+          sp: {
+            headers: {
+              "Accept": "application/json; odata=nometadata"
+            },
+            baseUrl: this.context.pageContext.web.absoluteUrl
+          }
+        });
+      });
+  }
 
   /**
    * Get Users who have access to this site.  These users will be used to populate dropdown lists.
@@ -73,19 +87,19 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
   private getARInvoices = async () => {
 
     let arInvoices = await sp.web.lists.getByTitle('Ar Invoices')
-    .items
-    .select(`*, FileRef,
+      .items
+      .select(`*, FileRef,
     Customer/Title,
     AccountDetails/Account_x0020_Code,
     AccountDetails/Amount,
     AccountDetails/ID`)
-    .expand('Customer, AccountDetails')
-    .get();
+      .expand('Customer, AccountDetails')
+      .get();
 
 
     let accounts = await sp.web.lists.getByTitle("AR Invoice Accounts")
-    .items
-    .get();
+      .items
+      .get();
 
     // This is how we can get additional data since the .select() method only include Dependent Lookups
     // https://github.com/pnp/pnpjs/issues/1258 <--- see my open ticket here.
@@ -132,12 +146,12 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
         break;
 
       case ActiveDisplay.FinanceForm:
-          const element: React.ReactElement = React.createElement(
-            MyFinanceForm,
-            {}
-          );
+        const element: React.ReactElement = React.createElement(
+          MyFinanceForm,
+          {}
+        );
 
-          ReactDom.render(element, this.domElement);
+        ReactDom.render(element, this.domElement);
         break;
 
       default:
