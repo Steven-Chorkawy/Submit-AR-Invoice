@@ -74,7 +74,88 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     // We will use this to update states later.
     let currentFiles: IUploadingFile[] = this.state.MyFiles;
 
+    // Users are allowed to submit this form without any attachments.
+    // First I'm going to check if there are any attachments, if not I will upload a blank file and record the metadata they provided.
+    if (!dataItem.hasOwnProperty('InvoiceAttachments')) {
+      this.uploadNewFileAndSetMetadata(dataItem, "EmptyFile", null)
+        .then(file => {
+          file.file.get().then(f => {
+            currentFiles.push({
+              FileName: f.Name,
+              UploadSuccessful: true,
+              ErrorMessage: null
+            });
 
+            this.setState({
+              MyFiles: currentFiles
+            });
+          });
+        })
+        .catch((error) => {
+
+          alert("Something went wrong!");
+          console.log(error);
+
+          currentFiles.push({
+            FileName: "get file name",
+            UploadSuccessful: false,
+            ErrorMessage: error
+          });
+
+          this.setState({
+            MyFiles: currentFiles
+          })
+        });
+    }
+    else {
+      // 1 or more attachments are present.
+      for (let index = 0; index < dataItem.InvoiceAttachments.length; index++) {
+        const attachedFile = dataItem.InvoiceAttachments[index];
+        this.uploadNewFileAndSetMetadata(dataItem, attachedFile.name, attachedFile.getRawFile())
+          .then(file => {
+            file.file.get().then(f => {
+              currentFiles.push({
+                FileName: f.Name,
+                UploadSuccessful: true,
+                ErrorMessage: null
+              });
+
+              this.setState({
+                MyFiles: currentFiles
+              });
+            });
+
+          })
+          .catch((error) => {
+            alert("Something went wrong!");
+            console.log(error);
+
+            currentFiles.push({
+              FileName: "get file name",
+              UploadSuccessful: false,
+              ErrorMessage: error
+            });
+
+            this.setState({
+              MyFiles: currentFiles
+            })
+          })
+      }
+    }
+  }
+
+  /**
+   * Don't touch my spaghetti!
+   */
+  S4 = () => {
+    return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+  }
+
+  /**
+   * Upload a file to the document library and set its Metadata.
+   * @param dataItem Data from form.
+   */
+  uploadNewFileAndSetMetadata = async (dataItem, fileName, rawFile) => {
     let web = Web(this._siteUrl);
     let currentYear = new Date().getFullYear();
     const newARTitle = currentYear + "-AR-" + (this.S4() + this.S4() + "-" + this.S4() + "-4" + this.S4().substr(0, 3) + "-" + this.S4() + "-" + this.S4() + this.S4() + this.S4()).toLowerCase();
@@ -88,6 +169,10 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     // Gets the file that we just uploaded.  This will be used later to update the metadata.
     let newUploadedFile = await uploadRes.file.getItem();
 
+    // Title = "Current year"-AR-"GUID"
+    // 2020-AR-66d07df6-40a8-45e0-04c9-1b485ebc3aca
+    let currentYear = new Date().getFullYear();
+    const newARTitle = currentYear + "-AR-" + (this.S4() + this.S4() + "-" + this.S4() + "-4" + this.S4().substr(0,3) + "-" + this.S4() + "-" + this.S4() + this.S4() + this.S4()).toLowerCase();
 
     // Set the data for the invoice
     let myData: IARFormModel = {
@@ -106,10 +191,13 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     }
     const accounts: IARAccountDetails = { ...dataItem.GLAccounts }
 
+
     var output = await (await newUploadedFile.update(myData)).item;
 
 
     output.get().then(innerFile => {
+      debugger;
+      this.uploadRelatedFiles(dataItem, innerFile);
       // Set the data for the account details.
       let accountDetails: IARAccountDetails[] = [];
       dataItem.GLAccounts.map(account => {
@@ -137,6 +225,9 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
               });
           });
       }
+
+      this.addAccountCodes(accountDetails, file);
+
     })
 
     output.file.get().then(f => {
@@ -158,14 +249,48 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
 
 
 
+  uploadRelatedFiles = async (inputData, mainFile) => {
+    debugger;
+    let web = Web(this._siteUrl);
+
+    for (let index = 0; index < inputData.RelatedAttachments.length; index++) {
+      const element = inputData.RelatedAttachments[index];
+
+      let uploadRes = await web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/')
+        .files
+        .add(element.name, element.getRawFile(), true)
+        .then(({file}) => file.getItem()
+          .then((item:any) =>{
+            debugger;
+            return item.update({
+              ARInvoiceId: mainFile.Id
+            })
+          })
+        );
+
+      // let updateThisFile = await uploadRes.file.getItem();
+      // debugger;
+      // var res = await updateThisFile.update({ARInvoiceId: mainFile.ID});
+      // debugger;
+    }
+  }
+
+
   /**
    * Create the accounts for this invoice.
    *
    * @param accountDetails IARAccountDetails
    */
-  addAccountCodes = async (accountDetails: IARAccountDetails[]) => {
+  addAccountCodes = async (accountDetails: IARAccountDetails[], file) => {
     accountDetails.map(account => {
-      sp.web.lists.getByTitle('AR Invoice Accounts').items.add(account);
+      sp.web.lists.getByTitle('AR Invoice Accounts').items.add(account).then(f => {
+        // Connect the account to the document list.
+        file.update({
+          AccountDetailsId: {
+            results: [f.data.ID]
+          }
+        });
+      });
     });
   }
 
@@ -332,14 +457,16 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
               <hr />
 
               <Field
+
                 id="RelatedInvoiceAttachments"
                 name="RelatedInvoiceAttachments"
                 label="Upload Attachments"
                 batch={false}
-                multiple={true}
+                multiple={false}
                 component={MyFormComponents.FormUpload}
               />
               <hr />
+
 
 
               <div className="k-form-buttons">
