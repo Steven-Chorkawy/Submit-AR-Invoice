@@ -72,13 +72,8 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
    * @param dataItem Data from form
    */
   public handleSubmit = async (dataItem) => {
-    debugger;
-    console.log("handleSubmit");
-    console.log(dataItem);
-    Object.keys(dataItem).length
 
     if (!dataItem.hasOwnProperty('RequestedBy')) {
-      console.log("Empty Object.");
       return;
     }
 
@@ -99,14 +94,9 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
       .files
       .add(finalFileName, "Placeholder file until invoice from GP is uploaded", true);
 
-    console.log("handleSubmit1");
     // Gets the file that we just uploaded.  This will be used later to update the metadata.
     let newUploadedFile = await uploadRes.file.getItem();
     const uploadedFile: any = Object.assign({}, newUploadedFile);
-    console.log("handleSubmit2");
-
-    console.log(uploadedFile);
-    debugger;
 
 
     // Set the data for the invoice
@@ -130,18 +120,10 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
 
     var output = await (await sp.web.lists.getByTitle('AR Invoices').items.getById(uploadedFile.ID).update(myData)).item;
 
-    //var output = await (await newUploadedFile.update(myData)).item;
-    console.log("handleSubmit3");
-    console.log(output);
-
-
     output.get().then(innerFile => {
-      console.log("innerFile1");
-      console.log(innerFile);
       // Set the data for the account details.
       let accountDetails: IARAccountDetails[] = [];
       dataItem.GLAccounts.map(account => {
-        console.log("innerFile mapping");
         accountDetails.push({
           AR_x0020_InvoiceId: innerFile.ID,
           Account_x0020_Code: account.GLCode,
@@ -150,12 +132,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
         });
       });
 
-      console.log("handleSubmit4");
-
-
       this.addAccountCodes(accountDetails, output);
-
-      console.log("handleSubmit5");
 
       if (dataItem.RelatedInvoiceAttachments) {
         for (let index = 0; index < dataItem.RelatedInvoiceAttachments.length; index++) {
@@ -166,6 +143,9 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
             .then(uploadResponse => {
               uploadResponse.file.getItem()
                 .then(item => {
+                  console.log("Updating related file");
+                  console.log(item);
+                  console.log(innerFile.ID);
                   item.update({
                     ARInvoiceId: innerFile.ID
                   });
@@ -174,20 +154,16 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
         }
       }
     });
-    console.log("handleSubmit6");
     output.file.get().then(f => {
       currentFiles.push({
         FileName: f.Name,
         UploadSuccessful: true,
         ErrorMessage: null
       });
-      console.log("set final status");
       this.setState({
         MyFiles: currentFiles
       });
     });
-
-    console.log("handleSubmit7");
   }
 
   /**
