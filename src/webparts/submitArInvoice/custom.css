@@ -1,0 +1,5 @@
+
+/*This fixes the kendo bug that causes dropdown lists to appear behind dialogs and windows*/
+.k-animation-container {
+  z-index: 10003;
+}
