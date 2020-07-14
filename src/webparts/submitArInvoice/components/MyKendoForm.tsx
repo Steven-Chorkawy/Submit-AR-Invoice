@@ -76,6 +76,10 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     console.log(dataItem);
     console.log(this.state.productInEdit);
 
+    if(Object.keys(dataItem).length === 0) {
+      console.log("Empty Object.");
+      return;
+    }
 
     // We will use this to update states later.
     let currentFiles: IUploadingFile[] = this.state.MyFiles;
