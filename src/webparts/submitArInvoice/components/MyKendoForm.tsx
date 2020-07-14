@@ -36,6 +36,7 @@ export interface IARFormModel {
   CustomerId: number;
   Standard_x0020_Terms: string;
   Urgent: boolean;
+  Customer_x0020_PO_x0020_Number: any;
 }
 
 
@@ -119,6 +120,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
       },
       CustomerId: dataItem.Customer.Id,
       Comment: dataItem.Comment,
+      Customer_x0020_PO_x0020_Number: dataItem.CustomerPONumber,
       Invoice_x0020_Details: dataItem.InvoiceDetails,
       Standard_x0020_Terms: dataItem.StandardTerms,
       Urgent: dataItem.Urgent
