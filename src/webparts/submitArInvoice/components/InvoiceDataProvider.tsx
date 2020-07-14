@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 
 /** Start Kendo Imports */
-import { toODataString, translateAggregateResults, process } from '@progress/kendo-data-query';
+import { toODataString, process } from '@progress/kendo-data-query';
 /** End Kendo Imports */
 
 /** Start PnP Imports */
@@ -19,10 +19,10 @@ class InvoiceDataProvider extends React.Component<any, any> {
     super(props);
   }
 
-  pending = '';
-  lastSuccess = '';
+  public pending = '';
+  public lastSuccess = '';
 
-  requestDataIfNeeded = () => {
+  public requestDataIfNeeded = () => {
     if (this.pending || toODataString(this.props.dataState) === this.lastSuccess) {
 
       return;
@@ -73,7 +73,7 @@ class InvoiceDataProvider extends React.Component<any, any> {
       });
   };
 
-  requestStatusData = () => {
+  public requestStatusData = () => {
 
     if (this.props.statusDataState.length > 0) {
       return;
@@ -97,8 +97,8 @@ class InvoiceDataProvider extends React.Component<any, any> {
       });
   }
 
-  requestSiteUsers = () => {
-    if(this.props.siteUsersDataState.length > 0) {
+  public requestSiteUsers = () => {
+    if (this.props.siteUsersDataState.length > 0) {
       return;
     }
 
@@ -109,18 +109,19 @@ class InvoiceDataProvider extends React.Component<any, any> {
         this.props.onSiteUsersDataReceived.call(undefined, siteUsers.filter(user => user.UserPrincipalName != null));
       });
   }
-  render() {
+
+  public render() {
     // Query any methods required here.
     this.requestDataIfNeeded();
     this.requestStatusData();
     this.requestSiteUsers();
 
     return this.pending && <LoadingPanel />
-  };
+  }
 };
 
 class LoadingPanel extends React.Component {
-  render() {
+  public render() {
     const loadingPanel = (
       <div className="k-loading-mask">
         <span className="k-loading-text">Loading</span>
@@ -131,7 +132,7 @@ class LoadingPanel extends React.Component {
 
     const gridContent = document && document.querySelector('.k-grid-content');
     return gridContent ? ReactDom.createPortal(loadingPanel, gridContent) : loadingPanel;
-  };
+  }
 };
 
 export { InvoiceDataProvider };

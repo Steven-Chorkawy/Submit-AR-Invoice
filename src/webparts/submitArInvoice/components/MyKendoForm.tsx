@@ -116,12 +116,15 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
 
     var output = await (await newUploadedFile.update(myData)).item;
     console.log("handleSubmit3");
+    console.log(output);
 
 
     output.get().then(innerFile => {
+      console.log("innerFile1");
       // Set the data for the account details.
       let accountDetails: IARAccountDetails[] = [];
       dataItem.GLAccounts.map(account => {
+        console.log("innerFile mapping");
         accountDetails.push({
           AR_x0020_InvoiceId: innerFile.ID,
           Account_x0020_Code: account.GLCode,
