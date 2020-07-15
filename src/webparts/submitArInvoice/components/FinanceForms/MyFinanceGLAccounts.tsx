@@ -1,5 +1,17 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
+
+
+//PnPjs Imports
+import { sp } from "@pnp/sp";
+import { Web } from "@pnp/sp/webs";
+import "@pnp/sp/webs";
+import "@pnp/sp/files";
+import "@pnp/sp/folders";
+import "@pnp/sp/lists";
+import "@pnp/sp/items";
+
+
 import { Field } from '@progress/kendo-react-form';
 import { NumericTextBox, Checkbox } from '@progress/kendo-react-inputs';
 import { Grid, GridColumn, GridToolbar } from '@progress/kendo-react-grid';
@@ -191,9 +203,9 @@ class MyFinanceGlAccounts extends React.Component<any, any> {
     console.log(props);
 
     this.state = {
-      data: props.value.map(a => ({ ID: a.ID, GLCode: a.Account_x0020_Code, Amount: a.Amount, HSTTaxable: a.HST_x0020_Taxable, HST: a.HST, TotalInvoice: a.Total_x0020_Invoice })),
+      data: props.value.map(a => ({ InvoiceID: a.AR_x0020_InvoiceId, ID: a.ID, GLCode: a.Account_x0020_Code, Amount: a.Amount, HSTTaxable: a.HST_x0020_Taxable, HST: a.HST, TotalInvoice: a.Total_x0020_Invoice })),
       // same as data but we use this to reset state.
-      receivedData: props.value.map(a => ({ ID: a.ID, GLCode: a.Account_x0020_Code, Amount: a.Amount, HSTTaxable: a.HST_x0020_Taxable, HST: a.HST, TotalInvoice: a.Total_x0020_Invoice }))
+      receivedData: props.value.map(a => ({ InvoiceID: a.AR_x0020_InvoiceId, ID: a.ID, GLCode: a.Account_x0020_Code, Amount: a.Amount, HSTTaxable: a.HST_x0020_Taxable, HST: a.HST, TotalInvoice: a.Total_x0020_Invoice }))
     };
 
     this.CommandCell = MyCommandCell({
@@ -230,13 +242,24 @@ class MyFinanceGlAccounts extends React.Component<any, any> {
   public update = (dataItem) => {
     const data = [...this.state.data];
     const updatedItem = { ...dataItem, inEdit: undefined };
-
-    this.updateItem(data, updatedItem);
-    //this.updateItem(sampleProducts, updatedItem);
-
-    this.setState({ data });
+    sp.web.lists.getByTitle('AR Invoice Accounts').items.getById(dataItem.ID)
+      .update({
+        Account_x0020_Code: updatedItem.GLCode,
+        Amount: updatedItem.Amount,
+        HST_x0020_Taxable: updatedItem.HSTTaxable
+      })
+      .then(f => {
+        this.updateItem(data, updatedItem);
+        this.updateItem(this.state.receivedData, updatedItem);
+        this.setState({ data });
+      });
   }
 
+  /**
+   * Update objects found in state.
+   * @param data State Object
+   * @param item Item that we will update in state.
+   */
   public updateItem = (data, item) => {
     let index = data.findIndex(p => p === item || (item.ID && p.ID === item.ID));
     if (index >= 0) {
@@ -273,16 +296,26 @@ class MyFinanceGlAccounts extends React.Component<any, any> {
     this.setState({ data });
   }
 
+  //TODO: Why isn't this working?
   public addNew = () => {
-    const newDataItem = { inEdit: true, Discontinued: false };
+
+    const newDataItem = {
+      ID: 0,
+      GLCode: '',
+      Amount: '',
+      HSTTaxable: false,
+      inEdit: true
+    };
+    var data = this.state.data;
+    data.unshift(newDataItem);
 
     this.setState({
-      data: [newDataItem, ...this.state.data]
+      data: [...data]
     });
   }
 
   public cancelCurrentChanges = () => {
-    //this.setState({ data: [...sampleProducts] });
+    this.setState({ data: [...this.state.receivedData] });
   }
   //#endregion
 
@@ -299,13 +332,11 @@ class MyFinanceGlAccounts extends React.Component<any, any> {
         editField={this.editField}
       >
         <GridToolbar>
-          <button
+          {/* <button
             title="Add new"
             className="k-button k-primary"
             onClick={this.addNew}
-          >
-            Add new
-                  </button>
+          >Add new</button> */}
           {hasEditedItem && (
             <button
               title="Cancel current changes"
@@ -348,12 +379,10 @@ class MyFinanceGlAccounts extends React.Component<any, any> {
           title="Total Invoice"
           cell={totalInvoiceCell}
         />
-        <GridColumn cell={this.CommandCell} width="240px" />
+        <GridColumn cell={this.CommandCell} width="90px" />
       </Grid>
     );
   }
-
-  public generateId = data => data.reduce((acc, current) => Math.max(acc, current.ID), 0) + 1;
 
   public removeItem(data, item) {
     let index = data.findIndex(p => p === item || (item.ID && p.ID === item.ID));
