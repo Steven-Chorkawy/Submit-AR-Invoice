@@ -11,7 +11,7 @@ import {
 import { Button } from '@progress/kendo-react-buttons';
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import { Input, NumericTextBox } from '@progress/kendo-react-inputs';
-import { Form, Field, FormElement } from '@progress/kendo-react-form';
+import { Form, Field, FormElement, FieldArray } from '@progress/kendo-react-form';
 
 
 
@@ -31,6 +31,7 @@ import { MyCommandCell } from './MyCommandCell';
 import * as MyFormComponents from '../MyFormComponents';
 import { filterBy } from '@progress/kendo-data-query';
 import { filterGroupByField } from '@progress/kendo-react-grid/dist/npm/columnMenu/GridColumnMenuFilter';
+import { MyFinanceGlAccountsComponent } from './MyFinanceGlAccounts';
 
 
 interface IMyFinanceFormState {
@@ -152,7 +153,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   public onFilterChange = (e) => {
-    debugger;
+
     var newData = filterBy(this.state.receivedData.data, e.filter);
     var newStateData = {
       data: newData,
@@ -282,7 +283,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
     sp.web.lists.getByTitle('AR Invoices').items.getById(dataItem.ID).update(updateObject);
 
-    debugger;
+
 
     // Check to see if there is a file that we can update.
     if (dataItem.InvoiceAttachments) {
@@ -567,6 +568,14 @@ class InvoiceEditForm extends React.Component<any, any> {
                     value={this.state.productInEdit.Batch_x0020_Number}
                     onChange={this.onDialogInputChange}
                     component={MyFormComponents.FormInput}
+                  />
+                </div>
+                <div style={{ marginBottom: "2px" }}>
+                  <FieldArray
+                    name="GLAccounts"
+                    component={MyFinanceGlAccountsComponent}
+                    value={this.state.productInEdit.AccountDetails}
+                  //onchange={this.onDialogInputChange}
                   />
                 </div>
                 <div style={{ marginBottom: "2px" }}>
