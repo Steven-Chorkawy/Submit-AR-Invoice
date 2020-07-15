@@ -90,7 +90,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   //#region Variables
   private _editField: string = "inEdit";
   private _columnWidth: string = "150px";
-
   //#endregion
 
   //#region Custom Components
@@ -282,8 +281,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     }
 
     sp.web.lists.getByTitle('AR Invoices').items.getById(dataItem.ID).update(updateObject);
-
-
 
     // Check to see if there is a file that we can update.
     if (dataItem.InvoiceAttachments) {
@@ -519,7 +516,7 @@ class InvoiceEditForm extends React.Component<any, any> {
 
   public render() {
     return (
-      <Dialog onClose={this.props.cancel} title={"Edit AR Invoice"} minWidth="200px" width="50%" >
+      <Dialog onClose={this.props.cancel} title={"Edit AR Invoice"} minWidth="200px" width="80%" style={{"maxWidth": '1200px'}} >
         <Form
           onSubmit={this.handleSubmit}
           render={(formRenderProps) => (
