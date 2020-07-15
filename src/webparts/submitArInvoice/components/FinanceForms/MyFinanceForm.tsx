@@ -29,6 +29,8 @@ import "@pnp/sp/items";
 import { InvoiceDataProvider } from '../InvoiceDataProvider';
 import { MyCommandCell } from './MyCommandCell';
 import * as MyFormComponents from '../MyFormComponents';
+import { filterBy } from '@progress/kendo-data-query';
+import { filterGroupByField } from '@progress/kendo-react-grid/dist/npm/columnMenu/GridColumnMenuFilter';
 
 
 interface IMyFinanceFormState {
@@ -38,6 +40,7 @@ interface IMyFinanceFormState {
   productInEdit: any;
   statusData: any;
   siteUsersData: any;
+  filter: any;
 }
 
 interface IInvoicesDataState {
@@ -45,6 +48,8 @@ interface IInvoicesDataState {
   data: Array<any>;
   total: number;
 }
+
+
 
 
 class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
@@ -58,7 +63,13 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       dataState: { take: 10, skip: 0 },
       productInEdit: undefined,
       statusData: [],
-      siteUsersData: []
+      siteUsersData: [],
+      filter: {
+        logic: "and",
+        filters: [
+          { field: "Invoice_x0020_Status", operator: "neq", value: "Received" }
+        ]
+      }
     }
 
     this.CommandCell = MyCommandCell({
@@ -91,9 +102,16 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   public dataReceived = (invoices) => {
     console.log("dataReceived");
     console.log(invoices);
+    var dataHolder = filterBy(invoices.data, this.state.filter);
+    console.log("After Filter");
+    console.log(dataHolder);
+
     this.setState({
       ...this.state,
-      invoices: invoices,
+      invoices: {
+        data: dataHolder,
+        total: dataHolder.length
+      },
       receivedData: invoices
     });
   }
@@ -131,6 +149,20 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
   public cloneProduct(product) {
     return Object.assign({}, product);
+  }
+
+  public onFilterChange = (e) => {
+    debugger;
+    var newData = filterBy(this.state.receivedData.data, e.filter);
+    var newStateData = {
+      data: newData,
+      total: newData.length
+    }
+
+    this.setState({
+      filter: e.filter,
+      invoices: newStateData
+    });
   }
   //#endregion End Methods
 
@@ -374,6 +406,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           onDataStateChange={this.dataStateChange}
           onItemChange={this.itemChange}
           editField={this._editField}
+          filter={this.state.filter}
+          onFilterChange={this.onFilterChange}
 
           detail={InvoiceDetailComponent}
           expandField="expanded"
