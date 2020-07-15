@@ -31,7 +31,7 @@ import { MyCommandCell } from './MyCommandCell';
 import * as MyFormComponents from '../MyFormComponents';
 import { filterBy } from '@progress/kendo-data-query';
 import { filterGroupByField } from '@progress/kendo-react-grid/dist/npm/columnMenu/GridColumnMenuFilter';
-import { MyFinanceGlAccountsComponent } from './MyFinanceGlAccounts';
+import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from './MyFinanceGlAccounts';
 
 
 interface IMyFinanceFormState {
@@ -100,11 +100,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
   //#region Methods
   public dataReceived = (invoices) => {
-    console.log("dataReceived");
-    console.log(invoices);
     var dataHolder = filterBy(invoices.data, this.state.filter);
-    console.log("After Filter");
-    console.log(dataHolder);
 
     this.setState({
       ...this.state,
@@ -117,8 +113,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   public statusDataReceived = (status) => {
-    console.log('statusDataReceived');
-    console.log(status);
     this.setState({
       ...this.state,
       statusData: status
@@ -126,8 +120,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   public siteUserDataReceived = (users) => {
-    console.log('siteUserDataReceived');
-    console.log(users);
     this.setState({
       ...this.state,
       siteUsersData: users
@@ -254,9 +246,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     const invoices = this.state.invoices.data.slice();
     // const isNewProduct = dataItem.ProductID === undefined;
     const isNewProduct = false; // TODO: Add this if we plan on letting users create from this form.
-
-    console.log("Saving the following invoice");
-    console.log(dataItem);
 
     if (isNewProduct) {
       //products.unshift(this.newProduct(dataItem));
@@ -469,24 +458,26 @@ class InvoiceDetailComponent extends GridDetailRow {
   private itemChangeEvent
 
   constructor(props) {
+    debugger;
+    console.log("this element");
     super(props);
   }
 
   public render() {
-    return this.props.dataItem.inEdit ?
-      // Return Edit Mode
-      (
-        <div>
-          <Input value={this.props.dataItem.Standard_x0020_Terms} onChange={(e) => this.itemChangeEvent} />
-        </div>
-      ) :
-      // Return View Mode
-      (
-        <div>
-          <h5>Sample data for UAT.  We can add invoice data more here.</h5>
-          <p>{this.props.dataItem.Standard_x0020_Terms}</p>
-        </div>
-      );
+    // return this.props.dataItem.inEdit ?
+    //   // Return Edit Mode
+    //   (
+    //     <div>
+    //       <Input value={this.props.dataItem.Standard_x0020_Terms} onChange={(e) => this.itemChangeEvent} />
+    //     </div>
+    //   ) :
+    // Return View Mode
+    return (
+      <div>
+        <h5>Sample data for UAT.  We can add invoice data more here.</h5>
+        <MyFinanceGlAccounts value={this.props.dataItem.AccountDetails} />
+      </div>
+    );
   }
 }
 
@@ -516,7 +507,7 @@ class InvoiceEditForm extends React.Component<any, any> {
 
   public render() {
     return (
-      <Dialog onClose={this.props.cancel} title={"Edit AR Invoice"} minWidth="200px" width="80%" style={{"maxWidth": '1200px'}} >
+      <Dialog onClose={this.props.cancel} title={"Edit AR Invoice"} minWidth="200px" width="80%" style={{ "maxWidth": '1200px' }} >
         <Form
           onSubmit={this.handleSubmit}
           render={(formRenderProps) => (

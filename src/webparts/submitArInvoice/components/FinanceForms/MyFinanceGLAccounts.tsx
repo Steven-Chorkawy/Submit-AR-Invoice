@@ -76,14 +76,9 @@ const glCodeCell = (props) => {
 const amountCell = (props) => {
   const { dataItem, field } = props;
   const dataValue = dataItem[field] === null ? '' : dataItem[field];
-  console.log('amountCell');
-  console.log(dataValue);
-
 
   const handleChange = React.useCallback(
     (e) => {
-      console.log('handleChange');
-      console.log(e);
       props.onChange({
         dataItem: props.dataItem,
         field: props.field,
@@ -193,15 +188,12 @@ const hstCell = (props) => {
 //#endregion
 
 
-class MyFinanceGlAccounts extends React.Component<any, any> {
+export class MyFinanceGlAccounts extends React.Component<any, any> {
   public editField = "inEdit";
   public CommandCell;
 
   constructor(props) {
     super(props);
-    console.log("MyFinanceGlAccounts ctor");
-    console.log(props);
-
     this.state = {
       data: props.value.map(a => ({ InvoiceID: a.AR_x0020_InvoiceId, ID: a.ID, GLCode: a.Account_x0020_Code, Amount: a.Amount, HSTTaxable: a.HST_x0020_Taxable, HST: a.HST, TotalInvoice: a.Total_x0020_Invoice })),
       // same as data but we use this to reset state.
@@ -290,8 +282,6 @@ class MyFinanceGlAccounts extends React.Component<any, any> {
   }
 
   public itemChange = (event) => {
-    console.log("itemChange: " + event.field);
-    console.log(event);
     const data = this.state.data.map(item => item.ID === event.dataItem.ID ? { ...item, [event.field]: event.value } : item);
     this.setState({ data });
   }
@@ -394,8 +384,6 @@ class MyFinanceGlAccounts extends React.Component<any, any> {
 
 export const MyFinanceGlAccountsComponent = (fieldArrayRenderProps) => {
   const { accounts } = fieldArrayRenderProps;
-  console.log("MyFinanceGlAccountsComponent");
-  console.log(fieldArrayRenderProps);
   return (
     <div key={fieldArrayRenderProps.value}>
       <MyFinanceGlAccounts {...fieldArrayRenderProps} />

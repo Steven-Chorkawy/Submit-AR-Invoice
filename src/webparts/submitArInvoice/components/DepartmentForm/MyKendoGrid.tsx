@@ -45,8 +45,6 @@ type MyKendoGridState = {
 
 
 const MyItemRender = props => {
-  console.log("MyItemRender");
-  console.log(props);
   return (
     <div style={{ width: "90%" }}>
       <div className='row' style={{ marginBottom: "1px" }}>
@@ -130,7 +128,6 @@ class DetailComponent extends GridDetailRow {
  */
 class CustomCell extends React.Component<GridCellProps> {
   render() {
-    console.log(this.props);
     return (
       <td title={this.props.dataItem.StrTitle}>
         <a href={this.props.dataItem.FileRef} target='_blank' >
@@ -158,8 +155,6 @@ export class MyKendoGrid extends React.Component<MyKendoGridProps, MyKendoGridSt
     };
 
     this.state = this.createAppState({ ...this.state });
-    console.log("State after ctor");
-    console.log(this.state);
   }
 
   MyCustomCell = (props) => <CustomCell {...props} />

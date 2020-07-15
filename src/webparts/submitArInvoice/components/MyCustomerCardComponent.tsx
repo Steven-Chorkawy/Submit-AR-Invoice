@@ -11,8 +11,6 @@ export class MyCustomerCardComponent extends React.Component<IMyCustomerProps, I
    */
   constructor(props) {
     super(props);
-    console.log("MyCustomerCard");
-    console.log(props);
 
     this.state = {
       selectedCustomer: props.selectedCustomer
@@ -24,8 +22,6 @@ export class MyCustomerCardComponent extends React.Component<IMyCustomerProps, I
   }
 
   render() {
-    console.log("MyCustomCardRender");
-    console.log(this.state);
     // Nothing is selected.
     if (this.state.selectedCustomer == undefined) {
       return (<div key="0">Select a Customer</div>);
