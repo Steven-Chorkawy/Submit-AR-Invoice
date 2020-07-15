@@ -320,6 +320,7 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
         data={data}
         onItemChange={this.itemChange}
         editField={this.editField}
+        style={...this.props.style}
       >
         <GridToolbar>
           {/* <button
@@ -339,7 +340,7 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
         </GridToolbar>
         <GridColumn
           field="GLCode"
-          title="* G/L Account #"
+          title="G/L Account #"
           cell={glCodeCell}
           width="200px"
         />
@@ -369,7 +370,7 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
           title="Total Invoice"
           cell={totalInvoiceCell}
         />
-        <GridColumn cell={this.CommandCell} width="90px" />
+        {this.props.showCommandCell && <GridColumn cell={this.CommandCell} width="90px" />}
       </Grid>
     );
   }

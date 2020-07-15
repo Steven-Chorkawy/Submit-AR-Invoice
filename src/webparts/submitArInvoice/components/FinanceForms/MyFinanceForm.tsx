@@ -463,6 +463,7 @@ class InvoiceDetailComponent extends GridDetailRow {
     super(props);
   }
 
+
   public render() {
     // return this.props.dataItem.inEdit ?
     //   // Return Edit Mode
@@ -475,7 +476,7 @@ class InvoiceDetailComponent extends GridDetailRow {
     return (
       <div>
         <h5>Sample data for UAT.  We can add invoice data more here.</h5>
-        <MyFinanceGlAccounts value={this.props.dataItem.AccountDetails} />
+        <MyFinanceGlAccounts value={this.props.dataItem.AccountDetails} style={{ 'maxWidth': '1200px' }} />
       </div>
     );
   }
@@ -507,7 +508,7 @@ class InvoiceEditForm extends React.Component<any, any> {
 
   public render() {
     return (
-      <Dialog onClose={this.props.cancel} title={"Edit AR Invoice"} minWidth="200px" width="80%" style={{ "maxWidth": '1200px' }} >
+      <Dialog onClose={this.props.cancel} title={"Edit AR Invoice"} minWidth="200px" width="80%" >
         <Form
           onSubmit={this.handleSubmit}
           render={(formRenderProps) => (
