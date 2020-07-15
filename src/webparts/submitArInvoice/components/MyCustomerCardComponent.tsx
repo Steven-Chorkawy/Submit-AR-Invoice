@@ -32,8 +32,19 @@ export class MyCustomerCardComponent extends React.Component<IMyCustomerProps, I
     }
     // Custom value is entered.
     // If id isn't present that means the user has given us a custom value.
-    else if(!this.state.selectedCustomer.hasOwnProperty('ID')) {
-      return(<h4>TODO: Create a form here to get custom customer info.</h4>);
+    else if (!this.state.selectedCustomer.hasOwnProperty('ID')) {
+      return (
+        <div>
+          <div>
+            Please Enter Any Customer Details.
+          </div>
+          <textarea
+            className={'k-textarea k-autofill'}
+            id={'CustomerDescription'}
+            name={'CustomerDescription'}
+          />
+        </div>
+      );
     }
     // existing value is selected.
     else {
