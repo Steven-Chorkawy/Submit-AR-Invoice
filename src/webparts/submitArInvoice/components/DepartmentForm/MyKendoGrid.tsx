@@ -128,13 +128,17 @@ class DetailComponent extends GridDetailRow {
  */
 class CustomCell extends React.Component<GridCellProps> {
   render() {
-    return (
-      <td title={this.props.dataItem.StrTitle}>
+    return (this.props.dataItem.Invoice_x0020_Status === 'Entered in GP' || this.props.dataItem.Invoice_x0020_Status === 'Completed') ? (
+      <td title={'Click to view invoice.'}>
         <a href={this.props.dataItem.FileRef} target='_blank' >
           <Button primary={true} /*icon="hyperlink-open"*/ icon="folder"></Button>
         </a>
       </td>
-    );
+    ) : (
+        <td title={'Invoice not processed...'}>
+          <Button primary={true} /*icon="hyperlink-open"*/ icon="folder" disabled={true}></Button>
+        </td>
+      );
   }
 }
 
