@@ -95,7 +95,7 @@ const amountCell = (props) => {
         <Field
           format="c2"
           component={MyFormComponents.FormNumericTextBox}
-          validator={MyValidators.accountAmountValidator}
+          //validator={MyValidators.accountAmountValidator}
           name={`GLAccounts[${props.dataIndex}].${props.field}`}
           value={dataValue}
           editable={true}
@@ -103,15 +103,10 @@ const amountCell = (props) => {
           onChange={handleChange}
         />
       ) : (
-          <Field
+          <NumericTextBox
+            defaultValue={dataValue}
             format="c2"
-            component={MyFormComponents.FormNumericTextBox}
-            validator={MyValidators.accountAmountValidator}
-            name={`GLAccounts[${props.dataIndex}].${props.field}`}
-            value={dataValue}
-            editable={false}
             disabled={true}
-            onChange={handleChange}
           />
         )}
     </td>
@@ -125,18 +120,30 @@ const amountCell = (props) => {
  * @param props Grid properties.
  */
 const totalInvoiceCell = (props) => {
+  const { dataItem, field } = props;
+  const dataValue = dataItem[field] === null ? '' : dataItem[field];
+
   return (
     <td>
-      <Field
-        format="c2"
-        component={NumericTextBox}
-        name='TotalInvoice'
-        readonly={true}
-        disabled={true}
-        value={
-          (props.dataItem.Amount == null) ? 0 : CalculateHSTAmount(props) + props.dataItem.Amount
-        }
-      />
+      {dataItem.inEdit ? (
+        <Field
+          format="c2"
+          component={NumericTextBox}
+          name='TotalInvoice'
+          readonly={true}
+          disabled={true}
+          value={
+            (props.dataItem.Amount == null) ? 0 : CalculateHSTAmount(props) + props.dataItem.Amount
+          }
+        />
+      ) : (
+          <NumericTextBox
+            // defaultValue={dataValue}
+            value={Number(Number(dataValue).toFixed(2))}
+            format="c2"
+            disabled={true}
+          />
+        )}
     </td>
   );
 };
@@ -172,16 +179,16 @@ const hstTaxableCell = (props) => {
  * @param props Grid Properties
  */
 const hstCell = (props) => {
+  const { dataItem, field } = props;
+  const dataValue = dataItem[field] === null ? '' : dataItem[field];
   return (
     <td>
-      <Field
-        format="c2"
-        component={NumericTextBox}
-        name="HST"
-        readonly={true}
-        disabled={true}
-        value={CalculateHSTAmount(props)}
-      />
+      <NumericTextBox
+            // defaultValue={CalculateHSTAmount(props)}
+            value={CalculateHSTAmount(props)}
+            format="c2"
+            disabled={true}
+          />
     </td>
   );
 };
@@ -194,7 +201,7 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
 
   constructor(props) {
     super(props);
-    debugger;
+
     this.state = {
       data: props.value.map(a => ({ InvoiceID: a.AR_x0020_InvoiceId, ID: a.ID, GLCode: a.Account_x0020_Code, Amount: a.Amount, HSTTaxable: a.HST_x0020_Taxable, HST: a.HST, TotalInvoice: a.Total_x0020_Invoice })),
       // same as data but we use this to reset state.
@@ -244,7 +251,13 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
       .then(f => {
         this.updateItem(data, updatedItem);
         this.updateItem(this.state.receivedData, updatedItem);
-        this.setState({ data });
+
+        //TODO: Check what happens when this function is undefined.
+        if(this.props.onUpdateAccount) {
+          this.props.onUpdateAccount(data);
+        }
+
+        this.setState({ data: data });
       });
   }
 
@@ -283,6 +296,7 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
   }
 
   public itemChange = (event) => {
+
     const data = this.state.data.map(item => item.ID === event.dataItem.ID ? { ...item, [event.field]: event.value } : item);
     this.setState({ data });
   }

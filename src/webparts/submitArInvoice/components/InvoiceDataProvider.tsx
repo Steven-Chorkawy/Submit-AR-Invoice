@@ -23,14 +23,12 @@ class InvoiceDataProvider extends React.Component<any, any> {
   public lastSuccess = '';
 
   public requestDataIfNeeded = () => {
-    if (this.pending || toODataString(this.props.dataState) === this.lastSuccess) {
 
+    if (this.pending || toODataString(this.props.dataState) === this.lastSuccess) {
       return;
     }
 
-
     this.pending = toODataString(this.props.dataState);
-
 
     sp.web.lists.getByTitle('AR Invoices')
       .items
