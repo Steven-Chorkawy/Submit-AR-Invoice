@@ -95,6 +95,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
   //#region Methods
   public dataReceived = (invoices) => {
+    console.log("dataReceived");
+    console.log(invoices);
     var dataHolder = filterBy(invoices.data, this.state.filter);
 
     this.setState({
@@ -529,6 +531,9 @@ class InvoiceDetailComponent extends GridDetailRow {
           value={this.props.dataItem.AccountDetails}
           showCommandCell={false}
           style={{ 'maxWidth': '1200px' }} />
+          <hr/>
+          <h4>Approvals</h4>
+
       </div>
     );
   }

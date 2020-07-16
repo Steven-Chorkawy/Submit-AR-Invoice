@@ -39,35 +39,60 @@ class InvoiceDataProvider extends React.Component<any, any> {
 
         // Apply Kendo grids filters.
         var processedResponse = process(response, this.props.dataState);
-
-        //#region Query the required account details for this invoice.
         // Hold the list of invoice IDs that will be used to pull related accounts.
         var invoiceIds = [];
+        var idsForApproval = [];
         response.map(r => {
           invoiceIds.push(`AR_x0020_InvoiceId eq ${r.ID}`);
+          idsForApproval.push(`InvoiceID eq '${r.ID}'`);
         });
 
+        //#region Query the required account details for this invoice.
         // Join each of the invoiceIds together with and or.
         // this will be our final filter string that we send the SharePoint.
         var accountDetailFilter = `${invoiceIds.join(' or ')}`;
 
         // Using the filter string that we've worked so hard to build we will now get our SharePoint data.
-        var accountDetails = await sp.web.lists.getByTitle('AR Invoice Accounts')
-          .items
-          .filter(accountDetailFilter)
-          .get();
+        // var accountDetails = await sp.web.lists.getByTitle('AR Invoice Accounts')
+        //   .items
+        //   .filter(accountDetailFilter)
+        //   .get();
+        // //#endregion
+
+        // //#region Get Approval Info.
+        // var approvals = await sp.web.lists.getByTitle('Approval Requests Sent')
+        //   .items
+        //   .filter(idsForApproval.join(' or '))
+        //   .get();
+        // debugger;
+        // //#endregion
+
+        Promise.all([
+          sp.web.lists.getByTitle('AR Invoice Accounts')
+            .items
+            .filter(accountDetailFilter)
+            .get(),
+          sp.web.lists.getByTitle('Approval Requests Sent')
+            .items
+            .filter(idsForApproval.join(' or '))
+            .get()
+        ])
+          .then((values) => {
+            // Using each of the accounts that we found we will not attach them to the invoice object.
+            response.map(invoice => {
+              invoice.AccountDetails = values[0].filter(f => Number(f.AR_x0020_InvoiceId) === invoice.ID);
+              invoice.Approvals = values[1].filter(f => Number(f.InvoiceID) === invoice.ID);
+            });
+
+            // This is something from Kendo demos.
+            if (toODataString(this.props.dataState) === this.lastSuccess) {
+              this.props.onDataReceived.call(undefined, processedResponse);
+            } else {
+              this.requestDataIfNeeded();
+            }
+          })
 
 
-        // Using each of the accounts that we found we will not attach them to the invoice object.
-        response.map(invoice => { invoice.AccountDetails = accountDetails.filter(f => Number(f.AR_x0020_InvoiceId) === invoice.ID); });
-        //#endregion
-
-        // This is something from Kendo demos.
-        if (toODataString(this.props.dataState) === this.lastSuccess) {
-          this.props.onDataReceived.call(undefined, processedResponse);
-        } else {
-          this.requestDataIfNeeded();
-        }
       });
   };
 
