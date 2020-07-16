@@ -3,3 +3,8 @@
 .k-animation-container {
   z-index: 10003;
 }
+
+/*Prevents Dialog box from overflowing. */
+.k-widget.k-window.k-dialog {
+  max-height: 800px !important;
+}

@@ -5,6 +5,7 @@ import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import { Input, NumericTextBox } from '@progress/kendo-react-inputs';
 import { Form, FormElement, Field, FieldArray } from '@progress/kendo-react-form';
 import { Button } from '@progress/kendo-react-buttons';
+import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/kendo-react-layout';
 
 import * as MyFormComponents from '../MyFormComponents';
 import * as MyValidators from '../validators.jsx';
@@ -208,16 +209,34 @@ export class MyEditDialogContainer extends React.Component<any, any> {
               </div>
 
               <hr />
-
-              <Field
-                id="RelatedInvoiceAttachments"
-                name="RelatedInvoiceAttachments"
-                label="Upload Related Attachments"
-                batch={false}
-                multiple={true}
-                component={MyFormComponents.FormUpload}
-              //onchange={this.onDialogInputChange}
-              />
+              <Card style={{ width: 400 }}>
+                <CardBody>
+                  <CardTitle>Related Attachments</CardTitle>
+                  {
+                    this.state.productInEdit.RelatedAttachments.map(f => {
+                      return (
+                        <a target='_blank' href={f.ServerRedirectedEmbedUrl} style={{margin: '2px'}}>
+                          <div className='k-chip k-chip-filled k-chip-info'>
+                            <div className='k-chip-content'>
+                              {f.Title}
+                            </div>
+                          </div>
+                        </a>
+                      );
+                    })
+                  }
+                  <hr />
+                  <Field
+                    id="RelatedInvoiceAttachments"
+                    name="RelatedInvoiceAttachments"
+                    label="Upload Related Attachments"
+                    batch={false}
+                    multiple={true}
+                    component={MyFormComponents.FormUpload}
+                  //onchange={this.onDialogInputChange}
+                  />
+                </CardBody>
+              </Card>
             </FormElement>
           )} />
         <DialogActionsBar>

@@ -282,6 +282,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       Requires_x0020_Accountant_x0020_ApprovalId: dataItem.Requires_x0020_Accountant_x0020_ApprovalId ? dataItem.Requires_x0020_Accountant_x0020_ApprovalId.Id : null
     }
 
+
     sp.web.lists.getByTitle('AR Invoices').items.getById(dataItem.ID).update(updateObject);
 
     // Check to see if there is a file that we can update.
@@ -308,10 +309,11 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
             fileRes.file.getItem()
               .then(item => {
                 debugger;
-                item.update({
-                  ARInvoiceId: dataItem.ID,
-                  Title: element.name
-                });
+                const itemProxy: any = Object.assign({}, item);
+                  sp.web.lists.getByTitle('RelatedInvoiceAttachments').items.getById(itemProxy.ID).update({
+                    ARInvoiceId: dataItem.ID,
+                    Title: element.name
+                  });
               });
           });
       }

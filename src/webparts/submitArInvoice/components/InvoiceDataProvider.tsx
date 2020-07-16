@@ -70,16 +70,14 @@ class InvoiceDataProvider extends React.Component<any, any> {
           sp.web.getFolderByServerRelativePath("RelatedInvoiceAttachments").files()
         ])
           .then((values) => {
-            console.log(values);
-            debugger;
-
             // Using each of the accounts that we found we will not attach them to the invoice object.
             response.map(invoice => {
               invoice.AccountDetails = values[0].filter(f => Number(f.AR_x0020_InvoiceId) === invoice.ID) || [];
               invoice.Approvals = values[1].filter(f => Number(f.InvoiceID) === invoice.ID) || [];
               invoice.RelatedAttachments = values[2].filter(f => Number(f.ARInvoiceId) === invoice.ID) || []
+
+              // Add ServerDirectUrl if required.
               invoice.RelatedAttachments.map(relatedAttachments => {
-                // Add ServerDirectUrl if required.
                 if(relatedAttachments.ServerRedirectedEmbedUrl === ""){
                   var url = values[3].find(f => f.Title === relatedAttachments.Title).ServerRelativeUrl;
                   relatedAttachments.ServerRedirectedEmbedUrl = url;
@@ -87,8 +85,6 @@ class InvoiceDataProvider extends React.Component<any, any> {
                 }
               });
             });
-
-            debugger;
 
             // This is something from Kendo demos.
             if (toODataString(this.props.dataState) === this.lastSuccess) {
