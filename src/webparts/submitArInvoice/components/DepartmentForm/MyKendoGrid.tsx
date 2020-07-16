@@ -30,11 +30,6 @@ import { filterBy, orderBy, groupBy } from '@progress/kendo-data-query';
 import { MyEditDialogContainer } from './MyEditDialogContainer';
 
 
-
-type MyKendoGridProps = {
-
-}
-
 type MyKendoGridState = {
   data: IARInvoice[];
   filter: any;
@@ -44,7 +39,6 @@ type MyKendoGridState = {
   dataState?: any;
   productInEdit: any;
 }
-
 
 
 const MyItemRender = props => {
@@ -145,7 +139,7 @@ class CustomCell extends React.Component<GridCellProps> {
   }
 }
 
-export class MyKendoGrid extends React.Component<MyKendoGridProps, MyKendoGridState> {
+export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   /**
    *
    */
@@ -175,6 +169,7 @@ export class MyKendoGrid extends React.Component<MyKendoGridProps, MyKendoGridSt
   MyCustomCell = (props) => <CustomCell {...props} />
 
   createAppState = (dataState) => {
+    console.log(dataState);
     var output = {
       result: process(this.state.data, dataState),
       dataState: dataState,
@@ -268,7 +263,7 @@ export class MyKendoGrid extends React.Component<MyKendoGridProps, MyKendoGridSt
 
         </Grid>
 
-        {this.state.productInEdit && <MyEditDialogContainer dataItem={this.state.productInEdit} save={this.save} cancel={this.cancel} />}
+        {this.state.productInEdit && <MyEditDialogContainer dataItem={this.state.productInEdit} customers={this.props.customers} siteUsers={this.props.siteUsers} save={this.save} cancel={this.cancel} />}
       </div>
     );
   }
