@@ -28,7 +28,7 @@ import { MyCommandCell } from './MyCommandCell';
 import * as MyFormComponents from '../MyFormComponents';
 import { filterBy } from '@progress/kendo-data-query';
 import { filterGroupByField } from '@progress/kendo-react-grid/dist/npm/columnMenu/GridColumnMenuFilter';
-import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from './MyFinanceGlAccounts';
+import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceGLAccounts';
 import { ApprovalResponseComponent } from '../ApprovalResponseComponent'
 
 interface IMyFinanceFormState {

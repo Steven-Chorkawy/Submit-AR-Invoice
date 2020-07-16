@@ -8,7 +8,7 @@ import { Button } from '@progress/kendo-react-buttons';
 
 import * as MyFormComponents from '../MyFormComponents';
 import * as MyValidators from '../validators.jsx';
-import { MyGLAccountComponent } from '../MyGLAccountComponent';
+import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceGLAccounts';
 
 
 export class MyEditDialogContainer extends React.Component<any, any> {
@@ -203,7 +203,18 @@ export class MyEditDialogContainer extends React.Component<any, any> {
               <div style={{ width: '100%' }}>
                 <FieldArray
                   name="GLAccounts"
-                  component={MyGLAccountComponent}
+                  component={MyFinanceGlAccountsComponent}
+                  value={this.state.productInEdit.AccountDetails}
+                  // value={
+                  //   this.state.productInEdit.AccountDetails
+                  //     .map(f => {
+                  //       return {
+                  //         GLCode: f.Account_x0020_Code,
+                  //         Amount: f.Amount,
+                  //         HSTTaxable: f.HST_x0020_Taxable,
+                  //       };
+                  //     })
+                  // }
                 //onchange={this.onDialogInputChange}
                 />
               </div>

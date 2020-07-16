@@ -17,9 +17,9 @@ import { NumericTextBox, Checkbox } from '@progress/kendo-react-inputs';
 import { Grid, GridColumn, GridToolbar } from '@progress/kendo-react-grid';
 import { Button } from '@progress/kendo-react-buttons';
 
-import * as MyValidators from '../validators.jsx';
-import * as MyFormComponents from '../MyFormComponents';
-import { MyCommandCell } from './MyCommandCell';
+import * as MyValidators from './validators.jsx';
+import * as MyFormComponents from './MyFormComponents';
+import { MyCommandCell } from './FinanceForms/MyCommandCell';
 
 
 
@@ -201,7 +201,6 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
 
   constructor(props) {
     super(props);
-
     this.state = {
       data: props.value.map(a => ({ InvoiceID: a.AR_x0020_InvoiceId, ID: a.ID, GLCode: a.Account_x0020_Code, Amount: a.Amount, HSTTaxable: a.HST_x0020_Taxable, HST: a.HST, TotalInvoice: a.Total_x0020_Invoice })),
       // same as data but we use this to reset state.
