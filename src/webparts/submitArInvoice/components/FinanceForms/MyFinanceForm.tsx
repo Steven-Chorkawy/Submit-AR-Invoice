@@ -42,6 +42,7 @@ interface IMyFinanceFormState {
   statusData: any;
   siteUsersData: any;
   filter: any;
+  allRowsExpanded: boolean;
 }
 
 interface IInvoicesDataState {
@@ -61,7 +62,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       invoices: { data: [], total: 0 },
       // Same as invoices but this object is used to restore data to it's original state.
       receivedData: { data: [], total: 0 },
-      dataState: { take: 10, skip: 0 },
+      dataState: { take: 50, skip: 0 },
       productInEdit: undefined,
       statusData: [],
       siteUsersData: [],
@@ -70,7 +71,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         filters: [
           { field: "Invoice_x0020_Status", operator: "neq", value: "Received" }
         ]
-      }
+      },
+      allRowsExpanded: false,
     }
 
     this.CommandCell = MyCommandCell({
@@ -127,6 +129,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   public dataStateChange = (e) => {
+    debugger;
     this.setState({
       ...this.state,
       dataState: e.data
@@ -134,9 +137,26 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   public expandChange = (event) => {
+    debugger;
     event.dataItem.expanded = !event.dataItem.expanded;
-    event.myFunction = this.itemChange;
+
+    // myFunction is undefined....
+    //event.myFunction = this.itemChange;
+
     this.forceUpdate();
+  }
+
+  public expandAllRows = (event) => {
+    debugger;
+    this.setState({
+      allRowsExpanded: !this.state.allRowsExpanded
+    });
+    // loop over this.state.invoices.data
+    this.state.invoices.data.map(invoice => {
+      debugger;
+      invoice.expanded = this.state.allRowsExpanded;
+      this.expandChange({ dataItem: invoice });
+    });
   }
 
   public cloneProduct(product) {
@@ -144,8 +164,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   public onFilterChange = (e) => {
-
     var newData = filterBy(this.state.receivedData.data, e.filter);
+    newData.map(invoice => invoice.expanded = this.state.allRowsExpanded);
     var newStateData = {
       data: newData,
       total: newData.length
@@ -401,6 +421,10 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           onExpandChange={this.expandChange}
         >
           <GridToolbar>
+            <Button title="Expand All Rows"
+              className="k-button"
+              icon="plus"
+              onClick={this.expandAllRows}>Toggle All Rows</Button>
             {hasEditedItem && (
               <Button
                 title="Cancel current changes"
@@ -476,7 +500,7 @@ class InvoiceDetailComponent extends GridDetailRow {
     return (
       <div>
         <h5>Sample data for UAT.  We can add invoice data more here.</h5>
-        <MyFinanceGlAccounts value={this.props.dataItem.AccountDetails} style={{ 'maxWidth': '1200px' }} />
+        <MyFinanceGlAccounts value={this.props.dataItem.AccountDetails} showCommandCell={false} style={{ 'maxWidth': '1200px' }} />
       </div>
     );
   }

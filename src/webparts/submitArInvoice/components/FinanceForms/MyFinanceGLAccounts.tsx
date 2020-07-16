@@ -194,6 +194,7 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
 
   constructor(props) {
     super(props);
+    debugger;
     this.state = {
       data: props.value.map(a => ({ InvoiceID: a.AR_x0020_InvoiceId, ID: a.ID, GLCode: a.Account_x0020_Code, Amount: a.Amount, HSTTaxable: a.HST_x0020_Taxable, HST: a.HST, TotalInvoice: a.Total_x0020_Invoice })),
       // same as data but we use this to reset state.
@@ -370,7 +371,8 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
           title="Total Invoice"
           cell={totalInvoiceCell}
         />
-        {this.props.showCommandCell && <GridColumn cell={this.CommandCell} width="90px" />}
+
+        {(this.props.showCommandCell || this.props.showCommandCell === undefined) && <GridColumn cell={this.CommandCell} width="90px" />}
       </Grid>
     );
   }
