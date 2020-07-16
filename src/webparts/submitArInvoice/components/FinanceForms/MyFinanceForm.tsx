@@ -431,9 +431,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                 className="k-button"
                 icon="cancel"
                 onClick={this.cancelCurrentChanges}
-              >
-                Cancel Current Changes
-              </Button>
+              >Cancel Current Changes</Button>
             )}
           </GridToolbar>
 
