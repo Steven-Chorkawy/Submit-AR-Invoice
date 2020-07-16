@@ -28,16 +28,20 @@ import "@pnp/sp/items";
 import IARInvoice from '../IARInvoice';
 import { filterBy, orderBy, groupBy } from '@progress/kendo-data-query';
 import { MyEditDialogContainer } from './MyEditDialogContainer';
+import { InvoiceDataProvider } from '../InvoiceDataProvider';
 
 
 type MyKendoGridState = {
   data: IARInvoice[];
+  receivedData: IARInvoice[];
   filter: any;
   sort: any;
   group: any;
   result?: any;
   dataState?: any;
   productInEdit: any;
+  statusData: any;
+  siteUsersData: any;
 }
 
 
@@ -147,13 +151,17 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
     super(props);
 
     this.state = {
-      data: props.data,
+      data: [],
+      receivedData: [],
+      statusData: [],
+      siteUsersData: [],
       filter: {
         filters: []
       },
       sort: [],
       group: [],
       productInEdit: undefined,
+      dataState: { take: 50, skip: 0 }
     };
 
     this.CommandCell = MyCommandCell({
@@ -169,7 +177,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   MyCustomCell = (props) => <CustomCell {...props} />
 
   createAppState = (dataState) => {
-    console.log(dataState);
     var output = {
       result: process(this.state.data, dataState),
       dataState: dataState,
@@ -180,7 +187,10 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   }
 
   dataStateChange = (event) => {
+    debugger;
     var appSate = this.createAppState(event.data);
+    debugger;
+
     this.setState(appSate);
   }
 
@@ -195,7 +205,38 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   //#endregion
 
 
+
+  //#region Data Operations
+  public statusDataReceived = (status) => {
+    this.setState({
+      ...this.state,
+      statusData: status
+    });
+  }
+
+  public siteUserDataReceived = (users) => {
+    this.setState({
+      ...this.state,
+      siteUsersData: users
+    });
+  }
+
+  public dataReceived = (invoices) => {
+    console.log("dataReceived");
+    console.log(invoices);
+    var dataHolder = filterBy(invoices.data, this.state.filter);
+
+    this.setState({
+      ...this.state,
+      data: invoices,
+      receivedData: invoices
+    });
+  }
+  //#endregion
+
   //#region CRUD Methods
+
+
   public onEdit = (dataItem) => {
     this.setState({ productInEdit: Object.assign({}, dataItem) });
   }
@@ -236,7 +277,9 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
           pageable={{ pageSizes: true }}
           groupable={true}
 
-          data={this.state.result}
+          // data={this.state.result}
+
+          {...this.state.data}
           onDataStateChange={this.dataStateChange}
           {...this.state.dataState}
 
@@ -264,6 +307,17 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
         </Grid>
 
         {this.state.productInEdit && <MyEditDialogContainer dataItem={this.state.productInEdit} customers={this.props.customers} siteUsers={this.props.siteUsers} save={this.save} cancel={this.cancel} />}
+
+        <InvoiceDataProvider
+          dataState={this.state.dataState}
+          onDataReceived={this.dataReceived}
+
+          statusDataState={this.state.statusData}
+          onStatusDataReceived={this.statusDataReceived}
+
+          siteUsersDataState={this.state.siteUsersData}
+          onSiteUsersDataReceived={this.siteUserDataReceived}
+        />
       </div>
     );
   }

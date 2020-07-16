@@ -307,8 +307,10 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           .then(fileRes => {
             fileRes.file.getItem()
               .then(item => {
+                debugger;
                 item.update({
-                  ARInvoiceId: dataItem.ID
+                  ARInvoiceId: dataItem.ID,
+                  Title: element.name
                 });
               });
           });
@@ -560,8 +562,6 @@ class InvoiceEditForm extends React.Component<any, any> {
 
 
   public onDialogInputChange = (event) => {
-
-    this.props.onItemChange(event);
     let target = event.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = (target.props && target.props.name !== undefined) ? target.props.name : (target.name !== undefined) ? target.name : target.props.id;

@@ -12,6 +12,7 @@ import "@pnp/sp/lists";
 import "@pnp/sp/items";
 import "@pnp/sp/fields";
 import "@pnp/sp/site-users/web";
+import { IFile } from '@pnp/sp/files';
 /** End PnP Imports */
 
 class InvoiceDataProvider extends React.Component<any, any> {
@@ -39,50 +40,55 @@ class InvoiceDataProvider extends React.Component<any, any> {
 
         // Apply Kendo grids filters.
         var processedResponse = process(response, this.props.dataState);
+
         // Hold the list of invoice IDs that will be used to pull related accounts.
         var invoiceIds = [];
         var idsForApproval = [];
+        var idsForRelatedAttachments = [];
         response.map(r => {
           invoiceIds.push(`AR_x0020_InvoiceId eq ${r.ID}`);
           idsForApproval.push(`InvoiceID eq '${r.ID}'`);
+          idsForRelatedAttachments.push(`ARInvoice/ID eq ${r.ID}`);
         });
 
         //#region Query the required account details for this invoice.
-        // Join each of the invoiceIds together with and or.
-        // this will be our final filter string that we send the SharePoint.
-        var accountDetailFilter = `${invoiceIds.join(' or ')}`;
-
-        // Using the filter string that we've worked so hard to build we will now get our SharePoint data.
-        // var accountDetails = await sp.web.lists.getByTitle('AR Invoice Accounts')
-        //   .items
-        //   .filter(accountDetailFilter)
-        //   .get();
-        // //#endregion
-
-        // //#region Get Approval Info.
-        // var approvals = await sp.web.lists.getByTitle('Approval Requests Sent')
-        //   .items
-        //   .filter(idsForApproval.join(' or '))
-        //   .get();
-        // debugger;
-        // //#endregion
 
         Promise.all([
           sp.web.lists.getByTitle('AR Invoice Accounts')
             .items
-            .filter(accountDetailFilter)
+            .filter(invoiceIds.join(' or '))
             .get(),
           sp.web.lists.getByTitle('Approval Requests Sent')
             .items
             .filter(idsForApproval.join(' or '))
-            .get()
+            .get(),
+          sp.web.lists.getByTitle('RelatedInvoiceAttachments')
+            .items
+            .filter(idsForRelatedAttachments.join(' or '))
+            .getAll(),
+            //TODO: How can I filter these results? I don't need every file.
+          sp.web.getFolderByServerRelativePath("RelatedInvoiceAttachments").files()
         ])
           .then((values) => {
+            console.log(values);
+            debugger;
+
             // Using each of the accounts that we found we will not attach them to the invoice object.
             response.map(invoice => {
-              invoice.AccountDetails = values[0].filter(f => Number(f.AR_x0020_InvoiceId) === invoice.ID);
-              invoice.Approvals = values[1].filter(f => Number(f.InvoiceID) === invoice.ID);
+              invoice.AccountDetails = values[0].filter(f => Number(f.AR_x0020_InvoiceId) === invoice.ID) || [];
+              invoice.Approvals = values[1].filter(f => Number(f.InvoiceID) === invoice.ID) || [];
+              invoice.RelatedAttachments = values[2].filter(f => Number(f.ARInvoiceId) === invoice.ID) || []
+              invoice.RelatedAttachments.map(relatedAttachments => {
+                // Add ServerDirectUrl if required.
+                if(relatedAttachments.ServerRedirectedEmbedUrl === ""){
+                  var url = values[3].find(f => f.Title === relatedAttachments.Title).ServerRelativeUrl;
+                  relatedAttachments.ServerRedirectedEmbedUrl = url;
+                  relatedAttachments.ServerRedirectedEmbedUri = url;
+                }
+              });
             });
+
+            debugger;
 
             // This is something from Kendo demos.
             if (toODataString(this.props.dataState) === this.lastSuccess) {
@@ -134,6 +140,7 @@ class InvoiceDataProvider extends React.Component<any, any> {
   }
 
   public render() {
+
     // Query any methods required here.
     this.requestDataIfNeeded();
     this.requestStatusData();

@@ -185,7 +185,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                 id="Comment"
                 name="Comment"
                 label="Comments"
-                //value={this.state.productInEdit.Comment}
+                value={this.state.productInEdit.Comment}
                 component={MyFormComponents.FormTextArea}
               //onchange={this.onDialogInputChange}
               />
@@ -195,27 +195,15 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                 name="InvoiceDetails"
                 label="Invoice Details"
                 component={MyFormComponents.FormTextArea}
-              //value={this.state.productInEdit.Invoice_x0020_Details}
+                value={this.state.productInEdit.Invoice_x0020_Details}
               //onchange={this.onDialogInputChange}
               />
-
 
               <div style={{ width: '100%' }}>
                 <FieldArray
                   name="GLAccounts"
                   component={MyFinanceGlAccountsComponent}
                   value={this.state.productInEdit.AccountDetails}
-                  // value={
-                  //   this.state.productInEdit.AccountDetails
-                  //     .map(f => {
-                  //       return {
-                  //         GLCode: f.Account_x0020_Code,
-                  //         Amount: f.Amount,
-                  //         HSTTaxable: f.HST_x0020_Taxable,
-                  //       };
-                  //     })
-                  // }
-                //onchange={this.onDialogInputChange}
                 />
               </div>
 
@@ -232,38 +220,6 @@ export class MyEditDialogContainer extends React.Component<any, any> {
               />
             </FormElement>
           )} />
-        {/* <form onSubmit={this.handleSubmit}>
-          <div style={{ marginBottom: '1rem' }}>
-            <label>
-              Product Name<br />
-              <Input
-                type="text"
-                name="ProductName"
-                //value={this.state.productInEdit.ProductName || ''}
-                onChange={this.onDialogInputChange}
-              />
-            </label>
-          </div>
-          <div style={{ marginBottom: '1rem' }}>
-            <label>
-              Units In Stock<br />
-              <NumericTextBox
-                name="UnitsInStock"
-                //value={this.state.productInEdit.UnitsInStock || 0}
-                onChange={this.onDialogInputChange}
-              />
-            </label>
-          </div>
-          <div>
-            <label>
-              <input
-                type="checkbox"
-                name="Discontinued"
-                checked={this.state.productInEdit.Discontinued || false}
-                onChange={this.onDialogInputChange}
-              />Discontinued product</label>
-          </div>
-        </form> */}
         <DialogActionsBar>
           <button
             className="k-button k-primary"

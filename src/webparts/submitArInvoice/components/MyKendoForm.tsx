@@ -145,7 +145,8 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                 .then(item => {
                   const itemProxy: any = Object.assign({}, item);
                   sp.web.lists.getByTitle('RelatedInvoiceAttachments').items.getById(itemProxy.ID).update({
-                    ARInvoiceId: innerFile.ID
+                    ARInvoiceId: innerFile.ID,
+                    Title: element.name
                   });
                 });
             });
@@ -182,14 +183,16 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
 
     for (let index = 0; index < inputData.RelatedAttachments.length; index++) {
       const element = inputData.RelatedAttachments[index];
-
+      debugger;
       let uploadRes = await web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/')
         .files
         .add(element.name, element.getRawFile(), true)
         .then(({ file }) => file.getItem()
           .then((item: any) => {
+            debugger;
             return item.update({
-              ARInvoiceId: mainFile.Id
+              ARInvoiceId: mainFile.Id,
+              Title: element.name
             });
           })
         );
