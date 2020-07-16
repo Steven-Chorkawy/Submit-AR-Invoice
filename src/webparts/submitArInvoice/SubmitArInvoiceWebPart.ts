@@ -8,7 +8,6 @@ import {
   PropertyPaneDropdown
 } from '@microsoft/sp-property-pane';
 
-// ? What is this for ?
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 
 
