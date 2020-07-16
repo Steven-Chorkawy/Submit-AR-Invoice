@@ -461,7 +461,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                 icon="cancel"
                 onClick={this.cancelCurrentChanges}
               >Cancel Current Changes</Button>
-            )}
+            ) }
           </GridToolbar>
 
           <GridColumn field="ID" title="ID" width={this._columnWidth} editable={false} />
@@ -527,14 +527,14 @@ class InvoiceDetailComponent extends GridDetailRow {
     // Return View Mode
     return (
       <div>
-        <h4>G/L Accounts</h4>
+        <h3>G/L Accounts</h3>
         <MyFinanceGlAccounts
           value={this.props.dataItem.AccountDetails}
           showCommandCell={false}
           style={{ 'maxWidth': '1200px' }} />
         <hr />
 
-        <h4>Approval Responses</h4>
+        <h3>Approval Responses</h3>
         <ApprovalResponseComponent
           approvals={this.props.dataItem.Approvals}
         />
