@@ -13,9 +13,6 @@ import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import { Input, NumericTextBox } from '@progress/kendo-react-inputs';
 import { Form, Field, FormElement, FieldArray } from '@progress/kendo-react-form';
 
-
-
-
 //PnPjs Imports
 import { sp } from "@pnp/sp";
 import { Web } from "@pnp/sp/webs";
@@ -32,7 +29,7 @@ import * as MyFormComponents from '../MyFormComponents';
 import { filterBy } from '@progress/kendo-data-query';
 import { filterGroupByField } from '@progress/kendo-react-grid/dist/npm/columnMenu/GridColumnMenuFilter';
 import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from './MyFinanceGlAccounts';
-
+import { ApprovalResponseComponent } from '../ApprovalResponseComponent'
 
 interface IMyFinanceFormState {
   invoices: IInvoicesDataState;
@@ -50,9 +47,6 @@ interface IInvoicesDataState {
   data: Array<any>;
   total: number;
 }
-
-
-
 
 class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   constructor(props) {
@@ -102,6 +96,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
   //#region Methods
   public dataReceived = (invoices) => {
+    console.log("dataReceived");
+    console.log(invoices);
     var dataHolder = filterBy(invoices.data, this.state.filter);
 
     this.setState({
@@ -129,7 +125,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   public dataStateChange = (e) => {
-    debugger;
     this.setState({
       ...this.state,
       dataState: e.data
@@ -137,7 +132,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   public expandChange = (event) => {
-    debugger;
+
     event.dataItem.expanded = !event.dataItem.expanded;
 
     // myFunction is undefined....
@@ -146,14 +141,12 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     this.forceUpdate();
   }
 
-  public expandAllRows = (event) => {
-    debugger;
+  public expandAllRows = () => {
     this.setState({
       allRowsExpanded: !this.state.allRowsExpanded
     });
     // loop over this.state.invoices.data
     this.state.invoices.data.map(invoice => {
-      debugger;
       invoice.expanded = this.state.allRowsExpanded;
       this.expandChange({ dataItem: invoice });
     });
@@ -397,6 +390,42 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       invoices: { ...this.state.receivedData }
     });
   }
+
+  public updateAccount = (item) => {
+
+    let data = this.state.invoices.data;
+
+    for (let index = 0; index < item.length; index++) {
+
+      const currentAccount = item[index];
+      console.log("updateAccount");
+      console.log(currentAccount);
+
+      let invoiceIndex = this.state.invoices.data.findIndex(p => p.ID === currentAccount.InvoiceID);
+
+      if (invoiceIndex >= 0) {
+        let accountIndex = data[invoiceIndex].AccountDetails.findIndex(p => p.ID === currentAccount.ID);
+        if (accountIndex >= 0) {
+          console.log(data[invoiceIndex].AccountDetails[accountIndex]);
+          data[invoiceIndex].AccountDetails[accountIndex] = {
+            ...data[invoiceIndex].AccountDetails[accountIndex],
+            Account_x0020_Code: currentAccount.GLCode,
+            Amount: currentAccount.Amount,
+            HST_x0020_Taxable: currentAccount.HSTTaxable
+          };
+        }
+      }
+    }
+
+    this.setState({
+      invoices: {
+        data: data,
+        total: data.length
+      }
+    });
+    this.forceUpdate();
+    this.expandAllRows();
+  }
   //#endregion end CRUD Methods
 
   public render() {
@@ -457,6 +486,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
             siteUsersData={this.state.siteUsersData}
             save={this.saveEditForm}
             cancel={this.cancelEditForm}
+            onUpdateAccount={this.updateAccount}
           />
         }
 
@@ -480,7 +510,7 @@ class InvoiceDetailComponent extends GridDetailRow {
   private itemChangeEvent
 
   constructor(props) {
-    debugger;
+
     console.log("this element");
     super(props);
   }
@@ -497,8 +527,18 @@ class InvoiceDetailComponent extends GridDetailRow {
     // Return View Mode
     return (
       <div>
-        <h5>Sample data for UAT.  We can add invoice data more here.</h5>
-        <MyFinanceGlAccounts value={this.props.dataItem.AccountDetails} showCommandCell={false} style={{ 'maxWidth': '1200px' }} />
+        <h4>G/L Accounts</h4>
+        <MyFinanceGlAccounts
+          value={this.props.dataItem.AccountDetails}
+          showCommandCell={false}
+          style={{ 'maxWidth': '1200px' }} />
+        <hr />
+
+        <h4>Approval Responses</h4>
+        <ApprovalResponseComponent
+          approvals={this.props.dataItem.Approvals}
+        />
+
       </div>
     );
   }
@@ -517,7 +557,11 @@ class InvoiceEditForm extends React.Component<any, any> {
     event.preventDefault();
   }
 
+
+
   public onDialogInputChange = (event) => {
+
+    this.props.onItemChange(event);
     let target = event.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = (target.props && target.props.name !== undefined) ? target.props.name : (target.name !== undefined) ? target.name : target.props.id;
@@ -586,6 +630,7 @@ class InvoiceEditForm extends React.Component<any, any> {
                     name="GLAccounts"
                     component={MyFinanceGlAccountsComponent}
                     value={this.state.productInEdit.AccountDetails}
+                    onUpdateAccount={this.props.onUpdateAccount}
                   //onchange={this.onDialogInputChange}
                   />
                 </div>
