@@ -393,9 +393,10 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
               />
 
 
-              <div style={{ width: '100%' }}>
+              <div style={{ width: '100%' }} className={'k-form-field'}>
                 <FieldArray
                   name="GLAccounts"
+                  label="G/L Accounts"
                   component={MyGLAccountComponent}
                 //onchange={this.onDialogInputChange}
                 />

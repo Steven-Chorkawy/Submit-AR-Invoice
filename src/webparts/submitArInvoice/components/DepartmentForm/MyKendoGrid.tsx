@@ -352,6 +352,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
           <Column
             width="75px"
             field="FileRef"
+            title=""
             filterable={false}
             sortable={false}
             cell={this.MyCustomCell} />

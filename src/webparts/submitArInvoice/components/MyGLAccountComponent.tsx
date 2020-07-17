@@ -4,6 +4,7 @@ import { Field } from '@progress/kendo-react-form';
 import { NumericTextBox, Checkbox } from '@progress/kendo-react-inputs';
 import { Grid, GridColumn, GridToolbar } from '@progress/kendo-react-grid';
 import { Button } from '@progress/kendo-react-buttons';
+import { Label, Error, Hint, FloatingLabel } from '@progress/kendo-react-labels';
 
 import * as MyValidators from './validators.jsx';
 import * as MyFormComponents from './MyFormComponents';
@@ -132,7 +133,7 @@ const commandCell = (onRemove) => (props) => {
 
 
 export const MyGLAccountComponent = (fieldArrayRenderProps) => {
-  const { validationMessage, visited } = fieldArrayRenderProps;
+  const { validationMessage, visited, label } = fieldArrayRenderProps;
 
   const onAdd = React.useCallback(
     (e) => {
@@ -155,11 +156,13 @@ export const MyGLAccountComponent = (fieldArrayRenderProps) => {
 
   return (
     <div key={fieldArrayRenderProps.value}>
+      <Label id={`${label}_id`}>
+        {label}
+      </Label>
       <Grid
         data={fieldArrayRenderProps.value}
         resizable={true}
       >
-
         <GridToolbar>
           <Button title="Add new" className="k-button k-primary" icon="plus" onClick={onAdd} >Add new Account</Button>
         </GridToolbar>

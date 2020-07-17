@@ -8,3 +8,8 @@
 .k-widget.k-window.k-dialog {
   max-height: 800px !important;
 }
+
+/*Makes labels stand out more as per Brajesh. */
+.k-form .k-label {
+  font-weight: bolder;
+}
