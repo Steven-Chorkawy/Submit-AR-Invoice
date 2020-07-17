@@ -100,13 +100,15 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
   //this.CommandCell is set in this classes constructor.
   private CommandCell;
+  private MyCustomUrgentCell = (props) => <CustomUrgentCell {...props} />
   //#endregion
 
   //#region Methods
   public dataReceived = (invoices) => {
     console.log("dataReceived");
     console.log(invoices);
-    var dataHolder = filterBy(invoices.data, this.state.filter);
+    var dataHolder: any = filterBy(invoices.data, this.state.filter);
+
 
     this.setState({
       ...this.state,
@@ -484,10 +486,9 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           <GridColumn field="Invoice_x0020_Status" title="Status" width={this._columnWidth} />
           <GridColumn field="Invoice_x0020_Number" title="Invoice #" width={this._columnWidth} />
           <GridColumn field="Batch_x0020_Number" title="Batch #" width={this._columnWidth} />
-
+          <GridColumn field="Urgent" title="Urgent" width={this._columnWidth} cell={this.MyCustomUrgentCell} />
 
           {/* <GridColumn field="Type_x0020_of_x0020_Request" title="Type" width={this._columnWidth} />
-          <GridColumn field="Urgent" title="Urgent" width={this._columnWidth} />
           <GridColumn field="Customer_x0020_PO_x0020_Number" title="Customer PO #" width={this._columnWidth} /> */}
 
           <GridColumn cell={this.CommandCell} width={"110px"} locked={true} resizable={false} filterable={false} sortable={false} />
@@ -516,6 +517,17 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           onSiteUsersDataReceived={this.siteUserDataReceived}
         />
       </div>
+    );
+  }
+}
+
+class CustomUrgentCell extends React.Component<any, any> {
+  render() {
+    const value = this.props.dataItem[this.props.field];
+    return typeof value  === "boolean" && (
+      <td>
+        {value ? `Yes` : `No`}
+      </td>
     );
   }
 }
