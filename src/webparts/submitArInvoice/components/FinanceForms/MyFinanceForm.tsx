@@ -40,6 +40,7 @@ interface IMyFinanceFormState {
   statusData: any;
   siteUsersData: any;
   filter: any;
+  //sort: any;
   allRowsExpanded: boolean;
 }
 
@@ -57,7 +58,13 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       invoices: { data: [], total: 0 },
       // Same as invoices but this object is used to restore data to it's original state.
       receivedData: { data: [], total: 0 },
-      dataState: { take: 50, skip: 0 },
+      dataState: {
+        take: 50,
+        skip: 0,
+        sort: [
+          { field: 'ID', dir: 'desc' }
+        ],
+      },
       productInEdit: undefined,
       statusData: [],
       siteUsersData: [],
@@ -312,10 +319,10 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
               .then(item => {
                 debugger;
                 const itemProxy: any = Object.assign({}, item);
-                  sp.web.lists.getByTitle('RelatedInvoiceAttachments').items.getById(itemProxy.ID).update({
-                    ARInvoiceId: dataItem.ID,
-                    Title: element.name
-                  });
+                sp.web.lists.getByTitle('RelatedInvoiceAttachments').items.getById(itemProxy.ID).update({
+                  ARInvoiceId: dataItem.ID,
+                  Title: element.name
+                });
               });
           });
       }
@@ -467,7 +474,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                 icon="cancel"
                 onClick={this.cancelCurrentChanges}
               >Cancel Current Changes</Button>
-            ) }
+            )}
           </GridToolbar>
 
           <GridColumn field="ID" title="ID" width={this._columnWidth} editable={false} />

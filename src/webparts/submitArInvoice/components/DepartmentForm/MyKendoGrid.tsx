@@ -29,7 +29,7 @@ import IARInvoice from '../IARInvoice';
 import { filterBy, orderBy, groupBy } from '@progress/kendo-data-query';
 import { MyEditDialogContainer } from './MyEditDialogContainer';
 import { InvoiceDataProvider } from '../InvoiceDataProvider';
-import {InvoiceStatus} from '../enums/InvoiceStatus'
+import { InvoiceStatus } from '../enums/InvoiceStatus'
 
 
 type MyKendoGridState = {
@@ -162,7 +162,13 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       sort: [],
       group: [],
       productInEdit: undefined,
-      dataState: { take: 50, skip: 0 }
+      dataState: {
+        take: 50,
+        skip: 0,
+        sort: [
+          { field: 'ID', dir: 'desc' }
+        ],
+      }
     };
 
     this.CommandCell = MyCommandCell({
@@ -402,7 +408,7 @@ export function MyCommandCell({ edit }) {
 
       const isNewItem = dataItem.ID === undefined;
 
-      return (this.props.dataItem.Invoice_x0020_Status === InvoiceStatus.Hold  || this.props.dataItem.Invoice_x0020_Status === InvoiceStatus.Submitted || this.props.dataItem.Invoice_x0020_Status === InvoiceStatus.Rejected)
+      return (this.props.dataItem.Invoice_x0020_Status === InvoiceStatus.Hold || this.props.dataItem.Invoice_x0020_Status === InvoiceStatus.Submitted || this.props.dataItem.Invoice_x0020_Status === InvoiceStatus.Rejected)
         ? (
           <td className={this.props.className + " k-command-cell"} style={this.props.style}>
             <Button
