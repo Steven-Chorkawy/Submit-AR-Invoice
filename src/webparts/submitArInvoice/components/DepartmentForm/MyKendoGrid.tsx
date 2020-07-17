@@ -263,21 +263,33 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       productInEdit: undefined
     });
 
-
     let updateObject  = {
       Department: dataItem.Department,
       Date: dataItem.Date,
       Requested_x0020_ById: dataItem.Requested_x0020_ById,
       Requires_x0020_Authorization_x0020_ById: {
-        'results': dataItem.Requires_x0020_Authorization_x0020_ById.map((user) => { return user.Id; })
+        'results': dataItem.Requires_x0020_Authorization_x0020_ById.map((user) => {
+          if(Number.isInteger(user)) {
+            return user;
+          } else {
+            return user.Id;
+          }
+        })
       },
       Urgent: dataItem.Urgent,
       CustomerId: dataItem.CustomerId,
       Comment: dataItem.Comment,
-      Invoice_x0020_Details: dataItem.InvoiceDetails,
-      Customer_x0020_PO_x0020_Number: dataItem.CustomerPONumber,
-      Standard_x0020_Terms: dataItem.StandardTerms,
+      Invoice_x0020_Details: dataItem.Invoice_x0020_Details,
+      Customer_x0020_PO_x0020_Number: dataItem.Customer_x0020_PO_x0020_Number,
+      Standard_x0020_Terms: dataItem.Standard_x0020_Terms,
     };
+
+
+
+    console.log("Edit ITem");
+    console.log(dataItem);
+    console.log("Sending these changes to save");
+    console.log(updateObject);
 
 
     sp.web.lists.getByTitle('AR Invoices').items.getById(dataItem.ID).update(updateObject);

@@ -44,7 +44,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
     if (name === "" && target.id !== undefined) {
       name = target.id;
     }
-
+    debugger;
     switch (name) {
       case 'RequestedBy':
         name = 'Requested_x0020_ById';
@@ -63,7 +63,15 @@ export class MyEditDialogContainer extends React.Component<any, any> {
           selectedReqApprovers: this._selectedReqApprovers
         });
         break;
-
+      case 'Customer':
+        name='CustomerId';
+        value=value.Id;
+        break;
+      case 'CustomerPONumber':
+        name='Customer_x0020_PO_x0020_Number';
+        break;
+      case 'InvoiceDetails':
+        name='Invoice_x0020_Details';
       default:
         break;
     }
