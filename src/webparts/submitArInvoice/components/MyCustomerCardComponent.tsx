@@ -32,7 +32,7 @@ export class MyCustomerCardComponent extends React.Component<IMyCustomerProps, I
       return (
         <div>
           <div>
-            Please Enter Any Customer Details. <b>* This value does not save to SharePoint yet. I'm going this for functionality.</b>
+            Enter Additional Customer Details.
           </div>
           <textarea
             className={'k-textarea k-autofill'}
