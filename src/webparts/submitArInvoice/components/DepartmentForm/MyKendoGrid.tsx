@@ -263,13 +263,13 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       productInEdit: undefined
     });
 
-    let updateObject  = {
+    let updateObject = {
       Department: dataItem.Department,
       Date: dataItem.Date,
       Requested_x0020_ById: dataItem.Requested_x0020_ById,
       Requires_x0020_Authorization_x0020_ById: {
         'results': dataItem.Requires_x0020_Authorization_x0020_ById.map((user) => {
-          if(Number.isInteger(user)) {
+          if (Number.isInteger(user)) {
             return user;
           } else {
             return user.Id;
@@ -305,10 +305,10 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
               .then(item => {
 
                 const itemProxy: any = Object.assign({}, item);
-                  sp.web.lists.getByTitle('RelatedInvoiceAttachments').items.getById(itemProxy.ID).update({
-                    ARInvoiceId: dataItem.ID,
-                    Title: element.name
-                  });
+                sp.web.lists.getByTitle('RelatedInvoiceAttachments').items.getById(itemProxy.ID).update({
+                  ARInvoiceId: dataItem.ID,
+                  Title: element.name
+                });
               });
           });
       }
@@ -401,16 +401,27 @@ export function MyCommandCell({ edit }) {
 
       const isNewItem = dataItem.ID === undefined;
 
-      return (this.props.dataItem.Invoice_x0020_Status !== 'Entered in GP' && this.props.dataItem.Invoice_x0020_Status !== 'Completed') && (
-        <td className={this.props.className + " k-command-cell"} style={this.props.style}>
-          <Button
-            className="k-primary k-button k-grid-edit-command col-sm-12"
-            onClick={() => edit(dataItem)}
-            icon="edit"
-            style={{ "marginBottom": "5px" }}
-          >Edit</Button>
-        </td>
-      );
+      return (this.props.dataItem.Invoice_x0020_Status === 'Hold' || this.props.dataItem.Invoice_x0020_Status === 'Received' || this.props.dataItem.Invoice_x0020_Status === 'Rejected')
+        ? (
+          <td className={this.props.className + " k-command-cell"} style={this.props.style}>
+            <Button
+              className="k-primary k-button k-grid-edit-command col-sm-12"
+              onClick={() => edit(dataItem)}
+              icon="edit"
+              style={{ "marginBottom": "5px" }}
+            >Edit</Button>
+          </td>
+        )
+        : (
+          <td className={this.props.className + " k-command-cell"} style={this.props.style}>
+            <Button
+              className="k-button k-grid-edit-command col-sm-12 k-chip-filled k-chip-error"
+              onClick={() => { alert('TODO: Start Cancel Process.') }}
+              icon="cancel"
+              style={{ "marginBottom": "5px" }}
+            >Cancel</Button>
+          </td>
+        );
     }
   }
 };
