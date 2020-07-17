@@ -422,7 +422,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                   icon="save"
                   onClick={this.handleSubmit}
                 // disabled={!formRenderProps.allowSubmit}
-                >Send AR Invoice Request</Button>
+                >Submit AR Invoice Request</Button>
                 <Button onClick={formRenderProps.onFormReset}>Clear</Button>
               </div>
 
