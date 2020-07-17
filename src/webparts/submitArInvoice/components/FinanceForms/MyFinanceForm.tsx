@@ -478,15 +478,17 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           </GridToolbar>
 
           <GridColumn field="ID" title="ID" width={this._columnWidth} editable={false} />
-          <GridColumn field="Type_x0020_of_x0020_Request" title="Type" width={this._columnWidth} />
+          <GridColumn field="Date" title="Date" width={this._columnWidth} filter='date' format={MyGridStrings.DateFilter} />
+          <GridColumn field="Department" title="Department" width={this._columnWidth} />
+          <GridColumn field="Customer" title="Customer" width={this._columnWidth} />
           <GridColumn field="Invoice_x0020_Status" title="Status" width={this._columnWidth} />
           <GridColumn field="Invoice_x0020_Number" title="Invoice #" width={this._columnWidth} />
           <GridColumn field="Batch_x0020_Number" title="Batch #" width={this._columnWidth} />
-          <GridColumn field="Department" title="Department" width={this._columnWidth} />
-          <GridColumn field="Date" title="Date" width={this._columnWidth} filter='date' format={MyGridStrings.DateFilter} />
+
+
+          {/* <GridColumn field="Type_x0020_of_x0020_Request" title="Type" width={this._columnWidth} />
           <GridColumn field="Urgent" title="Urgent" width={this._columnWidth} />
-          <GridColumn field="Customer" title="Customer" width={this._columnWidth} />
-          <GridColumn field="Customer_x0020_PO_x0020_Number" title="Customer PO #" width={this._columnWidth} />
+          <GridColumn field="Customer_x0020_PO_x0020_Number" title="Customer PO #" width={this._columnWidth} /> */}
 
           <GridColumn cell={this.CommandCell} width={"110px"} locked={true} resizable={false} filterable={false} sortable={false} />
         </Grid>
