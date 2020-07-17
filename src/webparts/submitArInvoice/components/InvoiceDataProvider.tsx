@@ -47,11 +47,16 @@ class InvoiceDataProvider extends React.Component<any, any> {
         var invoiceIds = [];
         var idsForApproval = [];
         var idsForRelatedAttachments = [];
-        response.map(r => {
-          invoiceIds.push(`AR_x0020_InvoiceId eq ${r.ID}`);
-          idsForApproval.push(`InvoiceID eq '${r.ID}'`);
-          idsForRelatedAttachments.push(`ARInvoice/ID eq ${r.ID}`);
-        });
+
+        for (let index = 0; index < response.length; index++) {
+          const element = response[index];
+          invoiceIds.push(`AR_x0020_InvoiceId eq ${element.ID}`);
+          idsForApproval.push(`InvoiceID eq '${element.ID}'`);
+          idsForRelatedAttachments.push(`ARInvoice/ID eq ${element.ID}`);
+
+          response[index].Date = new Date(response[index].Date);
+          response[index].Created = new Date(response[index].Created);
+        }
 
         //#region Query the required account details for this invoice.
 
@@ -68,7 +73,7 @@ class InvoiceDataProvider extends React.Component<any, any> {
             .items
             .filter(idsForRelatedAttachments.join(' or '))
             .getAll(),
-            //TODO: How can I filter these results? I don't need every file.
+          //TODO: How can I filter these results? I don't need every file.
           sp.web.getFolderByServerRelativePath("RelatedInvoiceAttachments").files()
         ])
           .then((values) => {
@@ -80,7 +85,7 @@ class InvoiceDataProvider extends React.Component<any, any> {
 
               // Add ServerDirectUrl if required.
               invoice.RelatedAttachments.map(relatedAttachments => {
-                if(relatedAttachments.ServerRedirectedEmbedUrl === ""){
+                if (relatedAttachments.ServerRedirectedEmbedUrl === "") {
                   var url = values[3].find(f => f.Title === relatedAttachments.Title).ServerRelativeUrl;
                   relatedAttachments.ServerRedirectedEmbedUrl = url;
                   relatedAttachments.ServerRedirectedEmbedUri = url;
@@ -94,9 +99,7 @@ class InvoiceDataProvider extends React.Component<any, any> {
             } else {
               this.requestDataIfNeeded();
             }
-          })
-
-
+          });
       });
   };
 

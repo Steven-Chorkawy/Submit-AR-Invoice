@@ -29,7 +29,7 @@ import IARInvoice from '../IARInvoice';
 import { filterBy, orderBy, groupBy } from '@progress/kendo-data-query';
 import { MyEditDialogContainer } from './MyEditDialogContainer';
 import { InvoiceDataProvider } from '../InvoiceDataProvider';
-import { InvoiceStatus } from '../enums/InvoiceStatus'
+import { InvoiceStatus, MyGridStrings } from '../enums/MyEnums'
 
 
 type MyKendoGridState = {
@@ -130,7 +130,7 @@ class DetailComponent extends GridDetailRow {
  */
 class CustomCell extends React.Component<GridCellProps> {
   render() {
-    return (this.props.dataItem.Invoice_x0020_Status === 'Entered in GP' || this.props.dataItem.Invoice_x0020_Status === 'Completed') ? (
+    return (this.props.dataItem.Invoice_x0020_Status === InvoiceStatus["Entered into GP"] || this.props.dataItem.Invoice_x0020_Status === InvoiceStatus.Completed) ? (
       <td title={'Click to view invoice.'}>
         <a href={this.props.dataItem.FileRef} target='_blank' >
           <Button primary={true} /*icon="hyperlink-open"*/ icon="folder"></Button>
@@ -189,17 +189,15 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       dataState: dataState,
       ...dataState
     };
-
     return output;
   }
 
   dataStateChange = (event) => {
-
     var appSate = this.createAppState(event.data);
-
 
     this.setState(appSate);
   }
+
 
   expandChange = (event) => {
     event.dataItem[event.target.props.expandField] = event.value;
@@ -358,12 +356,11 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
             sortable={false}
             cell={this.MyCustomCell} />
 
-          <Column field="Date" title="Date" width="250px" filter="date" format="{0:dd-MMM-yyyy}" />
-          <Column field="Department" width="250px" title="Department" />
-          <Column field="Invoice_x0020_Status" width="250px" title="Status" />
-          <Column field="Type_x0020_of_x0020_Request" width="250px" title="Type" />
+          <Column field="Created" width="250px" title="Created Date" filter="date" format={MyGridStrings.DateFilter}/>
           <Column field="Customer.Title" width="250px" title="Customer" />
-          <Column field="Batch_x0020_Number" width="250px" title="Batch Number" />
+          <Column field="Invoice_x0020_Status" width="250px" title="Status" />
+          <Column field="Date" title="Date" width="250px" filter="date" format={MyGridStrings.DateFilter} />
+          <Column field="Type_x0020_of_x0020_Request" width="250px" title="Type" />
 
           <Column cell={this.CommandCell} width={"110px"} locked={true} resizable={false} filterable={false} sortable={false} />
 

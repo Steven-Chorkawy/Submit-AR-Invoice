@@ -1,4 +1,8 @@
-enum InvoiceStatus {
+/**
+ * Default Invoice Status values.
+ * The values are set in AR Invoices document library as a Choice column.
+ */
+export enum InvoiceStatus {
   'Submitted' = 'Submitted',
   'Approved' = 'Approved',
   'Rejected' = 'Rejected',
@@ -9,4 +13,6 @@ enum InvoiceStatus {
   'Completed' = 'Completed'
 }
 
-export { InvoiceStatus }
+export enum MyGridStrings {
+  DateFilter = '{0: MM/dd/yyyy}',
+}

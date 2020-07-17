@@ -30,7 +30,7 @@ import { filterBy } from '@progress/kendo-data-query';
 import { filterGroupByField } from '@progress/kendo-react-grid/dist/npm/columnMenu/GridColumnMenuFilter';
 import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceGLAccounts';
 import { ApprovalResponseComponent } from '../ApprovalResponseComponent'
-import { InvoiceStatus } from '../enums/InvoiceStatus';
+import { InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
 
 interface IMyFinanceFormState {
   invoices: IInvoicesDataState;
@@ -483,7 +483,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           <GridColumn field="Invoice_x0020_Number" title="Invoice #" width={this._columnWidth} />
           <GridColumn field="Batch_x0020_Number" title="Batch #" width={this._columnWidth} />
           <GridColumn field="Department" title="Department" width={this._columnWidth} />
-          <GridColumn field="Date" title="Date" width={this._columnWidth} />
+          <GridColumn field="Date" title="Date" width={this._columnWidth} filter='date' format={MyGridStrings.DateFilter} />
           <GridColumn field="Urgent" title="Urgent" width={this._columnWidth} />
           <GridColumn field="Customer" title="Customer" width={this._columnWidth} />
           <GridColumn field="Customer_x0020_PO_x0020_Number" title="Customer PO #" width={this._columnWidth} />
