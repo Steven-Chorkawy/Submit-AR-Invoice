@@ -13,3 +13,9 @@
 .k-form .k-label {
   font-weight: bolder;
 }
+
+.k-grid-header tr[role="row"] {
+  border-color: rgba(25,118,210,.3);
+  color: #1976d2;
+  background-color: rgba(25,118,210,.12);
+}
