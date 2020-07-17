@@ -33,6 +33,8 @@ class InvoiceDataProvider extends React.Component<any, any> {
 
     sp.web.lists.getByTitle('AR Invoices')
       .items
+      .select('*, Customer/Title')
+      .expand('Customer')
       .getAll()
       .then(async response => {
         this.lastSuccess = this.pending;
