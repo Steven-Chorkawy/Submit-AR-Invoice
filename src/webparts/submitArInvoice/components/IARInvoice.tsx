@@ -1,4 +1,6 @@
 interface IARInvoice{
+  ID: number;
+  Id: number;
   Title: string,
   Date: Date,
   Department: string,

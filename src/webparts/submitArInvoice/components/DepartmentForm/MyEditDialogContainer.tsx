@@ -33,8 +33,28 @@ export class MyEditDialogContainer extends React.Component<any, any> {
 
   onDialogInputChange = (event) => {
     let target = event.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
-    const name = target.props ? target.props.name : target.name;
+    let value = target.type === 'checkbox' ? target.checked : target.value;
+    let name = (target.props && target.props.name !== undefined) ? target.props.name : (target.name !== undefined) ? target.name : target.props.id;
+    // last chance.
+    if (name === "" && target.id !== undefined) {
+      name = target.id;
+    }
+
+    debugger;
+    switch (name) {
+      case 'RequestedBy':
+        debugger;
+        name = 'Requested_x0020_ById';
+        value = value.Id;
+        break;
+      case 'RequiresAuthorizationBy':
+        name = 'Requires_x0020_Authorization_x0020_ById';
+        // TODO: Why can't I set the req auth value?!?!
+        break;
+
+      default:
+        break;
+    }
 
     const edited = this.state.productInEdit;
     edited[name] = value;
@@ -85,7 +105,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                   //validator={MyValidators.departmentValidator}
                   component={MyFormComponents.FormDropDownList}
                   value={this.state.productInEdit.Department}
-                //onchange={this.onDialogInputChange}
+                  onChange={this.onDialogInputChange}
                 />
 
                 <Field
@@ -96,7 +116,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                   //validator={MyValidators.dateValidator}
                   wrapperStyle={{ width: '50%' }}
                   value={new Date(this.state.productInEdit.Date)}
-                //onchange={this.onDialogInputChange}
+                  onChange={this.onDialogInputChange}
                 />
               </div>
 
@@ -112,7 +132,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                   //validator={MyValidators.requestedByValidator}
                   component={MyFormComponents.FormComboBox}
                   value={this.props.siteUsers.find(s => s.Id === this.state.productInEdit.Requested_x0020_ById)}
-                //onchange={this.onDialogInputChange}
+                  onChange={this.onDialogInputChange}
                 />
 
                 <Field
@@ -127,7 +147,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                   component={MyFormComponents.FormMultiSelect}
                   value={this.selectedReqApprovers}
 
-                //onchange={this.onDialogInputChange}
+                  onChange={this.onDialogInputChange}
                 />
               </div>
 
@@ -140,7 +160,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                   offLabel="No"
                   component={MyFormComponents.FormSwitch}
                   value={this.state.productInEdit.Urgent}
-                //onchange={this.onDialogInputChange}
+                  onChange={this.onDialogInputChange}
                 />
               </div>
               <Field
@@ -155,7 +175,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                 allowCustom={true}
                 component={MyFormComponents.CustomerComboBox}
                 value={this.props.customers.find(f => f.Id === this.state.productInEdit.CustomerId)}
-              //onchange={this.onDialogInputChange}
+                onChange={this.onDialogInputChange}
               />
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
@@ -165,7 +185,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                   ////validator={MyValidators.requiresCustomerPONUmber}
                   component={MyFormComponents.FormInput}
                   value={this.state.productInEdit.Customer_x0020_PO_x0020_Number}
-                //onchange={this.onDialogInputChange}
+                  onChange={this.onDialogInputChange}
                 />
 
                 <Field
@@ -178,7 +198,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                     'NET 30, 1% INTEREST CHARGED'
                   ]}
                   component={MyFormComponents.FormDropDownList}
-                //onchange={this.onDialogInputChange}
+                  onChange={this.onDialogInputChange}
                 />
               </div>
 
@@ -188,7 +208,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                 label="Comments"
                 value={this.state.productInEdit.Comment}
                 component={MyFormComponents.FormTextArea}
-              //onchange={this.onDialogInputChange}
+                onChange={this.onDialogInputChange}
               />
 
               <Field
@@ -197,7 +217,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                 label="Invoice Details"
                 component={MyFormComponents.FormTextArea}
                 value={this.state.productInEdit.Invoice_x0020_Details}
-              //onchange={this.onDialogInputChange}
+                onChange={this.onDialogInputChange}
               />
 
               <div style={{ width: '100%' }}>
@@ -215,7 +235,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                   {
                     this.state.productInEdit.RelatedAttachments.map(f => {
                       return (
-                        <a target='_blank' href={f.ServerRedirectedEmbedUrl} style={{margin: '2px'}}>
+                        <a target='_blank' href={f.ServerRedirectedEmbedUrl} style={{ margin: '2px' }}>
                           <div className='k-chip k-chip-filled k-chip-info'>
                             <div className='k-chip-content'>
                               {f.Title}
@@ -233,7 +253,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                     batch={false}
                     multiple={true}
                     component={MyFormComponents.FormUpload}
-                  //onchange={this.onDialogInputChange}
+                    myOnChange={this.onDialogInputChange}
                   />
                 </CardBody>
               </Card>

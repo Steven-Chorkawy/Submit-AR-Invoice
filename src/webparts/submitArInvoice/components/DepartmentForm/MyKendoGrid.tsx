@@ -32,7 +32,7 @@ import { InvoiceDataProvider } from '../InvoiceDataProvider';
 
 
 type MyKendoGridState = {
-  data: IARInvoice[];
+  data: any;
   receivedData: IARInvoice[];
   filter: any;
   sort: any;
@@ -243,20 +243,64 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
 
   public save = () => {
     const dataItem = this.state.productInEdit;
-    // const products = this.state.products.slice();
+    debugger;
+    const invoices = this.state.data.data.slice();
     // const isNewProduct = dataItem.ProductID === undefined;
+    const isNewProduct = false; // false because we don't let users create new items here.
 
-    // if (isNewProduct) {
-    //   products.unshift(this.newProduct(dataItem));
-    // } else {
-    //   const index = products.findIndex(p => p.ProductID === dataItem.ProductID);
-    //   products.splice(index, 1, dataItem);
-    // }
+    if (isNewProduct) {
+      //invoices.unshift(this.newProduct(dataItem));
+    } else {
+      const index = invoices.findIndex(p => p.ID === dataItem.ID);
+      invoices.splice(index, 1, dataItem);
+    }
 
-    // this.setState({
-    //   products: products,
-    //   productInEdit: undefined
-    // });
+    this.setState({
+      data: {
+        data: invoices,
+        total: invoices.length
+      },
+      productInEdit: undefined
+    });
+
+    debugger;
+    let updateObject  = {
+      Department: dataItem.Department,
+      Date: dataItem.Date,
+      Requested_x0020_ById: dataItem.Requested_x0020_ById,
+      // Requires_x0020_Authorization_x0020_ById: {
+      //   'results': dataItem.RequiresAuthorizationBy.map((user) => { return user.Id; })
+      // },
+      Urgent: dataItem.Urgent,
+      CustomerId: dataItem.CustomerId,
+      Comment: dataItem.Comment,
+      Invoice_x0020_Details: dataItem.InvoiceDetails,
+      Customer_x0020_PO_x0020_Number: dataItem.CustomerPONumber,
+      Standard_x0020_Terms: dataItem.StandardTerms,
+    };
+
+    debugger;
+    sp.web.lists.getByTitle('AR Invoices').items.getById(dataItem.ID).update(updateObject);
+
+    if (dataItem.RelatedInvoiceAttachments) {
+      debugger;
+      for (let index = 0; index < dataItem.RelatedInvoiceAttachments.length; index++) {
+        const element = dataItem.RelatedInvoiceAttachments[index];
+        sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/').files
+          .add(element.name, element.getRawFile(), true)
+          .then(fileRes => {
+            fileRes.file.getItem()
+              .then(item => {
+                debugger;
+                const itemProxy: any = Object.assign({}, item);
+                  sp.web.lists.getByTitle('RelatedInvoiceAttachments').items.getById(itemProxy.ID).update({
+                    ARInvoiceId: dataItem.ID,
+                    Title: element.name
+                  });
+              });
+          });
+      }
+    }
   }
 
   public cancel = () => {
@@ -306,7 +350,17 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
 
         </Grid>
 
-        {this.state.productInEdit && <MyEditDialogContainer dataItem={this.state.productInEdit} customers={this.props.customers} siteUsers={this.props.siteUsers} save={this.save} cancel={this.cancel} />}
+        {
+          this.state.productInEdit &&
+          <MyEditDialogContainer
+            dataItem={this.state.productInEdit}
+            customers={this.props.customers}
+            siteUsers={this.props.siteUsers}
+
+            save={this.save}
+            cancel={this.cancel}
+          />
+        }
 
         <InvoiceDataProvider
           dataState={this.state.dataState}
