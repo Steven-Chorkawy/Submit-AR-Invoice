@@ -30,6 +30,7 @@ import { filterBy } from '@progress/kendo-data-query';
 import { filterGroupByField } from '@progress/kendo-react-grid/dist/npm/columnMenu/GridColumnMenuFilter';
 import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceGLAccounts';
 import { ApprovalResponseComponent } from '../ApprovalResponseComponent'
+import { InvoiceStatus } from '../enums/InvoiceStatus';
 
 interface IMyFinanceFormState {
   invoices: IInvoicesDataState;
@@ -63,7 +64,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       filter: {
         logic: "and",
         filters: [
-          { field: "Invoice_x0020_Status", operator: "neq", value: "Received" }
+          { field: "Invoice_x0020_Status", operator: "neq", value: InvoiceStatus.Submitted }
         ]
       },
       allRowsExpanded: false,
