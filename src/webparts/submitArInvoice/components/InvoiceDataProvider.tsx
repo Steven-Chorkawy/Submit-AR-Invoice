@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 
 /** Start Kendo Imports */
-import { toODataString, translateAggregateResults, process } from '@progress/kendo-data-query';
+import { toODataString, process } from '@progress/kendo-data-query';
 /** End Kendo Imports */
 
 /** Start PnP Imports */
@@ -12,6 +12,7 @@ import "@pnp/sp/lists";
 import "@pnp/sp/items";
 import "@pnp/sp/fields";
 import "@pnp/sp/site-users/web";
+import { IFile } from '@pnp/sp/files';
 /** End PnP Imports */
 
 class InvoiceDataProvider extends React.Component<any, any> {
@@ -19,18 +20,16 @@ class InvoiceDataProvider extends React.Component<any, any> {
     super(props);
   }
 
-  pending = '';
-  lastSuccess = '';
+  public pending = '';
+  public lastSuccess = '';
 
-  requestDataIfNeeded = () => {
+  public requestDataIfNeeded = () => {
+
     if (this.pending || toODataString(this.props.dataState) === this.lastSuccess) {
-
       return;
     }
 
-
     this.pending = toODataString(this.props.dataState);
-
 
     sp.web.lists.getByTitle('AR Invoices')
       .items
@@ -42,38 +41,64 @@ class InvoiceDataProvider extends React.Component<any, any> {
         // Apply Kendo grids filters.
         var processedResponse = process(response, this.props.dataState);
 
-        //#region Query the required account details for this invoice.
         // Hold the list of invoice IDs that will be used to pull related accounts.
         var invoiceIds = [];
+        var idsForApproval = [];
+        var idsForRelatedAttachments = [];
         response.map(r => {
           invoiceIds.push(`AR_x0020_InvoiceId eq ${r.ID}`);
+          idsForApproval.push(`InvoiceID eq '${r.ID}'`);
+          idsForRelatedAttachments.push(`ARInvoice/ID eq ${r.ID}`);
         });
 
-        // Join each of the invoiceIds together with and or.
-        // this will be our final filter string that we send the SharePoint.
-        var accountDetailFilter = `${invoiceIds.join(' or ')}`;
+        //#region Query the required account details for this invoice.
 
-        // Using the filter string that we've worked so hard to build we will now get our SharePoint data.
-        var accountDetails = await sp.web.lists.getByTitle('AR Invoice Accounts')
-          .items
-          .filter(accountDetailFilter)
-          .get();
+        Promise.all([
+          sp.web.lists.getByTitle('AR Invoice Accounts')
+            .items
+            .filter(invoiceIds.join(' or '))
+            .get(),
+          sp.web.lists.getByTitle('Approval Requests Sent')
+            .items
+            .filter(idsForApproval.join(' or '))
+            .get(),
+          sp.web.lists.getByTitle('RelatedInvoiceAttachments')
+            .items
+            .filter(idsForRelatedAttachments.join(' or '))
+            .getAll(),
+            //TODO: How can I filter these results? I don't need every file.
+          sp.web.getFolderByServerRelativePath("RelatedInvoiceAttachments").files()
+        ])
+          .then((values) => {
+            // Using each of the accounts that we found we will not attach them to the invoice object.
+            response.map(invoice => {
+              invoice.AccountDetails = values[0].filter(f => Number(f.AR_x0020_InvoiceId) === invoice.ID) || [];
+              invoice.Approvals = values[1].filter(f => Number(f.InvoiceID) === invoice.ID) || [];
+              invoice.RelatedAttachments = values[2].filter(f => Number(f.ARInvoiceId) === invoice.ID) || []
+
+              // Add ServerDirectUrl if required.
+              invoice.RelatedAttachments.map(relatedAttachments => {
+                if(relatedAttachments.ServerRedirectedEmbedUrl === ""){
+                  var url = values[3].find(f => f.Title === relatedAttachments.Title).ServerRelativeUrl;
+                  relatedAttachments.ServerRedirectedEmbedUrl = url;
+                  relatedAttachments.ServerRedirectedEmbedUri = url;
+                }
+              });
+            });
+
+            // This is something from Kendo demos.
+            if (toODataString(this.props.dataState) === this.lastSuccess) {
+              this.props.onDataReceived.call(undefined, processedResponse);
+            } else {
+              this.requestDataIfNeeded();
+            }
+          })
 
 
-        // Using each of the accounts that we found we will not attach them to the invoice object.
-        response.map(invoice => { invoice.AccountDetails = accountDetails.filter(f => Number(f.AR_x0020_InvoiceId) === invoice.ID); });
-        //#endregion
-
-        // This is something from Kendo demos.
-        if (toODataString(this.props.dataState) === this.lastSuccess) {
-          this.props.onDataReceived.call(undefined, processedResponse);
-        } else {
-          this.requestDataIfNeeded();
-        }
       });
   };
 
-  requestStatusData = () => {
+  public requestStatusData = () => {
 
     if (this.props.statusDataState.length > 0) {
       return;
@@ -97,8 +122,8 @@ class InvoiceDataProvider extends React.Component<any, any> {
       });
   }
 
-  requestSiteUsers = () => {
-    if(this.props.siteUsersDataState.length > 0) {
+  public requestSiteUsers = () => {
+    if (this.props.siteUsersDataState.length > 0) {
       return;
     }
 
@@ -109,18 +134,20 @@ class InvoiceDataProvider extends React.Component<any, any> {
         this.props.onSiteUsersDataReceived.call(undefined, siteUsers.filter(user => user.UserPrincipalName != null));
       });
   }
-  render() {
+
+  public render() {
+
     // Query any methods required here.
     this.requestDataIfNeeded();
     this.requestStatusData();
     this.requestSiteUsers();
 
     return this.pending && <LoadingPanel />
-  };
+  }
 };
 
 class LoadingPanel extends React.Component {
-  render() {
+  public render() {
     const loadingPanel = (
       <div className="k-loading-mask">
         <span className="k-loading-text">Loading</span>
@@ -131,7 +158,7 @@ class LoadingPanel extends React.Component {
 
     const gridContent = document && document.querySelector('.k-grid-content');
     return gridContent ? ReactDom.createPortal(loadingPanel, gridContent) : loadingPanel;
-  };
+  }
 };
 
 export { InvoiceDataProvider };

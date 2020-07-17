@@ -22,10 +22,27 @@ export class MyCustomerCardComponent extends React.Component<IMyCustomerProps, I
   }
 
   render() {
-
+    // Nothing is selected.
     if (this.state.selectedCustomer == undefined) {
       return (<div key="0">Select a Customer</div>);
     }
+    // Custom value is entered.
+    // If id isn't present that means the user has given us a custom value.
+    else if (!this.state.selectedCustomer.hasOwnProperty('ID')) {
+      return (
+        <div>
+          <div>
+            Please Enter Any Customer Details. <b>* This value does not save to SharePoint yet. I'm going this for functionality.</b>
+          </div>
+          <textarea
+            className={'k-textarea k-autofill'}
+            id={'CustomerDescription'}
+            name={'CustomerDescription'}
+          />
+        </div>
+      );
+    }
+    // existing value is selected.
     else {
       return (
         // TODO: Design this better! This is just for the first round of review.
@@ -42,7 +59,6 @@ export class MyCustomerCardComponent extends React.Component<IMyCustomerProps, I
               <p>Telephone Number: {this.state.selectedCustomer.WorkPhone}</p>
               <p>Mailing Address: {this.state.selectedCustomer.WorkAddress}</p>
             </div>
-
             <p>Notes: {this.state.selectedCustomer.Comments}</p>
           </CardBody>
         </Card>

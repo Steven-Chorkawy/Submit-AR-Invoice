@@ -8,7 +8,6 @@ import {
   PropertyPaneDropdown
 } from '@microsoft/sp-property-pane';
 
-// ? What is this for ?
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 
 
@@ -134,11 +133,11 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
         break;
 
       case ActiveDisplay.DepartmentForm:
-        Promise.all([this.getARInvoices()])
+        Promise.all([this.getARInvoices(), this.getSiteUsers(), this.getCustomers()])
           .then((values) => {
             const element: React.ReactElement = React.createElement(
               MyKendoGrid,
-              { properties: this.properties, data: values[0] }
+              { properties: this.properties, data: values[0], siteUsers: values[1], customers: values[2] }
             );
 
             ReactDom.render(element, this.domElement);

@@ -1,14 +1,12 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { Form, Field, FieldArray, FieldArrayRenderProps, FormElement } from '@progress/kendo-react-form';
-import { Error } from '@progress/kendo-react-labels';
-import { Input, MaskedTextBox, NumericTextBox, Switch, Checkbox } from '@progress/kendo-react-inputs';
+import { Field } from '@progress/kendo-react-form';
+import { NumericTextBox, Checkbox } from '@progress/kendo-react-inputs';
 import { Grid, GridColumn, GridToolbar } from '@progress/kendo-react-grid';
-import { Button } from '@progress/kendo-react-buttons'
+import { Button } from '@progress/kendo-react-buttons';
 
-import * as MyValidators from './validators.jsx'
+import * as MyValidators from './validators.jsx';
 import * as MyFormComponents from './MyFormComponents';
-import { MyForm } from './MyKendoForm.js';
 
 /**
    * Calculate HST this current row.
@@ -16,7 +14,7 @@ import { MyForm } from './MyKendoForm.js';
    * @param props Grid properties.
    */
 const CalculateHSTAmount = (props) => {
-  return (props.dataItem.HSTTaxable == true) ? props.dataItem.Amount * 0.13 : 0
+  return (props.dataItem.HSTTaxable == true) ? props.dataItem.Amount * 0.13 : 0;
 }
 
 
