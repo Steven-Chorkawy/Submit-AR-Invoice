@@ -187,9 +187,9 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   }
 
   dataStateChange = (event) => {
-    debugger;
+
     var appSate = this.createAppState(event.data);
-    debugger;
+
 
     this.setState(appSate);
   }
@@ -243,7 +243,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
 
   public save = () => {
     const dataItem = this.state.productInEdit;
-    debugger;
+
     const invoices = this.state.data.data.slice();
     // const isNewProduct = dataItem.ProductID === undefined;
     const isNewProduct = false; // false because we don't let users create new items here.
@@ -263,14 +263,14 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       productInEdit: undefined
     });
 
-    debugger;
+
     let updateObject  = {
       Department: dataItem.Department,
       Date: dataItem.Date,
       Requested_x0020_ById: dataItem.Requested_x0020_ById,
-      // Requires_x0020_Authorization_x0020_ById: {
-      //   'results': dataItem.RequiresAuthorizationBy.map((user) => { return user.Id; })
-      // },
+      Requires_x0020_Authorization_x0020_ById: {
+        'results': dataItem.Requires_x0020_Authorization_x0020_ById.map((user) => { return user.Id; })
+      },
       Urgent: dataItem.Urgent,
       CustomerId: dataItem.CustomerId,
       Comment: dataItem.Comment,
@@ -279,11 +279,11 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       Standard_x0020_Terms: dataItem.StandardTerms,
     };
 
-    debugger;
+
     sp.web.lists.getByTitle('AR Invoices').items.getById(dataItem.ID).update(updateObject);
 
     if (dataItem.RelatedInvoiceAttachments) {
-      debugger;
+
       for (let index = 0; index < dataItem.RelatedInvoiceAttachments.length; index++) {
         const element = dataItem.RelatedInvoiceAttachments[index];
         sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/').files
@@ -291,7 +291,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
           .then(fileRes => {
             fileRes.file.getItem()
               .then(item => {
-                debugger;
+
                 const itemProxy: any = Object.assign({}, item);
                   sp.web.lists.getByTitle('RelatedInvoiceAttachments').items.getById(itemProxy.ID).update({
                     ARInvoiceId: dataItem.ID,

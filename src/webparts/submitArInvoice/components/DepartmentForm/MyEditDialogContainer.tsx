@@ -17,15 +17,19 @@ export class MyEditDialogContainer extends React.Component<any, any> {
     super(props);
     console.log("MyEditDialogContainer");
     console.log(props);
-    this.state = {
-      productInEdit: this.props.dataItem || null
-    };
+
     this.props.dataItem.Requires_x0020_Authorization_x0020_ById.map(reqAuthId => {
-      this.selectedReqApprovers.push(this.props.siteUsers.find(s => s.Id === reqAuthId))
+      this._selectedReqApprovers.push(this.props.siteUsers.find(s => s.Id === reqAuthId))
     });
+
+    this.state = {
+      productInEdit: this.props.dataItem || null,
+      selectedReqApprovers: this._selectedReqApprovers
+    };
+    this._selectedReqApprovers = [];
   }
 
-  private selectedReqApprovers = [];
+  private _selectedReqApprovers = [];
 
   handleSubmit(event) {
     event.preventDefault();
@@ -35,21 +39,29 @@ export class MyEditDialogContainer extends React.Component<any, any> {
     let target = event.target;
     let value = target.type === 'checkbox' ? target.checked : target.value;
     let name = (target.props && target.props.name !== undefined) ? target.props.name : (target.name !== undefined) ? target.name : target.props.id;
+
     // last chance.
     if (name === "" && target.id !== undefined) {
       name = target.id;
     }
 
-    debugger;
     switch (name) {
       case 'RequestedBy':
-        debugger;
         name = 'Requested_x0020_ById';
         value = value.Id;
         break;
       case 'RequiresAuthorizationBy':
         name = 'Requires_x0020_Authorization_x0020_ById';
-        // TODO: Why can't I set the req auth value?!?!
+        // Clear temp variable.
+        this._selectedReqApprovers = [];
+        // map each selected user into the temp variable.
+        value.map(user => {
+          this._selectedReqApprovers.push(this.props.siteUsers.find(s => s.Id === user.Id))
+        });
+        // Set the whole users object in the state which is used by the dropdown.
+        this.setState({
+          selectedReqApprovers: this._selectedReqApprovers
+        });
         break;
 
       default:
@@ -145,7 +157,12 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                   textField="Title"
                   //validator={MyValidators.requiresApprovalFrom}
                   component={MyFormComponents.FormMultiSelect}
-                  value={this.selectedReqApprovers}
+                  value={this.state.selectedReqApprovers}
+                  // value={
+                  //   this.state.productInEdit.Requires_x0020_Authorization_x0020_ById.map(reqAuthId => {
+                  //     { this.props.siteUsers.find(s => s.Id === reqAuthId) }
+                  //   })
+                  // }
 
                   onChange={this.onDialogInputChange}
                 />
