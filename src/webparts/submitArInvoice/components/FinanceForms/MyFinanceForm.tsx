@@ -659,7 +659,6 @@ class InvoiceEditForm extends React.Component<any, any> {
                     component={MyFinanceGlAccountsComponent}
                     value={this.state.productInEdit.AccountDetails}
                     onUpdateAccount={this.props.onUpdateAccount}
-                  //onchange={this.onDialogInputChange}
                   />
                 </div>
                 <div style={{ marginBottom: "2px" }}>
