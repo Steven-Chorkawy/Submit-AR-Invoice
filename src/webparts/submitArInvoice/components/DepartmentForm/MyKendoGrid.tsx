@@ -30,6 +30,8 @@ import { filterBy, orderBy, groupBy } from '@progress/kendo-data-query';
 import { MyEditDialogContainer } from './MyEditDialogContainer';
 import { InvoiceDataProvider } from '../InvoiceDataProvider';
 import { InvoiceStatus, MyGridStrings } from '../enums/MyEnums'
+import { ConvertQueryParamsToKendoFilter } from '../MyHelperMethods';
+
 
 
 type MyKendoGridState = {
@@ -114,10 +116,6 @@ class DetailComponent extends GridDetailRow {
         <section>
           <h2>Details</h2>
           <p>... add more details here...</p>
-          {/* <p><strong>Category:</strong> {dataItem.Category.CategoryName} - {dataItem.Category.Description}</p> */}
-        </section>
-        <section>
-
         </section>
       </div>
     );
@@ -151,6 +149,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   constructor(props) {
     super(props);
 
+
     this.state = {
       data: [],
       receivedData: [],
@@ -158,6 +157,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       siteUsersData: [],
       filter: {
         filters: []
+        //filters: ConvertQueryParamsToKendoFilter([{ FilterField: 'FILTERFIELD1', FilterValue: 'FILTERVALUE1' }])
       },
       sort: [],
       group: [],
@@ -357,7 +357,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
             sortable={false}
             cell={this.MyCustomCell} />
 
-          <Column field="Created" width="250px" title="Created Date" filter="date" format={MyGridStrings.DateFilter}/>
+          <Column field="Created" width="250px" title="Created Date" filter="date" format={MyGridStrings.DateFilter} />
           <Column field="Customer.Title" width="250px" title="Customer" />
           <Column field="Invoice_x0020_Status" width="250px" title="Status" />
           <Column field="Date" title="Date" width="250px" filter="date" format={MyGridStrings.DateFilter} />

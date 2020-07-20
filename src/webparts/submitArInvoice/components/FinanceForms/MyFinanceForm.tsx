@@ -32,6 +32,7 @@ import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceG
 import { ApprovalResponseComponent } from '../ApprovalResponseComponent'
 import { InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
 import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
+import { ConvertQueryParamsToKendoFilter } from '../MyHelperMethods';
 
 interface IMyFinanceFormState {
   invoices: IInvoicesDataState;
@@ -55,6 +56,10 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   constructor(props) {
     super(props);
 
+    let defaultFilters = ConvertQueryParamsToKendoFilter([{ FilterField: 'FILTERFIELD1', FilterValue: 'FILTERVALUE1' }]);
+    defaultFilters.push({ field: "Invoice_x0020_Status", operator: "neq", value: InvoiceStatus.Submitted });
+
+
     this.state = {
       invoices: { data: [], total: 0 },
       // Same as invoices but this object is used to restore data to it's original state.
@@ -71,9 +76,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       siteUsersData: [],
       filter: {
         logic: "and",
-        filters: [
-          { field: "Invoice_x0020_Status", operator: "neq", value: InvoiceStatus.Submitted }
-        ]
+        filters: defaultFilters
       },
       allRowsExpanded: false,
     }
