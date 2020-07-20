@@ -420,7 +420,7 @@ export function MyCommandCell({ edit }) {
         : (
           <td className={this.props.className + " k-command-cell"} style={this.props.style}>
             <Button
-              className="k-button k-grid-edit-command col-sm-12 k-chip-filled k-chip-error"
+              className="k-button k-grid-edit-command col-sm-12 k-text-error"
               onClick={() => { alert('TODO: Start Cancel Process.') }}
               icon="cancel"
               style={{ "marginBottom": "5px" }}
