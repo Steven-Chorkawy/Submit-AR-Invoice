@@ -31,6 +31,7 @@ import { filterGroupByField } from '@progress/kendo-react-grid/dist/npm/columnMe
 import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceGLAccounts';
 import { ApprovalResponseComponent } from '../ApprovalResponseComponent'
 import { InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
+import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
 
 interface IMyFinanceFormState {
   invoices: IInvoicesDataState;
@@ -524,7 +525,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 class CustomUrgentCell extends React.Component<any, any> {
   render() {
     const value = this.props.dataItem[this.props.field];
-    return typeof value  === "boolean" && (
+    return typeof value === "boolean" && (
       <td>
         {value ? `Yes` : `No`}
       </td>
@@ -574,6 +575,8 @@ class InvoiceDetailComponent extends GridDetailRow {
 class InvoiceEditForm extends React.Component<any, any> {
   constructor(props) {
     super(props);
+    console.log('InvoiceEditForm');
+    console.log(props);
     this.state = {
       productInEdit: this.props.dataItem || null,
       visible: false,
@@ -671,14 +674,9 @@ class InvoiceEditForm extends React.Component<any, any> {
                   />
                 </div>
                 <div style={{ marginBottom: "2px" }}>
-                  <Field
-                    id="RelatedInvoiceAttachments"
-                    name="RelatedInvoiceAttachments"
-                    label="Upload Related Attachments"
-                    batch={false}
-                    multiple={true}
-                    myOnChange={this.onDialogInputChange}
-                    component={MyFormComponents.FormUpload}
+                  <MyRelatedAttachmentComponent
+                    productInEdit={this.state.productInEdit}
+                    onChange={this.onDialogInputChange}
                   />
                 </div>
               </fieldset>

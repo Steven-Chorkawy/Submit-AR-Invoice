@@ -10,7 +10,7 @@ import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/
 import * as MyFormComponents from '../MyFormComponents';
 import * as MyValidators from '../validators.jsx';
 import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceGLAccounts';
-
+import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
 
 export class MyEditDialogContainer extends React.Component<any, any> {
   constructor(props) {
@@ -64,14 +64,14 @@ export class MyEditDialogContainer extends React.Component<any, any> {
         });
         break;
       case 'Customer':
-        name='CustomerId';
-        value=value.Id;
+        name = 'CustomerId';
+        value = value.Id;
         break;
       case 'CustomerPONumber':
-        name='Customer_x0020_PO_x0020_Number';
+        name = 'Customer_x0020_PO_x0020_Number';
         break;
       case 'InvoiceDetails':
-        name='Invoice_x0020_Details';
+        name = 'Invoice_x0020_Details';
       default:
         break;
     }
@@ -254,34 +254,10 @@ export class MyEditDialogContainer extends React.Component<any, any> {
               </div>
 
               <hr />
-              <Card style={{ width: 400 }}>
-                <CardBody>
-                  <CardTitle>Related Attachments</CardTitle>
-                  {
-                    this.state.productInEdit.RelatedAttachments.map(f => {
-                      return (
-                        <a target='_blank' href={f.ServerRedirectedEmbedUrl} style={{ margin: '2px' }}>
-                          <div className='k-chip k-chip-filled k-chip-info'>
-                            <div className='k-chip-content'>
-                              {f.Title}
-                            </div>
-                          </div>
-                        </a>
-                      );
-                    })
-                  }
-                  <hr />
-                  <Field
-                    id="RelatedInvoiceAttachments"
-                    name="RelatedInvoiceAttachments"
-                    label="Upload Related Attachments"
-                    batch={false}
-                    multiple={true}
-                    component={MyFormComponents.FormUpload}
-                    myOnChange={this.onDialogInputChange}
-                  />
-                </CardBody>
-              </Card>
+              <MyRelatedAttachmentComponent
+                productInEdit={this.state.productInEdit}
+                onChange={this.onDialogInputChange}
+              />
             </FormElement>
           )} />
         <DialogActionsBar>
