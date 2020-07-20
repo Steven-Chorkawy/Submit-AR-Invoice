@@ -384,54 +384,50 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
                 title="Clear All Filters"
                 className="k-button"
                 icon="filter-clear"
-                onClick={
-                  _ => {
-                    this.onFilterChange({filter: {...this.state.filter, filters: [] }})
-                  }
-                }
+                onClick={_ => { this.onFilterChange({ filter: { ...this.state.filter, filters: [] } }) }}
               >Clear All Filters</Button>
             )}
           </GridToolbar>
-        <Column
-          width="75px"
-          field="FileRef"
-          title=""
-          filterable={false}
-          sortable={false}
-          cell={this.MyCustomCell} />
+          <Column
+            width="75px"
+            field="FileRef"
+            title=""
+            filterable={false}
+            sortable={false}
+            cell={this.MyCustomCell} />
 
-        <Column field="Created" width="250px" title="Created Date" filter="date" format={MyGridStrings.DateFilter} />
-        <Column field="Customer.Title" width="250px" title="Customer" />
-        <Column field="Invoice_x0020_Status" width="250px" title="Status" />
-        <Column field="Date" title="Date" width="250px" filter="date" format={MyGridStrings.DateFilter} />
-        <Column field="Type_x0020_of_x0020_Request" width="250px" title="Type" />
+          <Column field="Created" width="250px" title="Created Date" filter="date" format={MyGridStrings.DateFilter} />
+          <Column field="Customer.Title" width="250px" title="Customer" />
+          <Column field="Invoice_x0020_Status" width="250px" title="Status" />
+          <Column field="Date" title="Date" width="250px" filter="date" format={MyGridStrings.DateFilter} />
+          <Column field="Type_x0020_of_x0020_Request" width="250px" title="Type" />
 
-        <Column cell={this.CommandCell} width={"110px"} locked={true} resizable={false} filterable={false} sortable={false} />
+          <Column cell={this.CommandCell} width={"110px"} locked={true} resizable={false} filterable={false} sortable={false} />
 
         </Grid>
 
         {
-      this.state.productInEdit &&
-        <MyEditDialogContainer
-          dataItem={this.state.productInEdit}
-          customers={this.props.customers}
-          siteUsers={this.props.siteUsers}
+          this.state.productInEdit &&
+          <MyEditDialogContainer
+            dataItem={this.state.productInEdit}
+            customers={this.props.customers}
+            siteUsers={this.props.siteUsers}
 
-          save={this.save}
-          cancel={this.cancel}
+            save={this.save}
+            cancel={this.cancel}
+          />
+        }
+
+        <InvoiceDataProvider
+          dataState={this.state.dataState}
+          onDataReceived={this.dataReceived}
+
+          statusDataState={this.state.statusData}
+          onStatusDataReceived={this.statusDataReceived}
+
+          siteUsersDataState={this.state.siteUsersData}
+          onSiteUsersDataReceived={this.siteUserDataReceived}
         />
-    }
-
-    <InvoiceDataProvider
-      dataState={this.state.dataState}
-      onDataReceived={this.dataReceived}
-
-      statusDataState={this.state.statusData}
-      onStatusDataReceived={this.statusDataReceived}
-
-      siteUsersDataState={this.state.siteUsersData}
-      onSiteUsersDataReceived={this.siteUserDataReceived}
-    />
       </div >
     );
   }
@@ -464,7 +460,7 @@ export function MyCommandCell({ edit }) {
           <td className={this.props.className + " k-command-cell"} style={this.props.style}>
             <Button
               className="k-button k-grid-edit-command col-sm-12 k-text-error"
-              onClick={() => { alert('TODO: Start Cancel Process.') }}
+              onClick={() => { alert('TODO: Start Cancel Process.'); console.log(dataItem); }}
               icon="cancel"
               style={{ "marginBottom": "5px" }}
             >Cancel</Button>
