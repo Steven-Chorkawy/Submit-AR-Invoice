@@ -32,6 +32,7 @@ import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceG
 import { ApprovalResponseComponent } from '../ApprovalResponseComponent'
 import { InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
 import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
+import { ConvertQueryParamsToKendoFilter } from '../MyHelperMethods';
 
 interface IMyFinanceFormState {
   invoices: IInvoicesDataState;
@@ -55,6 +56,9 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   constructor(props) {
     super(props);
 
+    let defaultFilters = ConvertQueryParamsToKendoFilter([{ FilterField: 'FILTERFIELD1', FilterValue: 'FILTERVALUE1' }]);
+    defaultFilters.push({ field: "Invoice_x0020_Status", operator: "neq", value: InvoiceStatus.Submitted });
+
     this.state = {
       invoices: { data: [], total: 0 },
       // Same as invoices but this object is used to restore data to it's original state.
@@ -71,9 +75,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       siteUsersData: [],
       filter: {
         logic: "and",
-        filters: [
-          { field: "Invoice_x0020_Status", operator: "neq", value: InvoiceStatus.Submitted }
-        ]
+        filters: defaultFilters
       },
       allRowsExpanded: false,
     }
@@ -106,6 +108,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
   //#region Methods
   public dataReceived = (invoices) => {
+
+    debugger;
     console.log("dataReceived");
     console.log(invoices);
     var dataHolder: any = filterBy(invoices.data, this.state.filter);
@@ -136,6 +140,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   public dataStateChange = (e) => {
+    debugger;
     this.setState({
       ...this.state,
       dataState: e.data
@@ -168,6 +173,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   public onFilterChange = (e) => {
+    debugger;
     var newData = filterBy(this.state.receivedData.data, e.filter);
     newData.map(invoice => invoice.expanded = this.state.allRowsExpanded);
     var newStateData = {
@@ -266,7 +272,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   public saveEditForm = () => {
-    debugger;
     const dataItem = this.state.productInEdit;
     const invoices = this.state.invoices.data.slice();
     // const isNewProduct = dataItem.ProductID === undefined;
@@ -320,7 +325,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           .then(fileRes => {
             fileRes.file.getItem()
               .then(item => {
-                debugger;
                 const itemProxy: any = Object.assign({}, item);
                 sp.web.lists.getByTitle('RelatedInvoiceAttachments').items.getById(itemProxy.ID).update({
                   ARInvoiceId: dataItem.ID,
@@ -470,6 +474,18 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
               className="k-button"
               icon="plus"
               onClick={this.expandAllRows}>Toggle All Rows</Button>
+            {this.state.filter.filters.length > 0 && (
+              <Button
+                title="Clear All Filters"
+                className="k-button"
+                icon="filter-clear"
+                onClick={
+                  _ => {
+                    this.onFilterChange({ filter: { ...this.state.filter, filters: [] } })
+                  }
+                }
+              >Clear All Filters</Button>
+            )}
             {hasEditedItem && (
               <Button
                 title="Cancel current changes"

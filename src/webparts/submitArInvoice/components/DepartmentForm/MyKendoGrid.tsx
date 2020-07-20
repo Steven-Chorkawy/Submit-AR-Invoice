@@ -6,6 +6,7 @@ import {
   Grid,
   GridColumn as Column,
   GridCell,
+  GridToolbar,
   GridColumnProps,
   GridCellProps,
   GridDetailRow
@@ -30,6 +31,8 @@ import { filterBy, orderBy, groupBy } from '@progress/kendo-data-query';
 import { MyEditDialogContainer } from './MyEditDialogContainer';
 import { InvoiceDataProvider } from '../InvoiceDataProvider';
 import { InvoiceStatus, MyGridStrings } from '../enums/MyEnums'
+import { ConvertQueryParamsToKendoFilter } from '../MyHelperMethods';
+
 
 
 type MyKendoGridState = {
@@ -114,10 +117,6 @@ class DetailComponent extends GridDetailRow {
         <section>
           <h2>Details</h2>
           <p>... add more details here...</p>
-          {/* <p><strong>Category:</strong> {dataItem.Category.CategoryName} - {dataItem.Category.Description}</p> */}
-        </section>
-        <section>
-
         </section>
       </div>
     );
@@ -151,13 +150,16 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   constructor(props) {
     super(props);
 
+
     this.state = {
       data: [],
       receivedData: [],
       statusData: [],
       siteUsersData: [],
       filter: {
-        filters: []
+        //filters: []
+        logic: "and",
+        filters: ConvertQueryParamsToKendoFilter([{ FilterField: 'FILTERFIELD1', FilterValue: 'FILTERVALUE1' }])
       },
       sort: [],
       group: [],
@@ -175,7 +177,8 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       edit: this.onEdit
     });
 
-    this.state = this.createAppState({ ...this.state });
+
+    //this.state = this.createAppState({ ...this.state });
   }
 
   private CommandCell;
@@ -183,19 +186,25 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   //#region Methods
   MyCustomCell = (props) => <CustomCell {...props} />
 
-  createAppState = (dataState) => {
-    var output = {
-      result: process(this.state.data, dataState),
-      dataState: dataState,
-      ...dataState
-    };
-    return output;
-  }
+  // createAppState = (dataState) => {
 
-  dataStateChange = (event) => {
-    var appSate = this.createAppState(event.data);
+  //   var output = {
+  //     result: process(this.state.data, dataState),
+  //     dataState: dataState,
+  //     ...dataState
+  //   };
+  //   return output;
+  // }
 
-    this.setState(appSate);
+  dataStateChange = (e) => {
+
+    this.setState({
+      ...this.state,
+      dataState: e.data
+    })
+    // var appSate = this.createAppState(event.dataState);
+
+    // this.setState(appSate);
   }
 
 
@@ -229,12 +238,31 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   public dataReceived = (invoices) => {
     console.log("dataReceived");
     console.log(invoices);
+    debugger;
     var dataHolder = filterBy(invoices.data, this.state.filter);
 
     this.setState({
       ...this.state,
-      data: invoices,
-      receivedData: invoices
+      data: {
+        data: dataHolder,
+        total: dataHolder.length
+      },
+      receivedData: invoices.data
+    });
+  }
+
+  public onFilterChange = (e) => {
+    debugger;
+    var newData = filterBy(this.state.receivedData, e.filter);
+
+    var newStateData = {
+      data: newData,
+      total: newData.length
+    }
+
+    this.setState({
+      filter: e.filter,
+      data: newStateData
     });
   }
   //#endregion
@@ -330,66 +358,81 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
     return (
       <div>
         <Grid
-          style={{ height: '520px' }}
-          resizable={true}
-          reorderable={true}
           filterable={true}
           sortable={true}
-          pageable={{ pageSizes: true }}
-          groupable={true}
+          pageable={true}
+          resizable={true}
 
-          // data={this.state.result}
-
-          {...this.state.data}
-          onDataStateChange={this.dataStateChange}
           {...this.state.dataState}
+          {...this.state.data}
+
+          onDataStateChange={this.dataStateChange}
+
+          filter={this.state.filter}
+          onFilterChange={this.onFilterChange}
+
+          style={{ minHeight: '520px' }}
 
           onExpandChange={this.expandChange}
           expandField="expanded"
 
           detail={DetailComponent}
         >
-          <Column
-            width="75px"
-            field="FileRef"
-            title=""
-            filterable={false}
-            sortable={false}
-            cell={this.MyCustomCell} />
+          <GridToolbar>
+            {this.state.filter.filters.length > 0 && (
+              <Button
+                title="Clear All Filters"
+                className="k-button"
+                icon="filter-clear"
+                onClick={
+                  _ => {
+                    this.onFilterChange({filter: {...this.state.filter, filters: [] }})
+                  }
+                }
+              >Clear All Filters</Button>
+            )}
+          </GridToolbar>
+        <Column
+          width="75px"
+          field="FileRef"
+          title=""
+          filterable={false}
+          sortable={false}
+          cell={this.MyCustomCell} />
 
-          <Column field="Created" width="250px" title="Created Date" filter="date" format={MyGridStrings.DateFilter}/>
-          <Column field="Customer.Title" width="250px" title="Customer" />
-          <Column field="Invoice_x0020_Status" width="250px" title="Status" />
-          <Column field="Date" title="Date" width="250px" filter="date" format={MyGridStrings.DateFilter} />
-          <Column field="Type_x0020_of_x0020_Request" width="250px" title="Type" />
+        <Column field="Created" width="250px" title="Created Date" filter="date" format={MyGridStrings.DateFilter} />
+        <Column field="Customer.Title" width="250px" title="Customer" />
+        <Column field="Invoice_x0020_Status" width="250px" title="Status" />
+        <Column field="Date" title="Date" width="250px" filter="date" format={MyGridStrings.DateFilter} />
+        <Column field="Type_x0020_of_x0020_Request" width="250px" title="Type" />
 
-          <Column cell={this.CommandCell} width={"110px"} locked={true} resizable={false} filterable={false} sortable={false} />
+        <Column cell={this.CommandCell} width={"110px"} locked={true} resizable={false} filterable={false} sortable={false} />
 
         </Grid>
 
         {
-          this.state.productInEdit &&
-          <MyEditDialogContainer
-            dataItem={this.state.productInEdit}
-            customers={this.props.customers}
-            siteUsers={this.props.siteUsers}
+      this.state.productInEdit &&
+        <MyEditDialogContainer
+          dataItem={this.state.productInEdit}
+          customers={this.props.customers}
+          siteUsers={this.props.siteUsers}
 
-            save={this.save}
-            cancel={this.cancel}
-          />
-        }
-
-        <InvoiceDataProvider
-          dataState={this.state.dataState}
-          onDataReceived={this.dataReceived}
-
-          statusDataState={this.state.statusData}
-          onStatusDataReceived={this.statusDataReceived}
-
-          siteUsersDataState={this.state.siteUsersData}
-          onSiteUsersDataReceived={this.siteUserDataReceived}
+          save={this.save}
+          cancel={this.cancel}
         />
-      </div>
+    }
+
+    <InvoiceDataProvider
+      dataState={this.state.dataState}
+      onDataReceived={this.dataReceived}
+
+      statusDataState={this.state.statusData}
+      onStatusDataReceived={this.statusDataReceived}
+
+      siteUsersDataState={this.state.siteUsersData}
+      onSiteUsersDataReceived={this.siteUserDataReceived}
+    />
+      </div >
     );
   }
 }
