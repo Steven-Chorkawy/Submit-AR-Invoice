@@ -82,7 +82,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     let currentFiles: IUploadingFile[] = this.state.MyFiles;
 
 
-    debugger;
+
 
     let web = Web(this._siteUrl);
     let currentYear = new Date().getFullYear();
@@ -183,13 +183,13 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
 
     for (let index = 0; index < inputData.RelatedAttachments.length; index++) {
       const element = inputData.RelatedAttachments[index];
-      debugger;
+
       let uploadRes = await web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/')
         .files
         .add(element.name, element.getRawFile(), true)
         .then(({ file }) => file.getItem()
           .then((item: any) => {
-            debugger;
+
             return item.update({
               ARInvoiceId: mainFile.Id,
               Title: element.name

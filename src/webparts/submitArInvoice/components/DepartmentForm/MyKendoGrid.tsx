@@ -29,6 +29,7 @@ import "@pnp/sp/items";
 import IARInvoice from '../IARInvoice';
 import { filterBy, orderBy, groupBy } from '@progress/kendo-data-query';
 import { MyEditDialogContainer } from './MyEditDialogContainer';
+import { MyCancelDialogContainer } from './MyCancelDialogContainer';
 import { InvoiceDataProvider } from '../InvoiceDataProvider';
 import { InvoiceStatus, MyGridStrings } from '../enums/MyEnums'
 import { ConvertQueryParamsToKendoFilter } from '../MyHelperMethods';
@@ -44,6 +45,7 @@ type MyKendoGridState = {
   result?: any;
   dataState?: any;
   productInEdit: any;
+  productInCancel: any;
   statusData: any;
   siteUsersData: any;
 }
@@ -102,21 +104,16 @@ const MyItemRender = props => {
 
 class DetailComponent extends GridDetailRow {
   render() {
-    const dataItem: IARInvoice = this.props.dataItem;
+    debugger;
+    const dataItem: any = this.props.dataItem;
     return (
       <div>
         <section>
-          <h2>Accounts</h2>
-          <ListView
-            data={dataItem.AccountDetails}
-            item={MyItemRender}
-            style={{ width: "40%" }}
-          />
-          <hr />
-        </section>
-        <section>
-          <h2>Details</h2>
-          <p>... add more details here...</p>
+          {
+            dataItem.CancelRequests.map(cr => {
+              return (<p>{cr.Requested_x0020_ById} - {cr.Requester_x0020_Comments}</p>);
+            })
+          }
         </section>
       </div>
     );
@@ -164,6 +161,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       sort: [],
       group: [],
       productInEdit: undefined,
+      productInCancel: undefined,
       dataState: {
         take: 50,
         skip: 0,
@@ -174,7 +172,8 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
     };
 
     this.CommandCell = MyCommandCell({
-      edit: this.onEdit
+      edit: this.onEdit,
+      cancel: this.onInvoiceCancel
     });
 
 
@@ -238,7 +237,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   public dataReceived = (invoices) => {
     console.log("dataReceived");
     console.log(invoices);
-    debugger;
+
     var dataHolder = filterBy(invoices.data, this.state.filter);
 
     this.setState({
@@ -252,7 +251,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   }
 
   public onFilterChange = (e) => {
-    debugger;
     var newData = filterBy(this.state.receivedData, e.filter);
 
     var newStateData = {
@@ -272,6 +270,12 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
 
   public onEdit = (dataItem) => {
     this.setState({ productInEdit: Object.assign({}, dataItem) });
+  }
+
+  public onInvoiceCancel = (dataItem) => {
+    this.setState({
+      productInCancel: Object.assign({}, dataItem)
+    });
   }
 
   public save = () => {
@@ -348,11 +352,43 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
     }
   }
 
+  public sendCancelRequest = () => {
+    sp.web.currentUser.get()
+      .then(currentUser => {
+        debugger;
+        const dataItem = this.state.productInCancel;
+        sp.web.lists.getByTitle('Cancel Invoice Request')
+          .items
+          .add({
+            Title: 'Invoice Cancel Request',
+            Invoice_x0020_NumberId: dataItem.ID,
+            Requested_x0020_ById: currentUser.Id,
+            Requester_x0020_Comments: dataItem.CancelComment
+          })
+          .then(_ => {
+            this.setState({
+              productInCancel: undefined
+            });
+          });
+      });
+  }
+
   public cancel = () => {
     this.setState({ productInEdit: undefined });
   }
   //#endregion
 
+  rowRender(trElement, props) {
+    const red = { backgroundColor: "rgb(243, 23, 0, 0.32)" };
+    const trProps = { style: props.dataItem.CancelRequests.length > 0 && red };
+
+    if (props.dataItem.CancelRequests.length > 0) {
+      return React.cloneElement(trElement, { ...trProps }, trElement.props.children);
+    }
+    else {
+      return React.cloneElement(trElement, trElement.props.children);
+    }
+  }
 
   render() {
     return (
@@ -377,6 +413,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
           expandField="expanded"
 
           detail={DetailComponent}
+          rowRender={this.rowRender}
         >
           <GridToolbar>
             {this.state.filter.filters.length > 0 && (
@@ -396,6 +433,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
             sortable={false}
             cell={this.MyCustomCell} />
 
+          <Column field="ID" title="ID" filterable={false} />
           <Column field="Created" width="250px" title="Created Date" filter="date" format={MyGridStrings.DateFilter} />
           <Column field="Customer.Title" width="250px" title="Customer" />
           <Column field="Invoice_x0020_Status" width="250px" title="Status" />
@@ -406,16 +444,24 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
 
         </Grid>
 
-        {
-          this.state.productInEdit &&
-          <MyEditDialogContainer
-            dataItem={this.state.productInEdit}
-            customers={this.props.customers}
-            siteUsers={this.props.siteUsers}
 
-            save={this.save}
-            cancel={this.cancel}
-          />
+        {
+          this.state.productInEdit ?
+            <MyEditDialogContainer
+              dataItem={this.state.productInEdit}
+              customers={this.props.customers}
+              siteUsers={this.props.siteUsers}
+
+              save={this.save}
+              cancel={this.cancel}
+            />
+            : this.state.productInCancel ?
+              <MyCancelDialogContainer
+                dataItem={this.state.productInCancel}
+                save={this.sendCancelRequest}
+                cancel={() => { this.setState({ productInCancel: undefined }) }}
+              />
+              : null
         }
 
         <InvoiceDataProvider
@@ -434,7 +480,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
 }
 
 
-export function MyCommandCell({ edit }) {
+export function MyCommandCell({ edit, cancel }) {
   return class extends GridCell {
 
     constructor(props) {
@@ -460,7 +506,7 @@ export function MyCommandCell({ edit }) {
           <td className={this.props.className + " k-command-cell"} style={this.props.style}>
             <Button
               className="k-button k-grid-edit-command col-sm-12 k-text-error"
-              onClick={() => { alert('TODO: Start Cancel Process.'); console.log(dataItem); }}
+              onClick={() => { cancel(dataItem) }}
               icon="cancel"
               style={{ "marginBottom": "5px" }}
             >Cancel</Button>

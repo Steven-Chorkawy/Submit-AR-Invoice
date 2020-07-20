@@ -13,6 +13,7 @@ import "@pnp/sp/items";
 import "@pnp/sp/fields";
 import "@pnp/sp/site-users/web";
 import { IFile } from '@pnp/sp/files';
+import { InvoiceStatus } from './enums/MyEnums';
 /** End PnP Imports */
 
 class InvoiceDataProvider extends React.Component<any, any> {
@@ -47,12 +48,14 @@ class InvoiceDataProvider extends React.Component<any, any> {
         var invoiceIds = [];
         var idsForApproval = [];
         var idsForRelatedAttachments = [];
+        var idsForCancelRequests = [];
 
         for (let index = 0; index < response.length; index++) {
           const element = response[index];
           invoiceIds.push(`AR_x0020_InvoiceId eq ${element.ID}`);
           idsForApproval.push(`InvoiceID eq '${element.ID}'`);
           idsForRelatedAttachments.push(`ARInvoice/ID eq ${element.ID}`);
+          idsForCancelRequests.push(`Invoice_x0020_Number/ID eq ${element.ID}`);
 
           response[index].Date = new Date(response[index].Date);
           response[index].Created = new Date(response[index].Created);
@@ -74,14 +77,28 @@ class InvoiceDataProvider extends React.Component<any, any> {
             .filter(idsForRelatedAttachments.join(' or '))
             .getAll(),
           //TODO: How can I filter these results? I don't need every file.
-          sp.web.getFolderByServerRelativePath("RelatedInvoiceAttachments").files()
+          sp.web.getFolderByServerRelativePath("RelatedInvoiceAttachments").files(),
+          sp.web.lists.getByTitle('Cancel Invoice Request').items.filter(idsForCancelRequests.join(' or ')).getAll()
         ])
           .then((values) => {
+            /***********************************
+             *
+             * 0 = G/L Accounts.
+             * 1 = Approval Responses.
+             * 2 = Related Attachments.
+             * 3 = Files from RelatedAttachments.
+             *      This is used to get the URL to the files.
+             * 4 = Cancel Requests.
+             *
+             ***********************************/
+
             // Using each of the accounts that we found we will not attach them to the invoice object.
             response.map(invoice => {
+
               invoice.AccountDetails = values[0].filter(f => Number(f.AR_x0020_InvoiceId) === invoice.ID) || [];
               invoice.Approvals = values[1].filter(f => Number(f.InvoiceID) === invoice.ID) || [];
               invoice.RelatedAttachments = values[2].filter(f => Number(f.ARInvoiceId) === invoice.ID) || []
+              invoice.CancelRequests = values[4].filter(f => Number(f.Invoice_x0020_NumberId) === invoice.ID) || []
 
               // Add ServerDirectUrl if required.
               invoice.RelatedAttachments.map(relatedAttachments => {

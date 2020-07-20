@@ -22,7 +22,7 @@ class MyItemCardRender extends React.Component<any, any> {
   }
 
   render() {
-    debugger;
+
     console.log("MyItemRender");
     console.log(this.props);
     let item = this.props.dataItem;

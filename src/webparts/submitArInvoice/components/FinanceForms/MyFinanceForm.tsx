@@ -108,8 +108,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
   //#region Methods
   public dataReceived = (invoices) => {
-
-    debugger;
     console.log("dataReceived");
     console.log(invoices);
     var dataHolder: any = filterBy(invoices.data, this.state.filter);
@@ -140,7 +138,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   public dataStateChange = (e) => {
-    debugger;
     this.setState({
       ...this.state,
       dataState: e.data
@@ -173,7 +170,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   public onFilterChange = (e) => {
-    debugger;
     var newData = filterBy(this.state.receivedData.data, e.filter);
     newData.map(invoice => invoice.expanded = this.state.allRowsExpanded);
     var newStateData = {
