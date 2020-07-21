@@ -157,12 +157,28 @@ class InvoiceDataProvider extends React.Component<any, any> {
       });
   }
 
+  public requestCurrentUser = () => {
+    if (this.props.currentUserDataState != undefined) {
+      return;
+    }
+
+    sp.web.currentUser.get()
+      .then(user => {
+        this.props.onCurrentUserDataReceived.call(undefined, user);
+      })
+  }
+
+
   public render() {
 
     // Query any methods required here.
     this.requestDataIfNeeded();
     this.requestStatusData();
     this.requestSiteUsers();
+
+    if (this.props.onCurrentUserDataReceived !== undefined) {
+      this.requestCurrentUser();
+    }
 
     return this.pending && <LoadingPanel />
   }
