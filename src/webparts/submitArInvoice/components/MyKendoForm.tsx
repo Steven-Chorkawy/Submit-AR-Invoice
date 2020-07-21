@@ -23,6 +23,7 @@ import { IMyFormState, IUploadingFile } from './IMyFormState';
 import * as MyValidators from './validators.jsx';
 import { MyCustomerCardComponent } from './MyCustomerCardComponent';
 import { MyGLAccountComponent } from './MyGLAccountComponent';
+import { FieldUserSelectionMode } from '@pnp/sp/fields';
 
 
 export interface IARFormModel {
@@ -56,12 +57,14 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
    */
   constructor(props) {
     super(props);
+    debugger;
 
     this._siteUrl = props.ctx.pageContext.web.absoluteUrl;
 
     this.state = {
       MyFiles: [],
       productInEdit: {},
+      stateHolder: 0,
       ...props
     };
   }
@@ -77,14 +80,11 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
       return;
     }
 
-
     // We will use this to update states later.
     let currentFiles: IUploadingFile[] = this.state.MyFiles;
 
-
-
-
     let web = Web(this._siteUrl);
+
     let currentYear = new Date().getFullYear();
     const newARTitle = currentYear + "-AR-" + (this.S4() + this.S4() + "-" + this.S4() + "-4" + this.S4().substr(0, 3) + "-" + this.S4() + "-" + this.S4() + this.S4() + this.S4()).toLowerCase();
     let finalFileName = newARTitle + '.pdf'; // .pdf because GP exports pdf files.  Finance will replace this place holder file in the future.
@@ -121,6 +121,16 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     var output = await (await sp.web.lists.getByTitle('AR Invoices').items.getById(uploadedFile.ID).update(myData)).item;
 
     output.get().then(innerFile => {
+      currentFiles.push({
+        FileName: innerFile.Name,
+        UploadSuccessful: true,
+        ErrorMessage: null,
+        LinkToFile: `${this._siteUrl}/SitePages/Department-AR-Search-Page.aspx/?FilterField1=ID&FilterValue1=${innerFile.ID}`
+      });
+      this.setState({
+        MyFiles: currentFiles
+      });
+
       // Set the data for the account details.
       let accountDetails: IARAccountDetails[] = [];
       dataItem.GLAccounts.map(account => {
@@ -153,16 +163,24 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
         }
       }
     });
-    output.file.get().then(f => {
-      currentFiles.push({
-        FileName: f.Name,
-        UploadSuccessful: true,
-        ErrorMessage: null
-      });
-      this.setState({
-        MyFiles: currentFiles
-      });
+
+    // output.file.get().then(f => {
+    //   debugger;
+    //   currentFiles.push({
+    //     FileName: f.Name,
+    //     UploadSuccessful: true,
+    //     ErrorMessage: null
+    //   });
+    //   this.setState({
+    //     MyFiles: currentFiles
+    //   });
+    // });
+
+    this.setState({
+      stateHolder: this.state.stateHolder + 1
     });
+
+    this.forceUpdate();
   }
 
   /**
@@ -225,7 +243,9 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
       output.push(
         <Card type={f.UploadSuccessful ? 'success' : 'error'} style={{ margin: '2px' }}>
           <CardBody>
-            <CardTitle>{f.FileName} - {f.UploadSuccessful ? 'Success!' : 'Error'}</CardTitle>
+            <CardTitle>
+              <a href={f.LinkToFile} target='_blank'>{f.UploadSuccessful ? 'Success! - View Invoice Here' : 'Error'}</a>
+            </CardTitle>
             <p>{f.ErrorMessage}</p>
           </CardBody>
         </Card>
@@ -235,20 +255,11 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     return output;
   }
 
-  public onDialogInputChange = (event) => {
-    let target = event.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
-    const name = (target.props && target.props.name !== undefined) ? target.props.name : (target.name !== undefined) ? target.name : target.props.id;
-    const edited = this.state.productInEdit;
-    edited[name] = value;
-    this.setState({
-      productInEdit: edited
-    });
-  }
+
 
   public render() {
     return (
-      <div style={{ padding: '5px' }}>
+      <div style={{ padding: '5px' }} key={this.state.stateHolder}>
         <Form
           //onSubmit={this.handleSubmit}
           onSubmit={this.handleSubmit}
@@ -262,7 +273,6 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
 
           render={(formRenderProps) => (
             <FormElement >
-
               <legend className={'k-form-legend'}>ACCOUNTS RECEIVABLE - INVOICE REQUISITION </legend>
 
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -421,7 +431,6 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                   type={'submit'}
                   icon="save"
                   onClick={this.handleSubmit}
-                // disabled={!formRenderProps.allowSubmit}
                 >Submit AR Invoice Request</Button>
                 <Button onClick={formRenderProps.onFormReset}>Clear</Button>
               </div>
