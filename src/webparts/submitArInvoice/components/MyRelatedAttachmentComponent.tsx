@@ -21,7 +21,7 @@ export class MyRelatedAttachmentComponent extends React.Component<any, any> {
     return (
       <Card style={{ width: 400 }}>
         <CardBody>
-          <CardTitle>Related Attachments</CardTitle>
+          <CardTitle><b>Upload Related Attachments</b></CardTitle>
           {
             this.props.productInEdit.RelatedAttachments.map(f => {
               return (
@@ -39,7 +39,7 @@ export class MyRelatedAttachmentComponent extends React.Component<any, any> {
           <Field
             id="RelatedInvoiceAttachments"
             name="RelatedInvoiceAttachments"
-            label="Upload Related Attachments"
+            // label="Upload Related Attachments"
             batch={false}
             multiple={true}
             component={MyFormComponents.FormUpload}

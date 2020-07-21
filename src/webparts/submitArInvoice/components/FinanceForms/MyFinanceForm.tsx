@@ -12,6 +12,7 @@ import { Button } from '@progress/kendo-react-buttons';
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import { Input, NumericTextBox } from '@progress/kendo-react-inputs';
 import { Form, Field, FormElement, FieldArray } from '@progress/kendo-react-form';
+import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/kendo-react-layout';
 
 //PnPjs Imports
 import { sp } from "@pnp/sp";
@@ -674,15 +675,36 @@ class InvoiceEditForm extends React.Component<any, any> {
                   />
                 </div>
                 <div style={{ marginBottom: "2px" }}>
-                  <Field
-                    id="InvoiceAttachments"
-                    name="InvoiceAttachments"
-                    label="Upload Attachments"
-                    batch={false}
-                    multiple={false}
-                    myOnChange={this.onDialogInputChange}
-                    component={MyFormComponents.FormUpload}
-                  />
+                  <Card style={{ width: 400 }}>
+                    <CardBody>
+                      <CardTitle><b>Upload GP Attachment</b></CardTitle>
+                      {/* {
+                        this.props.productInEdit.RelatedAttachments.map(f => {
+                          return (
+                            <a target='_blank' href={f.ServerRedirectedEmbedUrl} style={{ margin: '2px' }}>
+                              <div className='k-chip k-chip-filled k-chip-info'>
+                                <div className='k-chip-content'>
+                                  {f.Title}
+                                </div>
+                              </div>
+                            </a>
+                          );
+                        })
+                      }
+                      <hr /> */}
+                      <Field
+                        id="InvoiceAttachments"
+                        name="InvoiceAttachments"
+                        // label="Upload GP Invoice"
+                        batch={false}
+                        multiple={false}
+                        myOnChange={this.onDialogInputChange}
+                        component={MyFormComponents.FormUpload}
+                      />
+                    </CardBody>
+                  </Card>
+
+
                 </div>
                 <div style={{ marginBottom: "2px" }}>
                   <MyRelatedAttachmentComponent
