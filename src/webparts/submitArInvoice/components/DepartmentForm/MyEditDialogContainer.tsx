@@ -11,6 +11,8 @@ import * as MyFormComponents from '../MyFormComponents';
 import * as MyValidators from '../validators.jsx';
 import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceGLAccounts';
 import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
+import {ApprovalRequiredComponent} from '../ApprovalRequiredComponent';
+
 
 export class MyEditDialogContainer extends React.Component<any, any> {
   constructor(props) {
@@ -87,6 +89,10 @@ export class MyEditDialogContainer extends React.Component<any, any> {
   render() {
     return (
       <Dialog onClose={this.props.cancel} title={"Edit AR Invoice Request"} minWidth="200px" width="80%">
+        <ApprovalRequiredComponent
+          productInEdit={this.state.productInEdit}
+          currentUser={this.props.currentUser}
+        />
         <Form
           //onSubmit={this.handleSubmit}
           onSubmit={this.handleSubmit}

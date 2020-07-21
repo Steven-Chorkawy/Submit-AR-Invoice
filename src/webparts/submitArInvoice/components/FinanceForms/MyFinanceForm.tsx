@@ -34,6 +34,7 @@ import { ApprovalResponseComponent } from '../ApprovalResponseComponent'
 import { InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
 import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
 import { ConvertQueryParamsToKendoFilter } from '../MyHelperMethods';
+import {ApprovalRequiredComponent} from '../ApprovalRequiredComponent';
 
 interface IMyFinanceFormState {
   invoices: IInvoicesDataState;
@@ -628,75 +629,13 @@ class InvoiceEditForm extends React.Component<any, any> {
 
   }
 
-  public onApprovalDialogInputChange = (event) => {
-    let target = event.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
-    const name = (target.props && target.props.name !== undefined) ? target.props.name : (target.name !== undefined) ? target.name : target.props.id;
-
-    this.setState({
-      approvalNotes: value
-    });
-  }
-
-  public sendApproval = (event) => {
-    this.sendApprovalResponse("Approve");
-  }
-
-  public sendReject = (event) => {
-    this.sendApprovalResponse("Reject");
-  }
-
-  //TODO: Pick the correct request instead of the first one.
-  private sendApprovalResponse = (response) => {
-    var comment = this.state.approvalNotes;
-    var request = this.state.productInEdit.Approvals.filter(a => a.Users_x0020_Email === this.props.currentUser.Email);
-    var updateObj = {
-      Response: response,
-      Response_x0020_Summary: "Approved from SharePoint Form",
-      Response_x0020_Message: comment
-    };
-    sp.web.lists.getByTitle('Approval Requests Sent').items
-      .getById(request[0].ID)
-      .update(updateObj)
-      .then(res => {
-        request[0] = { ...request[0], ...updateObj };
-        const index = this.state.productInEdit.Approvals.findIndex(a => a.ID === request[0].ID);
-        var allRequests = this.state.productInEdit.Approvals;
-        allRequests[index] = request[0];
-        this.setState({
-          productInEdit: {
-            ...this.state.productInEdit,
-            Approvals: [...allRequests]
-          }
-        });
-      })
-      .catch(error => {
-        this.setState({
-          approvalRequestError: true
-        });
-      });
-  }
-
   public render() {
     return (
       <Dialog onClose={this.props.cancel} title={"Edit AR Invoice"} minWidth="200px" width="80%" >
-        {this.state.productInEdit.Approvals.filter(a => a.Users_x0020_Email === this.props.currentUser.Email && a.Response === null).length > 0 &&
-          <div>
-            <Card style={{ width: 600 }} type={this.state.approvalRequestError ? 'error' : ''}>
-              <CardBody>
-                <CardTitle><b>Your Response is Required</b></CardTitle>
-                <p>Reason (Optional)</p>
-                {this.state.approvalRequestError && <h4 className="k-text-error">Something went wrong, cannot send your response at the moment.</h4>}
-                <textarea disabled={this.state.approvalRequestError} style={{ width: '100%' }} id={'ApprovalNote'} onChange={this.onApprovalDialogInputChange}></textarea>
-              </CardBody>
-              <CardActions className="row">
-                <Button className="k-text-success col-sm-6" icon="check" disabled={this.state.approvalRequestError} onClick={this.sendApproval}>Approve</Button>
-                <Button className="k-text-error col-sm-6" icon="close" disabled={this.state.approvalRequestError} onClick={this.sendReject}>Reject</Button>
-              </CardActions>
-            </Card>
-            <hr />
-          </div>
-        }
+        <ApprovalRequiredComponent
+          productInEdit={this.state.productInEdit}
+          currentUser={this.props.currentUser}
+        />
         <Form
           onSubmit={this.handleSubmit}
           render={(formRenderProps) => (

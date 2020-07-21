@@ -48,6 +48,7 @@ type MyKendoGridState = {
   productInCancel: any;
   statusData: any;
   siteUsersData: any;
+  currentUser?: any;
 }
 
 
@@ -175,9 +176,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       edit: this.onEdit,
       cancel: this.onInvoiceCancel
     });
-
-
-    //this.state = this.createAppState({ ...this.state });
   }
 
   private CommandCell;
@@ -185,25 +183,11 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   //#region Methods
   MyCustomCell = (props) => <CustomCell {...props} />
 
-  // createAppState = (dataState) => {
-
-  //   var output = {
-  //     result: process(this.state.data, dataState),
-  //     dataState: dataState,
-  //     ...dataState
-  //   };
-  //   return output;
-  // }
-
   dataStateChange = (e) => {
-
     this.setState({
       ...this.state,
       dataState: e.data
     })
-    // var appSate = this.createAppState(event.dataState);
-
-    // this.setState(appSate);
   }
 
 
@@ -231,6 +215,13 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
     this.setState({
       ...this.state,
       siteUsersData: users
+    });
+  }
+
+  public currentUserDataReceived = (user) => {
+    this.setState({
+      ...this.state,
+      currentUser: user
     });
   }
 
@@ -451,7 +442,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
               dataItem={this.state.productInEdit}
               customers={this.props.customers}
               siteUsers={this.props.siteUsers}
-
+              currentUser={this.state.currentUser}
               save={this.save}
               cancel={this.cancel}
             />
@@ -473,6 +464,9 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
 
           siteUsersDataState={this.state.siteUsersData}
           onSiteUsersDataReceived={this.siteUserDataReceived}
+
+          currentUserDataState={this.state.currentUser}
+          onCurrentUserDataReceived={this.currentUserDataReceived}
         />
       </div >
     );
