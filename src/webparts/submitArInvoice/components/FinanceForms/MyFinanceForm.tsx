@@ -560,25 +560,15 @@ class CustomUrgentCell extends React.Component<any, any> {
 }
 
 class InvoiceDetailComponent extends GridDetailRow {
-
   private itemChangeEvent
 
   constructor(props) {
-
     console.log("this element");
     super(props);
   }
 
 
   public render() {
-    // return this.props.dataItem.inEdit ?
-    //   // Return Edit Mode
-    //   (
-    //     <div>
-    //       <Input value={this.props.dataItem.Standard_x0020_Terms} onChange={(e) => this.itemChangeEvent} />
-    //     </div>
-    //   ) :
-    // Return View Mode
     return (
       <div>
         <h3>G/L Accounts</h3>
@@ -587,12 +577,10 @@ class InvoiceDetailComponent extends GridDetailRow {
           showCommandCell={false}
           style={{ 'maxWidth': '1200px' }} />
         <hr />
-
         <h3>Approval Responses</h3>
         <ApprovalResponseComponent
           approvals={this.props.dataItem.Approvals}
         />
-
       </div>
     );
   }
@@ -615,8 +603,6 @@ class InvoiceEditForm extends React.Component<any, any> {
     event.preventDefault();
   }
 
-
-
   public onDialogInputChange = (event) => {
     let target = event.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
@@ -626,7 +612,6 @@ class InvoiceEditForm extends React.Component<any, any> {
     this.setState({
       productInEdit: edited
     });
-
   }
 
   public render() {
@@ -698,20 +683,6 @@ class InvoiceEditForm extends React.Component<any, any> {
                   <Card style={{ width: 400 }}>
                     <CardBody>
                       <CardTitle><b>Upload GP Attachment</b></CardTitle>
-                      {/* {
-                        this.props.productInEdit.RelatedAttachments.map(f => {
-                          return (
-                            <a target='_blank' href={f.ServerRedirectedEmbedUrl} style={{ margin: '2px' }}>
-                              <div className='k-chip k-chip-filled k-chip-info'>
-                                <div className='k-chip-content'>
-                                  {f.Title}
-                                </div>
-                              </div>
-                            </a>
-                          );
-                        })
-                      }
-                      <hr /> */}
                       <Field
                         id="InvoiceAttachments"
                         name="InvoiceAttachments"
@@ -723,8 +694,6 @@ class InvoiceEditForm extends React.Component<any, any> {
                       />
                     </CardBody>
                   </Card>
-
-
                 </div>
                 <div style={{ marginBottom: "2px" }}>
                   <MyRelatedAttachmentComponent
