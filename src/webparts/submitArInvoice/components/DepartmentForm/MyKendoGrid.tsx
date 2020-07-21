@@ -105,7 +105,7 @@ const MyItemRender = props => {
 
 class DetailComponent extends GridDetailRow {
   render() {
-    debugger;
+
     const dataItem: any = this.props.dataItem;
     return (
       <div>
@@ -346,7 +346,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   public sendCancelRequest = () => {
     sp.web.currentUser.get()
       .then(currentUser => {
-        debugger;
+
         const dataItem = this.state.productInCancel;
         sp.web.lists.getByTitle('Cancel Invoice Request')
           .items

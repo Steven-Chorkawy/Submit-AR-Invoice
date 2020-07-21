@@ -62,7 +62,7 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
           }
         });
 
-        debugger;
+
 
         // trigger a change on the invoice which in turn will trigger a workflow.
         sp.web.lists.getByTitle('AR Invoices').items

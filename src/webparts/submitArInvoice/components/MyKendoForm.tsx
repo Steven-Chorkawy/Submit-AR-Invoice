@@ -57,7 +57,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
    */
   constructor(props) {
     super(props);
-    debugger;
+
 
     this._siteUrl = props.ctx.pageContext.web.absoluteUrl;
 
@@ -100,7 +100,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
 
 
     // Set the data for the invoice
-    let myData: IARFormModel = {
+    var myData = {
       Title: newARTitle,
       Department: dataItem.Department,
       Date: dataItem.Date,
@@ -108,13 +108,25 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
       Requires_x0020_Authorization_x0020_ById: {
         'results': dataItem.RequiresAuthorizationBy.map((user) => { return user.Id; })
       },
-      CustomerId: dataItem.Customer.Id,
+      //CustomerId: dataItem.Customer.Id,
       Comment: dataItem.Comment,
       Customer_x0020_PO_x0020_Number: dataItem.CustomerPONumber,
       Invoice_x0020_Details: dataItem.InvoiceDetails,
       Standard_x0020_Terms: dataItem.StandardTerms,
       Urgent: dataItem.Urgent
     };
+
+    // Add customer data.
+    // dataItem.Customer.ID is undefined when a custom customer is added.
+    debugger;
+    if (dataItem.Customer.ID === undefined) {
+      myData['MiscCustomerDetails'] = this.state.MiscCustomerDetails;
+      myData['MiscCustomerName'] = dataItem.Customer.Company;
+    }
+    else {
+      myData['CustomerId'] = dataItem.Customer.Id;
+    }
+
 
     const accounts: IARAccountDetails = { ...dataItem.GLAccounts };
 
@@ -164,18 +176,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
       }
     });
 
-    // output.file.get().then(f => {
-    //   debugger;
-    //   currentFiles.push({
-    //     FileName: f.Name,
-    //     UploadSuccessful: true,
-    //     ErrorMessage: null
-    //   });
-    //   this.setState({
-    //     MyFiles: currentFiles
-    //   });
-    // });
-
+    // Force a re render.
     this.setState({
       stateHolder: this.state.stateHolder + 1
     });
@@ -255,7 +256,22 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     return output;
   }
 
+  private customerItemRender = (li, itemProps) => {
 
+    const index = itemProps.index;
+    const itemChildren = <span>{itemProps.dataItem.Customer_x0020_Name} | {itemProps.dataItem.WorkAddress}</span>;
+
+    return React.cloneElement(li, li.props, itemChildren);
+  }
+  public onCustomCustomerChange = (event) => {
+    debugger;
+    let target = event.target;
+    let value = target.type === 'checkbox' ? target.checked : target.value;
+
+    this.setState({
+      MiscCustomerDetails: value
+    });
+  }
 
   public render() {
     return (
@@ -356,11 +372,12 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                 wrapperStyle={{ width: '100%' }}
                 data={this.props.customerList}
                 dataItemKey="ID"
-                textField="Title"
+                textField="Company"
                 validator={MyValidators.requiresCustomer}
                 allowCustom={true}
+                itemRender={this.customerItemRender}
                 component={MyFormComponents.CustomerComboBox}
-              //onchange={this.onDialogInputChange}
+                onCustomCusteromChange={this.onCustomCustomerChange}
               />
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field

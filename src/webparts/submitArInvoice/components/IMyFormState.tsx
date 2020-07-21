@@ -4,6 +4,7 @@ export interface IMyFormState {
   MyFiles: IUploadingFile[];
   productInEdit: any;
   stateHolder: number;
+  MiscCustomerDetails?: string;
 }
 
 export interface IUploadingFile {

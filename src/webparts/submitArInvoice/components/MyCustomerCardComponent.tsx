@@ -1,10 +1,9 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Card, CardTitle, CardBody, CardActions } from '@progress/kendo-react-layout';
-import { IMyCustomerProps } from '../components/IMyCustomerProps';
-import { IMyCustomerState } from '../components/IMyCustomerState';
 
-export class MyCustomerCardComponent extends React.Component<IMyCustomerProps, IMyCustomerState> {
+
+export class MyCustomerCardComponent extends React.Component<any, any> {
 
   /**
    *
@@ -32,12 +31,13 @@ export class MyCustomerCardComponent extends React.Component<IMyCustomerProps, I
       return (
         <div>
           <div>
-            Enter Additional Customer Details.
+            <b>Enter Additional Customer Details.</b>
           </div>
           <textarea
             className={'k-textarea k-autofill'}
-            id={'CustomerDescription'}
-            name={'CustomerDescription'}
+            id={'MiscCustomerDetails'}
+            name={'MiscCustomerDetails'}
+            onChange={this.props.onCustomCusteromChange}
           />
         </div>
       );
@@ -48,7 +48,7 @@ export class MyCustomerCardComponent extends React.Component<IMyCustomerProps, I
         // TODO: Design this better! This is just for the first round of review.
         <Card key={this.state.selectedCustomer.ID} type="info">
           <CardBody>
-            <CardTitle>{this.state.selectedCustomer.Title}</CardTitle>
+            <CardTitle>{this.state.selectedCustomer.Customer_x0020_Name}</CardTitle>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <p>GP Customer ID: {this.state.selectedCustomer.GPCustomerID}</p>
               <p>Customer Name: {this.state.selectedCustomer.Company}</p>
