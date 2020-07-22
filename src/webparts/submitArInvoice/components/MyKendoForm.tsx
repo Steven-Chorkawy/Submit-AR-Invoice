@@ -23,6 +23,7 @@ import { IMyFormState, IUploadingFile } from './IMyFormState';
 import * as MyValidators from './validators.jsx';
 import { MyCustomerCardComponent } from './MyCustomerCardComponent';
 import { MyGLAccountComponent } from './MyGLAccountComponent';
+import { FieldUserSelectionMode } from '@pnp/sp/fields';
 
 
 export interface IARFormModel {
@@ -57,11 +58,13 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
   constructor(props) {
     super(props);
 
+
     this._siteUrl = props.ctx.pageContext.web.absoluteUrl;
 
     this.state = {
       MyFiles: [],
       productInEdit: {},
+      stateHolder: 0,
       ...props
     };
   }
@@ -77,14 +80,11 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
       return;
     }
 
-
     // We will use this to update states later.
     let currentFiles: IUploadingFile[] = this.state.MyFiles;
 
-
-    debugger;
-
     let web = Web(this._siteUrl);
+
     let currentYear = new Date().getFullYear();
     const newARTitle = currentYear + "-AR-" + (this.S4() + this.S4() + "-" + this.S4() + "-4" + this.S4().substr(0, 3) + "-" + this.S4() + "-" + this.S4() + this.S4() + this.S4()).toLowerCase();
     let finalFileName = newARTitle + '.pdf'; // .pdf because GP exports pdf files.  Finance will replace this place holder file in the future.
@@ -100,7 +100,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
 
 
     // Set the data for the invoice
-    let myData: IARFormModel = {
+    var myData = {
       Title: newARTitle,
       Department: dataItem.Department,
       Date: dataItem.Date,
@@ -108,7 +108,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
       Requires_x0020_Authorization_x0020_ById: {
         'results': dataItem.RequiresAuthorizationBy.map((user) => { return user.Id; })
       },
-      CustomerId: dataItem.Customer.Id,
+      //CustomerId: dataItem.Customer.Id,
       Comment: dataItem.Comment,
       Customer_x0020_PO_x0020_Number: dataItem.CustomerPONumber,
       Invoice_x0020_Details: dataItem.InvoiceDetails,
@@ -116,11 +116,33 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
       Urgent: dataItem.Urgent
     };
 
+    // Add customer data.
+    // dataItem.Customer.ID is undefined when a custom customer is added.
+    debugger;
+    if (dataItem.Customer.ID === undefined) {
+      myData['MiscCustomerDetails'] = this.state.MiscCustomerDetails;
+      myData['MiscCustomerName'] = dataItem.Customer.Company;
+    }
+    else {
+      myData['CustomerId'] = dataItem.Customer.Id;
+    }
+
+
     const accounts: IARAccountDetails = { ...dataItem.GLAccounts };
 
     var output = await (await sp.web.lists.getByTitle('AR Invoices').items.getById(uploadedFile.ID).update(myData)).item;
 
     output.get().then(innerFile => {
+      currentFiles.push({
+        FileName: innerFile.Name,
+        UploadSuccessful: true,
+        ErrorMessage: null,
+        LinkToFile: `${this._siteUrl}/SitePages/Department-AR-Search-Page.aspx/?FilterField1=ID&FilterValue1=${innerFile.ID}`
+      });
+      this.setState({
+        MyFiles: currentFiles
+      });
+
       // Set the data for the account details.
       let accountDetails: IARAccountDetails[] = [];
       dataItem.GLAccounts.map(account => {
@@ -153,16 +175,13 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
         }
       }
     });
-    output.file.get().then(f => {
-      currentFiles.push({
-        FileName: f.Name,
-        UploadSuccessful: true,
-        ErrorMessage: null
-      });
-      this.setState({
-        MyFiles: currentFiles
-      });
+
+    // Force a re render.
+    this.setState({
+      stateHolder: this.state.stateHolder + 1
     });
+
+    this.forceUpdate();
   }
 
   /**
@@ -183,13 +202,13 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
 
     for (let index = 0; index < inputData.RelatedAttachments.length; index++) {
       const element = inputData.RelatedAttachments[index];
-      debugger;
+
       let uploadRes = await web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/')
         .files
         .add(element.name, element.getRawFile(), true)
         .then(({ file }) => file.getItem()
           .then((item: any) => {
-            debugger;
+
             return item.update({
               ARInvoiceId: mainFile.Id,
               Title: element.name
@@ -225,7 +244,9 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
       output.push(
         <Card type={f.UploadSuccessful ? 'success' : 'error'} style={{ margin: '2px' }}>
           <CardBody>
-            <CardTitle>{f.FileName} - {f.UploadSuccessful ? 'Success!' : 'Error'}</CardTitle>
+            <CardTitle>
+              <a href={f.LinkToFile} target='_blank'>{f.UploadSuccessful ? 'Success! - View Invoice Here' : 'Error'}</a>
+            </CardTitle>
             <p>{f.ErrorMessage}</p>
           </CardBody>
         </Card>
@@ -235,20 +256,26 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     return output;
   }
 
-  public onDialogInputChange = (event) => {
+  private customerItemRender = (li, itemProps) => {
+
+    const index = itemProps.index;
+    const itemChildren = <span>{itemProps.dataItem.Customer_x0020_Name} | {itemProps.dataItem.WorkAddress}</span>;
+
+    return React.cloneElement(li, li.props, itemChildren);
+  }
+  public onCustomCustomerChange = (event) => {
+    debugger;
     let target = event.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
-    const name = (target.props && target.props.name !== undefined) ? target.props.name : (target.name !== undefined) ? target.name : target.props.id;
-    const edited = this.state.productInEdit;
-    edited[name] = value;
+    let value = target.type === 'checkbox' ? target.checked : target.value;
+
     this.setState({
-      productInEdit: edited
+      MiscCustomerDetails: value
     });
   }
 
   public render() {
     return (
-      <div style={{ padding: '5px' }}>
+      <div style={{ padding: '5px' }} key={this.state.stateHolder}>
         <Form
           //onSubmit={this.handleSubmit}
           onSubmit={this.handleSubmit}
@@ -262,7 +289,6 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
 
           render={(formRenderProps) => (
             <FormElement >
-
               <legend className={'k-form-legend'}>ACCOUNTS RECEIVABLE - INVOICE REQUISITION </legend>
 
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -346,11 +372,12 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                 wrapperStyle={{ width: '100%' }}
                 data={this.props.customerList}
                 dataItemKey="ID"
-                textField="Title"
+                textField="Company"
                 validator={MyValidators.requiresCustomer}
                 allowCustom={true}
+                itemRender={this.customerItemRender}
                 component={MyFormComponents.CustomerComboBox}
-              //onchange={this.onDialogInputChange}
+                onCustomCusteromChange={this.onCustomCustomerChange}
               />
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
@@ -421,7 +448,6 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                   type={'submit'}
                   icon="save"
                   onClick={this.handleSubmit}
-                // disabled={!formRenderProps.allowSubmit}
                 >Submit AR Invoice Request</Button>
                 <Button onClick={formRenderProps.onFormReset}>Clear</Button>
               </div>

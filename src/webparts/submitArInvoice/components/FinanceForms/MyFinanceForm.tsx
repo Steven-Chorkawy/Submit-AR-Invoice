@@ -12,6 +12,7 @@ import { Button } from '@progress/kendo-react-buttons';
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
 import { Input, NumericTextBox } from '@progress/kendo-react-inputs';
 import { Form, Field, FormElement, FieldArray } from '@progress/kendo-react-form';
+import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/kendo-react-layout';
 
 //PnPjs Imports
 import { sp } from "@pnp/sp";
@@ -33,6 +34,9 @@ import { ApprovalResponseComponent } from '../ApprovalResponseComponent'
 import { InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
 import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
 import { ConvertQueryParamsToKendoFilter } from '../MyHelperMethods';
+import {ApprovalRequiredComponent} from '../ApprovalRequiredComponent';
+import {InvoiceGridDetailComponent} from '../InvoiceGridDetailComponent';
+
 
 interface IMyFinanceFormState {
   invoices: IInvoicesDataState;
@@ -44,6 +48,7 @@ interface IMyFinanceFormState {
   filter: any;
   //sort: any;
   allRowsExpanded: boolean;
+  currentUser?: any;
 }
 
 interface IInvoicesDataState {
@@ -108,8 +113,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
   //#region Methods
   public dataReceived = (invoices) => {
-
-    debugger;
     console.log("dataReceived");
     console.log(invoices);
     var dataHolder: any = filterBy(invoices.data, this.state.filter);
@@ -139,8 +142,14 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     });
   }
 
+  public currentUserDataReceived = (user) => {
+    this.setState({
+      ...this.state,
+      currentUser: user
+    });
+  }
+
   public dataStateChange = (e) => {
-    debugger;
     this.setState({
       ...this.state,
       dataState: e.data
@@ -173,7 +182,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   public onFilterChange = (e) => {
-    debugger;
     var newData = filterBy(this.state.receivedData.data, e.filter);
     newData.map(invoice => invoice.expanded = this.state.allRowsExpanded);
     var newStateData = {
@@ -465,7 +473,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           filter={this.state.filter}
           onFilterChange={this.onFilterChange}
 
-          detail={InvoiceDetailComponent}
+          detail={InvoiceGridDetailComponent}
           expandField="expanded"
           onExpandChange={this.expandChange}
         >
@@ -514,6 +522,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         {
           this.state.productInEdit &&
           <InvoiceEditForm
+            currentUser={this.state.currentUser}
             dataItem={this.state.productInEdit}
             statusData={this.state.statusData}
             siteUsersData={this.state.siteUsersData}
@@ -532,6 +541,9 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
           siteUsersDataState={this.state.siteUsersData}
           onSiteUsersDataReceived={this.siteUserDataReceived}
+
+          currentUserDataState={this.state.currentUser}
+          onCurrentUserDataReceived={this.currentUserDataReceived}
         />
       </div>
     );
@@ -549,61 +561,24 @@ class CustomUrgentCell extends React.Component<any, any> {
   }
 }
 
-class InvoiceDetailComponent extends GridDetailRow {
 
-  private itemChangeEvent
-
-  constructor(props) {
-
-    console.log("this element");
-    super(props);
-  }
-
-
-  public render() {
-    // return this.props.dataItem.inEdit ?
-    //   // Return Edit Mode
-    //   (
-    //     <div>
-    //       <Input value={this.props.dataItem.Standard_x0020_Terms} onChange={(e) => this.itemChangeEvent} />
-    //     </div>
-    //   ) :
-    // Return View Mode
-    return (
-      <div>
-        <h3>G/L Accounts</h3>
-        <MyFinanceGlAccounts
-          value={this.props.dataItem.AccountDetails}
-          showCommandCell={false}
-          style={{ 'maxWidth': '1200px' }} />
-        <hr />
-
-        <h3>Approval Responses</h3>
-        <ApprovalResponseComponent
-          approvals={this.props.dataItem.Approvals}
-        />
-
-      </div>
-    );
-  }
-}
 
 class InvoiceEditForm extends React.Component<any, any> {
   constructor(props) {
     super(props);
     console.log('InvoiceEditForm');
     console.log(props);
+
     this.state = {
       productInEdit: this.props.dataItem || null,
       visible: false,
+      approvalRequestError: false
     }
   }
 
   public handleSubmit(event) {
     event.preventDefault();
   }
-
-
 
   public onDialogInputChange = (event) => {
     let target = event.target;
@@ -619,6 +594,10 @@ class InvoiceEditForm extends React.Component<any, any> {
   public render() {
     return (
       <Dialog onClose={this.props.cancel} title={"Edit AR Invoice"} minWidth="200px" width="80%" >
+        <ApprovalRequiredComponent
+          productInEdit={this.state.productInEdit}
+          currentUser={this.props.currentUser}
+        />
         <Form
           onSubmit={this.handleSubmit}
           render={(formRenderProps) => (
@@ -678,15 +657,20 @@ class InvoiceEditForm extends React.Component<any, any> {
                   />
                 </div>
                 <div style={{ marginBottom: "2px" }}>
-                  <Field
-                    id="InvoiceAttachments"
-                    name="InvoiceAttachments"
-                    label="Upload Attachments"
-                    batch={false}
-                    multiple={false}
-                    myOnChange={this.onDialogInputChange}
-                    component={MyFormComponents.FormUpload}
-                  />
+                  <Card style={{ width: 400 }}>
+                    <CardBody>
+                      <CardTitle><b>Upload GP Attachment</b></CardTitle>
+                      <Field
+                        id="InvoiceAttachments"
+                        name="InvoiceAttachments"
+                        // label="Upload GP Invoice"
+                        batch={false}
+                        multiple={false}
+                        myOnChange={this.onDialogInputChange}
+                        component={MyFormComponents.FormUpload}
+                      />
+                    </CardBody>
+                  </Card>
                 </div>
                 <div style={{ marginBottom: "2px" }}>
                   <MyRelatedAttachmentComponent
