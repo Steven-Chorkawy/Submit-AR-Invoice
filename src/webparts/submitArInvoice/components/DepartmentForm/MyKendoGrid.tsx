@@ -426,7 +426,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
             sortable={false}
             cell={this.MyCustomCell} />
 
-          <Column field="ID" title="ID" filterable={false} />
+          <Column field="Id" title="Id" width="75px" filterable={false} />
           <Column field="Created" width="250px" title="Created Date" filter="date" format={MyGridStrings.DateFilter} />
           <Column field="Customer.Customer_x0020_Name" width="250px" title="Customer" />
           <Column field="Invoice_x0020_Status" width="250px" title="Status" />
