@@ -164,7 +164,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       productInEdit: undefined,
       productInCancel: undefined,
       dataState: {
-        take: 5,
+        take: 20,
         skip: 0,
         sort: [
           { field: 'ID', dir: 'desc' }
