@@ -23,8 +23,8 @@ class MyItemCardRender extends React.Component<any, any> {
 
   render() {
 
-    console.log("MyItemRender");
-    console.log(this.props);
+    ("MyItemRender");
+    (this.props);
     let item = this.props.dataItem;
     let cardType = '';
     switch (item.Response) {

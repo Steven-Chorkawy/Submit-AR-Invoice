@@ -49,16 +49,11 @@ export class MyCustomerCardComponent extends React.Component<any, any> {
         <Card key={this.state.selectedCustomer.ID} type="info">
           <CardBody>
             <CardTitle>{this.state.selectedCustomer.Customer_x0020_Name}</CardTitle>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <p>GP Customer ID: {this.state.selectedCustomer.GPCustomerID}</p>
-              <p>Customer Name: {this.state.selectedCustomer.Company}</p>
-              <p>Email Address: {this.state.selectedCustomer.Email}</p>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <p>Telephone Number: {this.state.selectedCustomer.WorkPhone}</p>
-              <p>Mailing Address: {this.state.selectedCustomer.WorkAddress}</p>
-            </div>
+            <p>GP Customer ID: {this.state.selectedCustomer.GPCustomerID}</p>
+            <p>Contact Name: {this.state.selectedCustomer.Company}</p>
+            <p>Email Address: {this.state.selectedCustomer.Email}</p>
+            <p>Telephone Number: {this.state.selectedCustomer.WorkPhone}</p>
+            <p>Mailing Address: {this.state.selectedCustomer.WorkAddress}</p>
             <p>Notes: {this.state.selectedCustomer.Comments}</p>
           </CardBody>
         </Card>
