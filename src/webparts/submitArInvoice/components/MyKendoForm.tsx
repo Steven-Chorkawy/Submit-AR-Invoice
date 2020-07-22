@@ -6,6 +6,8 @@ import { Input, MaskedTextBox } from '@progress/kendo-react-inputs';
 import { Button } from '@progress/kendo-react-buttons';
 import { Card, CardTitle, CardBody, CardActions } from '@progress/kendo-react-layout';
 import { Grid, GridColumn, GridToolbar } from '@progress/kendo-react-grid';
+import { filterBy } from '@progress/kendo-data-query';
+
 
 import { sp } from "@pnp/sp";
 import { Web } from "@pnp/sp/webs";
@@ -49,7 +51,7 @@ export interface IARAccountDetails {
 }
 
 
-export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
+export class MyForm extends React.Component<IMyFormProps, any> {
   private _siteUrl: string;
 
   /**
@@ -65,6 +67,8 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
       MyFiles: [],
       productInEdit: {},
       stateHolder: 0,
+      customerList: this.props.customerList,
+      receivedCustomerList: this.props.customerList,
       ...props
     };
   }
@@ -118,7 +122,7 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
 
     // Add customer data.
     // dataItem.Customer.ID is undefined when a custom customer is added.
-    debugger;
+
     if (dataItem.Customer.ID === undefined) {
       myData['MiscCustomerDetails'] = this.state.MiscCustomerDetails;
       myData['MiscCustomerName'] = dataItem.Customer.Company;
@@ -264,13 +268,28 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
     return React.cloneElement(li, li.props, itemChildren);
   }
   public onCustomCustomerChange = (event) => {
-    debugger;
+
     let target = event.target;
     let value = target.type === 'checkbox' ? target.checked : target.value;
 
     this.setState({
       MiscCustomerDetails: value
     });
+  }
+
+  public customerFilterChange = (event) => {
+    setTimeout(() => {
+      this.setState({
+        customerList: this.filterData(event.filter),
+        loading: false
+      });
+    }, 500);
+  }
+
+  public filterData(filter) {
+
+    const data = this.state.receivedCustomerList.slice();
+    return filterBy(data, filter);
   }
 
   public render() {
@@ -370,13 +389,16 @@ export class MyForm extends React.Component<IMyFormProps, IMyFormState> {
                 name="Customer"
                 label="* Customer"
                 wrapperStyle={{ width: '100%' }}
-                data={this.props.customerList}
+                data={this.state.customerList}
                 dataItemKey="ID"
-                textField="Company"
+                textField="Customer_x0020_Name"
                 validator={MyValidators.requiresCustomer}
                 allowCustom={true}
                 itemRender={this.customerItemRender}
                 component={MyFormComponents.CustomerComboBox}
+                filterable={true}
+                suggest={true}
+                onFilterChange={this.customerFilterChange}
                 onCustomCusteromChange={this.onCustomCustomerChange}
               />
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>

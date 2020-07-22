@@ -507,7 +507,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           <GridColumn field="ID" title="ID" width={this._columnWidth} editable={false} />
           <GridColumn field="Date" title="Date" width={this._columnWidth} filter='date' format={MyGridStrings.DateFilter} />
           <GridColumn field="Department" title="Department" width={this._columnWidth} />
-          <GridColumn field="Customer.Title" title="Customer" width={this._columnWidth} />
+          <GridColumn field="Customer.Customer_x0020_Name" title="Customer" width={this._columnWidth} />
           <GridColumn field="Invoice_x0020_Status" title="Status" width={this._columnWidth} />
           <GridColumn field="Invoice_x0020_Number" title="Invoice #" width={this._columnWidth} />
           <GridColumn field="Batch_x0020_Number" title="Batch #" width={this._columnWidth} />
