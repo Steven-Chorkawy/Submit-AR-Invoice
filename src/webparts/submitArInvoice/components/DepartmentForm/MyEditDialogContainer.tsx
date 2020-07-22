@@ -219,7 +219,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                   onLabel="Yes"
                   offLabel="No"
                   component={MyFormComponents.FormSwitch}
-                  value={this.state.productInEdit.Urgent}
+                  defaultChecked={this.state.productInEdit.Urgent}
                   onChange={this.onDialogInputChange}
                 />
               </div>
