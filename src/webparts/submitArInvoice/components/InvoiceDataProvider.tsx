@@ -77,8 +77,14 @@ class InvoiceDataProvider extends React.Component<any, any> {
             .filter(idsForRelatedAttachments.join(' or '))
             .getAll(),
           //TODO: How can I filter these results? I don't need every file.
-          sp.web.getFolderByServerRelativePath("RelatedInvoiceAttachments").files(),
-          sp.web.lists.getByTitle('Cancel Invoice Request').items.filter(idsForCancelRequests.join(' or ')).getAll()
+          sp.web.getFolderByServerRelativePath("RelatedInvoiceAttachments")
+            .files(),
+          sp.web.lists.getByTitle('Cancel Invoice Request')
+            .items
+            .select('*, Requested_x0020_By/EMail, Requested_x0020_By/Title')
+            .expand('Requested_x0020_By')
+            .filter(idsForCancelRequests.join(' or '))
+            .getAll()
         ])
           .then((values) => {
             /***********************************

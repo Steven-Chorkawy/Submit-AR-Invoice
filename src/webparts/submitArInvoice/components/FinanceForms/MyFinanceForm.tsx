@@ -35,6 +35,8 @@ import { InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
 import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
 import { ConvertQueryParamsToKendoFilter } from '../MyHelperMethods';
 import {ApprovalRequiredComponent} from '../ApprovalRequiredComponent';
+import {InvoiceGridDetailComponent} from '../InvoiceGridDetailComponent';
+
 
 interface IMyFinanceFormState {
   invoices: IInvoicesDataState;
@@ -471,7 +473,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           filter={this.state.filter}
           onFilterChange={this.onFilterChange}
 
-          detail={InvoiceDetailComponent}
+          detail={InvoiceGridDetailComponent}
           expandField="expanded"
           onExpandChange={this.expandChange}
         >
@@ -559,32 +561,7 @@ class CustomUrgentCell extends React.Component<any, any> {
   }
 }
 
-class InvoiceDetailComponent extends GridDetailRow {
-  private itemChangeEvent
 
-  constructor(props) {
-    console.log("this element");
-    super(props);
-  }
-
-
-  public render() {
-    return (
-      <div>
-        <h3>G/L Accounts</h3>
-        <MyFinanceGlAccounts
-          value={this.props.dataItem.AccountDetails}
-          showCommandCell={false}
-          style={{ 'maxWidth': '1200px' }} />
-        <hr />
-        <h3>Approval Responses</h3>
-        <ApprovalResponseComponent
-          approvals={this.props.dataItem.Approvals}
-        />
-      </div>
-    );
-  }
-}
 
 class InvoiceEditForm extends React.Component<any, any> {
   constructor(props) {

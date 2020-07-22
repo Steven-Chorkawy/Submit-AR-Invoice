@@ -33,6 +33,7 @@ import { MyCancelDialogContainer } from './MyCancelDialogContainer';
 import { InvoiceDataProvider } from '../InvoiceDataProvider';
 import { InvoiceStatus, MyGridStrings } from '../enums/MyEnums'
 import { ConvertQueryParamsToKendoFilter } from '../MyHelperMethods';
+import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 
 
 
@@ -257,8 +258,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   //#endregion
 
   //#region CRUD Methods
-
-
   public onEdit = (dataItem) => {
     this.setState({ productInEdit: Object.assign({}, dataItem) });
   }
@@ -403,7 +402,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
           onExpandChange={this.expandChange}
           expandField="expanded"
 
-          detail={DetailComponent}
+          detail={InvoiceGridDetailComponent}
           rowRender={this.rowRender}
         >
           <GridToolbar>
