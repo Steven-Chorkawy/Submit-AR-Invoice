@@ -41,8 +41,6 @@ type MyKendoGridState = {
   data: any;
   receivedData: IARInvoice[];
   filter: any;
-  sort: any;
-  group: any;
   result?: any;
   dataState?: any;
   productInEdit: any;
@@ -163,12 +161,10 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
         logic: "and",
         filters: ConvertQueryParamsToKendoFilter([{ FilterField: 'FILTERFIELD1', FilterValue: 'FILTERVALUE1' }])
       },
-      sort: [],
-      group: [],
       productInEdit: undefined,
       productInCancel: undefined,
       dataState: {
-        take: 50,
+        take: 5,
         skip: 0,
         sort: [
           { field: 'ID', dir: 'desc' }
@@ -188,6 +184,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   MyCustomCell = (props) => <CustomCell {...props} />
 
   dataStateChange = (e) => {
+    debugger;
     this.setState({
       ...this.state,
       dataState: e.data
@@ -233,14 +230,9 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
     console.log("dataReceived");
     console.log(invoices);
 
-    var dataHolder = filterBy(invoices.data, this.state.filter);
-
     this.setState({
       ...this.state,
-      data: {
-        data: dataHolder,
-        total: dataHolder.length
-      },
+      data: invoices,
       receivedData: invoices.data
     });
   }
@@ -389,7 +381,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
         <Grid
           filterable={true}
           sortable={true}
-          pageable={true}
+          pageable={{ buttonCount: 4, pageSizes: true }}
           resizable={true}
 
           {...this.state.dataState}
@@ -400,7 +392,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
           filter={this.state.filter}
           onFilterChange={this.onFilterChange}
 
-          style={{ minHeight: '520px' }}
+          style={{ minHeight: '520px', maxHeight: '700px' }}
 
           onExpandChange={this.expandChange}
           expandField="expanded"
