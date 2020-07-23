@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 
 /** Start Kendo Imports */
-import { toODataString, process } from '@progress/kendo-data-query';
+import { toODataString, process, filterBy } from '@progress/kendo-data-query';
 /** End Kendo Imports */
 
 /** Start PnP Imports */
@@ -16,16 +16,31 @@ import { IFile } from '@pnp/sp/files';
 import { InvoiceStatus } from './enums/MyEnums';
 /** End PnP Imports */
 
-class InvoiceDataProvider extends React.Component<any, any> {
+interface IInvoiceDataProviderProps {
+  dataState: any;
+  filterState?: any;
+
+  onDataReceived: any;
+  statusDataState: any;
+  siteUsersDataState: any;
+  onStatusDataReceived: any;
+  onSiteUsersDataReceived: any;
+  currentUserDataState: any;
+  onCurrentUserDataReceived: any;
+}
+
+class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any> {
   constructor(props) {
     super(props);
   }
 
   public pending = '';
   public lastSuccess = '';
+  public lastForceGUID = '';
 
   public requestDataIfNeeded = () => {
 
+    // If pending is set OR dateSate === lastDataState
     if (this.pending || toODataString(this.props.dataState) === this.lastSuccess) {
       return;
     }
@@ -41,8 +56,11 @@ class InvoiceDataProvider extends React.Component<any, any> {
         this.lastSuccess = this.pending;
         this.pending = '';
 
+        debugger;
+        let filteredResponse = filterBy(response, this.props.filterState);
+
         // Apply Kendo grids filters.
-        var processedResponse = process(response, this.props.dataState);
+        var processedResponse = process(filteredResponse, this.props.dataState);
         debugger;
         // Hold the list of invoice IDs that will be used to pull related accounts.
         var invoiceIds = [];
@@ -121,7 +139,13 @@ class InvoiceDataProvider extends React.Component<any, any> {
 
             // This is something from Kendo demos.
             if (toODataString(this.props.dataState) === this.lastSuccess) {
-              this.props.onDataReceived.call(undefined, processedResponse);
+              debugger;
+              this.props.onDataReceived.call(undefined, {
+                // Add the filtered, sorted data.
+                data: processedResponse.data,
+                // Add the total amount of records found prior to filters and sorts being applied.
+                total: processedResponse.total
+              });
             } else {
               this.requestDataIfNeeded();
             }

@@ -1,13 +1,9 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Form, Field, FormElement, FieldWrapper, FieldArray } from '@progress/kendo-react-form';
-import { Error } from '@progress/kendo-react-labels';
-import { Input, MaskedTextBox } from '@progress/kendo-react-inputs';
 import { Button } from '@progress/kendo-react-buttons';
 import { Card, CardTitle, CardBody, CardActions } from '@progress/kendo-react-layout';
-import { Grid, GridColumn, GridToolbar } from '@progress/kendo-react-grid';
 import { filterBy } from '@progress/kendo-data-query';
-
 
 import { sp } from "@pnp/sp";
 import { Web } from "@pnp/sp/webs";
@@ -17,15 +13,13 @@ import "@pnp/sp/folders";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
 
-import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
-
 import * as MyFormComponents from './MyFormComponents';
 import { IMyFormProps } from './IMyFormProps';
-import { IMyFormState, IUploadingFile } from './IMyFormState';
+import { IUploadingFile } from './IMyFormState';
 import * as MyValidators from './validators.jsx';
-import { MyCustomerCardComponent } from './MyCustomerCardComponent';
 import { MyGLAccountComponent } from './MyGLAccountComponent';
-import { FieldUserSelectionMode } from '@pnp/sp/fields';
+import { BuildGUID } from './MyHelperMethods';
+
 
 
 export interface IARFormModel {
@@ -90,7 +84,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
     let web = Web(this._siteUrl);
 
     let currentYear = new Date().getFullYear();
-    const newARTitle = currentYear + "-AR-" + (this.S4() + this.S4() + "-" + this.S4() + "-4" + this.S4().substr(0, 3) + "-" + this.S4() + "-" + this.S4() + this.S4() + this.S4()).toLowerCase();
+    const newARTitle = currentYear + "-AR-" + BuildGUID();
     let finalFileName = newARTitle + '.pdf'; // .pdf because GP exports pdf files.  Finance will replace this place holder file in the future.
     // TODO: Remove this hard coded value! Can we possibly get this from the web parts properties window? That would allow this web part to be used in multiple locations.
     //? Can i upload a string as file content?
@@ -195,9 +189,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
     event.preventDefault();
   }
 
-  private S4 = () => {
-    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-  }
+
 
 
   public uploadRelatedFiles = async (inputData, mainFile) => {

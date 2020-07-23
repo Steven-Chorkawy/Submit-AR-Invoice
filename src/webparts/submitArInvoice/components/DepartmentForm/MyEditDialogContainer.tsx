@@ -53,7 +53,6 @@ export class MyEditDialogContainer extends React.Component<any, any> {
   }
 
   public customerFilterChange = (event) => {
-    debugger;
     setTimeout(() => {
       this.setState({
         customerList: this.filterData(event.filter),
@@ -63,7 +62,6 @@ export class MyEditDialogContainer extends React.Component<any, any> {
   }
 
   public filterData(filter) {
-    debugger;
     const data = this.state.receivedCustomerList.slice();
     return filterBy(data, filter);
   }

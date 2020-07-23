@@ -33,9 +33,9 @@ import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceG
 import { ApprovalResponseComponent } from '../ApprovalResponseComponent'
 import { InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
 import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
-import { ConvertQueryParamsToKendoFilter } from '../MyHelperMethods';
-import {ApprovalRequiredComponent} from '../ApprovalRequiredComponent';
-import {InvoiceGridDetailComponent} from '../InvoiceGridDetailComponent';
+import { ConvertQueryParamsToKendoFilter, BuildGUID } from '../MyHelperMethods';
+import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
+import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 
 
 interface IMyFinanceFormState {
@@ -62,14 +62,14 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     super(props);
 
     let defaultFilters = ConvertQueryParamsToKendoFilter([{ FilterField: 'FILTERFIELD1', FilterValue: 'FILTERVALUE1' }]);
-    defaultFilters.push({ field: "Invoice_x0020_Status", operator: "neq", value: InvoiceStatus.Submitted });
+    //defaultFilters.push({ field: "Invoice_x0020_Status", operator: "neq", value: InvoiceStatus.Submitted });
 
     this.state = {
       invoices: { data: [], total: 0 },
       // Same as invoices but this object is used to restore data to it's original state.
       receivedData: { data: [], total: 0 },
       dataState: {
-        take: 50,
+        take: 20,
         skip: 0,
         sort: [
           { field: 'ID', dir: 'desc' }
@@ -102,6 +102,16 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   //#region Variables
   private _editField: string = "inEdit";
   private _columnWidth: string = "150px";
+  private _NoSubmittedInvoiceFilter = {
+    logic: "and",
+    filters: [
+      {
+        field: "Invoice_x0020_Status",
+        operator: "neq",
+        value: InvoiceStatus.Submitted
+      }
+    ]
+  }
   //#endregion
 
   //#region Custom Components
@@ -117,12 +127,11 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     console.log(invoices);
     var dataHolder: any = filterBy(invoices.data, this.state.filter);
 
-
     this.setState({
       ...this.state,
       invoices: {
         data: dataHolder,
-        total: dataHolder.length
+        total: invoices.total
       },
       receivedData: invoices
     });
@@ -463,10 +472,12 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         <Grid
           filterable={true}
           sortable={true}
-          pageable={true}
+          pageable={{ buttonCount: 4, pageSizes: true }}
           resizable={true}
+
           {...this.state.dataState}
           {...this.state.invoices}
+
           onDataStateChange={this.dataStateChange}
           onItemChange={this.itemChange}
           editField={this._editField}
@@ -476,6 +487,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           detail={InvoiceGridDetailComponent}
           expandField="expanded"
           onExpandChange={this.expandChange}
+
+          style={{ minHeight: '520px', maxHeight: '700px' }}
         >
           <GridToolbar>
             <Button title="Expand All Rows"
@@ -489,7 +502,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                 icon="filter-clear"
                 onClick={
                   _ => {
-                    this.onFilterChange({ filter: { ...this.state.filter, filters: [] } })
+                    this.onFilterChange({ filter: { ...this.state.filter, filters: [] } });
                   }
                 }
               >Clear All Filters</Button>
@@ -534,6 +547,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
         <InvoiceDataProvider
           dataState={this.state.dataState}
+          filterState={this._NoSubmittedInvoiceFilter}
+
           onDataReceived={this.dataReceived}
 
           statusDataState={this.state.statusData}

@@ -184,13 +184,11 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   MyCustomCell = (props) => <CustomCell {...props} />
 
   dataStateChange = (e) => {
-    debugger;
     this.setState({
       ...this.state,
       dataState: e.data
-    })
+    });
   }
-
 
   expandChange = (event) => {
     event.dataItem[event.target.props.expandField] = event.value;
@@ -199,7 +197,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       dataState: this.state.dataState
     });
   }
-
   //#endregion
 
 
@@ -305,14 +302,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       Customer_x0020_PO_x0020_Number: dataItem.Customer_x0020_PO_x0020_Number,
       Standard_x0020_Terms: dataItem.Standard_x0020_Terms,
     };
-
-
-
-    console.log("Edit ITem");
-    console.log(dataItem);
-    console.log("Sending these changes to save");
-    console.log(updateObject);
-
 
     sp.web.lists.getByTitle('AR Invoices').items.getById(dataItem.ID).update(updateObject);
 
