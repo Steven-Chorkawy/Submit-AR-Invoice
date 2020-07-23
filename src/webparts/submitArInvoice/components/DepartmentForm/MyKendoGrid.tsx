@@ -410,14 +410,8 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
               >Clear All Filters</Button>
             )}
           </GridToolbar>
-          <Column
-            width="75px"
-            field="FileRef"
-            title=""
-            filterable={false}
-            sortable={false}
-            cell={this.MyCustomCell} />
 
+          <Column width="75px" field="FileRef" title="" filterable={false} sortable={false} cell={this.MyCustomCell} />
           <Column field="Id" title="Id" width="75px" filterable={false} />
           <Column field="Created" width="250px" title="Created Date" filter="date" format={MyGridStrings.DateFilter} />
           <Column field="Customer.Customer_x0020_Name" width="250px" title="Customer" />

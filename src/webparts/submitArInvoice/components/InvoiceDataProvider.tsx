@@ -43,22 +43,25 @@ class InvoiceDataProvider extends React.Component<any, any> {
 
         // Apply Kendo grids filters.
         var processedResponse = process(response, this.props.dataState);
-
+        debugger;
         // Hold the list of invoice IDs that will be used to pull related accounts.
         var invoiceIds = [];
         var idsForApproval = [];
         var idsForRelatedAttachments = [];
         var idsForCancelRequests = [];
 
-        for (let index = 0; index < response.length; index++) {
-          const element = response[index];
+        // Iterate through processedResponse instead of response because if you don't this will generate a URL that over
+        // 2000 characters long.
+        // That is too big for SharePoint to handle.
+        for (let index = 0; index < processedResponse.data.length; index++) {
+          const element = processedResponse.data[index];
           invoiceIds.push(`AR_x0020_InvoiceId eq ${element.ID}`);
           idsForApproval.push(`InvoiceID eq '${element.ID}'`);
           idsForRelatedAttachments.push(`ARInvoice/ID eq ${element.ID}`);
           idsForCancelRequests.push(`Invoice_x0020_Number/ID eq ${element.ID}`);
 
-          response[index].Date = new Date(response[index].Date);
-          response[index].Created = new Date(response[index].Created);
+          processedResponse.data[index].Date = new Date(processedResponse.data[index].Date);
+          processedResponse.data[index].Created = new Date(processedResponse.data[index].Created);
         }
 
         //#region Query the required account details for this invoice.
