@@ -21,7 +21,7 @@ class MyItemCardRender extends React.Component<any, any> {
     });
   }
 
-  render() {
+  public render() {
 
     ("MyItemRender");
     (this.props);
@@ -86,7 +86,7 @@ class ApprovalResponseComponent extends React.Component<any, any> {
   }
 
 
-  MyItemRender = props => <MyItemCardRender {...props} />
+  private MyItemRender = props => <MyItemCardRender {...props} />
 
 
   public render() {
@@ -103,4 +103,4 @@ class ApprovalResponseComponent extends React.Component<any, any> {
 }
 
 
-export { ApprovalResponseComponent }
+export { ApprovalResponseComponent };
