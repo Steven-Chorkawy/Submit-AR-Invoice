@@ -7,14 +7,9 @@ import {
   GridColumn as Column,
   GridCell,
   GridToolbar,
-  GridColumnProps,
   GridCellProps,
-  GridDetailRow
-} from '@progress/kendo-react-grid'
-import { NumericTextBox, MaskedTextBox } from '@progress/kendo-react-inputs'
-import { Button } from '@progress/kendo-react-buttons'
-import { process } from '@progress/kendo-data-query';
-import { ListView, ListViewHeader, ListViewFooter } from '@progress/kendo-react-listview';
+} from '@progress/kendo-react-grid';
+import { Button } from '@progress/kendo-react-buttons';
 
 //PnPjs Imports
 import { sp } from "@pnp/sp";
@@ -35,8 +30,6 @@ import { InvoiceStatus, MyGridStrings } from '../enums/MyEnums'
 import { ConvertQueryParamsToKendoFilter } from '../MyHelperMethods';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 
-
-
 type MyKendoGridState = {
   data: any;
   receivedData: IARInvoice[];
@@ -48,76 +41,6 @@ type MyKendoGridState = {
   statusData: any;
   siteUsersData: any;
   currentUser?: any;
-}
-
-
-const MyItemRender = props => {
-  return (
-    <div style={{ width: "90%" }}>
-      <div className='row' style={{ marginBottom: "1px" }}>
-        <div className='col-sm-6'>
-          <MaskedTextBox
-            mask="000-00-000-00000-0000"
-            title="Account Code"
-            defaultValue={props.dataItem.Account_x0020_Code}
-            readonly={true}
-          />
-        </div>
-        <div className='col-sm-6' title="Amount Before HST">
-          <NumericTextBox
-            defaultValue={props.dataItem.Amount}
-            format="c2"
-            disabled={true}
-            min={0}
-          />
-        </div>
-      </div>
-
-      <div className='row' style={{ marginBottom: "5px" }}>
-        <div className='col-sm-2' title="HST Applied">
-          HST: {props.dataItem.HST_x0020_Taxable ? 'Yes' : 'No'}
-        </div>
-
-        <div className='col-sm-4' title="HST">
-          <NumericTextBox
-            defaultValue={Number(props.dataItem.HST)}
-            format="c2"
-            disabled={true}
-            min={0}
-          />
-        </div>
-
-        <div className='col-sm-6' title="Amount After HST">
-          <NumericTextBox
-            defaultValue={Number(props.dataItem.Total_x0020_Invoice)}
-            format="c2"
-            disabled={true}
-            min={0}
-          />
-        </div>
-      </div>
-
-      <hr />
-    </div>
-  );
-}
-
-class DetailComponent extends GridDetailRow {
-  public render() {
-
-    const dataItem: any = this.props.dataItem;
-    return (
-      <div>
-        <section>
-          {
-            dataItem.CancelRequests.map(cr => {
-              return (<p>{cr.Requested_x0020_ById} - {cr.Requester_x0020_Comments}</p>);
-            })
-          }
-        </section>
-      </div>
-    );
-  }
 }
 
 
@@ -143,12 +66,8 @@ class CustomCell extends React.Component<GridCellProps> {
 }
 
 export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
-  /**
-   *
-   */
   constructor(props) {
     super(props);
-
 
     this.state = {
       data: [],
@@ -180,16 +99,16 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   private CommandCell;
 
   //#region Methods
-  MyCustomCell = (props) => <CustomCell {...props} />
+  public MyCustomCell = (props) => <CustomCell {...props} />
 
-  dataStateChange = (e) => {
+  public dataStateChange = (e) => {
     this.setState({
       ...this.state,
       dataState: e.data
     });
   }
 
-  expandChange = (event) => {
+  public expandChange = (event) => {
     event.dataItem[event.target.props.expandField] = event.value;
     this.setState({
       result: Object.assign({}, this.state.result),
@@ -351,7 +270,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   }
   //#endregion
 
-  rowRender(trElement, props) {
+  public rowRender(trElement, props) {
     const red = { backgroundColor: "rgb(243, 23, 0, 0.32)" };
     const trProps = { style: props.dataItem.CancelRequests.length > 0 && red };
 
@@ -452,7 +371,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
 
 export function MyCommandCell({ edit, cancel }) {
   return class extends GridCell {
-
     constructor(props) {
       super(props);
     }
