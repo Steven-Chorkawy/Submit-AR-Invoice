@@ -175,7 +175,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
           this.props.onStatusDataReceived.call(undefined, []);
         }
       });
-  }
+  };
 
   public requestSiteUsers = () => {
     if (this.props.siteUsersDataState.length > 0) {
@@ -187,8 +187,8 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
         // siteUsers() returns a list of users and groups.
         // by filtering out "users" who do not have a UserPrincipalName I can return a list of only users and no groups.
         this.props.onSiteUsersDataReceived.call(undefined, siteUsers.filter(user => user.UserPrincipalName != null));
-      });
-  }
+      })
+  };
 
   public requestCurrentUser = () => {
     if (this.props.currentUserDataState != undefined) {
@@ -199,7 +199,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
       .then(user => {
         this.props.onCurrentUserDataReceived.call(undefined, user);
       })
-  }
+  };
 
 
   public render() {
@@ -214,8 +214,8 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
     }
 
     return this.pending && <LoadingPanel />
-  }
-};
+  };
+}
 
 class LoadingPanel extends React.Component {
   public render() {
@@ -229,7 +229,7 @@ class LoadingPanel extends React.Component {
 
     const gridContent = document && document.querySelector('.k-grid-content');
     return gridContent ? ReactDom.createPortal(loadingPanel, gridContent) : loadingPanel;
-  }
+  };
 };
 
 export { InvoiceDataProvider };
