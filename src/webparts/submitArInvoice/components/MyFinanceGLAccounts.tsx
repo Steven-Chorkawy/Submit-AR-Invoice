@@ -395,7 +395,7 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
     if (index >= 0) {
       data.splice(index, 1);
     }
-  };
+  }
 }
 
 export const MyFinanceGlAccountsComponent = (fieldArrayRenderProps) => {
