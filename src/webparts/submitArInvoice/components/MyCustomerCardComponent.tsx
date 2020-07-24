@@ -13,14 +13,14 @@ export class MyCustomerCardComponent extends React.Component<any, any> {
 
     this.state = {
       selectedCustomer: props.selectedCustomer
-    }
+    };
   }
 
-  componentWillReceiveProps(nextProps) {
+  public componentWillReceiveProps(nextProps) {
     this.setState({ ...nextProps });
   }
 
-  render() {
+  public render() {
     // Nothing is selected.
     if (this.state.selectedCustomer == undefined) {
       return (<div key="0">Select a Customer</div>);
@@ -59,6 +59,5 @@ export class MyCustomerCardComponent extends React.Component<any, any> {
         </Card>
       );
     }
-  };
-
+  }
 }
