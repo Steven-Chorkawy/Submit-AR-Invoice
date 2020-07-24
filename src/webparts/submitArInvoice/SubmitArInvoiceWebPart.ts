@@ -18,8 +18,8 @@ import "@pnp/sp/items";
 import "@pnp/sp/fields";
 import "@pnp/sp/site-users/web";
 
-import './MyO365.scss';
 import './bootstrap.min.css';
+import './MyO365.scss';
 import './custom.css';
 
 
@@ -33,7 +33,7 @@ import { IMyFormProps } from './components/IMyFormProps';
 
 export interface ISubmitArInvoiceWebPartProps {
   description: string;
-  ActiveDisplay: ActiveDisplay
+  ActiveDisplay: ActiveDisplay;
 }
 
 
@@ -104,9 +104,9 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
     // https://github.com/pnp/pnpjs/issues/1258 <--- see my open ticket here.
     arInvoices.map(invoice => {
       for (let index = 0; index < invoice.AccountDetails.length; index++) {
-        const element = invoice.AccountDetails[index];
+        let element = invoice.AccountDetails[index];
         var newAccount = accounts.find(a => a.ID == element.ID);
-        invoice.AccountDetails[index] = newAccount
+        invoice.AccountDetails[index] = newAccount;
       }
     });
 
@@ -124,33 +124,33 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
             this.myFormProps.customerList = values[1];
           })
           .then(_ => {
-            const element: React.ReactElement<IMyFormProps> = React.createElement(
+            let departmentElement: React.ReactElement<IMyFormProps> = React.createElement(
               MyForm,
               { ctx: this.context, properties: this.properties, ...this.myFormProps }
             );
-            ReactDom.render(element, this.domElement);
+            ReactDom.render(departmentElement, this.domElement);
           });
         break;
 
       case ActiveDisplay.DepartmentForm:
         Promise.all([this.getARInvoices(), this.getSiteUsers(), this.getCustomers()])
           .then((values) => {
-            const element: React.ReactElement = React.createElement(
+            let depSearchElement: React.ReactElement = React.createElement(
               MyKendoGrid,
               { properties: this.properties, data: values[0], siteUsers: values[1], customers: values[2] }
             );
 
-            ReactDom.render(element, this.domElement);
-          })
+            ReactDom.render(depSearchElement, this.domElement);
+          });
         break;
 
       case ActiveDisplay.FinanceForm:
-        const element: React.ReactElement = React.createElement(
+        let financeForm: React.ReactElement = React.createElement(
           MyFinanceForm,
           {}
         );
 
-        ReactDom.render(element, this.domElement);
+        ReactDom.render(financeForm, this.domElement);
         break;
 
       default:
