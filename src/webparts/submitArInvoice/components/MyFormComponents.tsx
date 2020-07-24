@@ -56,7 +56,7 @@ export const FormRadioGroup = (fieldRenderProps) => {
   const { validationMessage, touched, id, label, valid, disabled, hint, ...others } = fieldRenderProps;
 
   const showValidationMessage = touched && validationMessage;
-  const showHint = !showValidationMessage && hint
+  const showHint = !showValidationMessage && hint;
   const hindId = showHint ? `${id}_hint` : '';
   const errorId = showValidationMessage ? `${id}_error` : '';
   const labelId = label ? `${id}_label` : '';
@@ -520,7 +520,7 @@ export const CustomerComboBox = (fieldRenderProps) => {
 
     </div>
   );
-}
+};
 
 export const FormComboBox = (fieldRenderProps) => {
   const { validationMessage, touched, label, id, valid, disabled, hint, wrapperStyle, ...others } = fieldRenderProps;
