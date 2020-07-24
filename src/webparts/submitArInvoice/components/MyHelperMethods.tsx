@@ -25,7 +25,7 @@ export const ConvertQueryParamsToKendoFilter = (fields:IMyQueryParameters[]) => 
         field: myParmField,
         operator: "contains",
         value: myParmValue
-      }
+      };
 
       output.push(kendoFilter);
     }
@@ -36,7 +36,8 @@ export const ConvertQueryParamsToKendoFilter = (fields:IMyQueryParameters[]) => 
 
 const S4 = () => {
   return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-}
+};
+
 /**
  * Generate a random GUID string.
  */
