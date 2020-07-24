@@ -566,7 +566,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 }
 
 class CustomUrgentCell extends React.Component<any, any> {
-  render() {
+  public render() {
     const value = this.props.dataItem[this.props.field];
     return typeof value === "boolean" && (
       <td>

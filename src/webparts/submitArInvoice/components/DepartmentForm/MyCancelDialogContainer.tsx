@@ -46,7 +46,7 @@ export class MyCancelDialogContainer extends React.Component<IMyEditDialogContai
     });
   }
 
-  render() {
+  public render() {
     return (
       <Dialog onClose={this.props.cancel} title={"Cancel AR Invoice Request"} minWidth="200px" width="40%">
         <h4>Enter Cancel Comment</h4>

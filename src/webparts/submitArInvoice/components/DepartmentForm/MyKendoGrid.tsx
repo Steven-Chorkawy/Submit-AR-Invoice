@@ -103,7 +103,7 @@ const MyItemRender = props => {
 }
 
 class DetailComponent extends GridDetailRow {
-  render() {
+  public render() {
 
     const dataItem: any = this.props.dataItem;
     return (
@@ -125,8 +125,7 @@ class DetailComponent extends GridDetailRow {
  * Used to Render a url to the current file.
  */
 class CustomCell extends React.Component<GridCellProps> {
-  render() {
-
+  public render() {
     return (this.props.dataItem.Invoice_x0020_Status === InvoiceStatus["Entered into GP"] || this.props.dataItem.Invoice_x0020_Status === InvoiceStatus.Completed) ? (
       <td title={'Click to view invoice.'}>
         {console.log("FileRef Cell:")}
@@ -364,7 +363,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
     }
   }
 
-  render() {
+  public render() {
     return (
       <div>
         <Grid
@@ -457,7 +456,8 @@ export function MyCommandCell({ edit, cancel }) {
     constructor(props) {
       super(props);
     }
-    render() {
+
+    public render() {
       const { dataItem } = this.props;
 
       const isNewItem = dataItem.ID === undefined;

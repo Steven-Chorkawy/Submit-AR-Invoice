@@ -17,7 +17,7 @@ export class MyRelatedAttachmentComponent extends React.Component<any, any> {
     super(props);
   }
 
-  render() {
+  public render() {
     return (
       <Card style={{ width: 400 }}>
         <CardBody>
