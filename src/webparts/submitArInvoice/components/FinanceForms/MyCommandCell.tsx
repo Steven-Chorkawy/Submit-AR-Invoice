@@ -6,7 +6,7 @@ import { Button } from '@progress/kendo-react-buttons';
 
 export function MyCommandCell({ edit, remove, add, update, discard, cancel, editField }) {
   return class extends GridCell {
-    render() {
+    public render() {
       const { dataItem } = this.props;
       const inEdit = dataItem[editField];
       const isNewItem = dataItem.ID === undefined;
@@ -47,6 +47,5 @@ export function MyCommandCell({ edit, remove, add, update, discard, cancel, edit
           </td>
         );
     }
-  }
-};
-
+  };
+}
