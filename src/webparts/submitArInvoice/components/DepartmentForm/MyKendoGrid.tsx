@@ -26,7 +26,7 @@ import { filterBy, orderBy, groupBy } from '@progress/kendo-data-query';
 import { MyEditDialogContainer } from './MyEditDialogContainer';
 import { MyCancelDialogContainer } from './MyCancelDialogContainer';
 import { InvoiceDataProvider } from '../InvoiceDataProvider';
-import { InvoiceStatus, MyGridStrings } from '../enums/MyEnums'
+import { InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
 import { ConvertQueryParamsToKendoFilter } from '../MyHelperMethods';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 
@@ -41,7 +41,7 @@ type MyKendoGridState = {
   statusData: any;
   siteUsersData: any;
   currentUser?: any;
-}
+};
 
 
 /**
@@ -99,7 +99,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   private CommandCell;
 
   //#region Methods
-  public MyCustomCell = (props) => <CustomCell {...props} />
+  public MyCustomCell = (props) => <CustomCell {...props} />;
 
   public dataStateChange = (e) => {
     this.setState({
@@ -158,7 +158,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
     var newStateData = {
       data: newData,
       total: newData.length
-    }
+    };
 
     this.setState({
       filter: e.filter,
@@ -313,7 +313,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
                 title="Clear All Filters"
                 className="k-button"
                 icon="filter-clear"
-                onClick={_ => { this.onFilterChange({ filter: { ...this.state.filter, filters: [] } }) }}
+                onClick={_ => { this.onFilterChange({ filter: { ...this.state.filter, filters: [] } }); }}
               >Clear All Filters</Button>
             )}
           </GridToolbar>
@@ -345,7 +345,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
               <MyCancelDialogContainer
                 dataItem={this.state.productInCancel}
                 save={this.sendCancelRequest}
-                cancel={() => { this.setState({ productInCancel: undefined }) }}
+                cancel={() => { this.setState({ productInCancel: undefined }); }}
               />
               : null
         }
@@ -395,12 +395,12 @@ export function MyCommandCell({ edit, cancel }) {
           <td className={this.props.className + " k-command-cell"} style={this.props.style}>
             <Button
               className="k-button k-grid-edit-command col-sm-12 k-text-error"
-              onClick={() => { cancel(dataItem) }}
+              onClick={() => { cancel(dataItem); }}
               icon="cancel"
               style={{ "marginBottom": "5px" }}
             >Cancel</Button>
           </td>
         );
     }
-  }
-};
+  };
+}
