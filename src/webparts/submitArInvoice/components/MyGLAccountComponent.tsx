@@ -16,7 +16,7 @@ import * as MyFormComponents from './MyFormComponents';
    */
 const CalculateHSTAmount = (props) => {
   return (props.dataItem.HSTTaxable == true) ? props.dataItem.Amount * 0.13 : 0;
-}
+};
 
 
 const glCodeCell = (props) => {
@@ -48,7 +48,7 @@ const amountCell = (props) => {
       />
     </td>
   );
-}
+};
 
 
 /**
@@ -71,7 +71,7 @@ const totalInvoiceCell = (props) => {
       />
     </td>
   );
-}
+};
 
 
 /**
@@ -87,7 +87,7 @@ const hstTaxableCell = (props) => {
       />
     </td>
   );
-}
+};
 
 
 /**
@@ -109,7 +109,7 @@ const hstCell = (props) => {
       />
     </td>
   );
-}
+};
 
 
 const commandCell = (onRemove) => (props) => {
