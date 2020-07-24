@@ -29,6 +29,22 @@ interface IInvoiceDataProviderProps {
   onCurrentUserDataReceived: any;
 }
 
+class LoadingPanel extends React.Component {
+  public render() {
+    const loadingPanel = (
+      <div className="k-loading-mask">
+        <span className="k-loading-text">Loading</span>
+        <div className="k-loading-image"></div>
+        <div className="k-loading-color"></div>
+      </div>
+    );
+
+    const gridContent = document && document.querySelector('.k-grid-content');
+    return gridContent ? ReactDom.createPortal(loadingPanel, gridContent) : loadingPanel;
+  };
+}
+
+
 class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any> {
   constructor(props) {
     super(props);
@@ -217,19 +233,6 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
   }
 }
 
-class LoadingPanel extends React.Component {
-  public render() {
-    const loadingPanel = (
-      <div className="k-loading-mask">
-        <span className="k-loading-text">Loading</span>
-        <div className="k-loading-image"></div>
-        <div className="k-loading-color"></div>
-      </div>
-    );
 
-    const gridContent = document && document.querySelector('.k-grid-content');
-    return gridContent ? ReactDom.createPortal(loadingPanel, gridContent) : loadingPanel;
-  };
-}
 
 export { InvoiceDataProvider };

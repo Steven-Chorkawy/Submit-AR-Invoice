@@ -12,7 +12,7 @@ class MyItemCardRender extends React.Component<any, any> {
 
     this.state = {
       showMoreDetails: false
-    }
+    };
   }
 
   public onShowMoreDetails = (e) => {
@@ -22,9 +22,6 @@ class MyItemCardRender extends React.Component<any, any> {
   }
 
   public render() {
-
-    ("MyItemRender");
-    (this.props);
     let item = this.props.dataItem;
     let cardType = '';
     switch (item.Response) {
@@ -73,7 +70,6 @@ class MyItemCardRender extends React.Component<any, any> {
             </CardBody>
           </Card>)
         }
-
         </div>
       </div>
     );
@@ -85,9 +81,7 @@ class ApprovalResponseComponent extends React.Component<any, any> {
     super(props);
   }
 
-
   private MyItemRender = props => <MyItemCardRender {...props} />
-
 
   public render() {
     return (
@@ -101,6 +95,5 @@ class ApprovalResponseComponent extends React.Component<any, any> {
     );
   }
 }
-
 
 export { ApprovalResponseComponent };

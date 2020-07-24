@@ -83,7 +83,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         filters: defaultFilters
       },
       allRowsExpanded: false,
-    }
+    };
 
     this.CommandCell = MyCommandCell({
       edit: this.edit,
@@ -588,7 +588,7 @@ class InvoiceEditForm extends React.Component<any, any> {
       productInEdit: this.props.dataItem || null,
       visible: false,
       approvalRequestError: false
-    }
+    };
   }
 
   public handleSubmit(event) {

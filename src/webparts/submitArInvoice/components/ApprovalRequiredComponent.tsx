@@ -27,7 +27,7 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
 
     this.state = {
       productInEdit: props.productInEdit
-    }
+    };
   }
 
   public sendApproval = (event) => {

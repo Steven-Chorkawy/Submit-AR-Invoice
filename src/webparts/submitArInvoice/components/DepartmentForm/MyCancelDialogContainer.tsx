@@ -26,7 +26,7 @@ export class MyCancelDialogContainer extends React.Component<IMyEditDialogContai
 
     this.state = {
       productInCancel: this.props.dataItem
-    }
+    };
   }
 
   onDialogInputChange = (event) => {
