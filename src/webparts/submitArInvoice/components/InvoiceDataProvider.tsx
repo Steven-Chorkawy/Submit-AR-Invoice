@@ -124,8 +124,8 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
 
               invoice.AccountDetails = values[0].filter(f => Number(f.AR_x0020_InvoiceId) === invoice.ID) || [];
               invoice.Approvals = values[1].filter(f => Number(f.InvoiceID) === invoice.ID) || [];
-              invoice.RelatedAttachments = values[2].filter(f => Number(f.ARInvoiceId) === invoice.ID) || []
-              invoice.CancelRequests = values[4].filter(f => Number(f.Invoice_x0020_NumberId) === invoice.ID) || []
+              invoice.RelatedAttachments = values[2].filter(f => Number(f.ARInvoiceId) === invoice.ID) || [];
+              invoice.CancelRequests = values[4].filter(f => Number(f.Invoice_x0020_NumberId) === invoice.ID) || [];
 
               // Add ServerDirectUrl if required.
               invoice.RelatedAttachments.map(relatedAttachments => {
@@ -151,7 +151,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
             }
           });
       });
-  };
+  }
 
   public requestStatusData = () => {
 
@@ -175,7 +175,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
           this.props.onStatusDataReceived.call(undefined, []);
         }
       });
-  };
+  }
 
   public requestSiteUsers = () => {
     if (this.props.siteUsersDataState.length > 0) {
@@ -188,7 +188,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
         // by filtering out "users" who do not have a UserPrincipalName I can return a list of only users and no groups.
         this.props.onSiteUsersDataReceived.call(undefined, siteUsers.filter(user => user.UserPrincipalName != null));
       })
-  };
+  }
 
   public requestCurrentUser = () => {
     if (this.props.currentUserDataState != undefined) {
@@ -199,7 +199,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
       .then(user => {
         this.props.onCurrentUserDataReceived.call(undefined, user);
       })
-  };
+  }
 
 
   public render() {
@@ -214,7 +214,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
     }
 
     return this.pending && <LoadingPanel />
-  };
+  }
 }
 
 class LoadingPanel extends React.Component {
@@ -230,6 +230,6 @@ class LoadingPanel extends React.Component {
     const gridContent = document && document.querySelector('.k-grid-content');
     return gridContent ? ReactDom.createPortal(loadingPanel, gridContent) : loadingPanel;
   };
-};
+}
 
 export { InvoiceDataProvider };
