@@ -122,7 +122,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
 
   render() {
     return (
-      <Dialog onClose={this.props.cancel} title={"Edit AR Invoice Request"} minWidth="200px" width="80%">
+      <Dialog onClose={this.props.cancel} title={"Edit AR Invoice Request"} minWidth="200px" width="80%" height="80%">
         <ApprovalRequiredComponent
           productInEdit={this.state.productInEdit}
           currentUser={this.props.currentUser}
