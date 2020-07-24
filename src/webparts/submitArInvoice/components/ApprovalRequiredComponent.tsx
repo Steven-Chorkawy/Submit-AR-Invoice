@@ -115,4 +115,4 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
 }
 
 
-export { ApprovalRequiredComponent }
+export { ApprovalRequiredComponent };

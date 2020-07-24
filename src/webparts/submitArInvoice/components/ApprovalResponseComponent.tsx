@@ -81,7 +81,7 @@ class ApprovalResponseComponent extends React.Component<any, any> {
     super(props);
   }
 
-  private MyItemRender = props => <MyItemCardRender {...props} />
+  private MyItemRender = props => <MyItemCardRender {...props} />;
 
   public render() {
     return (

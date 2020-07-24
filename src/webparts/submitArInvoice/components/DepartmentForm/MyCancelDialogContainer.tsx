@@ -3,12 +3,6 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
-import { Input, NumericTextBox } from '@progress/kendo-react-inputs';
-import { Form, FormElement, Field, FieldArray } from '@progress/kendo-react-form';
-import { Button } from '@progress/kendo-react-buttons';
-import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/kendo-react-layout';
-
-
 
 interface IMyEditDialogContainerProps {
   dataItem: any;
@@ -16,11 +10,7 @@ interface IMyEditDialogContainerProps {
   save: any;
 }
 
-
 export class MyCancelDialogContainer extends React.Component<IMyEditDialogContainerProps, any> {
-  /**
-   *
-   */
   constructor(props) {
     super(props);
 
@@ -29,7 +19,7 @@ export class MyCancelDialogContainer extends React.Component<IMyEditDialogContai
     };
   }
 
-  onDialogInputChange = (event) => {
+  public onDialogInputChange = (event) => {
     let target = event.target;
     let value = target.type === 'checkbox' ? target.checked : target.value;
     let name = (target.props && target.props.name !== undefined) ? target.props.name : (target.name !== undefined) ? target.name : target.props.id;
@@ -64,5 +54,4 @@ export class MyCancelDialogContainer extends React.Component<IMyEditDialogContai
       </Dialog>
     );
   }
-
 }

@@ -10,7 +10,7 @@ import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/
 
 // Custom Imports
 import { MyFinanceGlAccounts } from './MyFinanceGLAccounts';
-import { ApprovalResponseComponent } from './ApprovalResponseComponent'
+import { ApprovalResponseComponent } from './ApprovalResponseComponent';
 
 export class InvoiceGridDetailComponent extends GridDetailRow {
 
