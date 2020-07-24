@@ -45,7 +45,7 @@ export enum ActiveDisplay {
 
 
 export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmitArInvoiceWebPartProps> {
-  myFormProps = {} as IMyFormProps;
+  public myFormProps = {} as IMyFormProps;
 
   protected async onInit(): Promise<void> {
     await super.onInit()

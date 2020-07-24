@@ -22,7 +22,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
     console.log(props);
 
     this.props.dataItem.Requires_x0020_Authorization_x0020_ById.map(reqAuthId => {
-      this._selectedReqApprovers.push(this.props.siteUsers.find(s => s.Id === reqAuthId))
+      this._selectedReqApprovers.push(this.props.siteUsers.find(s => s.Id === reqAuthId));
     });
 
     this.state = {
@@ -67,11 +67,11 @@ export class MyEditDialogContainer extends React.Component<any, any> {
   }
   //#endregion
 
-  handleSubmit(event) {
+  public handleSubmit(event) {
     event.preventDefault();
   }
 
-  onDialogInputChange = (event) => {
+  public onDialogInputChange = (event) => {
     let target = event.target;
     let value = target.type === 'checkbox' ? target.checked : target.value;
     let name = (target.props && target.props.name !== undefined) ? target.props.name : (target.name !== undefined) ? target.name : target.props.id;
@@ -92,7 +92,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
         this._selectedReqApprovers = [];
         // map each selected user into the temp variable.
         value.map(user => {
-          this._selectedReqApprovers.push(this.props.siteUsers.find(s => s.Id === user.Id))
+          this._selectedReqApprovers.push(this.props.siteUsers.find(s => s.Id === user.Id));
         });
         // Set the whole users object in the state which is used by the dropdown.
         this.setState({
@@ -108,6 +108,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
         break;
       case 'InvoiceDetails':
         name = 'Invoice_x0020_Details';
+        break;
       default:
         break;
     }
