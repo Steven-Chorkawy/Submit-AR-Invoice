@@ -12,4 +12,7 @@ export enum MyLists {
 
     // List for Accounts. 
     'AR Invoice Accounts' = 'AR Invoice Accounts',
+
+    // Related Attachments
+    'Related Invoice Attachments' = 'RelatedInvoiceAttachments',
 } 

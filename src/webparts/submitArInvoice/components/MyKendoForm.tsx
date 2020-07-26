@@ -161,7 +161,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
               uploadResponse.file.getItem()
                 .then(item => {
                   const itemProxy: any = Object.assign({}, item);
-                  sp.web.lists.getByTitle('RelatedInvoiceAttachments').items.getById(itemProxy.ID).update({
+                  sp.web.lists.getByTitle(MyLists["Related Invoice Attachments"]).items.getById(itemProxy.ID).update({
                     AR_x0020_Invoice_x0020_RequestId: arInvoiceRequstListItem.data.ID,
                     Title: element.name
                   });
