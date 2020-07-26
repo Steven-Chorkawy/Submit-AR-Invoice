@@ -19,6 +19,7 @@ import { IUploadingFile } from './IMyFormState';
 import * as MyValidators from './validators.jsx';
 import { MyGLAccountComponent } from './MyGLAccountComponent';
 import { BuildGUID } from './MyHelperMethods';
+import { MyLists } from './enums/MyLists';
 
 
 
@@ -73,115 +74,147 @@ export class MyForm extends React.Component<IMyFormProps, any> {
    * @param dataItem Data from form
    */
   public handleSubmit = async (dataItem) => {
-
-    if (!dataItem.hasOwnProperty('RequestedBy')) {
-      return;
-    }
-
     // We will use this to update states later.
     let currentFiles: IUploadingFile[] = this.state.MyFiles;
 
-    let web = Web(this._siteUrl);
+    try {
+      if (!dataItem.hasOwnProperty('RequestedBy')) {
+        return;
+      }     
 
-    let currentYear = new Date().getFullYear();
-    const newARTitle = currentYear + "-AR-" + BuildGUID();
-    let finalFileName = newARTitle + '.pdf'; 
-    
-    // .pdf because GP exports pdf files.  Finance will replace this place holder file in the future.
-    // TODO: Remove this hard coded value! Can we possibly get this from the web parts properties window? That would allow this web part to be used in multiple locations.
-    //? Can i upload a string as file content?
-    let uploadRes = await web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/')
-      .files
-      .add(finalFileName, "Placeholder file until invoice from GP is uploaded", true);
+      let web = Web(this._siteUrl);
 
-    // Gets the file that we just uploaded.  This will be used later to update the metadata.
-    let newUploadedFile = await uploadRes.file.getItem();
-    const uploadedFile: any = Object.assign({}, newUploadedFile);
+      let currentYear = new Date().getFullYear();
+      const newARTitle = currentYear + "-AR-" + BuildGUID();
+      let finalFileName = newARTitle + '.pdf';
 
+      // Set the data for the invoice
+      var myData = {
+        Title: newARTitle,
+        Department: dataItem.Department,
+        Date: dataItem.Date,
+        Requested_x0020_ById: dataItem.RequestedBy.Id,
+        Requires_x0020_Authorization_x0020_ById: {
+          'results': dataItem.RequiresAuthorizationBy.map((user) => { return user.Id; })
+        },
+        //CustomerId: dataItem.Customer.Id,
+        Comment: dataItem.Comment,
+        Customer_x0020_PO_x0020_Number: dataItem.CustomerPONumber,
+        Invoice_x0020_Details: dataItem.InvoiceDetails,
+        Standard_x0020_Terms: dataItem.StandardTerms,
+        Urgent: dataItem.Urgent
+      };
+      debugger;
 
-    // Set the data for the invoice
-    var myData = {
-      Title: newARTitle,
-      Department: dataItem.Department,
-      Date: dataItem.Date,
-      Requested_x0020_ById: dataItem.RequestedBy.Id,
-      Requires_x0020_Authorization_x0020_ById: {
-        'results': dataItem.RequiresAuthorizationBy.map((user) => { return user.Id; })
-      },
-      //CustomerId: dataItem.Customer.Id,
-      Comment: dataItem.Comment,
-      Customer_x0020_PO_x0020_Number: dataItem.CustomerPONumber,
-      Invoice_x0020_Details: dataItem.InvoiceDetails,
-      Standard_x0020_Terms: dataItem.StandardTerms,
-      Urgent: dataItem.Urgent
-    };
+      var arInvoiceRequestListItemData = {
+        ...myData,
+        Requires_x0020_Department_x0020_Id: myData.Requires_x0020_Authorization_x0020_ById
+      };
 
-    // Add customer data.
-    // dataItem.Customer.ID is undefined when a custom customer is added.
-
-    if (dataItem.Customer.ID === undefined) {
-      myData['MiscCustomerDetails'] = this.state.MiscCustomerDetails;
-      myData['MiscCustomerName'] = dataItem.Customer.Company;
-    }
-    else {
-      myData['CustomerId'] = dataItem.Customer.Id;
-    }
+      delete arInvoiceRequestListItemData.Requires_x0020_Authorization_x0020_ById;
 
 
-    const accounts: IARAccountDetails = { ...dataItem.GLAccounts };
+      // .pdf because GP exports pdf files.  Finance will replace this place holder file in the future.
+      // TODO: Remove this hard coded value! Can we possibly get this from the web parts properties window? That would allow this web part to be used in multiple locations.
+      //? Can i upload a string as file content?
+      //! This creates the invoice!
+      let uploadRes = await web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/')
+        .files
+        .add(finalFileName, "Placeholder file until invoice from GP is uploaded", true);
 
-    var output = await (await sp.web.lists.getByTitle('AR Invoices').items.getById(uploadedFile.ID).update(myData)).item;
+      let arInvoiceRequstListItem = await web.lists.getByTitle(MyLists["AR Invoice Requests"])
+        .items.add(arInvoiceRequestListItemData);
 
-    output.get().then(innerFile => {
+
+      // Gets the file that we just uploaded.  This will be used later to update the metadata.
+      let newUploadedFile = await uploadRes.file.getItem();
+      const uploadedFile: any = Object.assign({}, newUploadedFile);
+
+
+      // Add customer data.
+      // dataItem.Customer.ID is undefined when a custom customer is added.
+
+      if (dataItem.Customer.ID === undefined) {
+        myData['MiscCustomerDetails'] = this.state.MiscCustomerDetails;
+        myData['MiscCustomerName'] = dataItem.Customer.Company;
+      }
+      else {
+        myData['CustomerId'] = dataItem.Customer.Id;
+      }
+
+
+      const accounts: IARAccountDetails = { ...dataItem.GLAccounts };
+
+      var output = await (await sp.web.lists.getByTitle(MyLists["AR Invoices"]).items.getById(uploadedFile.ID).update(myData)).item;
+
+      output.get().then(innerFile => {
+        currentFiles.push({
+          FileName: innerFile.Name,
+          UploadSuccessful: true,
+          ErrorMessage: null,
+          LinkToFile: `${this._siteUrl}/SitePages/Department-AR-Search-Page.aspx/?FilterField1=ID&FilterValue1=${innerFile.ID}`
+        });
+        this.setState({
+          MyFiles: currentFiles
+        });
+
+        // Set the data for the account details.
+        let accountDetails: IARAccountDetails[] = [];
+        dataItem.GLAccounts.map(account => {
+          accountDetails.push({
+            AR_x0020_InvoiceId: innerFile.ID,
+            Account_x0020_Code: account.GLCode,
+            HST_x0020_Taxable: account.HSTTaxable,
+            Amount: account.Amount
+          });
+        });
+
+        this.addAccountCodes(accountDetails, output);
+
+        if (dataItem.RelatedInvoiceAttachments) {
+          for (let index = 0; index < dataItem.RelatedInvoiceAttachments.length; index++) {
+            const element = dataItem.RelatedInvoiceAttachments[index];
+            web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/')
+              .files
+              .add(element.name, element.getRawFile(), true)
+              .then(uploadResponse => {
+                uploadResponse.file.getItem()
+                  .then(item => {
+                    const itemProxy: any = Object.assign({}, item);
+                    sp.web.lists.getByTitle('RelatedInvoiceAttachments').items.getById(itemProxy.ID).update({
+                      ARInvoiceId: innerFile.ID,
+                      Title: element.name
+                    });
+                  });
+              });
+          }
+        }
+      });
+
+      // Force a re render.
+      this.setState({
+        stateHolder: this.state.stateHolder + 1
+      });
+
+      this.forceUpdate();
+    } catch (error) {
+      debugger;
+      console.log("Something went wrong!");
+      console.log(error);
+
       currentFiles.push({
-        FileName: innerFile.Name,
-        UploadSuccessful: true,
-        ErrorMessage: null,
-        LinkToFile: `${this._siteUrl}/SitePages/Department-AR-Search-Page.aspx/?FilterField1=ID&FilterValue1=${innerFile.ID}`
+        FileName: '',
+        UploadSuccessful: false,
+        ErrorMessage: "Something went wrong!",
+        LinkToFile: null
       });
       this.setState({
         MyFiles: currentFiles
       });
 
-      // Set the data for the account details.
-      let accountDetails: IARAccountDetails[] = [];
-      dataItem.GLAccounts.map(account => {
-        accountDetails.push({
-          AR_x0020_InvoiceId: innerFile.ID,
-          Account_x0020_Code: account.GLCode,
-          HST_x0020_Taxable: account.HSTTaxable,
-          Amount: account.Amount
-        });
-      });
 
-      this.addAccountCodes(accountDetails, output);
-
-      if (dataItem.RelatedInvoiceAttachments) {
-        for (let index = 0; index < dataItem.RelatedInvoiceAttachments.length; index++) {
-          const element = dataItem.RelatedInvoiceAttachments[index];
-          web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/')
-            .files
-            .add(element.name, element.getRawFile(), true)
-            .then(uploadResponse => {
-              uploadResponse.file.getItem()
-                .then(item => {
-                  const itemProxy: any = Object.assign({}, item);
-                  sp.web.lists.getByTitle('RelatedInvoiceAttachments').items.getById(itemProxy.ID).update({
-                    ARInvoiceId: innerFile.ID,
-                    Title: element.name
-                  });
-                });
-            });
-        }
-      }
-    });
-
-    // Force a re render.
-    this.setState({
-      stateHolder: this.state.stateHolder + 1
-    });
-
-    this.forceUpdate();
+      throw error;
+    }
   }
 
   /**
