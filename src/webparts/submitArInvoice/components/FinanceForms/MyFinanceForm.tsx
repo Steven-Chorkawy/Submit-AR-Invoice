@@ -319,71 +319,184 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     // const isNewProduct = dataItem.ProductID === undefined;
     const isNewProduct = false; // TODO: Add this if we plan on letting users create from this form.
 
-    if (isNewProduct) {
-      //products.unshift(this.newProduct(dataItem));
-    } else {
-      const index = invoices.findIndex(p => p.ID === dataItem.ID);
-      invoices.splice(index, 1, dataItem);
-    }
-
-    this.setState({
-      invoices: {
-        data: invoices,
-        total: invoices.length
-      },
-      productInEdit: undefined
-    });
-
-    var updateObject = {
-      Invoice_x0020_Status: dataItem.Invoice_x0020_Status,
-      Invoice_x0020_Number: dataItem.Invoice_x0020_Number,
-      Batch_x0020_Number: dataItem.Batch_x0020_Number,
-      Requires_x0020_Accountant_x0020_ApprovalId: dataItem.Requires_x0020_Accountant_x0020_ApprovalId ? dataItem.Requires_x0020_Accountant_x0020_ApprovalId.Id : null
-    };
-    debugger;
-    if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
-      updateObject['Requires_x0020_Accountant_x0020_Id'] = dataItem.Requires_x0020_Accountant_x0020_ApprovalId ? dataItem.Requires_x0020_Accountant_x0020_ApprovalId.Id : null
-      delete updateObject.Requires_x0020_Accountant_x0020_ApprovalId;
-      sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(dataItem.ID).update(updateObject);
-    }
-    else {
-      sp.web.lists.getByTitle(MyLists["AR Invoices"]).items.getById(dataItem.ID).update(updateObject);
-    }
-
-
-    // Check to see if there is a file that we can update.
-    if (dataItem.InvoiceAttachments) {
-      for (let index = 0; index < dataItem.InvoiceAttachments.length; index++) {
-        const element = dataItem.InvoiceAttachments[index];
-        const newFileName = dataItem.Title + element.extension;
-
-        sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/').files
-          .add(newFileName, element.getRawFile(), true)
-          .then(fileResult => {
-            // Title is cleared when file uploads? Don't know why but we need it so yeah.
-            sp.web.lists.getByTitle(MyLists["AR Invoices"]).items.getById(dataItem.ID).update({ Title: dataItem.Title });
-          });
+    try {
+      if (isNewProduct) {
+        //products.unshift(this.newProduct(dataItem));
+      } else {
+        const index = invoices.findIndex(p => p.ID === dataItem.ID);
+        invoices.splice(index, 1, dataItem);
       }
-    }
 
-    if (dataItem.RelatedInvoiceAttachments) {
-      for (let index = 0; index < dataItem.RelatedInvoiceAttachments.length; index++) {
-        const element = dataItem.RelatedInvoiceAttachments[index];
-        sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/').files
-          .add(element.name, element.getRawFile(), true)
-          .then(fileRes => {
-            fileRes.file.getItem()
-              .then(item => {
-                const itemProxy: any = Object.assign({}, item);
-                sp.web.lists.getByTitle(MyLists["Related Invoice Attachments"]).items.getById(itemProxy.ID).update({
-                  ARInvoiceId: dataItem.ID,
-                  Title: element.name
+
+
+      var updateObject = {
+        Invoice_x0020_Status: dataItem.Invoice_x0020_Status,
+        Invoice_x0020_Number: dataItem.Invoice_x0020_Number,
+        Batch_x0020_Number: dataItem.Batch_x0020_Number,
+        Requires_x0020_Accountant_x0020_ApprovalId: dataItem.Requires_x0020_Accountant_x0020_ApprovalId ? dataItem.Requires_x0020_Accountant_x0020_ApprovalId.Id : null
+      };
+      debugger;
+      if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
+        updateObject['Requires_x0020_Accountant_x0020_Id'] = dataItem.Requires_x0020_Accountant_x0020_ApprovalId ? dataItem.Requires_x0020_Accountant_x0020_ApprovalId.Id : null
+        delete updateObject.Requires_x0020_Accountant_x0020_ApprovalId;
+        sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(dataItem.ID).update(updateObject);
+      }
+      else {
+        sp.web.lists.getByTitle(MyLists["AR Invoices"]).items.getById(dataItem.ID).update(updateObject);
+      }
+
+
+      // Check to see if there is a file that we can update.
+      if (dataItem.InvoiceAttachments) {
+        for (let index = 0; index < dataItem.InvoiceAttachments.length; index++) {
+          const element = dataItem.InvoiceAttachments[index];
+
+          sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/').files
+            .add(element.name, element.getRawFile(), true)
+            .then(f => {
+              f.file.getItem()
+                .then(item => {
+                  const itemProxy: any = Object.assign({}, item);
+                  const editItemId: number = dataItem.ID;
+                  // ! Transfer metadata from AR Request to AR Invoice.
+                  // THIS IS A 'YUGE' STEP!
+                  var copiedMetadata = dataItem;
+                  // Remove unwanted fields
+                  this.removeFields(copiedMetadata,
+                    [
+                      'ContentTypeId',
+                      'FileSystemObjectType',
+                      'ServerRedirectedEmbedUri',
+                      'ServerRedirectedEmbedUrl',
+                      'ComplianceAssetId',
+                      'Title',
+                      'Requires_x0020_Accountant_x0020_Id',
+                      'Requires_x0020_Accountant_x0020_StringId',
+                      'Requires_x0020_Authorization_x0020_ByStringId',
+                      'Requires_x0020_Accountant_x0020_ApprovalId',
+                      'Requires_x0020_Accountant_x0020_ApprovalStringId',
+                      'Requires_x0020_Completed_x0020_AId',
+                      'Requires_x0020_Completed_x0020_AStringId',
+                      'CancelRequests',
+                      'RelatedAttachments',
+                      'Approvals',
+                      'AccountDetails',
+                      'AccountDetailsId',
+                      'InvoiceAttachments',
+                      'ID',
+                      'Id',
+                      'Requires_x0020_Department_x0020_Id',
+                      'Requires_x0020_Department_x0020_StringId',
+                      'Attachments',
+                      'AR_x0020_InvoiceId'
+                    ]
+                  );
+
+                  // Add extra fields. 
+                  copiedMetadata['AR_x0020_RequestId'] = editItemId;
+                  copiedMetadata['Requires_x0020_Accountant_x0020_ApprovalId'] = dataItem.Requires_x0020_Accountant_x0020_Id;
+                  copiedMetadata['Requires_x0020_Completed_x0020_ApprovalId'] = dataItem.Requires_x0020_Completed_x0020_AId;
+                  copiedMetadata['Requires_x0020_Authorization_x0020_ById'] = dataItem.Requires_x0020_Department_x0020_Id;
+
+                  // Copy the meta data from the AR Req to the AR Invoice. 
+                  sp.web.lists.getByTitle(MyLists["AR Invoices"]).items.getById(itemProxy.ID)
+                    .update({
+                      StrTitle: element.name,
+                      Title: element.name,
+                      ...copiedMetadata
+                    })
+                    .then(f => {
+                      // Update all related records. 
+                      // this update will add the documents id to the files. 
+                      // this will allow us to get all related data for this document without having to use the request record. 
+                      Promise.all([
+                        this._updateRelatedDocuments(editItemId, itemProxy.ID),
+                        this._updateInvoiceAccounts(editItemId, itemProxy.ID),
+                        this._updateInvoiceRequest(editItemId, itemProxy.ID),
+                        this._updateCancelRequests(editItemId, itemProxy.ID),
+                        this._updateApprovalRequests(editItemId, itemProxy.ID)
+                      ])
+                        .then(value => {
+                          this.setState({
+                            invoices: {
+                              data: invoices,
+                              total: invoices.length
+                            },
+                            productInEdit: undefined
+                          });
+                        });
+                    })
+                    .catch(e => {
+                      throw e;
+                      debugger;
+                    });
                 });
-              });
-          });
+            });
+        }
       }
+
+      // Upload Any related attachments
+      if (dataItem.RelatedInvoiceAttachments) {
+        for (let index = 0; index < dataItem.RelatedInvoiceAttachments.length; index++) {
+          const element = dataItem.RelatedInvoiceAttachments[index];
+          sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/').files
+            .add(element.name, element.getRawFile(), true)
+            .then(fileRes => {
+              fileRes.file.getItem()
+                .then(item => {
+                  const itemProxy: any = Object.assign({}, item);
+                  sp.web.lists.getByTitle(MyLists["Related Invoice Attachments"]).items.getById(itemProxy.ID).update({
+                    ARInvoiceId: dataItem.ID,
+                    Title: element.name
+                  });
+                });
+            });
+        }
+      }
+    } catch (error) {
+      throw error;
     }
   }
+
+  private removeFields(input, fields) {
+    for (let index = 0; index < fields.length; index++) {
+      delete input[fields[index]];
+    }
+    return input;
+  }
+  // Add docId to related documents.
+  private _updateRelatedDocuments = async (reqId, docId) => {
+    await sp.web.lists
+      .getByTitle(MyLists["Related Invoice Attachments"])
+      .items
+      .filter(`AR_x0020_Invoice_x0020_Request/ID eq ${reqId}`)
+      .get()
+      .then((items: any[]) => {
+        if (items.length > 0) {
+          sp.web.lists
+            .getByTitle(MyLists["Related Invoice Attachments"])
+            .items.getById(items[0].Id)
+            .update({ ARInvoiceId: docId });
+        }
+      });
+  }
+  // Add docId to related accounts.
+  private _updateInvoiceAccounts = async (reqId, docId) => {
+
+  }
+  // Add docId to related invoice request. 
+  private _updateInvoiceRequest = async (reqId, docId) => {
+
+  }
+  // Add docId to related cancel requests. 
+  private _updateCancelRequests = async (reqId, docId) => {
+
+  }
+  // Add docId to related approval requests. 
+  private _updateApprovalRequests = async (reqId, docId) => {
+
+  }
+
 
   public updateItem = (data, item) => {
     let index = data.findIndex(p => p === item || (item.ID && p.ID === item.ID));
