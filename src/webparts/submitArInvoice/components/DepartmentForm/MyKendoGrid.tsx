@@ -29,6 +29,8 @@ import { InvoiceDataProvider } from '../InvoiceDataProvider';
 import { InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
 import { ConvertQueryParamsToKendoFilter } from '../MyHelperMethods';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
+import { MyLists } from '../enums/MyLists';
+import { MyContentTypes } from '../enums/MyEnums';
 
 type MyKendoGridState = {
   data: any;
@@ -152,6 +154,17 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
     });
   }
 
+  public arDataReceived = (invoices) => {
+
+    console.log('arDataReceived');
+    console.log(invoices);
+    this.setState({
+      ...this.state,
+      data: invoices,
+      receivedData: invoices.data
+    });
+  }
+
   public onFilterChange = (e) => {
     var newData = filterBy(this.state.receivedData, e.filter);
 
@@ -180,6 +193,8 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
 
   public save = () => {
     const dataItem = this.state.productInEdit;
+    console.log("saving this data");
+    console.log(dataItem);
 
     const invoices = this.state.data.data.slice();
     // const isNewProduct = dataItem.ProductID === undefined;
@@ -204,15 +219,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       Department: dataItem.Department,
       Date: dataItem.Date,
       Requested_x0020_ById: dataItem.Requested_x0020_ById,
-      Requires_x0020_Authorization_x0020_ById: {
-        'results': dataItem.Requires_x0020_Authorization_x0020_ById.map((user) => {
-          if (Number.isInteger(user)) {
-            return user;
-          } else {
-            return user.Id;
-          }
-        })
-      },
       Urgent: dataItem.Urgent,
       CustomerId: dataItem.CustomerId,
       Comment: dataItem.Comment,
@@ -220,8 +226,37 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       Customer_x0020_PO_x0020_Number: dataItem.Customer_x0020_PO_x0020_Number,
       Standard_x0020_Terms: dataItem.Standard_x0020_Terms,
     };
+    debugger;
 
-    sp.web.lists.getByTitle('AR Invoices').items.getById(dataItem.ID).update(updateObject);
+    // Update request item. 
+    if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
+      updateObject['Requires_x0020_Department_x0020_Id'] = {
+        'results': dataItem.Requires_x0020_Department_x0020_Id.map((user) => {
+          if (Number.isInteger(user)) {
+            return user;
+          }
+          else {
+            return user.Id
+          }
+        })
+      };
+      sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(dataItem.ID).update(updateObject)
+    }
+    // Update document item. 
+    else {
+      updateObject['Requires_x0020_Authorization_x0020_ById'] = {
+        'results': dataItem.Requires_x0020_Authorization_x0020_ById.map((user) => {
+          if (Number.isInteger(user)) {
+            return user;
+          }
+          else {
+            return user.Id
+          }
+        })
+      };
+      sp.web.lists.getByTitle(MyLists["AR Invoices"]).items.getById(dataItem.ID).update(updateObject)
+    }
+
 
     if (dataItem.RelatedInvoiceAttachments) {
 
@@ -232,12 +267,19 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
           .then(fileRes => {
             fileRes.file.getItem()
               .then(item => {
-
                 const itemProxy: any = Object.assign({}, item);
-                sp.web.lists.getByTitle('RelatedInvoiceAttachments').items.getById(itemProxy.ID).update({
-                  ARInvoiceId: dataItem.ID,
+                let relatedAttachmentUpdateObject = {
                   Title: element.name
-                });
+                };
+
+                if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
+                  relatedAttachmentUpdateObject['AR_x0020_Invoice_x0020_RequestId'] = dataItem.ID
+                }
+                else{
+                  relatedAttachmentUpdateObject['ARInvoiceId'] = dataItem.ID;
+                }
+
+                sp.web.lists.getByTitle('RelatedInvoiceAttachments').items.getById(itemProxy.ID).update(relatedAttachmentUpdateObject);
               });
           });
       }
@@ -353,6 +395,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
         <InvoiceDataProvider
           dataState={this.state.dataState}
           onDataReceived={this.dataReceived}
+          onARRequestDataReceived={this.arDataReceived}
 
           statusDataState={this.state.statusData}
           onStatusDataReceived={this.statusDataReceived}

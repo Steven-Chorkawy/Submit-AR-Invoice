@@ -285,6 +285,11 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     });
   }
 
+  public arDataReceived = (invoices) => {
+    console.log('arDataReceived');
+    console.log(invoices);
+  }
+
   public statusDataReceived = (status) => {
     this.setState({
       ...this.state,
@@ -698,7 +703,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           filterState={this._NoSubmittedInvoiceFilter}
 
           onDataReceived={this.dataReceived}
-
+          onARRequestDataReceived={this.arDataReceived}
           statusDataState={this.state.statusData}
           onStatusDataReceived={this.statusDataReceived}
 

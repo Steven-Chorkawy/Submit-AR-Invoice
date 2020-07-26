@@ -12,7 +12,7 @@ import * as MyFormComponents from '../MyFormComponents';
 import * as MyValidators from '../validators.jsx';
 import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceGLAccounts';
 import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
-import {ApprovalRequiredComponent} from '../ApprovalRequiredComponent';
+import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
 
 
 export class MyEditDialogContainer extends React.Component<any, any> {
@@ -20,10 +20,18 @@ export class MyEditDialogContainer extends React.Component<any, any> {
     super(props);
     console.log("MyEditDialogContainer");
     console.log(props);
+    debugger;
 
-    this.props.dataItem.Requires_x0020_Authorization_x0020_ById.map(reqAuthId => {
-      this._selectedReqApprovers.push(this.props.siteUsers.find(s => s.Id === reqAuthId));
-    });
+    if (this.props.dataItem.Requires_x0020_Authorization_x0020_ById) {
+      this.props.dataItem.Requires_x0020_Authorization_x0020_ById.map(reqAuthId => {
+        this._selectedReqApprovers.push(this.props.siteUsers.find(s => s.Id === reqAuthId));
+      });
+    }
+    else if(this.props.dataItem.Requires_x0020_Department_x0020_Id) {
+      this.props.dataItem.Requires_x0020_Department_x0020_Id.map(reqAuthId => {
+        this._selectedReqApprovers.push(this.props.siteUsers.find(s => s.Id === reqAuthId));
+      });
+    }    
 
     this.state = {
       productInEdit: this.props.dataItem || null,

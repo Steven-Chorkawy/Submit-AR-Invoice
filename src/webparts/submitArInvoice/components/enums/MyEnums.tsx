@@ -16,3 +16,8 @@ export enum InvoiceStatus {
 export enum MyGridStrings {
   DateFilter = '{0: MM/dd/yyyy}',
 }
+
+export enum MyContentTypes {
+  'AR Request List Item' = '0x01009B60AAD03E8EEE4781EB045A4B5C2F35',
+  'AR Invoice Document Item' = '0x010100199615C6D9FF66478377323A08EB946A',
+}
