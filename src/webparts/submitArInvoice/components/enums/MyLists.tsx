@@ -4,6 +4,12 @@
  */
 // TODO: Add more common names here. 
 export enum MyLists {
+    // Doc Lib for AR Invoices
     'AR Invoices' = 'AR Invoices',
+
+    // List for AR Requests
     'AR Invoice Requests' = 'AR Invoice Requests',
+
+    // List for Accounts. 
+    'AR Invoice Accounts' = 'AR Invoice Accounts',
 } 
