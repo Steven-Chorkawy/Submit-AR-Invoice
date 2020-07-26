@@ -39,12 +39,28 @@ import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { deleteable } from '@pnp/sp/sharepointqueryable';
 
-export class InvoiceEditForm extends React.Component<any, any> {
+
+export interface IGPAttachmentProps {
+  type: string;
+  errorMessage: string;
+}
+
+interface IInvoiceEditFormProps {
+  GPAttachmentWidgetProps: IGPAttachmentProps;
+  dataItem;
+  cancel;
+  currentUser;
+  statusData;
+  siteUsersData;
+  onUpdateAccount;
+  save;
+}
+
+export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any> {
   constructor(props) {
     super(props);
     console.log('InvoiceEditForm');
     console.log(props);
-
     this.state = {
       productInEdit: this.props.dataItem || null,
       visible: false,
@@ -133,9 +149,10 @@ export class InvoiceEditForm extends React.Component<any, any> {
                   />
                 </div>
                 <div style={{ marginBottom: "2px" }}>
-                  <Card style={{ width: 400 }}>
+                  <Card style={{ width: 400 }} type={this.props.GPAttachmentWidgetProps.type}>
                     <CardBody>
                       <CardTitle><b>Upload GP Attachment</b></CardTitle>
+                      <p>{this.props.GPAttachmentWidgetProps.errorMessage}</p>
                       <Field
                         id="InvoiceAttachments"
                         name="InvoiceAttachments"

@@ -37,7 +37,7 @@ import { ConvertQueryParamsToKendoFilter, BuildGUID } from '../MyHelperMethods';
 import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
-import { InvoiceEditForm } from './InvoiceEditForm';
+import { InvoiceEditForm, IGPAttachmentProps } from './InvoiceEditForm';
 
 
 interface IMyFinanceFormState {
@@ -51,6 +51,8 @@ interface IMyFinanceFormState {
   //sort: any;
   allRowsExpanded: boolean;
   currentUser?: any;
+
+  gpAttachmentProps: IGPAttachmentProps;
 }
 
 interface IInvoicesDataState {
@@ -96,6 +98,10 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         filters: defaultFilters
       },
       allRowsExpanded: false,
+      gpAttachmentProps: {
+        type: null,
+        errorMessage: null
+      }
     };
 
     this.CommandCell = MyCommandCell({
@@ -427,6 +433,13 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                         });
                     })
                     .catch(e => {
+                      console.error("Error Mapping AR Invoice!");
+                      this.setState({
+                        gpAttachmentProps:{
+                          type: 'error',
+                          errorMessage: 'Cannot Upload GP Invoice' 
+                        }
+                      })
                       throw e;
                       debugger;
                     });
@@ -707,6 +720,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
             save={this.saveEditForm}
             cancel={this.cancelEditForm}
             onUpdateAccount={this.updateAccount}
+            GPAttachmentWidgetProps={this.state.gpAttachmentProps}
           />
         }
 
