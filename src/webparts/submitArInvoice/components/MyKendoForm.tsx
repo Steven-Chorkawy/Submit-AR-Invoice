@@ -85,7 +85,9 @@ export class MyForm extends React.Component<IMyFormProps, any> {
 
     let currentYear = new Date().getFullYear();
     const newARTitle = currentYear + "-AR-" + BuildGUID();
-    let finalFileName = newARTitle + '.pdf'; // .pdf because GP exports pdf files.  Finance will replace this place holder file in the future.
+    let finalFileName = newARTitle + '.pdf'; 
+    
+    // .pdf because GP exports pdf files.  Finance will replace this place holder file in the future.
     // TODO: Remove this hard coded value! Can we possibly get this from the web parts properties window? That would allow this web part to be used in multiple locations.
     //? Can i upload a string as file content?
     let uploadRes = await web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/')
