@@ -464,34 +464,54 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     }
     return input;
   }
+
   // Add docId to related documents.
   private _updateRelatedDocuments = async (reqId, docId) => {
+    // Get the related attachments that for this request. 
     await sp.web.lists
       .getByTitle(MyLists["Related Invoice Attachments"])
       .items
       .filter(`AR_x0020_Invoice_x0020_Request/ID eq ${reqId}`)
       .get()
-      .then((items: any[]) => {
+      .then(async (items: any[]) => {
         if (items.length > 0) {
-          sp.web.lists
+          // Update the related attachment so it is now related to the AR Invoice. 
+          await sp.web.lists
             .getByTitle(MyLists["Related Invoice Attachments"])
             .items.getById(items[0].Id)
             .update({ ARInvoiceId: docId });
         }
       });
   }
+
   // Add docId to related accounts.
   private _updateInvoiceAccounts = async (reqId, docId) => {
-
+    await sp.web.lists
+      .getByTitle(MyLists["AR Invoice Accounts"])
+      .items
+      .filter(`AR_x0020_Invoice_x0020_Request/ID eq ${reqId}`)
+      .get()
+      .then(async (item: any[]) => {
+        if (item.length > 0) {
+          debugger;
+          await sp.web.lists
+            .getByTitle(MyLists["AR Invoice Accounts"])
+            .items.getById(item[0].Id)
+            .update({ AR_x0020_InvoiceId: docId });
+        }
+      });
   }
+
   // Add docId to related invoice request. 
   private _updateInvoiceRequest = async (reqId, docId) => {
 
   }
+
   // Add docId to related cancel requests. 
   private _updateCancelRequests = async (reqId, docId) => {
 
   }
+
   // Add docId to related approval requests. 
   private _updateApprovalRequests = async (reqId, docId) => {
 
