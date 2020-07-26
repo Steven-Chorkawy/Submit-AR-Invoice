@@ -109,7 +109,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
         Standard_x0020_Terms: dataItem.StandardTerms,
         Urgent: dataItem.Urgent
       };
-      debugger;
+      
 
       // Add customer data.
       // dataItem.Customer.ID is undefined when a custom customer is added.
@@ -187,7 +187,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
       this.forceUpdate();
 
     } catch (error) {
-      debugger;
+      
       console.log("Something went wrong!");
       console.log(error);
 
@@ -400,7 +400,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                 label="* Customer"
                 wrapperStyle={{ width: '100%' }}
                 data={this.state.customerList}
-                dataItemKey="ID"
+                dataItemKey="Id"
                 textField="Customer_x0020_Name"
                 validator={MyValidators.requiresCustomer}
                 allowCustom={true}

@@ -226,7 +226,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       Customer_x0020_PO_x0020_Number: dataItem.Customer_x0020_PO_x0020_Number,
       Standard_x0020_Terms: dataItem.Standard_x0020_Terms,
     };
-    debugger;
+    
 
     // Update request item. 
     if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {

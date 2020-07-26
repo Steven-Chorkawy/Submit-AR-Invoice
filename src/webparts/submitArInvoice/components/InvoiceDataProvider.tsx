@@ -67,7 +67,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
 
     sp.web.lists.getByTitle(MyLists["AR Invoice Requests"])
       .items
-      .select('*, Customer/Customer_x0020_Name')
+      .select('*, Customer/Customer_x0020_Name, Customer/ID')
       .expand('Customer')
       .getAll()
       .then(async response => {

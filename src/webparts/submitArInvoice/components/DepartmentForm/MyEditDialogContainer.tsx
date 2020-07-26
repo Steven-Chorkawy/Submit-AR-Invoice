@@ -20,7 +20,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
     super(props);
     console.log("MyEditDialogContainer");
     console.log(props);
-    debugger;
+    
 
     if (this.props.dataItem.Requires_x0020_Authorization_x0020_ById) {
       this.props.dataItem.Requires_x0020_Authorization_x0020_ById.map(reqAuthId => {
@@ -36,6 +36,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
     this.state = {
       productInEdit: this.props.dataItem || null,
       selectedReqApprovers: this._selectedReqApprovers,
+      selectedCustomer: this.props.dataItem.Customer,
       customerList: this.props.customers,
       receivedCustomerList: this.props.customers
     };
@@ -52,6 +53,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
     return React.cloneElement(li, li.props, itemChildren);
   }
   public onCustomCustomerChange = (event) => {
+    
     let target = event.target;
     let value = target.type === 'checkbox' ? target.checked : target.value;
 
@@ -83,7 +85,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
     let target = event.target;
     let value = target.type === 'checkbox' ? target.checked : target.value;
     let name = (target.props && target.props.name !== undefined) ? target.props.name : (target.name !== undefined) ? target.name : target.props.id;
-
+    
     // last chance.
     if (name === "" && target.id !== undefined) {
       name = target.id;
@@ -110,6 +112,12 @@ export class MyEditDialogContainer extends React.Component<any, any> {
       case 'Customer':
         name = 'CustomerId';
         value = value.Id;
+        this.setState({
+          selectedCustomer: {
+            Customer_x0020_Name: value.Customer_x0020_Name,
+            ID: value.Id
+          }
+        });
         break;
       case 'CustomerPONumber':
         name = 'Customer_x0020_PO_x0020_Number';
@@ -238,29 +246,17 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                 data={this.state.customerList}
                 dataItemKey="ID"
                 textField="Customer_x0020_Name"
-                validator={MyValidators.requiresCustomer}
+                //validator={MyValidators.requiresCustomer}
+                value={this.props.customers.find(f => f.Id === this.state.productInEdit.CustomerId)}
                 allowCustom={true}
                 itemRender={this.customerItemRender}
                 component={MyFormComponents.CustomerComboBox}
                 filterable={true}
                 suggest={true}
                 onFilterChange={this.customerFilterChange}
+                onChange={this.onDialogInputChange}
                 onCustomCusteromChange={this.onCustomCustomerChange}
               />
-              {/* <Field
-                id="Customer"
-                name="Customer"
-                label="* Customer"
-                wrapperStyle={{ width: '100%' }}
-                data={this.props.customers}
-                dataItemKey="ID"
-                textField="Title"
-                //validator={MyValidators.requiresCustomer}
-                allowCustom={true}
-                component={MyFormComponents.CustomerComboBox}
-                value={this.props.customers.find(f => f.Id === this.state.productInEdit.CustomerId)}
-                onChange={this.onDialogInputChange}
-              /> */}
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
                   id="CustomerPONumber"
