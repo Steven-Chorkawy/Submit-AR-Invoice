@@ -10,8 +10,7 @@ export class MyCustomerCardComponent extends React.Component<any, any> {
    */
   constructor(props) {
     super(props);
-    debugger;
-
+    
     this.state = {
       selectedCustomer: props.selectedCustomer
     };

@@ -93,7 +93,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
           invoiceIds.push(`AR_x0020_Invoice_x0020_Request/ID eq ${element.ID}`);
           idsForApproval.push(`InvoiceID eq '${element.ID}'`);
           idsForRelatedAttachments.push(`AR_x0020_Invoice_x0020_Request/ID eq ${element.ID}`);
-          idsForCancelRequests.push(`Invoice_x0020_Number/ID eq ${element.ID}`);
+          idsForCancelRequests.push(`AR_x0020_Invoice_x0020_Request/ID eq ${element.ID}`);
 
           processedResponse.data[index].Date = new Date(processedResponse.data[index].Date);
           processedResponse.data[index].Created = new Date(processedResponse.data[index].Created);
@@ -140,7 +140,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
               invoice.AccountDetails = values[0].filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === invoice.ID) || [];
               invoice.Approvals = values[1].filter(f => Number(f.InvoiceID) === invoice.ID) || [];
               invoice.RelatedAttachments = values[2].filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === invoice.ID) || [];
-              invoice.CancelRequests = values[4].filter(f => Number(f.Invoice_x0020_NumberId) === invoice.ID) || [];
+              invoice.CancelRequests = values[4].filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === invoice.ID) || [];
 
               // Add ServerDirectUrl if required.
               invoice.RelatedAttachments.map(relatedAttachments => {

@@ -196,6 +196,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
     console.log("saving this data");
     console.log(dataItem);
 
+
     const invoices = this.state.data.data.slice();
     // const isNewProduct = dataItem.ProductID === undefined;
     const isNewProduct = false; // false because we don't let users create new items here.
@@ -289,16 +290,25 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   public sendCancelRequest = () => {
     sp.web.currentUser.get()
       .then(currentUser => {
-
         const dataItem = this.state.productInCancel;
-        sp.web.lists.getByTitle('Cancel Invoice Request')
+
+        var cancelReqUpdateObj = {
+          Title: 'Invoice Cancel Request',
+          //Invoice_x0020_NumberId: dataItem.ID,
+          Requested_x0020_ById: currentUser.Id,
+          Requester_x0020_Comments: dataItem.CancelComment
+        };
+
+        if(dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
+          cancelReqUpdateObj['AR_x0020_Invoice_x0020_RequestId'] = dataItem.Id
+        }
+        else {
+          cancelReqUpdateObj['Invoice_x0020_NumberId'] = dataItem.Id
+        }
+
+        sp.web.lists.getByTitle(MyLists["Cancel Invoice Request"])
           .items
-          .add({
-            Title: 'Invoice Cancel Request',
-            Invoice_x0020_NumberId: dataItem.ID,
-            Requested_x0020_ById: currentUser.Id,
-            Requester_x0020_Comments: dataItem.CancelComment
-          })
+          .add(cancelReqUpdateObj)
           .then(_ => {
             this.setState({
               productInCancel: undefined

@@ -15,4 +15,7 @@ export enum MyLists {
 
     // Related Attachments
     'Related Invoice Attachments' = 'RelatedInvoiceAttachments',
+
+    // List for Cancel Requests.
+    'Cancel Invoice Request' = 'Cancel Invoice Request',
 } 
