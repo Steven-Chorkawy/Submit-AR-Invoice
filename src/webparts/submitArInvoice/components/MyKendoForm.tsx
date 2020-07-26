@@ -18,8 +18,9 @@ import { IMyFormProps } from './IMyFormProps';
 import { IUploadingFile } from './IMyFormState';
 import * as MyValidators from './validators.jsx';
 import { MyGLAccountComponent } from './MyGLAccountComponent';
-import { BuildGUID } from './MyHelperMethods';
+import { BuildGUID, ConvertQueryParamsToKendoFilter } from './MyHelperMethods';
 import { MyLists } from './enums/MyLists';
+import { IItemAddResult } from '@pnp/sp/items';
 
 
 
@@ -39,10 +40,11 @@ export interface IARFormModel {
 
 
 export interface IARAccountDetails {
-  AR_x0020_InvoiceId: number;   //ID of Invoice
-  Account_x0020_Code: string; // GL Code
-  Amount: number;             // Amount for account
-  HST_x0020_Taxable: boolean; // Is amount taxable?
+  AR_x0020_InvoiceId?: number;               //ID of Invoice
+  AR_x0020_Invoice_x0020_RequestId: number; // ID of AR Request
+  Account_x0020_Code: string;               // GL Code
+  Amount: number;                           // Amount for account
+  HST_x0020_Taxable: boolean;               // Is amount taxable?
 }
 
 
@@ -76,11 +78,14 @@ export class MyForm extends React.Component<IMyFormProps, any> {
   public handleSubmit = async (dataItem) => {
     // We will use this to update states later.
     let currentFiles: IUploadingFile[] = this.state.MyFiles;
+    console.log("handleSubmit data");
+    console.log(dataItem);
+
 
     try {
       if (!dataItem.hasOwnProperty('RequestedBy')) {
         return;
-      }     
+      }
 
       let web = Web(this._siteUrl);
 
@@ -106,6 +111,16 @@ export class MyForm extends React.Component<IMyFormProps, any> {
       };
       debugger;
 
+      // Add customer data.
+      // dataItem.Customer.ID is undefined when a custom customer is added.
+      if (dataItem.Customer.ID === undefined) {
+        myData['MiscCustomerDetails'] = this.state.MiscCustomerDetails;
+        myData['MiscCustomerName'] = dataItem.Customer.Customer_x0020_Name;
+      }
+      else {
+        myData['CustomerId'] = dataItem.Customer.Id;
+      }
+
       var arInvoiceRequestListItemData = {
         ...myData,
         Requires_x0020_Department_x0020_Id: myData.Requires_x0020_Authorization_x0020_ById
@@ -113,90 +128,64 @@ export class MyForm extends React.Component<IMyFormProps, any> {
 
       delete arInvoiceRequestListItemData.Requires_x0020_Authorization_x0020_ById;
 
-
-      // .pdf because GP exports pdf files.  Finance will replace this place holder file in the future.
-      // TODO: Remove this hard coded value! Can we possibly get this from the web parts properties window? That would allow this web part to be used in multiple locations.
-      //? Can i upload a string as file content?
-      //! This creates the invoice!
-      let uploadRes = await web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/')
-        .files
-        .add(finalFileName, "Placeholder file until invoice from GP is uploaded", true);
-
-      let arInvoiceRequstListItem = await web.lists.getByTitle(MyLists["AR Invoice Requests"])
+      let arInvoiceRequstListItem = await web.lists
+        .getByTitle(MyLists["AR Invoice Requests"])
         .items.add(arInvoiceRequestListItemData);
-
-
-      // Gets the file that we just uploaded.  This will be used later to update the metadata.
-      let newUploadedFile = await uploadRes.file.getItem();
-      const uploadedFile: any = Object.assign({}, newUploadedFile);
-
-
-      // Add customer data.
-      // dataItem.Customer.ID is undefined when a custom customer is added.
-
-      if (dataItem.Customer.ID === undefined) {
-        myData['MiscCustomerDetails'] = this.state.MiscCustomerDetails;
-        myData['MiscCustomerName'] = dataItem.Customer.Company;
-      }
-      else {
-        myData['CustomerId'] = dataItem.Customer.Id;
-      }
 
 
       const accounts: IARAccountDetails = { ...dataItem.GLAccounts };
 
-      var output = await (await sp.web.lists.getByTitle(MyLists["AR Invoices"]).items.getById(uploadedFile.ID).update(myData)).item;
-
-      output.get().then(innerFile => {
-        currentFiles.push({
-          FileName: innerFile.Name,
-          UploadSuccessful: true,
-          ErrorMessage: null,
-          LinkToFile: `${this._siteUrl}/SitePages/Department-AR-Search-Page.aspx/?FilterField1=ID&FilterValue1=${innerFile.ID}`
+      // Set the data for the account details.
+      let accountDetails: IARAccountDetails[] = [];
+      dataItem.GLAccounts.map(account => {
+        accountDetails.push({
+          // AR_x0020_InvoiceId: innerFile.ID,
+          AR_x0020_Invoice_x0020_RequestId: arInvoiceRequstListItem.data.ID,
+          Account_x0020_Code: account.GLCode,
+          HST_x0020_Taxable: account.HSTTaxable,
+          Amount: account.Amount
         });
-        this.setState({
-          MyFiles: currentFiles
-        });
+      });
 
-        // Set the data for the account details.
-        let accountDetails: IARAccountDetails[] = [];
-        dataItem.GLAccounts.map(account => {
-          accountDetails.push({
-            AR_x0020_InvoiceId: innerFile.ID,
-            Account_x0020_Code: account.GLCode,
-            HST_x0020_Taxable: account.HSTTaxable,
-            Amount: account.Amount
-          });
-        });
+      // Add Account Codes
+      this.addAccountCodesToListItem(accountDetails, arInvoiceRequstListItem);
 
-        this.addAccountCodes(accountDetails, output);
-
-        if (dataItem.RelatedInvoiceAttachments) {
-          for (let index = 0; index < dataItem.RelatedInvoiceAttachments.length; index++) {
-            const element = dataItem.RelatedInvoiceAttachments[index];
-            web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/')
-              .files
-              .add(element.name, element.getRawFile(), true)
-              .then(uploadResponse => {
-                uploadResponse.file.getItem()
-                  .then(item => {
-                    const itemProxy: any = Object.assign({}, item);
-                    sp.web.lists.getByTitle('RelatedInvoiceAttachments').items.getById(itemProxy.ID).update({
-                      ARInvoiceId: innerFile.ID,
-                      Title: element.name
-                    });
+      // Add related items
+      if (dataItem.RelatedInvoiceAttachments) {
+        for (let index = 0; index < dataItem.RelatedInvoiceAttachments.length; index++) {
+          const element = dataItem.RelatedInvoiceAttachments[index];
+          web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/')
+            .files
+            .add(element.name, element.getRawFile(), true)
+            .then(uploadResponse => {
+              uploadResponse.file.getItem()
+                .then(item => {
+                  const itemProxy: any = Object.assign({}, item);
+                  sp.web.lists.getByTitle('RelatedInvoiceAttachments').items.getById(itemProxy.ID).update({
+                    AR_x0020_Invoice_x0020_RequestId: arInvoiceRequstListItem.data.ID,
+                    Title: element.name
                   });
-              });
-          }
+                });
+            });
         }
+      }
+
+      // Provide a success message back to the user.
+      currentFiles.push({
+        FileName: 'To be set',
+        UploadSuccessful: true,
+        ErrorMessage: null,
+        LinkToFile: `${this._siteUrl}/SitePages/Department-AR-Search-Page.aspx/?FilterField1=ID&FilterValue1=${arInvoiceRequstListItem.data.ID}`
       });
 
       // Force a re render.
       this.setState({
-        stateHolder: this.state.stateHolder + 1
+        stateHolder: this.state.stateHolder + 1,
+        MyFiles: currentFiles
       });
 
       this.forceUpdate();
+
     } catch (error) {
       debugger;
       console.log("Something went wrong!");
@@ -212,10 +201,10 @@ export class MyForm extends React.Component<IMyFormProps, any> {
         MyFiles: currentFiles
       });
 
-
       throw error;
     }
   }
+
 
   /**
    * handleSubmit2
@@ -223,7 +212,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
   public handleSubmit2 = async (event) => {
     event.preventDefault();
   }
-
 
 
 
@@ -249,17 +237,12 @@ export class MyForm extends React.Component<IMyFormProps, any> {
     }
   }
 
-  /**
-   * Create the accounts for this invoice.
-   *
-   * @param accountDetails IARAccountDetails
-   */
-  public addAccountCodes = async (accountDetails: IARAccountDetails[], file) => {
+
+  public addAccountCodesToListItem = async (accountDetails: IARAccountDetails[], listItem: IItemAddResult) => {
     accountDetails.map(account => {
-      sp.web.lists.getByTitle('AR Invoice Accounts').items.add(account)
+      sp.web.lists.getByTitle(MyLists["AR Invoice Accounts"]).items.add(account)
         .then(f => {
-          // Connect the account to the document list.
-          file.update({
+          listItem.item.update({
             AccountDetailsId: {
               results: [f.data.ID]
             }
