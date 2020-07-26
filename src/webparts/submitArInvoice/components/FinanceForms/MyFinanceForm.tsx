@@ -31,11 +31,13 @@ import { filterBy } from '@progress/kendo-data-query';
 import { filterGroupByField } from '@progress/kendo-react-grid/dist/npm/columnMenu/GridColumnMenuFilter';
 import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceGLAccounts';
 import { ApprovalResponseComponent } from '../ApprovalResponseComponent';
-import { InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
+import { InvoiceStatus, MyGridStrings, MyContentTypes } from '../enums/MyEnums';
 import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
 import { ConvertQueryParamsToKendoFilter, BuildGUID } from '../MyHelperMethods';
 import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
+import { MyLists } from '../enums/MyLists';
+import { InvoiceEditForm } from './InvoiceEditForm';
 
 
 interface IMyFinanceFormState {
@@ -55,143 +57,6 @@ interface IInvoicesDataState {
   //TODO: Change Array<any> to Array<IInvoice>
   data: Array<any>;
   total: number;
-}
-
-class InvoiceEditForm extends React.Component<any, any> {
-  constructor(props) {
-    super(props);
-    console.log('InvoiceEditForm');
-    console.log(props);
-
-    this.state = {
-      productInEdit: this.props.dataItem || null,
-      visible: false,
-      approvalRequestError: false
-    };
-  }
-
-  public handleSubmit(event) {
-    event.preventDefault();
-  }
-
-  public onDialogInputChange = (event) => {
-    let target = event.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
-    const name = (target.props && target.props.name !== undefined) ? target.props.name : (target.name !== undefined) ? target.name : target.props.id;
-    const edited = this.state.productInEdit;
-    edited[name] = value;
-    this.setState({
-      productInEdit: edited
-    });
-  }
-
-  public render() {
-    return (
-      <Dialog onClose={this.props.cancel} title={"Edit AR Invoice"} minWidth="200px" width="80%" height="80%" >
-        <ApprovalRequiredComponent
-          productInEdit={this.state.productInEdit}
-          currentUser={this.props.currentUser}
-        />
-        <Form
-          onSubmit={this.handleSubmit}
-          render={(formRenderProps) => (
-            <FormElement style={{ width: '100%' }}>
-              <fieldset className={'k-form-fieldset'}>
-                <div style={{ marginBottom: "2px" }}>
-                  <Field
-                    id={'Invoice_x0020_Status'}
-                    name={'Invoice_x0020_Status'}
-                    label={'Status'}
-                    value={this.state.productInEdit.Invoice_x0020_Status}
-                    data={this.props.statusData}
-                    onChange={this.onDialogInputChange}
-                    component={MyFormComponents.FormDropDownList}
-                  />
-                </div>
-                <div style={{ marginBottom: "2px" }}>
-                  <Field
-                    id="Requires_x0020_Accountant_x0020_ApprovalId"
-                    name="Requires_x0020_Accountant_x0020_ApprovalId"
-                    label="Requires Approval From Accountant"
-                    data={this.props.siteUsersData}
-                    dataItemKey="Id"
-                    textField="Title"
-                    value={this.state.productInEdit.Requires_x0020_Accountant_x0020_ApprovalId}
-                    onChange={this.onDialogInputChange}
-                    disabled={this.state.productInEdit.Invoice_x0020_Status !== 'Accountant Approval Required'}
-                    component={MyFormComponents.FormComboBox}
-                  />
-                </div>
-                <div style={{ marginBottom: "2px" }}>
-                  <Field
-                    id={'Invoice_x0020_Number'}
-                    name={'Invoice_x0020_Number'}
-                    label={'Invoice Number'}
-                    value={this.state.productInEdit.Invoice_x0020_Number}
-                    onChange={this.onDialogInputChange}
-                    component={MyFormComponents.FormInput}
-                  />
-                </div>
-                <div style={{ marginBottom: "2px" }}>
-                  <Field
-                    id={'Batch_x0020_Number'}
-                    name={'Batch_x0020_Number'}
-                    label={'Batch Number'}
-                    value={this.state.productInEdit.Batch_x0020_Number}
-                    onChange={this.onDialogInputChange}
-                    component={MyFormComponents.FormInput}
-                  />
-                </div>
-                <div style={{ marginBottom: "2px" }}>
-                  <FieldArray
-                    name="GLAccounts"
-                    component={MyFinanceGlAccountsComponent}
-                    value={this.state.productInEdit.AccountDetails}
-                    onUpdateAccount={this.props.onUpdateAccount}
-                  />
-                </div>
-                <div style={{ marginBottom: "2px" }}>
-                  <Card style={{ width: 400 }}>
-                    <CardBody>
-                      <CardTitle><b>Upload GP Attachment</b></CardTitle>
-                      <Field
-                        id="InvoiceAttachments"
-                        name="InvoiceAttachments"
-                        // label="Upload GP Invoice"
-                        batch={false}
-                        multiple={false}
-                        myOnChange={this.onDialogInputChange}
-                        component={MyFormComponents.FormUpload}
-                      />
-                    </CardBody>
-                  </Card>
-                </div>
-                <div style={{ marginBottom: "2px" }}>
-                  <MyRelatedAttachmentComponent
-                    productInEdit={this.state.productInEdit}
-                    onChange={this.onDialogInputChange}
-                  />
-                </div>
-              </fieldset>
-            </FormElement>
-          )}
-        />
-        <DialogActionsBar>
-          <Button
-            className="k-button k-primary"
-            icon="save"
-            primary={true}
-            onClick={this.props.save}
-          >Save</Button>
-          <Button
-            className="k-button"
-            icon="cancel"
-            onClick={this.props.cancel}
-          >Cancel</Button>
-        </DialogActionsBar>
-      </Dialog>
-    );
-  }
 }
 
 class CustomUrgentCell extends React.Component<any, any> {
@@ -288,6 +153,16 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   public arDataReceived = (invoices) => {
     console.log('arDataReceived');
     console.log(invoices);
+    var dataHolder: any = filterBy(invoices.data, this.state.filter);
+
+    this.setState({
+      ...this.state,
+      invoices: {
+        data: dataHolder,
+        total: invoices.total
+      },
+      receivedData: invoices
+    });
   }
 
   public statusDataReceived = (status) => {
@@ -403,7 +278,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * @param dataItem Invoice to edit.
    */
   public edit = (dataItem) => {
-
     this.setState({ productInEdit: this.cloneProduct(dataItem) });
   }
 
@@ -413,8 +287,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    */
   public add = (dataItem) => {
     dataItem.inEdit = undefined;
-
-    // TODO: Call method that adds dataItem to the SP List.
 
     this.setState({
       invoices: {
@@ -468,9 +340,16 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       Batch_x0020_Number: dataItem.Batch_x0020_Number,
       Requires_x0020_Accountant_x0020_ApprovalId: dataItem.Requires_x0020_Accountant_x0020_ApprovalId ? dataItem.Requires_x0020_Accountant_x0020_ApprovalId.Id : null
     };
+    debugger;
+    if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
+      updateObject['Requires_x0020_Accountant_x0020_Id'] = dataItem.Requires_x0020_Accountant_x0020_ApprovalId ? dataItem.Requires_x0020_Accountant_x0020_ApprovalId.Id : null
+      delete updateObject.Requires_x0020_Accountant_x0020_ApprovalId;
+      sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(dataItem.ID).update(updateObject);
+    }
+    else {
+      sp.web.lists.getByTitle(MyLists["AR Invoices"]).items.getById(dataItem.ID).update(updateObject);
+    }
 
-
-    sp.web.lists.getByTitle('AR Invoices').items.getById(dataItem.ID).update(updateObject);
 
     // Check to see if there is a file that we can update.
     if (dataItem.InvoiceAttachments) {
@@ -482,7 +361,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           .add(newFileName, element.getRawFile(), true)
           .then(fileResult => {
             // Title is cleared when file uploads? Don't know why but we need it so yeah.
-            sp.web.lists.getByTitle('AR Invoices').items.getById(dataItem.ID).update({ Title: dataItem.Title });
+            sp.web.lists.getByTitle(MyLists["AR Invoices"]).items.getById(dataItem.ID).update({ Title: dataItem.Title });
           });
       }
     }
@@ -496,7 +375,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
             fileRes.file.getItem()
               .then(item => {
                 const itemProxy: any = Object.assign({}, item);
-                sp.web.lists.getByTitle('RelatedInvoiceAttachments').items.getById(itemProxy.ID).update({
+                sp.web.lists.getByTitle(MyLists["Related Invoice Attachments"]).items.getById(itemProxy.ID).update({
                   ARInvoiceId: dataItem.ID,
                   Title: element.name
                 });

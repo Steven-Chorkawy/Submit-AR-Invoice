@@ -155,7 +155,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   }
 
   public arDataReceived = (invoices) => {
-
     console.log('arDataReceived');
     console.log(invoices);
     this.setState({
