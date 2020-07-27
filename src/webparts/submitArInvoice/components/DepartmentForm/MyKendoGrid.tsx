@@ -51,7 +51,7 @@ type MyKendoGridState = {
  */
 class CustomCell extends React.Component<GridCellProps> {
   public render() {
-    return (this.props.dataItem.Invoice_x0020_Status === InvoiceStatus["Entered into GP"] || this.props.dataItem.Invoice_x0020_Status === InvoiceStatus.Completed) ? (
+    return (this.props.dataItem.ContentTypeId === MyContentTypes["AR Invoice Document Item"]) ? (
       <td title={'Click to view invoice.'}>
         {console.log("FileRef Cell:")}
         {console.log(this.props)}
@@ -61,7 +61,6 @@ class CustomCell extends React.Component<GridCellProps> {
       </td>
     ) : (
         <td title={'Invoice not processed...'}>
-          <Button primary={true} /*icon="hyperlink-open"*/ icon="folder" disabled={true}></Button>
         </td>
       );
   }
@@ -226,9 +225,9 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       Customer_x0020_PO_x0020_Number: dataItem.Customer_x0020_PO_x0020_Number,
       Standard_x0020_Terms: dataItem.Standard_x0020_Terms,
     };
-    
 
-    // Update request item. 
+
+    // Update request item.
     if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
       updateObject['Requires_x0020_Department_x0020_Id'] = {
         'results': dataItem.Requires_x0020_Department_x0020_Id.map((user) => {
@@ -242,7 +241,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       };
       sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(dataItem.ID).update(updateObject)
     }
-    // Update document item. 
+    // Update document item.
     else {
       updateObject['Requires_x0020_Authorization_x0020_ById'] = {
         'results': dataItem.Requires_x0020_Authorization_x0020_ById.map((user) => {
