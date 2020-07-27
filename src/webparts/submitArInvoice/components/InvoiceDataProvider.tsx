@@ -122,9 +122,6 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
           idsForCancelRequests.push(`AR_x0020_Invoice_x0020_Request/ID eq ${element.ID}`);
 
           idsForARDocuments.push(`AR_x0020_RequestId eq ${element.ID}`);
-
-          this.state.processedResponse.data[index].Date = new Date(this.state.processedResponse.data[index].Date);
-          this.state.processedResponse.data[index].Created = new Date(this.state.processedResponse.data[index].Created);
         }
 
         Promise.all([
@@ -212,6 +209,11 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
                   relatedAttachments.ServerRedirectedEmbedUri = url;
                 }
               });
+
+
+              // Convert dates from strings to dates.... thanks SharePoint.
+              this.state.processedResponse.data[index].Date = new Date(this.state.processedResponse.data[index].Date);
+              this.state.processedResponse.data[index].Created = new Date(this.state.processedResponse.data[index].Created);
             }
             // This is something from Kendo demos.
             if (toODataString(this.props.dataState) === this.lastSuccess) {
