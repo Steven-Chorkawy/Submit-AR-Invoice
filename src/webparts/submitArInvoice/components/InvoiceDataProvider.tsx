@@ -122,8 +122,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
             .filter(idsForCancelRequests.join(' or '))
             .getAll()
         ])
-          .then((values) => {
-            
+          .then((values) => {            
             /***********************************
              *
              * 0 = G/L Accounts.
@@ -136,7 +135,6 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
              ***********************************/
             // Using each of the accounts that we found we will not attach them to the invoice object.
             response.map(invoice => {
-
               invoice.AccountDetails = values[0].filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === invoice.ID) || [];
               invoice.Approvals = values[1].filter(f => Number(f.InvoiceID) === invoice.ID) || [];
               invoice.RelatedAttachments = values[2].filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === invoice.ID) || [];
@@ -154,7 +152,6 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
 
             // This is something from Kendo demos.
             if (toODataString(this.props.dataState) === this.lastSuccess) {
-              
               this.props.onARRequestDataReceived.call(undefined, {
                 // Add the filtered, sorted data.
                 data: processedResponse.data,
