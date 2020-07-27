@@ -171,19 +171,26 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
 
 
               if (values[ARLoadQuery.ARInvoiceDocuments].filter(f => Number(f.AR_x0020_RequestId) === this.state.processedResponse.data[index].ID).length > 0) {
-
                 this.state.processedResponse.data[index] = values[ARLoadQuery.ARInvoiceDocuments].filter(f => Number(f.AR_x0020_RequestId) === this.state.processedResponse.data[index].ID)[0];
               }
 
-              this.state.processedResponse.data[index].AccountDetails = values[ARLoadQuery.GLAccounts].filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].ID) || [];
-              this.state.processedResponse.data[index].Approvals = values[ARLoadQuery.ApprovalResponses].filter(f => Number(f.InvoiceID) === this.state.processedResponse.data[index].ID) || [];
-              this.state.processedResponse.data[index].RelatedAttachments = values[ARLoadQuery.RelatedAttachments].filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].ID) || [];
-              this.state.processedResponse.data[index].CancelRequests = values[ARLoadQuery.CancelRequests].filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].ID) || [];
+              this.state.processedResponse.data[index].AccountDetails = values[ARLoadQuery.GLAccounts]
+                .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].ID) || [];
+
+              this.state.processedResponse.data[index].Approvals = values[ARLoadQuery.ApprovalResponses]
+                .filter(f => Number(f.InvoiceID) === this.state.processedResponse.data[index].ID) || [];
+
+              this.state.processedResponse.data[index].RelatedAttachments = values[ARLoadQuery.RelatedAttachments]
+                .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].ID) || [];
+
+              this.state.processedResponse.data[index].CancelRequests = values[ARLoadQuery.CancelRequests]
+                .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].ID) || [];
+
 
               // Add ServerDirectUrl if required.
               this.state.processedResponse.data[index].RelatedAttachments.map(relatedAttachments => {
                 if (relatedAttachments.ServerRedirectedEmbedUrl === "") {
-                  var url = values[3].find(f => f.Title === relatedAttachments.Title).ServerRelativeUrl;
+                  var url = values[ARLoadQuery.FilesRelatedAttachments].find(f => f.Title === relatedAttachments.Title).ServerRelativeUrl;
                   relatedAttachments.ServerRedirectedEmbedUrl = url;
                   relatedAttachments.ServerRedirectedEmbedUri = url;
                 }
