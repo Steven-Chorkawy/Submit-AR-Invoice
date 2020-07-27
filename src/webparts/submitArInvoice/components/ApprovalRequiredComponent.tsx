@@ -90,7 +90,7 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
   public render() {
     return (
       <div>
-        {this.state.productInEdit.Approvals.filter(a => a.Users_x0020_Email === this.props.currentUser.Email && a.Response === null).length > 0 &&
+        {this.state.productInEdit.Approvals && this.state.productInEdit.Approvals.filter(a => a.Users_x0020_Email === this.props.currentUser.Email && a.Response === null).length > 0 &&
           <div>
             <Card style={{ width: 600 }} type={this.state.approvalRequestError ? 'error' : ''}>
               <CardBody>

@@ -171,7 +171,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
 
 
               if (values[ARLoadQuery.ARInvoiceDocuments].filter(f => Number(f.AR_x0020_RequestId) === this.state.processedResponse.data[index].ID).length > 0) {
-                debugger;
+
                 this.state.processedResponse.data[index] = values[ARLoadQuery.ARInvoiceDocuments].filter(f => Number(f.AR_x0020_RequestId) === this.state.processedResponse.data[index].ID)[0];
               }
 
@@ -191,7 +191,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
             }
             // This is something from Kendo demos.
             if (toODataString(this.props.dataState) === this.lastSuccess) {
-              debugger;
+
               // Process data once more to place the ID's in the correct order.
               var outputProcessedResponse = process(this.state.processedResponse.data, this.props.dataState);
 

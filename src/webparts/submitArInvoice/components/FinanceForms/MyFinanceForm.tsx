@@ -339,7 +339,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         Batch_x0020_Number: dataItem.Batch_x0020_Number,
         Requires_x0020_Accountant_x0020_ApprovalId: dataItem.Requires_x0020_Accountant_x0020_ApprovalId ? dataItem.Requires_x0020_Accountant_x0020_ApprovalId.Id : null
       };
-      debugger;
+
       if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
         updateObject['Requires_x0020_Accountant_x0020_Id'] = dataItem.Requires_x0020_Accountant_x0020_ApprovalId ? dataItem.Requires_x0020_Accountant_x0020_ApprovalId.Id : null
         delete updateObject.Requires_x0020_Accountant_x0020_ApprovalId;
@@ -363,8 +363,17 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                   const itemProxy: any = Object.assign({}, item);
                   const editItemId: number = dataItem.ID;
                   // ! Transfer metadata from AR Request to AR Invoice.
-                  // THIS IS A 'YUGE' STEP!
+                  // ! THIS IS A 'YUGE' STEP!
                   var copiedMetadata = dataItem;
+
+                  // Add extra fields.
+                  copiedMetadata['AR_x0020_RequestId'] = editItemId;
+                  copiedMetadata['Requires_x0020_Accountant_x0020_ApprovalId'] = dataItem.Requires_x0020_Accountant_x0020_Id;
+                  //copiedMetadata['Requires_x0020_Completed_x0020_ApprovalId'] = dataItem.Requires_x0020_Completed_x0020_AId;
+                  copiedMetadata['Requires_x0020_Authorization_x0020_ById'] = {
+                    results: dataItem.Requires_x0020_Department_x0020_Id
+                  };
+
                   // Remove unwanted fields
                   this.removeFields(copiedMetadata,
                     [
@@ -396,13 +405,9 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                     ]
                   );
 
-                  // Add extra fields. 
-                  copiedMetadata['AR_x0020_RequestId'] = editItemId;
-                  copiedMetadata['Requires_x0020_Accountant_x0020_ApprovalId'] = dataItem.Requires_x0020_Accountant_x0020_Id;
-                  copiedMetadata['Requires_x0020_Completed_x0020_ApprovalId'] = dataItem.Requires_x0020_Completed_x0020_AId;
-                  copiedMetadata['Requires_x0020_Authorization_x0020_ById'] = dataItem.Requires_x0020_Department_x0020_Id;
 
-                  // Copy the meta data from the AR Req to the AR Invoice. 
+                  debugger;
+                  // Copy the meta data from the AR Req to the AR Invoice.
                   sp.web.lists.getByTitle(MyLists["AR Invoices"]).items.getById(itemProxy.ID)
                     .update({
                       StrTitle: element.name,
@@ -410,9 +415,9 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                       ...copiedMetadata
                     })
                     .then(f => {
-                      // Update all related records. 
-                      // this update will add the documents id to the files. 
-                      // this will allow us to get all related data for this document without having to use the request record. 
+                      // Update all related records.
+                      // this update will add the documents id to the files.
+                      // this will allow us to get all related data for this document without having to use the request record.
                       Promise.all([
                         this._updateRelatedDocuments(editItemId, itemProxy.ID),
                         this._updateInvoiceAccounts(editItemId, itemProxy.ID),
@@ -432,6 +437,12 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                     })
                     .catch(e => {
                       console.error("Error Mapping AR Invoice!");
+                      this.setState({
+                        gpAttachmentProps: {
+                          type: 'error',
+                          errorMessage: 'Cannot Upload GP Invoice'
+                        }
+                      });
                       throw e;
                     });
                 });
@@ -460,9 +471,9 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     } catch (error) {
       console.log('Throwing the error here');
       this.setState({
-        gpAttachmentProps:{
+        gpAttachmentProps: {
           type: 'error',
-          errorMessage: 'Cannot Upload GP Invoice' 
+          errorMessage: 'Cannot Save GP Invoice'
         }
       });
       throw error;
@@ -478,7 +489,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
   // Add docId to related documents.
   private _updateRelatedDocuments = async (reqId, docId) => {
-    // Get the related attachments that for this request. 
+    // Get the related attachments that for this request.
     await sp.web.lists
       .getByTitle(MyLists["Related Invoice Attachments"])
       .items
@@ -486,7 +497,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       .get()
       .then(async (items: any[]) => {
         if (items.length > 0) {
-          // Update the related attachment so it is now related to the AR Invoice. 
+          // Update the related attachment so it is now related to the AR Invoice.
           await sp.web.lists
             .getByTitle(MyLists["Related Invoice Attachments"])
             .items.getById(items[0].Id)
@@ -504,7 +515,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       .get()
       .then(async (item: any[]) => {
         if (item.length > 0) {
-          debugger;
           await sp.web.lists
             .getByTitle(MyLists["AR Invoice Accounts"])
             .items.getById(item[0].Id)
@@ -513,19 +523,31 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       });
   }
 
-  // Add docId to related invoice request. 
+  // Add docId to related invoice request.
   private _updateInvoiceRequest = async (reqId, docId) => {
-
+    await sp.web.lists
+      .getByTitle(MyLists["AR Invoice Requests"])
+      .items
+      .filter(`ID eq ${reqId}`)
+      .get()
+      .then(async (item: any[]) => {
+        if (item.length > 0) {
+          await sp.web.lists
+            .getByTitle(MyLists["AR Invoice Requests"])
+            .items.getById(item[0].Id)
+            .update({AR_x0020_InvoiceId: docId});
+        }
+      });
   }
 
-  // Add docId to related cancel requests. 
+  // Add docId to related cancel requests.
   private _updateCancelRequests = async (reqId, docId) => {
-
+    //TODO: Test Cancel requests with this new list.
   }
 
-  // Add docId to related approval requests. 
+  // Add docId to related approval requests.
   private _updateApprovalRequests = async (reqId, docId) => {
-
+    //TODO: Test Approval process with new list.
   }
 
 
