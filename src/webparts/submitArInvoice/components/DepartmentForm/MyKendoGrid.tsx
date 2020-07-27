@@ -60,8 +60,7 @@ class CustomCell extends React.Component<GridCellProps> {
         </a>
       </td>
     ) : (
-        <td title={'Invoice not processed...'}>
-        </td>
+        <td title={'Invoice not processed...'}></td>
       );
   }
 }
@@ -274,7 +273,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
                 if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
                   relatedAttachmentUpdateObject['AR_x0020_Invoice_x0020_RequestId'] = dataItem.ID
                 }
-                else{
+                else {
                   relatedAttachmentUpdateObject['ARInvoiceId'] = dataItem.ID;
                 }
 
@@ -297,7 +296,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
           Requester_x0020_Comments: dataItem.CancelComment
         };
 
-        if(dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
+        if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
           cancelReqUpdateObj['AR_x0020_Invoice_x0020_RequestId'] = dataItem.Id
         }
         else {
