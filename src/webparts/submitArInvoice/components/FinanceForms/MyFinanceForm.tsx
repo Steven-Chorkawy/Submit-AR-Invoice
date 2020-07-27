@@ -340,8 +340,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         Requires_x0020_Accountant_x0020_ApprovalId: dataItem.Requires_x0020_Accountant_x0020_ApprovalId ? dataItem.Requires_x0020_Accountant_x0020_ApprovalId.Id : null
       };
 
-      debugger;
-
       if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
         updateObject['Requires_x0020_Accountant_x0020_Id'] = dataItem.Requires_x0020_Accountant_x0020_ApprovalId ? dataItem.Requires_x0020_Accountant_x0020_ApprovalId.Id : null
         delete updateObject.Requires_x0020_Accountant_x0020_ApprovalId;
@@ -407,8 +405,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                     ]
                   );
 
-
-                  debugger;
                   // Copy the meta data from the AR Req to the AR Invoice.
                   sp.web.lists.getByTitle(MyLists["AR Invoices"]).items.getById(itemProxy.ID)
                     .update({
@@ -428,6 +424,9 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                         this._updateApprovalRequests(editItemId, itemProxy.ID)
                       ])
                         .then(value => {
+                          const indexOf = invoices.findIndex(f => f.AR_x0020_RequestId === editItemId);
+                          invoices[indexOf].Id = itemProxy.ID;
+                          invoices[indexOf].ID = itemProxy.ID;
                           this.setState({
                             invoices: {
                               data: invoices,

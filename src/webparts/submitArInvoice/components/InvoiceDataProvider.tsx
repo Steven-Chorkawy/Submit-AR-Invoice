@@ -191,7 +191,6 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
               }
               // For Invoice Document Content Type
               else {
-                debugger;
                 this.state.processedResponse.data[index].AccountDetails = values[ARLoadQuery.GLAccounts]
                   .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].AR_x0020_RequestId) || [];
 
