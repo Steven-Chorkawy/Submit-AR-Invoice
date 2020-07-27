@@ -15,6 +15,7 @@ import "@pnp/sp/site-users/web";
 import { IFile } from '@pnp/sp/files';
 import { MyLists } from './enums/MyLists';
 import { filter } from '@progress/kendo-data-query/dist/npm/transducers';
+import { MyContentTypes } from './enums/MyEnums';
 
 /** End PnP Imports */
 
@@ -174,18 +175,35 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
                 this.state.processedResponse.data[index] = values[ARLoadQuery.ARInvoiceDocuments].filter(f => Number(f.AR_x0020_RequestId) === this.state.processedResponse.data[index].ID)[0];
               }
 
-              this.state.processedResponse.data[index].AccountDetails = values[ARLoadQuery.GLAccounts]
-                .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].ID) || [];
+              // For Request Content Type
+              if (this.state.processedResponse.data[index].ContentTypeId === MyContentTypes["AR Request List Item"]) {
+                this.state.processedResponse.data[index].AccountDetails = values[ARLoadQuery.GLAccounts]
+                  .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].ID) || [];
 
-              this.state.processedResponse.data[index].Approvals = values[ARLoadQuery.ApprovalResponses]
-                .filter(f => Number(f.InvoiceID) === this.state.processedResponse.data[index].ID) || [];
+                this.state.processedResponse.data[index].Approvals = values[ARLoadQuery.ApprovalResponses]
+                  .filter(f => Number(f.InvoiceID) === this.state.processedResponse.data[index].ID) || [];
 
-              this.state.processedResponse.data[index].RelatedAttachments = values[ARLoadQuery.RelatedAttachments]
-                .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].ID) || [];
+                this.state.processedResponse.data[index].RelatedAttachments = values[ARLoadQuery.RelatedAttachments]
+                  .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].ID) || [];
 
-              this.state.processedResponse.data[index].CancelRequests = values[ARLoadQuery.CancelRequests]
-                .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].ID) || [];
+                this.state.processedResponse.data[index].CancelRequests = values[ARLoadQuery.CancelRequests]
+                  .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].ID) || [];
+              }
+              // For Invoice Document Content Type
+              else {
+                debugger;
+                this.state.processedResponse.data[index].AccountDetails = values[ARLoadQuery.GLAccounts]
+                  .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].AR_x0020_RequestId) || [];
 
+                this.state.processedResponse.data[index].Approvals = values[ARLoadQuery.ApprovalResponses]
+                  .filter(f => Number(f.InvoiceID) === this.state.processedResponse.data[index].AR_x0020_RequestId) || [];
+
+                this.state.processedResponse.data[index].RelatedAttachments = values[ARLoadQuery.RelatedAttachments]
+                  .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].AR_x0020_RequestId) || [];
+
+                this.state.processedResponse.data[index].CancelRequests = values[ARLoadQuery.CancelRequests]
+                  .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].AR_x0020_RequestId) || [];
+              }
 
               // Add ServerDirectUrl if required.
               this.state.processedResponse.data[index].RelatedAttachments.map(relatedAttachments => {
