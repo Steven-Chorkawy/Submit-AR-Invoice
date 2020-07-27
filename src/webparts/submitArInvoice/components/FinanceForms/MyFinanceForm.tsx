@@ -340,6 +340,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         Requires_x0020_Accountant_x0020_ApprovalId: dataItem.Requires_x0020_Accountant_x0020_ApprovalId ? dataItem.Requires_x0020_Accountant_x0020_ApprovalId.Id : null
       };
 
+      debugger;
+
       if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
         updateObject['Requires_x0020_Accountant_x0020_Id'] = dataItem.Requires_x0020_Accountant_x0020_ApprovalId ? dataItem.Requires_x0020_Accountant_x0020_ApprovalId.Id : null
         delete updateObject.Requires_x0020_Accountant_x0020_ApprovalId;
@@ -468,6 +470,15 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
             });
         }
       }
+
+      this.setState({
+        invoices: {
+          data: invoices,
+          total: invoices.length
+        },
+        productInEdit: undefined
+      });
+
     } catch (error) {
       console.log('Throwing the error here');
       this.setState({

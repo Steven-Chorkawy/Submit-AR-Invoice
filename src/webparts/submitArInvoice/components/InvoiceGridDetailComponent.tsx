@@ -21,7 +21,7 @@ export class InvoiceGridDetailComponent extends GridDetailRow {
   public render() {
     return (
       <div style={{ marginBottom: '3em;' }}>
-        {this.props.dataItem.CancelRequests.length > 0 &&
+        {this.props.dataItem.CancelRequests && <div> {this.props.dataItem.CancelRequests.length > 0 &&
           <div>
             <h3>Cancel Requests</h3>
             <Card style={{ width: 600 }} type='error'>
@@ -36,7 +36,7 @@ export class InvoiceGridDetailComponent extends GridDetailRow {
               })}
             </Card>
           </div>
-        }
+        }</div>}
 
         <h3>G/L Accounts</h3>
         <MyFinanceGlAccounts
