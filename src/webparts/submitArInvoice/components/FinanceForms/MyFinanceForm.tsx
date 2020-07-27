@@ -38,6 +38,7 @@ import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { InvoiceEditForm, IGPAttachmentProps } from './InvoiceEditForm';
+import { FileRefCell } from '../FileRefCell';
 
 
 interface IMyFinanceFormState {
@@ -138,6 +139,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   //this.CommandCell is set in this classes constructor.
   private CommandCell;
   private MyCustomUrgentCell = (props) => <CustomUrgentCell {...props} />;
+
+  public MyCustomCell = (props) => <FileRefCell {...props} />;
   //#endregion
 
   //#region Methods
@@ -724,7 +727,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
               >Cancel Current Changes</Button>
             )}
           </GridToolbar>
-
+          <GridColumn width="75px" field="FileRef" title="" filterable={false} sortable={false} cell={this.MyCustomCell} />
           <GridColumn field="ID" title="ID" width={this._columnWidth} editable={false} />
           <GridColumn field="Date" title="Date" width={this._columnWidth} filter='date' format={MyGridStrings.DateFilter} />
           <GridColumn field="Department" title="Department" width={this._columnWidth} />

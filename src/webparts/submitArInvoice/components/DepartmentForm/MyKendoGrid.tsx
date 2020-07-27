@@ -31,6 +31,7 @@ import { ConvertQueryParamsToKendoFilter } from '../MyHelperMethods';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { MyContentTypes } from '../enums/MyEnums';
+import { FileRefCell } from '../FileRefCell';
 
 type MyKendoGridState = {
   data: any;
@@ -46,24 +47,7 @@ type MyKendoGridState = {
 };
 
 
-/**
- * Used to Render a url to the current file.
- */
-class CustomCell extends React.Component<GridCellProps> {
-  public render() {
-    return (this.props.dataItem.ContentTypeId === MyContentTypes["AR Invoice Document Item"]) ? (
-      <td title={'Click to view invoice.'}>
-        {console.log("FileRef Cell:")}
-        {console.log(this.props)}
-        <a href={this.props.dataItem.ServerRedirectedEmbedUrl} target='_blank' >
-          <Button primary={true} /*icon="hyperlink-open"*/ icon="folder"></Button>
-        </a>
-      </td>
-    ) : (
-        <td title={'Invoice not processed...'}></td>
-      );
-  }
-}
+
 
 export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   constructor(props) {
@@ -99,7 +83,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   private CommandCell;
 
   //#region Methods
-  public MyCustomCell = (props) => <CustomCell {...props} />;
+  public MyCustomCell = (props) => <FileRefCell {...props} />;
 
   public dataStateChange = (e) => {
     this.setState({
