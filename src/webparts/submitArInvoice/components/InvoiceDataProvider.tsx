@@ -99,20 +99,22 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
         let filteredResponse = filterBy(response, this.props.filterState);
 
         // Apply Kendo grids filters.
-        var processedResponse = process(filteredResponse, this.props.dataState);
+        this.setState({
+          processedResponse: process(filteredResponse, this.props.dataState)
+        });
 
         // Hold the list of invoice IDs that will be used to pull related accounts.
         var invoiceIds = [];                // filter for accounts
-        var idsForApproval = [];            // filter for approval requests. 
-        var idsForRelatedAttachments = [];  // filter for related attachments. 
+        var idsForApproval = [];            // filter for approval requests.
+        var idsForRelatedAttachments = [];  // filter for related attachments.
         var idsForCancelRequests = [];      // filter for cancel requests.
         var idsForARDocuments = [];
 
         // Iterate through processedResponse instead of response because if you don't this will generate a URL that over
         // 2000 characters long.
         // That is too big for SharePoint to handle.
-        for (let index = 0; index < processedResponse.data.length; index++) {
-          const element = processedResponse.data[index];
+        for (let index = 0; index < this.state.processedResponse.data.length; index++) {
+          const element = this.state.processedResponse.data[index];
           invoiceIds.push(`AR_x0020_Invoice_x0020_Request/ID eq ${element.ID}`);
           idsForApproval.push(`InvoiceID eq '${element.ID}'`);
           idsForRelatedAttachments.push(`AR_x0020_Invoice_x0020_Request/ID eq ${element.ID}`);
@@ -120,8 +122,8 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
 
           idsForARDocuments.push(`AR_x0020_RequestId eq ${element.ID}`);
 
-          processedResponse.data[index].Date = new Date(processedResponse.data[index].Date);
-          processedResponse.data[index].Created = new Date(processedResponse.data[index].Created);
+          this.state.processedResponse.data[index].Date = new Date(this.state.processedResponse.data[index].Date);
+          this.state.processedResponse.data[index].Created = new Date(this.state.processedResponse.data[index].Created);
         }
 
         Promise.all([
@@ -164,22 +166,22 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
              *
              ***********************************/
             // Using each of the accounts that we found we will not attach them to the invoice object.
-            for (let index = 0; index < processedResponse.data.length; index++) {
-              processedResponse.data[index];
-              
+            for (let index = 0; index < this.state.processedResponse.data.length; index++) {
+              this.state.processedResponse.data[index];
 
-              if (values[ARLoadQuery.ARInvoiceDocuments].filter(f => Number(f.AR_x0020_RequestId) === processedResponse.data[index].ID).length > 0) {
+
+              if (values[ARLoadQuery.ARInvoiceDocuments].filter(f => Number(f.AR_x0020_RequestId) === this.state.processedResponse.data[index].ID).length > 0) {
                 debugger;
-                processedResponse.data[index] = values[ARLoadQuery.ARInvoiceDocuments].filter(f => Number(f.AR_x0020_RequestId) === processedResponse.data[index].ID)[0];
+                this.state.processedResponse.data[index] = values[ARLoadQuery.ARInvoiceDocuments].filter(f => Number(f.AR_x0020_RequestId) === this.state.processedResponse.data[index].ID)[0];
               }
 
-              processedResponse.data[index].AccountDetails = values[ARLoadQuery.GLAccounts].filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === processedResponse.data[index].ID) || [];
-              processedResponse.data[index].Approvals = values[ARLoadQuery.ApprovalResponses].filter(f => Number(f.InvoiceID) === processedResponse.data[index].ID) || [];
-              processedResponse.data[index].RelatedAttachments = values[ARLoadQuery.RelatedAttachments].filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === processedResponse.data[index].ID) || [];
-              processedResponse.data[index].CancelRequests = values[ARLoadQuery.CancelRequests].filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === processedResponse.data[index].ID) || [];
+              this.state.processedResponse.data[index].AccountDetails = values[ARLoadQuery.GLAccounts].filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].ID) || [];
+              this.state.processedResponse.data[index].Approvals = values[ARLoadQuery.ApprovalResponses].filter(f => Number(f.InvoiceID) === this.state.processedResponse.data[index].ID) || [];
+              this.state.processedResponse.data[index].RelatedAttachments = values[ARLoadQuery.RelatedAttachments].filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].ID) || [];
+              this.state.processedResponse.data[index].CancelRequests = values[ARLoadQuery.CancelRequests].filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].ID) || [];
 
               // Add ServerDirectUrl if required.
-              processedResponse.data[index].RelatedAttachments.map(relatedAttachments => {
+              this.state.processedResponse.data[index].RelatedAttachments.map(relatedAttachments => {
                 if (relatedAttachments.ServerRedirectedEmbedUrl === "") {
                   var url = values[3].find(f => f.Title === relatedAttachments.Title).ServerRelativeUrl;
                   relatedAttachments.ServerRedirectedEmbedUrl = url;
@@ -187,35 +189,17 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
                 }
               });
             }
-            // response.map(invoice => {
-            //   if (values[ARLoadQuery.ARInvoiceDocuments].filter(f => Number(f.AR_x0020_RequestId) === invoice.ID).length > 0) {
-            //     debugger;
-            //     invoice = values[ARLoadQuery.ARInvoiceDocuments].filter(f => Number(f.AR_x0020_RequestId) === invoice.ID)[0];
-            //   }
-
-            //   invoice.AccountDetails = values[ARLoadQuery.GLAccounts].filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === invoice.ID) || [];
-            //   invoice.Approvals = values[ARLoadQuery.ApprovalResponses].filter(f => Number(f.InvoiceID) === invoice.ID) || [];
-            //   invoice.RelatedAttachments = values[ARLoadQuery.RelatedAttachments].filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === invoice.ID) || [];
-            //   invoice.CancelRequests = values[ARLoadQuery.CancelRequests].filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === invoice.ID) || [];
-
-            //   // Add ServerDirectUrl if required.
-            //   invoice.RelatedAttachments.map(relatedAttachments => {
-            //     if (relatedAttachments.ServerRedirectedEmbedUrl === "") {
-            //       var url = values[3].find(f => f.Title === relatedAttachments.Title).ServerRelativeUrl;
-            //       relatedAttachments.ServerRedirectedEmbedUrl = url;
-            //       relatedAttachments.ServerRedirectedEmbedUri = url;
-            //     }
-            //   });
-            // });
-            debugger;
-
             // This is something from Kendo demos.
             if (toODataString(this.props.dataState) === this.lastSuccess) {
+              debugger;
+              // Process data once more to place the ID's in the correct order.
+              var outputProcessedResponse = process(this.state.processedResponse.data, this.props.dataState);
+
               this.props.onARRequestDataReceived.call(undefined, {
                 // Add the filtered, sorted data.
-                data: processedResponse.data,
+                data: outputProcessedResponse.data,
                 // Add the total amount of records found prior to filters and sorts being applied.
-                total: processedResponse.total
+                total: outputProcessedResponse.total
               });
             } else {
               this.requestARRequestsIfNeeded();
