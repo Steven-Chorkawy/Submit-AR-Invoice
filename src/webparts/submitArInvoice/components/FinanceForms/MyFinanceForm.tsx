@@ -333,8 +333,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         invoices.splice(index, 1, dataItem);
       }
 
-
-
       var updateObject = {
         Invoice_x0020_Status: dataItem.Invoice_x0020_Status,
         Invoice_x0020_Number: dataItem.Invoice_x0020_Number,
@@ -434,14 +432,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                     })
                     .catch(e => {
                       console.error("Error Mapping AR Invoice!");
-                      this.setState({
-                        gpAttachmentProps:{
-                          type: 'error',
-                          errorMessage: 'Cannot Upload GP Invoice' 
-                        }
-                      })
                       throw e;
-                      debugger;
                     });
                 });
             });
@@ -467,6 +458,13 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         }
       }
     } catch (error) {
+      console.log('Throwing the error here');
+      this.setState({
+        gpAttachmentProps:{
+          type: 'error',
+          errorMessage: 'Cannot Upload GP Invoice' 
+        }
+      });
       throw error;
     }
   }
