@@ -301,15 +301,44 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
         }
         else {
           cancelReqUpdateObj['Invoice_x0020_NumberId'] = dataItem.Id
+          cancelReqUpdateObj['AR_x0020_Invoice_x0020_RequestId'] = dataItem.AR_x0020_RequestId
         }
 
         sp.web.lists.getByTitle(MyLists["Cancel Invoice Request"])
           .items
           .add(cancelReqUpdateObj)
-          .then(_ => {
-            this.setState({
-              productInCancel: undefined
-            });
+          .then(createRes => {
+            debugger;
+            var indexOf = -1;
+            var arReqId = -1;
+
+            if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
+              indexOf = this.state.data.data.findIndex(f => f.ID === dataItem.Id);
+              arReqId = dataItem.Id;
+            }
+            else {
+              indexOf = this.state.data.data.findIndex(f => f.AR_x0020_RequestId === dataItem.AR_x0020_RequestId);
+              arReqId = dataItem.AR_x0020_RequestId;
+            }
+
+            sp.web.lists.getByTitle(MyLists["Cancel Invoice Request"])
+              .items.getById(createRes.data.Id)
+              .select('*, Requested_x0020_By/EMail, Requested_x0020_By/Title')
+              .expand('Requested_x0020_By')
+              .get()
+              .then(response => {
+                debugger;
+                var updatedARs = this.state.data.data;
+                updatedARs[indexOf].CancelRequests.push(response);
+
+                this.setState({
+                  data: {
+                    data: updatedARs,
+                    total: updatedARs.length
+                  },
+                  productInCancel: undefined
+                });
+              });
           });
       });
   }
