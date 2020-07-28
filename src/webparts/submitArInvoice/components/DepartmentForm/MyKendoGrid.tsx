@@ -189,13 +189,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       invoices.splice(index, 1, dataItem);
     }
 
-    this.setState({
-      data: {
-        data: invoices,
-        total: invoices.length
-      },
-      productInEdit: undefined
-    });
+
 
     let updateObject = {
       Department: dataItem.Department,
@@ -266,6 +260,24 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
           });
       }
     }
+
+
+    // Query the new record to get all the new info.
+    //TODO: Include more related records here.
+    sp.web.lists.getByTitle(MyLists["AR Invoice Requests"])
+      .items.getById(dataItem.ID)
+      .get()
+      .then(response => {
+        const index = invoices.findIndex(p => p.ID === dataItem.ID);
+        invoices.splice(index, 1, response);
+        this.setState({
+          data: {
+            data: invoices,
+            total: invoices.length
+          },
+          productInEdit: undefined
+        });
+      });
   }
 
   public sendCancelRequest = () => {
