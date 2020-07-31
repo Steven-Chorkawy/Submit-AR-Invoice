@@ -5,7 +5,7 @@ import { ListView, ListViewHeader, ListViewFooter } from '@progress/kendo-react-
 import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/kendo-react-layout';
 import { Pager } from '@progress/kendo-react-data-tools';
 
-import { InvoiceDataProvider } from '../InvoiceDataProvider';
+import { InvoiceDataProvider } from './InvoiceDataProvider';
 
 
 // Content of List Item
@@ -43,7 +43,7 @@ const MyItemRender = props => {
   );
 }
 
-class DepartmentListView extends React.Component<any, any> {
+class ARInvoiceListView extends React.Component<any, any> {
   constructor(props) {
     super(props);
 
@@ -61,7 +61,6 @@ class DepartmentListView extends React.Component<any, any> {
       }
     };
   }
-
 
 
   //#region Data Operations
@@ -159,4 +158,4 @@ class DepartmentListView extends React.Component<any, any> {
 }
 
 
-export { DepartmentListView };
+export { ARInvoiceListView };
