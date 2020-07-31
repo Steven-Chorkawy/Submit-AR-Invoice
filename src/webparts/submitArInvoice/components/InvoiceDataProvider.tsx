@@ -55,6 +55,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
   public lastForceGUID = '';
 
   public requestDataIfNeeded = () => {
+    debugger;
 
     // If pending is set OR dateSate === lastDataState
     if (this.pending || toODataString(this.props.dataState) === this.lastSuccess) {
