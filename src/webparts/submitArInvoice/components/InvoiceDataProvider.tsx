@@ -55,7 +55,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
   public lastForceGUID = '';
 
   public requestDataIfNeeded = () => {
-    debugger;
+
 
     // If pending is set OR dateSate === lastDataState
     if (this.pending || toODataString(this.props.dataState) === this.lastSuccess) {
@@ -73,12 +73,12 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
         this.lastSuccess = this.pending;
         this.pending = '';
 
-        debugger;
+     
         let filteredResponse = filterBy(response, this.props.filterState);
 
         // Apply Kendo grids filters.
         var processedResponse = process(filteredResponse, this.props.dataState);
-        debugger;
+       
         // Hold the list of invoice IDs that will be used to pull related accounts.
         var invoiceIds = [];
         var idsForApproval = [];
@@ -156,7 +156,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
 
             // This is something from Kendo demos.
             if (toODataString(this.props.dataState) === this.lastSuccess) {
-              debugger;
+              
               this.props.onDataReceived.call(undefined, {
                 // Add the filtered, sorted data.
                 data: processedResponse.data,

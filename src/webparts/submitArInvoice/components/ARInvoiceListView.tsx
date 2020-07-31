@@ -13,33 +13,52 @@ const MyItemRender = props => {
   let item = props.dataItem;
 
   return (
-      <Card key={props.dataItem.ID} orientation='vertical' style={{ borderWidth: '0px 0px 1px', width: '100%', marginBottom:'15px' }}>
-        <CardBody>
-          <div className='row p-2 border-bottom align-middle' style={{ margin: 0 }}>
-            <div className='col-sm-2'>
-              ID: {item.ID}
-            </div>
-            <div className='col-sm-6'>
-              <h2 style={{ fontSize: 14, color: '#454545', marginBottom: 0, marginTop: 0 }} className="text-uppercase">name</h2>
-              <div style={{ fontSize: 12, color: "#a0a0a0" }}>email</div>
-            </div>
-            <div className='col-sm-4'>
-              <div className='k-chip k-chip-filled'>
-                <div className='k-chip-content'>new messages</div>
-              </div>
+    <Card key={props.dataItem.ID} orientation='vertical' style={{ borderWidth: '0px 0px 1px', width: '100%', marginBottom: '15px' }}>
+      <CardBody>
+        <div className='row p-2 border-bottom align-middle' style={{ margin: 0 }}>
+          <div className='col-sm-2'>
+            ID: {item.ID}
+          </div>
+          <div className='col-sm-6'>
+            <h2 style={{ fontSize: 14, color: '#454545', marginBottom: 0, marginTop: 0 }} className="text-uppercase">name</h2>
+            <div style={{ fontSize: 12, color: "#a0a0a0" }}>email</div>
+          </div>
+          <div className='col-sm-4'>
+            <div className='k-chip k-chip-filled'>
+              <div className='k-chip-content'>new messages</div>
             </div>
           </div>
+        </div>
+      </CardBody>
+      <CardBody>
+        Card body 2
         </CardBody>
-        <CardBody>
-          Card body 2
-        </CardBody>
-        <CardActions>
-          <button className='k-button k-bare'>1</button>
-          <button className='k-button k-bare'>2</button>
-          <button className='k-button k-bare'>3</button>
-          <button className='k-button k-bare'>4</button>
-        </CardActions>
-      </Card>
+      <CardActions>
+        <button className='k-button k-bare'>1</button>
+        <button className='k-button k-bare'>2</button>
+        <button className='k-button k-bare'>3</button>
+        <button className='k-button k-bare'>4</button>
+      </CardActions>
+    </Card>
+  );
+}
+
+const MyPager = props => {
+  console.log('MyPager');
+  console.log(props);
+  console.log(this);
+  return (
+    <Pager
+      skip={props.dataState.skip}
+      take={props.dataState.take}
+      total={props.invoicesReceived.total}
+      buttonCount={5}
+      info={true}
+      type={'numeric'}
+      previousNext={true}
+      pageSizes={[5, 10, 15, 20, 25]}
+      onPageChange={props.handlePagesChange}
+    />
   );
 }
 
@@ -119,22 +138,13 @@ class ARInvoiceListView extends React.Component<any, any> {
         {
           this.state.invoicesReceived.data ?
             <div>
+              {MyPager({ ...this.state, handlePagesChange: this.handlePageChange })}
               <ListView
                 data={this.state.invoicesReceived.data}
                 item={MyItemRender}
                 style={{ width: "100%" }}
               />
-              <Pager
-                skip={this.state.dataState.skip}
-                take={this.state.dataState.take}
-                total={this.state.invoicesReceived.total}
-                buttonCount={5}
-                info={true}
-                type={'numeric'}
-                previousNext={true}
-                pageSizes={[5, 10, 15, 20, 25]}
-                onPageChange={this.handlePageChange}
-              />
+              {MyPager({ ...this.state, handlePagesChange: this.handlePageChange })}
             </div>
             : <p>Loading...</p>
         }
