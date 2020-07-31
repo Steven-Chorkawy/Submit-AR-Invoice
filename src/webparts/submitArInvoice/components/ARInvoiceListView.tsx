@@ -4,49 +4,25 @@ import * as ReactDom from 'react-dom';
 import { ListView, ListViewHeader, ListViewFooter } from '@progress/kendo-react-listview';
 import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/kendo-react-layout';
 import { Pager } from '@progress/kendo-react-data-tools';
+import { Button } from '@progress/kendo-react-buttons';
 
 import { InvoiceDataProvider } from './InvoiceDataProvider';
+import { ARListViewItem } from './ARListViewItem';
 
 
 // Content of List Item
-const MyItemRender = props => {
+const MyItemRender = (props) => {
   let item = props.dataItem;
+  console.log('my item render');
+  console.log(props);
+  debugger;
 
   return (
-    <Card key={props.dataItem.ID} orientation='vertical' style={{ borderWidth: '0px 0px 1px', width: '100%', marginBottom: '15px' }}>
-      <CardBody>
-        <div className='row p-2 border-bottom align-middle' style={{ margin: 0 }}>
-          <div className='col-sm-2'>
-            ID: {item.ID}
-          </div>
-          <div className='col-sm-6'>
-            <h2 style={{ fontSize: 14, color: '#454545', marginBottom: 0, marginTop: 0 }} className="text-uppercase">name</h2>
-            <div style={{ fontSize: 12, color: "#a0a0a0" }}>email</div>
-          </div>
-          <div className='col-sm-4'>
-            <div className='k-chip k-chip-filled'>
-              <div className='k-chip-content'>new messages</div>
-            </div>
-          </div>
-        </div>
-      </CardBody>
-      <CardBody>
-        Card body 2
-        </CardBody>
-      <CardActions>
-        <button className='k-button k-bare'>1</button>
-        <button className='k-button k-bare'>2</button>
-        <button className='k-button k-bare'>3</button>
-        <button className='k-button k-bare'>4</button>
-      </CardActions>
-    </Card>
+    <ARListViewItem {...props} />
   );
 }
 
 const MyPager = props => {
-  console.log('MyPager');
-  console.log(props);
-  console.log(this);
   return (
     <Pager
       skip={props.dataState.skip}
@@ -77,7 +53,8 @@ class ARInvoiceListView extends React.Component<any, any> {
       dataState: {
         take: 5,
         skip: 0
-      }
+      },
+      showAllListDetails: false
     };
   }
 
@@ -141,7 +118,7 @@ class ARInvoiceListView extends React.Component<any, any> {
               {MyPager({ ...this.state, handlePagesChange: this.handlePageChange })}
               <ListView
                 data={this.state.invoicesReceived.data}
-                item={MyItemRender}
+                item={(item) => { return MyItemRender({ ...item, showMore: this.state.showAllListDetails }) }}
                 style={{ width: "100%" }}
               />
               {MyPager({ ...this.state, handlePagesChange: this.handlePageChange })}
