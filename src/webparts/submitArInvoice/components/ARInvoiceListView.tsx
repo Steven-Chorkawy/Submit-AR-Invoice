@@ -13,9 +13,7 @@ import { ARListViewItem } from './ARListViewItem';
 // Content of List Item
 const MyItemRender = (props) => {
   let item = props.dataItem;
-  console.log('my item render');
-  console.log(props);
-  debugger;
+  
 
   return (
     <ARListViewItem {...props} />
@@ -82,7 +80,7 @@ class ARInvoiceListView extends React.Component<any, any> {
   }
 
   public dataReceived = (invoices) => {
-    debugger;
+    
     console.log("dataReceived");
     console.log(invoices);
 
