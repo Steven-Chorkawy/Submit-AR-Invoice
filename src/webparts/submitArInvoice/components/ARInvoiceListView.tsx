@@ -13,7 +13,7 @@ import { ARListViewItem } from './ARListViewItem';
 // Content of List Item
 const MyItemRender = (props) => {
   let item = props.dataItem;
-  
+
 
   return (
     <ARListViewItem {...props} />
@@ -22,17 +22,20 @@ const MyItemRender = (props) => {
 
 const MyPager = props => {
   return (
-    <Pager
-      skip={props.dataState.skip}
-      take={props.dataState.take}
-      total={props.invoicesReceived.total}
-      buttonCount={5}
-      info={true}
-      type={'numeric'}
-      previousNext={true}
-      pageSizes={[5, 10, 15, 20, 25]}
-      onPageChange={props.handlePagesChange}
-    />
+    <div>
+      <Button icon={props.showAllListDetails ? 'minus' : 'plus'} onClick={(e) => { props.toggleShowMore(e); }}>{props.showAllListDetails ? 'Hide All Details' : 'Show All Details'}</Button>
+      <Pager
+        skip={props.dataState.skip}
+        take={props.dataState.take}
+        total={props.invoicesReceived.total}
+        buttonCount={5}
+        info={true}
+        type={'numeric'}
+        previousNext={true}
+        pageSizes={[5, 10, 15, 20, 25]}
+        onPageChange={props.handlePagesChange}
+      />
+    </div>
   );
 }
 
@@ -80,7 +83,7 @@ class ARInvoiceListView extends React.Component<any, any> {
   }
 
   public dataReceived = (invoices) => {
-    
+
     console.log("dataReceived");
     console.log(invoices);
 
@@ -93,7 +96,12 @@ class ARInvoiceListView extends React.Component<any, any> {
   //#endregion
 
   //#region Pager Methods
-  handlePageChange = event => {
+  public toggleShowMore = (e) => {
+    debugger;
+    this.setState({ showAllListDetails: !this.state.showAllListDetails });
+  }
+
+  public handlePageChange = event => {
     const { skip, take } = event;
     this.setState({
       dataState: {
@@ -113,13 +121,14 @@ class ARInvoiceListView extends React.Component<any, any> {
         {
           this.state.invoicesReceived.data ?
             <div>
-              {MyPager({ ...this.state, handlePagesChange: this.handlePageChange })}
+              {}
               <ListView
                 data={this.state.invoicesReceived.data}
                 item={(item) => { return MyItemRender({ ...item, showMore: this.state.showAllListDetails }) }}
+                header={() => { return MyPager({ ...this.state, handlePagesChange: this.handlePageChange, toggleShowMore: this.toggleShowMore }) }}
+                footer={() => { return MyPager({ ...this.state, handlePagesChange: this.handlePageChange, toggleShowMore: this.toggleShowMore }) }}
                 style={{ width: "100%" }}
               />
-              {MyPager({ ...this.state, handlePagesChange: this.handlePageChange })}
             </div>
             : <p>Loading...</p>
         }

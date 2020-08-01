@@ -14,8 +14,6 @@ class ARListViewItem extends React.Component<any, any> {
         };
     }
 
-
-
     public render() {
         return (
             <Card type={this.state.index % 2 === 0 ? 'info' : ''}
@@ -30,7 +28,12 @@ class ARListViewItem extends React.Component<any, any> {
                 <CardBody>
                     <div className='row p-2 border-bottom align-middle' style={{ margin: 0 }}>
                         <div className='col-sm-2'>
-                            ID: {this.state.dataItem.ID}
+                            <div title={'index'} className={'k-chip k-chip-filled k-chip-error'} style={{ padding: '2px' }}>
+                                {this.state.index + 1}
+                            </div>
+                            <div title={'ID'} className={'k-chip k-chip-filled k-chip-info'} style={{ width: '100%' }}>
+                                {this.state.dataItem.ID}
+                            </div>
                         </div>
                         <div className='col-sm-6'>
                             <h2 style={{ fontSize: 14, color: '#454545', marginBottom: 0, marginTop: 0 }} className="text-uppercase">name</h2>
