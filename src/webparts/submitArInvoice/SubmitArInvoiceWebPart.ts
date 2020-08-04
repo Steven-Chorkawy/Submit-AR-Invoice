@@ -29,6 +29,7 @@ import * as strings from 'SubmitArInvoiceWebPartStrings';
 import { MyForm } from './components/MyKendoForm';
 import { MyFinanceForm } from './components/FinanceForms/MyFinanceForm';
 import { MyKendoGrid } from './components/DepartmentForm/MyKendoGrid';
+import { DepartmentListView } from './components/DepartmentForm/DepartmentListView';
 import { IMyFormProps } from './components/IMyFormProps';
 
 export interface ISubmitArInvoiceWebPartProps {
@@ -40,7 +41,8 @@ export interface ISubmitArInvoiceWebPartProps {
 export enum ActiveDisplay {
   CreateARForm = 1,
   DepartmentForm = 2,
-  FinanceForm = 3
+  FinanceForm = 3,
+  DepartmentListView = 4
 }
 
 
@@ -144,6 +146,18 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
           });
         break;
 
+      case ActiveDisplay.DepartmentListView:
+        Promise.all([this.getARInvoices(), this.getSiteUsers(), this.getCustomers()])
+          .then((values) => {
+            let depSearchElement: React.ReactElement = React.createElement(
+              DepartmentListView,
+              { properties: this.properties, data: values[0], siteUsers: values[1], customers: values[2] }
+            );
+
+            ReactDom.render(depSearchElement, this.domElement);
+          });
+        break;
+
       case ActiveDisplay.FinanceForm:
         let financeForm: React.ReactElement = React.createElement(
           MyFinanceForm,
@@ -179,7 +193,8 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
                   options: [
                     { key: ActiveDisplay.CreateARForm, text: 'Create AR Form' },
                     { key: ActiveDisplay.DepartmentForm, text: 'Departments Form' },
-                    { key: ActiveDisplay.FinanceForm, text: 'Finance Form' }
+                    { key: ActiveDisplay.FinanceForm, text: 'Finance Form' },
+                    { key: ActiveDisplay.DepartmentListView, text: 'Department List View' },
                   ]
                 }),
               ]

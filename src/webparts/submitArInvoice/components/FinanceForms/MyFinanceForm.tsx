@@ -60,9 +60,6 @@ interface IInvoicesDataState {
 class InvoiceEditForm extends React.Component<any, any> {
   constructor(props) {
     super(props);
-    console.log('InvoiceEditForm');
-    console.log(props);
-
     this.state = {
       productInEdit: this.props.dataItem || null,
       visible: false,
@@ -271,8 +268,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
   //#region Methods
   public dataReceived = (invoices) => {
-    console.log("dataReceived");
-    console.log(invoices);
     var dataHolder: any = filterBy(invoices.data, this.state.filter);
 
     this.setState({
@@ -583,15 +578,11 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     for (let index = 0; index < item.length; index++) {
 
       const currentAccount = item[index];
-      console.log("updateAccount");
-      console.log(currentAccount);
-
       let invoiceIndex = this.state.invoices.data.findIndex(p => p.ID === currentAccount.InvoiceID);
 
       if (invoiceIndex >= 0) {
         let accountIndex = data[invoiceIndex].AccountDetails.findIndex(p => p.ID === currentAccount.ID);
         if (accountIndex >= 0) {
-          console.log(data[invoiceIndex].AccountDetails[accountIndex]);
           data[invoiceIndex].AccountDetails[accountIndex] = {
             ...data[invoiceIndex].AccountDetails[accountIndex],
             Account_x0020_Code: currentAccount.GLCode,

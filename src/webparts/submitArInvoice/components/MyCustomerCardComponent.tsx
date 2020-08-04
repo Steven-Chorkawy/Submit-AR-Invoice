@@ -10,7 +10,6 @@ export class MyCustomerCardComponent extends React.Component<any, any> {
    */
   constructor(props) {
     super(props);
-
     this.state = {
       selectedCustomer: props.selectedCustomer
     };
@@ -37,7 +36,8 @@ export class MyCustomerCardComponent extends React.Component<any, any> {
             className={'k-textarea k-autofill'}
             id={'MiscCustomerDetails'}
             name={'MiscCustomerDetails'}
-            onChange={this.props.onCustomCusteromChange}
+            onChange={this.props.onCustomCustomerChange}
+            value={this.state.selectedCustomer.CustomerDetails}
           />
         </div>
       );
