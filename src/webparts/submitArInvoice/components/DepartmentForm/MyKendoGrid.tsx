@@ -51,8 +51,6 @@ class CustomCell extends React.Component<GridCellProps> {
   public render() {
     return (this.props.dataItem.Invoice_x0020_Status === InvoiceStatus["Entered into GP"] || this.props.dataItem.Invoice_x0020_Status === InvoiceStatus.Completed) ? (
       <td title={'Click to view invoice.'}>
-        {console.log("FileRef Cell:")}
-        {console.log(this.props)}
         <a href={this.props.dataItem.ServerRedirectedEmbedUrl} target='_blank' >
           <Button primary={true} /*icon="hyperlink-open"*/ icon="folder"></Button>
         </a>
@@ -142,9 +140,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   }
 
   public dataReceived = (invoices) => {
-    console.log("dataReceived");
-    console.log(invoices);
-
     this.setState({
       ...this.state,
       data: invoices,

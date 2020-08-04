@@ -18,9 +18,6 @@ import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
 export class MyEditDialogContainer extends React.Component<any, any> {
   constructor(props) {
     super(props);
-    console.log("MyEditDialogContainer");
-    console.log(props);
-
     this.props.dataItem.Requires_x0020_Authorization_x0020_ById.map(reqAuthId => {
       this._selectedReqApprovers.push(this.props.siteUsers.find(s => s.Id === reqAuthId));
     });
@@ -238,9 +235,6 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                 suggest={true}
                 onFilterChange={this.customerFilterChange}
                 onCustomCusteromChange={this.onCustomCustomerChange}
-                //value={this.props.customers.find(f => f.Id === this.state.productInEdit.CustomerId)}
-                // value={{ Customer_x0020_Name: 'tester' }}
-                //value={this.state.productInEdit.Customer}
                 value={
                   this.state.productInEdit.CustomerId === null
                     ? this.state.productInEdit.Customer
