@@ -194,7 +194,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       },
       productInEdit: undefined
     });
-
+    debugger;
     let updateObject = {
       Department: dataItem.Department,
       Date: dataItem.Date,
@@ -210,11 +210,15 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       },
       Urgent: dataItem.Urgent,
       CustomerId: dataItem.CustomerId,
+      MiscCustomerName: dataItem.CustomerId === null && dataItem.Customer.Customer_x0020_Name,
+      MiscCustomerDetails: dataItem.CustomerId === null && dataItem.Customer.CustomerDetails,
       Comment: dataItem.Comment,
       Invoice_x0020_Details: dataItem.Invoice_x0020_Details,
       Customer_x0020_PO_x0020_Number: dataItem.Customer_x0020_PO_x0020_Number,
       Standard_x0020_Terms: dataItem.Standard_x0020_Terms,
     };
+
+    debugger;
 
     sp.web.lists.getByTitle('AR Invoices').items.getById(dataItem.ID).update(updateObject);
 

@@ -43,9 +43,18 @@ export class MyEditDialogContainer extends React.Component<any, any> {
   public onCustomCustomerChange = (event) => {
     let target = event.target;
     let value = target.type === 'checkbox' ? target.checked : target.value;
+    debugger;
+
+    let customer = {
+      ...this.state.productInEdit.Customer,
+      CustomerDetails: value
+    }
+
+    let edited = this.state.productInEdit;
+    edited.Customer = customer;
 
     this.setState({
-      MiscCustomerDetails: value
+      productInEdit: edited
     });
   }
 
@@ -65,10 +74,12 @@ export class MyEditDialogContainer extends React.Component<any, any> {
   //#endregion
 
   public handleSubmit(event) {
+    debugger;
     event.preventDefault();
   }
 
   public onDialogInputChange = (event) => {
+    debugger;
     let target = event.target;
     let value = target.type === 'checkbox' ? target.checked : target.value;
     let name = (target.props && target.props.name !== undefined) ? target.props.name : (target.name !== undefined) ? target.name : target.props.id;
@@ -138,9 +149,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
 
           render={(formRenderProps) => (
             <FormElement >
-
               <legend className={'k-form-legend'}>ACCOUNTS RECEIVABLE - INVOICE REQUISITION </legend>
-
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
                   id="Department"
@@ -235,6 +244,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                 suggest={true}
                 onFilterChange={this.customerFilterChange}
                 onCustomCusteromChange={this.onCustomCustomerChange}
+                onChange={this.onDialogInputChange}
                 value={
                   this.state.productInEdit.CustomerId === null
                     ? this.state.productInEdit.Customer

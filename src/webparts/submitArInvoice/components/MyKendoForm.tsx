@@ -118,7 +118,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
     // dataItem.Customer.ID is undefined when a custom customer is added.
 
     if (dataItem.Customer.ID === undefined) {
-
       myData['MiscCustomerDetails'] = this.state.MiscCustomerDetails;
       myData['MiscCustomerName'] = dataItem.Customer.Customer_x0020_Name;
     }
@@ -401,7 +400,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   label="Customer PO Number"
                   //validator={MyValidators.requiresCustomerPONUmber}
                   component={MyFormComponents.FormInput}
-                //onchange={this.onDialogInputChange}
                 />
 
                 <Field
@@ -414,7 +412,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                     'NET 30, 1% INTEREST CHARGED'
                   ]}
                   component={MyFormComponents.FormDropDownList}
-                //onchange={this.onDialogInputChange}
                 />
               </div>
 

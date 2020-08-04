@@ -505,6 +505,7 @@ export const CustomerComboBox = (fieldRenderProps) => {
           valid={valid}
           id={id}
           disabled={disabled}
+          onChange={fieldRenderProps.onChange}
           {...others}
         />
         {
