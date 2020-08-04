@@ -87,7 +87,7 @@ class DepartmentListView extends React.Component<any, any> {
   }
 
   public dataReceived = (invoices) => {
-    debugger;
+
     console.log("dataReceived");
     console.log(invoices);
 

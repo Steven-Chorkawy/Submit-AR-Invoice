@@ -55,7 +55,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
   public lastForceGUID = '';
 
   public requestDataIfNeeded = () => {
-    debugger;
+
 
     // If pending is set OR dateSate === lastDataState
     if (this.pending || toODataString(this.props.dataState) === this.lastSuccess) {
@@ -73,12 +73,12 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
         this.lastSuccess = this.pending;
         this.pending = '';
 
-        debugger;
+
         let filteredResponse = filterBy(response, this.props.filterState);
 
         // Apply Kendo grids filters.
         var processedResponse = process(filteredResponse, this.props.dataState);
-        debugger;
+
         // Hold the list of invoice IDs that will be used to pull related accounts.
         var invoiceIds = [];
         var idsForApproval = [];
@@ -88,15 +88,19 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
         // Iterate through processedResponse instead of response because if you don't this will generate a URL that over
         // 2000 characters long.
         // That is too big for SharePoint to handle.
+        // ! This fails if processedResponse contains ~50 items.
         for (let index = 0; index < processedResponse.data.length; index++) {
+          // Builds filters that will be used in the next step.
           const element = processedResponse.data[index];
           invoiceIds.push(`AR_x0020_InvoiceId eq ${element.ID}`);
           idsForApproval.push(`InvoiceID eq '${element.ID}'`);
           idsForRelatedAttachments.push(`ARInvoice/ID eq ${element.ID}`);
           idsForCancelRequests.push(`Invoice_x0020_Number/ID eq ${element.ID}`);
 
+          // Format data of processedResponse.
           processedResponse.data[index].Date = new Date(processedResponse.data[index].Date);
           processedResponse.data[index].Created = new Date(processedResponse.data[index].Created);
+          debugger;
         }
 
         //#region Query the required account details for this invoice.
@@ -156,7 +160,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
 
             // This is something from Kendo demos.
             if (toODataString(this.props.dataState) === this.lastSuccess) {
-              debugger;
+
               this.props.onDataReceived.call(undefined, {
                 // Add the filtered, sorted data.
                 data: processedResponse.data,
