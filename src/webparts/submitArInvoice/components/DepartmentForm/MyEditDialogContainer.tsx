@@ -7,12 +7,17 @@ import { Form, FormElement, Field, FieldArray } from '@progress/kendo-react-form
 import { Button } from '@progress/kendo-react-buttons';
 import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/kendo-react-layout';
 import { filterBy } from '@progress/kendo-data-query';
+import { Label, Error, Hint, FloatingLabel } from '@progress/kendo-react-labels';
+import { FieldWrapper } from '@progress/kendo-react-form';
+import { DropDownList, AutoComplete, MultiSelect, ComboBox } from '@progress/kendo-react-dropdowns';
+
 
 import * as MyFormComponents from '../MyFormComponents';
 import * as MyValidators from '../validators.jsx';
 import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceGLAccounts';
 import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
 import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
+import { MyCustomerCardComponent } from '../MyCustomerCardComponent';
 
 
 export class MyEditDialogContainer extends React.Component<any, any> {
@@ -108,8 +113,11 @@ export class MyEditDialogContainer extends React.Component<any, any> {
         });
         break;
       case 'Customer':
-        name = 'CustomerId';
-        value = value.Id;
+        var prod = this.state.productInEdit;
+        value.Id === undefined ? prod.CustomerId = null : prod.CustomerId = value.Id;
+        this.setState({
+          productInEdit: prod
+        });
         break;
       case 'CustomerPONumber':
         name = 'Customer_x0020_PO_x0020_Number';
@@ -228,7 +236,36 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                   onChange={this.onDialogInputChange}
                 />
               </div>
-              <Field
+              <div>
+                <FieldWrapper>
+                  <Label id={'Customer_label'} >
+                    * Customer
+                  </Label>
+                  <ComboBox
+                    id="Customer"
+                    name="Customer"
+                    allowCustom={true}
+                    onChange={this.onDialogInputChange}
+                    data={this.state.customerList}
+                    //dataItemKey="ID"
+                    textField="Customer_x0020_Name"
+                    filterable={true}
+                    suggest={true}
+                    itemRender={this.customerItemRender}
+                    value={this.state.productInEdit.Customer}
+                  />
+                </FieldWrapper>
+                <MyCustomerCardComponent
+                  selectedCustomer={
+                    this.state.productInEdit.CustomerId === null
+                      ? this.state.productInEdit.Customer
+                      : this.props.customers.find(f => f.Id === this.state.productInEdit.CustomerId)
+                  }
+                  onCustomCusteromChange={this.onCustomCustomerChange}
+                />
+
+              </div>
+              {/* <Field
                 id="Customer"
                 name="Customer"
                 label="* Customer"
@@ -250,7 +287,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                     ? this.state.productInEdit.Customer
                     : this.props.customers.find(f => f.Id === this.state.productInEdit.CustomerId)
                 }
-              />
+              /> */}
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
                   id="CustomerPONumber"
