@@ -53,7 +53,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
     let customer = {
       ...this.state.productInEdit.Customer,
       CustomerDetails: value
-    }
+    };
 
     let edited = this.state.productInEdit;
     edited.Customer = customer;
