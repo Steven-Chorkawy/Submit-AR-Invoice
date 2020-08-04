@@ -236,58 +236,28 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                   onChange={this.onDialogInputChange}
                 />
               </div>
-              <div>
-                <FieldWrapper>
-                  <Label id={'Customer_label'} >
-                    * Customer
-                  </Label>
-                  <ComboBox
-                    id="Customer"
-                    name="Customer"
-                    allowCustom={true}
-                    onChange={this.onDialogInputChange}
-                    data={this.state.customerList}
-                    //dataItemKey="ID"
-                    textField="Customer_x0020_Name"
-                    filterable={true}
-                    suggest={true}
-                    itemRender={this.customerItemRender}
-                    value={this.state.productInEdit.Customer}
-                  />
-                </FieldWrapper>
-                <MyCustomerCardComponent
-                  selectedCustomer={
-                    this.state.productInEdit.CustomerId === null
-                      ? this.state.productInEdit.Customer
-                      : this.props.customers.find(f => f.Id === this.state.productInEdit.CustomerId)
-                  }
-                  onCustomCusteromChange={this.onCustomCustomerChange}
-                />
-
-              </div>
-              {/* <Field
+              <Field
                 id="Customer"
                 name="Customer"
                 label="* Customer"
                 wrapperStyle={{ width: '100%' }}
                 data={this.state.customerList}
-                dataItemKey="ID"
                 textField="Customer_x0020_Name"
-                validator={MyValidators.requiresCustomer}
+                //validator={MyValidators.requiresCustomer}
                 allowCustom={true}
                 itemRender={this.customerItemRender}
                 component={MyFormComponents.CustomerComboBox}
                 filterable={true}
                 suggest={true}
                 onFilterChange={this.customerFilterChange}
-                onCustomCusteromChange={this.onCustomCustomerChange}
+                onCustomCustomerChange={this.onCustomCustomerChange}
                 onChange={this.onDialogInputChange}
                 value={
                   this.state.productInEdit.CustomerId === null
                     ? this.state.productInEdit.Customer
                     : this.props.customers.find(f => f.Id === this.state.productInEdit.CustomerId)
                 }
-              /> */}
+              />
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
                   id="CustomerPONumber"
