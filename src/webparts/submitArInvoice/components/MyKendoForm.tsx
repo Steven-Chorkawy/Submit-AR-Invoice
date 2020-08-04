@@ -119,7 +119,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
 
     if (dataItem.Customer.ID === undefined) {
       myData['MiscCustomerDetails'] = this.state.MiscCustomerDetails;
-      myData['MiscCustomerName'] = dataItem.Customer.Company;
+      myData['MiscCustomerName'] = dataItem.Customer.Customer_x0020_Name;
     }
     else {
       myData['CustomerId'] = dataItem.Customer.Id;
@@ -400,7 +400,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   label="Customer PO Number"
                   //validator={MyValidators.requiresCustomerPONUmber}
                   component={MyFormComponents.FormInput}
-                //onchange={this.onDialogInputChange}
                 />
 
                 <Field
@@ -413,7 +412,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                     'NET 30, 1% INTEREST CHARGED'
                   ]}
                   component={MyFormComponents.FormDropDownList}
-                //onchange={this.onDialogInputChange}
                 />
               </div>
 

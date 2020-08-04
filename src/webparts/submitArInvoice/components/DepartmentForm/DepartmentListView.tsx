@@ -41,7 +41,7 @@ const MyItemRender = props => {
         </CardActions>
       </Card>
   );
-}
+};
 
 class DepartmentListView extends React.Component<any, any> {
   constructor(props) {
@@ -87,10 +87,6 @@ class DepartmentListView extends React.Component<any, any> {
   }
 
   public dataReceived = (invoices) => {
-    debugger;
-    console.log("dataReceived");
-    console.log(invoices);
-
     this.setState({
       ...this.state,
       invoicesReceived: invoices,
@@ -100,7 +96,7 @@ class DepartmentListView extends React.Component<any, any> {
   //#endregion
 
   //#region Pager Methods
-  handlePageChange = event => {
+  public handlePageChange = event => {
     const { skip, take } = event;
     this.setState({
       dataState: {
@@ -109,9 +105,7 @@ class DepartmentListView extends React.Component<any, any> {
         skip: skip
       }
     });
-
-    console.log(`Page Change: skip ${skip}, take ${take}`);
-  };
+  }
   //#endregion Pager Methods
 
   public render() {

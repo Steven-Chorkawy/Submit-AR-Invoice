@@ -7,20 +7,22 @@ import { Form, FormElement, Field, FieldArray } from '@progress/kendo-react-form
 import { Button } from '@progress/kendo-react-buttons';
 import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/kendo-react-layout';
 import { filterBy } from '@progress/kendo-data-query';
+import { Label, Error, Hint, FloatingLabel } from '@progress/kendo-react-labels';
+import { FieldWrapper } from '@progress/kendo-react-form';
+import { DropDownList, AutoComplete, MultiSelect, ComboBox } from '@progress/kendo-react-dropdowns';
+
 
 import * as MyFormComponents from '../MyFormComponents';
 import * as MyValidators from '../validators.jsx';
 import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceGLAccounts';
 import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
-import {ApprovalRequiredComponent} from '../ApprovalRequiredComponent';
+import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
+import { MyCustomerCardComponent } from '../MyCustomerCardComponent';
 
 
 export class MyEditDialogContainer extends React.Component<any, any> {
   constructor(props) {
     super(props);
-    console.log("MyEditDialogContainer");
-    console.log(props);
-
     this.props.dataItem.Requires_x0020_Authorization_x0020_ById.map(reqAuthId => {
       this._selectedReqApprovers.push(this.props.siteUsers.find(s => s.Id === reqAuthId));
     });
@@ -46,9 +48,18 @@ export class MyEditDialogContainer extends React.Component<any, any> {
   public onCustomCustomerChange = (event) => {
     let target = event.target;
     let value = target.type === 'checkbox' ? target.checked : target.value;
+    debugger;
+
+    let customer = {
+      ...this.state.productInEdit.Customer,
+      CustomerDetails: value
+    };
+
+    let edited = this.state.productInEdit;
+    edited.Customer = customer;
 
     this.setState({
-      MiscCustomerDetails: value
+      productInEdit: edited
     });
   }
 
@@ -68,10 +79,12 @@ export class MyEditDialogContainer extends React.Component<any, any> {
   //#endregion
 
   public handleSubmit(event) {
+    debugger;
     event.preventDefault();
   }
 
   public onDialogInputChange = (event) => {
+    debugger;
     let target = event.target;
     let value = target.type === 'checkbox' ? target.checked : target.value;
     let name = (target.props && target.props.name !== undefined) ? target.props.name : (target.name !== undefined) ? target.name : target.props.id;
@@ -100,8 +113,11 @@ export class MyEditDialogContainer extends React.Component<any, any> {
         });
         break;
       case 'Customer':
-        name = 'CustomerId';
-        value = value.Id;
+        var prod = this.state.productInEdit;
+        value.Id === undefined ? prod.CustomerId = null : prod.CustomerId = value.Id;
+        this.setState({
+          productInEdit: prod
+        });
         break;
       case 'CustomerPONumber':
         name = 'Customer_x0020_PO_x0020_Number';
@@ -141,9 +157,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
 
           render={(formRenderProps) => (
             <FormElement >
-
               <legend className={'k-form-legend'}>ACCOUNTS RECEIVABLE - INVOICE REQUISITION </legend>
-
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
                   id="Department"
@@ -228,31 +242,22 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                 label="* Customer"
                 wrapperStyle={{ width: '100%' }}
                 data={this.state.customerList}
-                dataItemKey="ID"
                 textField="Customer_x0020_Name"
-                validator={MyValidators.requiresCustomer}
+                //validator={MyValidators.requiresCustomer}
                 allowCustom={true}
                 itemRender={this.customerItemRender}
                 component={MyFormComponents.CustomerComboBox}
                 filterable={true}
                 suggest={true}
                 onFilterChange={this.customerFilterChange}
-                onCustomCusteromChange={this.onCustomCustomerChange}
-              />
-              {/* <Field
-                id="Customer"
-                name="Customer"
-                label="* Customer"
-                wrapperStyle={{ width: '100%' }}
-                data={this.props.customers}
-                dataItemKey="ID"
-                textField="Title"
-                //validator={MyValidators.requiresCustomer}
-                allowCustom={true}
-                component={MyFormComponents.CustomerComboBox}
-                value={this.props.customers.find(f => f.Id === this.state.productInEdit.CustomerId)}
+                onCustomCustomerChange={this.onCustomCustomerChange}
                 onChange={this.onDialogInputChange}
-              /> */}
+                value={
+                  this.state.productInEdit.CustomerId === null
+                    ? this.state.productInEdit.Customer
+                    : this.props.customers.find(f => f.Id === this.state.productInEdit.CustomerId)
+                }
+              />
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
                   id="CustomerPONumber"
