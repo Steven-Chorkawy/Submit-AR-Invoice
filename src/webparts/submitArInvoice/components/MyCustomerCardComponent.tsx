@@ -10,7 +10,8 @@ export class MyCustomerCardComponent extends React.Component<any, any> {
    */
   constructor(props) {
     super(props);
-
+    console.log('MyCustomerCardComponent');
+    console.log(props);
     this.state = {
       selectedCustomer: props.selectedCustomer
     };
@@ -38,6 +39,7 @@ export class MyCustomerCardComponent extends React.Component<any, any> {
             id={'MiscCustomerDetails'}
             name={'MiscCustomerDetails'}
             onChange={this.props.onCustomCusteromChange}
+            value={this.state.selectedCustomer.CustomerDetails}
           />
         </div>
       );

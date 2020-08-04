@@ -100,7 +100,18 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
           // Format data of processedResponse.
           processedResponse.data[index].Date = new Date(processedResponse.data[index].Date);
           processedResponse.data[index].Created = new Date(processedResponse.data[index].Created);
-          debugger;
+
+
+          // If CustomerId isn't present and MisCustomerName isn't null that means the user has entered a random customer.
+          // By building a Customer object out of the misc customer info it will be much easier to display real customers and mis customers together.
+
+          if ((processedResponse.data[index].CustomerId === undefined || processedResponse.data[index].CustomerId === null) && processedResponse.data[index].MiscCustomerName !== null) {
+
+            processedResponse.data[index].Customer = {
+              "Customer_x0020_Name": processedResponse.data[index].MiscCustomerName,
+              "CustomerDetails": processedResponse.data[index].MiscCustomerDetails
+            };
+          }
         }
 
         //#region Query the required account details for this invoice.

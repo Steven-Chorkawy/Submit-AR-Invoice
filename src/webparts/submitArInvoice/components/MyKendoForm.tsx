@@ -118,8 +118,9 @@ export class MyForm extends React.Component<IMyFormProps, any> {
     // dataItem.Customer.ID is undefined when a custom customer is added.
 
     if (dataItem.Customer.ID === undefined) {
+
       myData['MiscCustomerDetails'] = this.state.MiscCustomerDetails;
-      myData['MiscCustomerName'] = dataItem.Customer.Company;
+      myData['MiscCustomerName'] = dataItem.Customer.Customer_x0020_Name;
     }
     else {
       myData['CustomerId'] = dataItem.Customer.Id;

@@ -12,7 +12,7 @@ import * as MyFormComponents from '../MyFormComponents';
 import * as MyValidators from '../validators.jsx';
 import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceGLAccounts';
 import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
-import {ApprovalRequiredComponent} from '../ApprovalRequiredComponent';
+import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
 
 
 export class MyEditDialogContainer extends React.Component<any, any> {
@@ -238,21 +238,15 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                 suggest={true}
                 onFilterChange={this.customerFilterChange}
                 onCustomCusteromChange={this.onCustomCustomerChange}
+                //value={this.props.customers.find(f => f.Id === this.state.productInEdit.CustomerId)}
+                // value={{ Customer_x0020_Name: 'tester' }}
+                //value={this.state.productInEdit.Customer}
+                value={
+                  this.state.productInEdit.CustomerId === null
+                    ? this.state.productInEdit.Customer
+                    : this.props.customers.find(f => f.Id === this.state.productInEdit.CustomerId)
+                }
               />
-              {/* <Field
-                id="Customer"
-                name="Customer"
-                label="* Customer"
-                wrapperStyle={{ width: '100%' }}
-                data={this.props.customers}
-                dataItemKey="ID"
-                textField="Title"
-                //validator={MyValidators.requiresCustomer}
-                allowCustom={true}
-                component={MyFormComponents.CustomerComboBox}
-                value={this.props.customers.find(f => f.Id === this.state.productInEdit.CustomerId)}
-                onChange={this.onDialogInputChange}
-              /> */}
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
                   id="CustomerPONumber"
