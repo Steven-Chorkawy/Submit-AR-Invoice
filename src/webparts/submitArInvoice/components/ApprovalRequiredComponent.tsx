@@ -14,6 +14,7 @@ import "@pnp/sp/files";
 import "@pnp/sp/folders";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
+import { MyLists } from './enums/MyLists';
 
 
 interface IApprovalRequiredComponentProps {
@@ -47,7 +48,7 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
       Response_x0020_Summary: "Approved from SharePoint Form",
       Response_x0020_Message: comment
     };
-    sp.web.lists.getByTitle('Approval Requests Sent').items
+    sp.web.lists.getByTitle(MyLists.ApprovalRequestsSent).items
       .getById(request[0].ID)
       .update(updateObj)
       .then(res => {

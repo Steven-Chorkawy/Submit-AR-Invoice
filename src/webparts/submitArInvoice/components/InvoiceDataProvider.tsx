@@ -129,7 +129,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
             .items
             .filter(invoiceIds.join(' or '))
             .get(),
-          sp.web.lists.getByTitle('Approval Requests Sent')
+          sp.web.lists.getByTitle(MyLists.ApprovalRequestsSent)
             .items
             .filter(idsForApproval.join(' or '))
             .get(),
@@ -286,7 +286,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
             .items
             .filter(invoiceIds.join(' or '))
             .get(),
-          sp.web.lists.getByTitle('Approval Requests Sent')
+          sp.web.lists.getByTitle(MyLists.ApprovalRequestsSent)
             .items
             .filter(idsForApproval.join(' or '))
             .get(),
