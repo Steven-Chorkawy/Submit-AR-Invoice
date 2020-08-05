@@ -104,11 +104,14 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
           processedResponse: process(filteredResponse, this.props.dataState)
         });
 
+        console.log('processedResponse');
+        console.log(response);
+
         // Hold the list of invoice IDs that will be used to pull related accounts.
         var invoiceIds = [];                // filter for accounts
-        var idsForApproval = [];            // filter for approval requests.
-        var idsForRelatedAttachments = [];  // filter for related attachments.
-        var idsForCancelRequests = [];      // filter for cancel requests.
+        //var idsForApproval = [];            // filter for approval requests.
+        //var idsForRelatedAttachments = [];  // filter for related attachments.
+        //var idsForCancelRequests = [];      // filter for cancel requests.
         var idsForARDocuments = [];
 
         // Iterate through processedResponse instead of response because if you don't this will generate a URL that over
@@ -117,10 +120,9 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
         for (let index = 0; index < this.state.processedResponse.data.length; index++) {
           const element = this.state.processedResponse.data[index];
           invoiceIds.push(`AR_x0020_Invoice_x0020_Request/ID eq ${element.ID}`);
-          idsForApproval.push(`InvoiceID eq '${element.ID}'`);
-          idsForRelatedAttachments.push(`AR_x0020_Invoice_x0020_Request/ID eq ${element.ID}`);
-          idsForCancelRequests.push(`AR_x0020_Invoice_x0020_Request/ID eq ${element.ID}`);
-
+          // idsForApproval.push(`AR_x0020_Invoice_x0020_Request eq '${element.ID}'`);
+          // idsForRelatedAttachments.push(`AR_x0020_Invoice_x0020_Request/ID eq ${element.ID}`);
+          // idsForCancelRequests.push(`AR_x0020_Invoice_x0020_Request/ID eq ${element.ID}`);
           idsForARDocuments.push(`AR_x0020_RequestId eq ${element.ID}`);
         }
 
@@ -129,15 +131,13 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
             .items
             .filter(invoiceIds.join(' or '))
             .get(),
-          null,
-          // TODO: Add a query from the new list here.
-          // sp.web.lists.getByTitle(MyLists.ApprovalRequestsSent)
-          //   .items
-          //   .filter(idsForApproval.join(' or '))
-          //   .get(),
+          sp.web.lists.getByTitle(MyLists.InvoiceActionRequired)
+            .items
+            .filter(invoiceIds.join(' or '))
+            .get(),
           sp.web.lists.getByTitle('RelatedInvoiceAttachments')
             .items
-            .filter(idsForRelatedAttachments.join(' or '))
+            .filter(invoiceIds.join(' or '))
             .getAll(),
           //TODO: How can I filter these results? I don't need every file.
           sp.web.getFolderByServerRelativePath(MyLists["Related Invoice Attachments"])
@@ -146,7 +146,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
             .items
             .select('*, Requested_x0020_By/EMail, Requested_x0020_By/Title')
             .expand('Requested_x0020_By')
-            .filter(idsForCancelRequests.join(' or '))
+            .filter(invoiceIds.join(' or '))
             .getAll(),
           sp.web.lists.getByTitle(MyLists["AR Invoices"])
             .items

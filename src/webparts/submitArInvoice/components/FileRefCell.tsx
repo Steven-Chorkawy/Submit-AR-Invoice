@@ -16,8 +16,6 @@ export class FileRefCell extends React.Component<GridCellProps> {
   public render() {
     return (this.props.dataItem.ContentTypeId === MyContentTypes["AR Invoice Document Item"]) ? (
       <td title={'Click to view invoice.'}>
-        {console.log("FileRef Cell:")}
-        {console.log(this.props)}
         <a href={this.props.dataItem.ServerRedirectedEmbedUrl} target='_blank' >
           <Button primary={true} /*icon="hyperlink-open"*/ icon="folder"></Button>
         </a>
