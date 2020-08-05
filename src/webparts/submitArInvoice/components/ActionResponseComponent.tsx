@@ -53,7 +53,7 @@ class MyItemCardRender extends React.Component<IMyItemCardRender, any> {
             (<Card type={cardType}>
               <CardBody>
                 <h3>
-                  {item.Title}{item.Created && ` - ${item.Created}`}
+                  {item.Request_x0020_Type}{item.Created && ` - ${item.Created}`}
                 </h3>
                 <CardTitle>{item.AssignedTo.EMail} - {item.Response_x0020_Status}</CardTitle>
 

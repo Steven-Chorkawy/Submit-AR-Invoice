@@ -13,9 +13,20 @@ import * as MyValidators from '../validators.jsx';
 import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceGLAccounts';
 import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
 import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
+import { IInvoiceItem } from '../interface/InvoiceItem';
+import { InvoiceActionRequiredResponseStatus } from '../interface/IInvoiceActionRequired';
 
+interface IMyEditDialogContainerState {
+  productInEdit: IInvoiceItem;
+  selectedReqApprovers: any;
+  selectedCustomer: any;
+  customerList: any;
+  receivedCustomerList: any;
+  MiscCustomerDetails?: any;
+  loading?: boolean;
+}
 
-export class MyEditDialogContainer extends React.Component<any, any> {
+export class MyEditDialogContainer extends React.Component<any, IMyEditDialogContainerState> {
   constructor(props) {
     super(props);
     console.log("MyEditDialogContainer");
@@ -137,13 +148,30 @@ export class MyEditDialogContainer extends React.Component<any, any> {
     });
   }
 
+  public onActionResponseSent = (e) => {
+    console.log('before update');
+    console.log(this.state.productInEdit.Actions);
+    this.forceUpdate();
+  }
+
   public render() {
     return (
       <Dialog onClose={this.props.cancel} title={"Edit AR Invoice Request"} minWidth="200px" width="80%" height="80%">
-        <ApprovalRequiredComponent
-          productInEdit={this.state.productInEdit}
-          currentUser={this.props.currentUser}
-        />
+        {
+          this.state.productInEdit.Actions
+            .filter(f => f.AuthorId === this.props.currentUser.Id && f.Response_x0020_Status === InvoiceActionRequiredResponseStatus.Waiting)
+            .map(action => {
+
+              return (<ApprovalRequiredComponent
+                action={action}
+                productInEdit={this.state.productInEdit}
+                currentUser={this.props.currentUser}
+                onActionSentCallBack={this.onActionResponseSent}
+              />);
+            })
+        }
+
+
         <Form
           //onSubmit={this.handleSubmit}
           onSubmit={this.handleSubmit}

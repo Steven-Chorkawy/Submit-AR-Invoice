@@ -142,8 +142,8 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
             .get(),
           sp.web.lists.getByTitle(MyLists.InvoiceActionRequired)
             .items
-            .select('*, AssignedTo/EMail, AssignedTo/Title')
-            .expand('AssignedTo')
+            .select('*, AssignedTo/EMail, AssignedTo/Title, Author/EMail, Author/Title')
+            .expand('AssignedTo, Author')
             .filter(invoiceIds.join(' or '))
             .get(),
           sp.web.lists.getByTitle('RelatedInvoiceAttachments')

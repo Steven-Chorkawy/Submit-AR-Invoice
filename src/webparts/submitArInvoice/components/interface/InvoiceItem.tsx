@@ -15,6 +15,7 @@ export interface IInvoiceAction {
   Id: number;
   ContentTypeId: string;
   AuthorId: number;
+  Author?: IPersonField;
   Created: Date;
   EditorId: number;
   Modified: Date;
