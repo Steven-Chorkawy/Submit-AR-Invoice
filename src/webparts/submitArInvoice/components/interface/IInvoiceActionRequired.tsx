@@ -8,17 +8,17 @@ export interface IInvoiceActionRequired {
   Response_x0020_Message?: string;
   Response_x0020_Status: InvoiceActionRequiredResponseStatus;
   Response_x0020_Summary?: string;
-};
+}
 
 export enum InvoiceActionRequiredRequestType {
   DepartmentApprovalRequired = 'Department Approval Required',
   AccountantApprovalRequired = 'Accountant Approval Required',
   EditRequired = 'Edit Required',
-};
+}
 
 export enum InvoiceActionRequiredResponseStatus {
   Approved = 'Approved',
   Rejected = 'Rejected',
   Denied = 'Denied',
   Waiting = 'Waiting'
-};
+}

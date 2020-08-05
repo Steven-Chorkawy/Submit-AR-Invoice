@@ -129,10 +129,12 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
             .items
             .filter(invoiceIds.join(' or '))
             .get(),
-          sp.web.lists.getByTitle(MyLists.ApprovalRequestsSent)
-            .items
-            .filter(idsForApproval.join(' or '))
-            .get(),
+          null,
+          // TODO: Add a query from the new list here.
+          // sp.web.lists.getByTitle(MyLists.ApprovalRequestsSent)
+          //   .items
+          //   .filter(idsForApproval.join(' or '))
+          //   .get(),
           sp.web.lists.getByTitle('RelatedInvoiceAttachments')
             .items
             .filter(idsForRelatedAttachments.join(' or '))
@@ -286,10 +288,12 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
             .items
             .filter(invoiceIds.join(' or '))
             .get(),
-          sp.web.lists.getByTitle(MyLists.ApprovalRequestsSent)
-            .items
-            .filter(idsForApproval.join(' or '))
-            .get(),
+            // TODO: Add a query from the new list here.
+          null,
+          // sp.web.lists.getByTitle(MyLists.ApprovalRequestsSent)
+          //   .items
+          //   .filter(idsForApproval.join(' or '))
+          //   .get(),
           sp.web.lists.getByTitle('RelatedInvoiceAttachments')
             .items
             .filter(idsForRelatedAttachments.join(' or '))

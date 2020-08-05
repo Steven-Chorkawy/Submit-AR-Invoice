@@ -136,6 +136,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
       // Create an approval request.
       // For each requires approval from.
       for (let index = 0; index < dataItem.RequiresAuthorizationBy.length; index++) {
+        debugger;
         const element = dataItem.RequiresAuthorizationBy[index];
         let newAction: IInvoiceActionRequired = {
           AR_x0020_Invoice_x0020_RequestId: arInvoiceRequstListItem.data.ID,

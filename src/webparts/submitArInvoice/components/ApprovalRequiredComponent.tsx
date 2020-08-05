@@ -40,7 +40,9 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
   }
 
   //TODO: Pick the correct request instead of the first one.
+  // TODO: Update this method so it uses the new list.
   private sendApprovalResponse = (response) => {
+    throw 'In the works';
     var comment = this.state.approvalNotes;
     var request = this.state.productInEdit.Approvals.filter(a => a.Users_x0020_Email === this.props.currentUser.Email);
     var updateObj = {
@@ -48,34 +50,34 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
       Response_x0020_Summary: "Approved from SharePoint Form",
       Response_x0020_Message: comment
     };
-    sp.web.lists.getByTitle(MyLists.ApprovalRequestsSent).items
-      .getById(request[0].ID)
-      .update(updateObj)
-      .then(res => {
-        request[0] = { ...request[0], ...updateObj };
-        const index = this.state.productInEdit.Approvals.findIndex(a => a.ID === request[0].ID);
-        var allRequests = this.state.productInEdit.Approvals;
-        allRequests[index] = request[0];
-        this.setState({
-          productInEdit: {
-            ...this.state.productInEdit,
-            Approvals: [...allRequests]
-          }
-        });
+    // sp.web.lists.getByTitle(MyLists.ApprovalRequestsSent).items
+    //   .getById(request[0].ID)
+    //   .update(updateObj)
+    //   .then(res => {
+    //     request[0] = { ...request[0], ...updateObj };
+    //     const index = this.state.productInEdit.Approvals.findIndex(a => a.ID === request[0].ID);
+    //     var allRequests = this.state.productInEdit.Approvals;
+    //     allRequests[index] = request[0];
+    //     this.setState({
+    //       productInEdit: {
+    //         ...this.state.productInEdit,
+    //         Approvals: [...allRequests]
+    //       }
+    //     });
 
-        // trigger a change on the invoice which in turn will trigger a workflow.
-        sp.web.lists.getByTitle('AR Invoices').items
-          .getById(request[0].InvoiceID)
-          .update({
-            DirtyField: new Date()
-          });
+      //   // trigger a change on the invoice which in turn will trigger a workflow.
+      //   sp.web.lists.getByTitle('AR Invoices').items
+      //     .getById(request[0].InvoiceID)
+      //     .update({
+      //       DirtyField: new Date()
+      //     });
 
-      })
-      .catch(error => {
-        this.setState({
-          approvalRequestError: true
-        });
-      });
+      // })
+      // .catch(error => {
+      //   this.setState({
+      //     approvalRequestError: true
+      //   });
+      // });
   }
 
   public onApprovalDialogInputChange = (event) => {
