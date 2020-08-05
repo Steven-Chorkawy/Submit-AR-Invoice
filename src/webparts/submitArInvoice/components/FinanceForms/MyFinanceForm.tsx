@@ -30,7 +30,7 @@ import * as MyFormComponents from '../MyFormComponents';
 import { filterBy } from '@progress/kendo-data-query';
 import { filterGroupByField } from '@progress/kendo-react-grid/dist/npm/columnMenu/GridColumnMenuFilter';
 import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceGLAccounts';
-import { ApprovalResponseComponent } from '../ApprovalResponseComponent';
+import { ActionResponseComponent } from '../ActionResponseComponent';
 import { InvoiceStatus, MyGridStrings, MyContentTypes } from '../enums/MyEnums';
 import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
 import { ConvertQueryParamsToKendoFilter, BuildGUID } from '../MyHelperMethods';

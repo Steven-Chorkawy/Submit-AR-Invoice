@@ -4,9 +4,18 @@ import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import { ListView, ListViewHeader, ListViewFooter } from '@progress/kendo-react-listview';
 import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/kendo-react-layout';
 import { Button } from '@progress/kendo-react-buttons';
+import { IInvoiceAction } from './interface/InvoiceItem';
 
 
-class MyItemCardRender extends React.Component<any, any> {
+interface IActionResponseComponentProps {
+  actions: Array<IInvoiceAction>;
+};
+
+interface IMyItemCardRender {
+  dataItem: IInvoiceAction;
+}
+
+class MyItemCardRender extends React.Component<IMyItemCardRender, any> {
   constructor(props) {
     super(props);
 
@@ -24,7 +33,7 @@ class MyItemCardRender extends React.Component<any, any> {
   public render() {
     let item = this.props.dataItem;
     let cardType = '';
-    switch (item.Response) {
+    switch (item.Response_x0020_Status) {
       case 'Approve':
         cardType = 'success';
         break;
@@ -38,14 +47,13 @@ class MyItemCardRender extends React.Component<any, any> {
     return (
       <div className='row p-2 border-bottom align-middle' style={{ margin: 0, marginBottom: '2px' }}>
         <div className='col-sm-12'>
-          {item.Response ?
+          {item.Response_x0020_Status ?
             (<Card type={cardType}>
               <CardBody>
                 <h3>
-                  {item.Title}
-                  {item.Date_x0020_Received && ` - ${item.Date_x0020_Received}`}
+                  {item.Title}{item.Created && ` - ${item.Created}`}
                 </h3>
-                <CardTitle>{item.Users_x0020_Email} - {item.Response}</CardTitle>
+                <CardTitle>{item.AssignedTo.EMail} - {item.Response_x0020_Status}</CardTitle>
 
                 {item.Response_x0020_Message && <p>"{item.Response_x0020_Message}"</p>}
                 {
@@ -60,23 +68,24 @@ class MyItemCardRender extends React.Component<any, any> {
                 <Button className="k-button k-flat k-primary" onClick={this.onShowMoreDetails}>{this.state.showMoreDetails ? 'Hide' : 'Show'} Details</Button>
               </CardActions>
             </Card>) : (<Card type={cardType}>
-            <CardBody>
-              <h3>
-                {item.Title}
-                {item.Date_x0020_Received && ` - ${item.Date_x0020_Received}`}
-              </h3>
-              <p>Waiting for response from {item.Users_x0020_Email}</p>
-              <p>Request sent on {item.Created}</p>
-            </CardBody>
-          </Card>)
-        }
+              <CardBody>
+                <h3>
+                  {item.Title}
+                  {item.Created && ` - ${item.Created}`}
+                </h3>
+                <p>Waiting for response from {item.AssignedTo.EMail}</p>
+                <p>Request sent on {item.Created}</p>
+              </CardBody>
+            </Card>)
+          }
         </div>
       </div>
     );
   }
 }
 
-class ApprovalResponseComponent extends React.Component<any, any> {
+
+class ActionResponseComponent extends React.Component<IActionResponseComponentProps, any> {
   constructor(props) {
     super(props);
   }
@@ -88,7 +97,7 @@ class ApprovalResponseComponent extends React.Component<any, any> {
       <div>
         <ListView
           style={{ 'maxWidth': '600px' }}
-          data={this.props.approvals}
+          data={this.props.actions}
           item={this.MyItemRender}
         />
       </div>
@@ -96,4 +105,4 @@ class ApprovalResponseComponent extends React.Component<any, any> {
   }
 }
 
-export { ApprovalResponseComponent };
+export { ActionResponseComponent };

@@ -1,6 +1,6 @@
-interface IRequestedBy {
+interface IPersonField {
   // Users Email
-  EMAil: string;
+  EMail: string;
   // Users Name.  Last, First
   Title: string;
 }
@@ -20,6 +20,7 @@ export interface IInvoiceAction {
   AR_x0020_InvoiceId?: number;
   AR_x0020_Invoice_x0020_RequestId: number;
   AssignedToId: number;
+  AssignedTo?: IPersonField;
   Title: string;
   Body: number;
   DueDate?: Date;
@@ -95,7 +96,7 @@ export interface IInvoiceItem extends IInvoiceQueryItem {
  * CancelRequest that is attached to the invoice output object.
  */
 export interface IInvoiceCancelRequest {
-  Requested_x0020_By: IRequestedBy;
+  Requested_x0020_By: IPersonField;
   Id: number;
   ID: number;
 

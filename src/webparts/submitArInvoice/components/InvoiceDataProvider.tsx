@@ -142,6 +142,8 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
             .get(),
           sp.web.lists.getByTitle(MyLists.InvoiceActionRequired)
             .items
+            .select('*, AssignedTo/EMail, AssignedTo/Title')
+            .expand('AssignedTo')
             .filter(invoiceIds.join(' or '))
             .get(),
           sp.web.lists.getByTitle('RelatedInvoiceAttachments')
@@ -163,7 +165,8 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
             .getAll(),
         ])
           .then((values) => {
-            debugger;
+            console.log('Raw Query Res');
+            console.log(values);
             /***********************************
              *
              * 0 = G/L Accounts.
