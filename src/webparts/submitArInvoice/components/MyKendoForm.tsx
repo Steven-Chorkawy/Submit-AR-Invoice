@@ -21,6 +21,7 @@ import { MyGLAccountComponent } from './MyGLAccountComponent';
 import { BuildGUID, ConvertQueryParamsToKendoFilter } from './MyHelperMethods';
 import { MyLists } from './enums/MyLists';
 import { IItemAddResult } from '@pnp/sp/items';
+import { IInvoiceActionRequired, InvoiceActionRequiredRequestType, InvoiceActionRequiredResponseStatus } from '../components/interface/IInvoiceActionRequired';
 
 
 
@@ -109,7 +110,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
         Standard_x0020_Terms: dataItem.StandardTerms,
         Urgent: dataItem.Urgent
       };
-      
+
 
       // Add customer data.
       // dataItem.Customer.ID is undefined when a custom customer is added.
@@ -132,6 +133,23 @@ export class MyForm extends React.Component<IMyFormProps, any> {
         .getByTitle(MyLists["AR Invoice Requests"])
         .items.add(arInvoiceRequestListItemData);
 
+      // Create an approval request.
+      // For each requires approval from.
+      for (let index = 0; index < dataItem.RequiresAuthorizationBy.length; index++) {
+        const element = dataItem.RequiresAuthorizationBy[index];
+        let newAction: IInvoiceActionRequired = {
+          AR_x0020_Invoice_x0020_RequestId: arInvoiceRequstListItem.data.ID,
+          Title: 'Approval Required',
+          AssignedTo: element.Id,
+          Description: 'Approval Required',
+          Request_x0020_Type: InvoiceActionRequiredRequestType.DepartmentApprovalRequired,
+          Response_x0020_Status: InvoiceActionRequiredResponseStatus.Waiting
+        }
+
+        web.lists.getByTitle(MyLists.InvoiceActionRequired)
+          .items
+          .add(newAction);
+      }
 
       const accounts: IARAccountDetails = { ...dataItem.GLAccounts };
 
@@ -187,7 +205,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
       this.forceUpdate();
 
     } catch (error) {
-      
+
       console.log("Something went wrong!");
       console.log(error);
 

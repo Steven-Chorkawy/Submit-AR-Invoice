@@ -18,9 +18,6 @@ export enum MyLists {
   // List for Cancel Requests.
   'Cancel Invoice Request' = 'Cancel Invoice Request',
 
-  // Old Approval Requests.
-  ApprovalRequestsSent = 'Approval Requests Sent',
-
   // New Approval Requests.
   InvoiceActionRequired = 'Invoice Action Required',
 }
