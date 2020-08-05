@@ -15,14 +15,22 @@ import "@pnp/sp/folders";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
 import { MyLists } from './enums/MyLists';
+import { IInvoiceItem } from './interface/InvoiceItem';
+import { InvoiceActionRequiredResponseStatus } from './interface/IInvoiceActionRequired';
 
 
 interface IApprovalRequiredComponentProps {
-  productInEdit: any;
+  productInEdit: IInvoiceItem;
   currentUser: any;
 }
 
-class ApprovalRequiredComponent extends React.Component<IApprovalRequiredComponentProps, any> {
+interface IApprovalRequiredComponentState {
+  productInEdit: IInvoiceItem;
+  approvalNotes?;
+  approvalRequestError?;
+}
+
+class ApprovalRequiredComponent extends React.Component<IApprovalRequiredComponentProps, IApprovalRequiredComponentState> {
   constructor(props) {
     super(props);
 
@@ -39,12 +47,10 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
     this.sendApprovalResponse("Reject");
   }
 
-  //TODO: Pick the correct request instead of the first one.
-  // TODO: Update this method so it uses the new list.
+
   private sendApprovalResponse = (response) => {
-    throw 'In the works';
     var comment = this.state.approvalNotes;
-    var request = this.state.productInEdit.Approvals.filter(a => a.Users_x0020_Email === this.props.currentUser.Email);
+    var request = this.state.productInEdit.Actions.filter(a => a.AssignedToId === this.props.currentUser.Id);
     var updateObj = {
       Response: response,
       Response_x0020_Summary: "Approved from SharePoint Form",
@@ -65,19 +71,19 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
     //       }
     //     });
 
-      //   // trigger a change on the invoice which in turn will trigger a workflow.
-      //   sp.web.lists.getByTitle('AR Invoices').items
-      //     .getById(request[0].InvoiceID)
-      //     .update({
-      //       DirtyField: new Date()
-      //     });
+    //   // trigger a change on the invoice which in turn will trigger a workflow.
+    //   sp.web.lists.getByTitle('AR Invoices').items
+    //     .getById(request[0].InvoiceID)
+    //     .update({
+    //       DirtyField: new Date()
+    //     });
 
-      // })
-      // .catch(error => {
-      //   this.setState({
-      //     approvalRequestError: true
-      //   });
-      // });
+    // })
+    // .catch(error => {
+    //   this.setState({
+    //     approvalRequestError: true
+    //   });
+    // });
   }
 
   public onApprovalDialogInputChange = (event) => {
@@ -93,7 +99,15 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
   public render() {
     return (
       <div>
-        {this.state.productInEdit.Approvals && this.state.productInEdit.Approvals.filter(a => a.Users_x0020_Email === this.props.currentUser.Email && a.Response === null).length > 0 &&
+        {
+          this.state.productInEdit.Actions
+          &&
+          this.state.productInEdit.Actions
+            .filter(a =>
+              a.AssignedToId === this.props.currentUser.Id
+              && a.Response_x0020_Status === InvoiceActionRequiredResponseStatus.Waiting
+            ).length > 0
+          &&
           <div>
             <Card style={{ width: 600 }} type={this.state.approvalRequestError ? 'error' : ''}>
               <CardBody>

@@ -20,18 +20,18 @@ export class MyEditDialogContainer extends React.Component<any, any> {
     super(props);
     console.log("MyEditDialogContainer");
     console.log(props);
-    
+
 
     if (this.props.dataItem.Requires_x0020_Authorization_x0020_ById) {
       this.props.dataItem.Requires_x0020_Authorization_x0020_ById.map(reqAuthId => {
         this._selectedReqApprovers.push(this.props.siteUsers.find(s => s.Id === reqAuthId));
       });
     }
-    else if(this.props.dataItem.Requires_x0020_Department_x0020_Id) {
+    else if (this.props.dataItem.Requires_x0020_Department_x0020_Id) {
       this.props.dataItem.Requires_x0020_Department_x0020_Id.map(reqAuthId => {
         this._selectedReqApprovers.push(this.props.siteUsers.find(s => s.Id === reqAuthId));
       });
-    }    
+    }
 
     this.state = {
       productInEdit: this.props.dataItem || null,
@@ -53,7 +53,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
     return React.cloneElement(li, li.props, itemChildren);
   }
   public onCustomCustomerChange = (event) => {
-    
+
     let target = event.target;
     let value = target.type === 'checkbox' ? target.checked : target.value;
 
@@ -85,7 +85,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
     let target = event.target;
     let value = target.type === 'checkbox' ? target.checked : target.value;
     let name = (target.props && target.props.name !== undefined) ? target.props.name : (target.name !== undefined) ? target.name : target.props.id;
-    
+
     // last chance.
     if (name === "" && target.id !== undefined) {
       name = target.id;

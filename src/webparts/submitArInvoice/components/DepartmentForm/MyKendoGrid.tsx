@@ -304,7 +304,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
           .items
           .add(cancelReqUpdateObj)
           .then(createRes => {
-            debugger;
+
             var indexOf = -1;
             var arReqId = -1;
 
@@ -323,7 +323,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
               .expand('Requested_x0020_By')
               .get()
               .then(response => {
-                debugger;
+
                 var updatedARs = this.state.data.data;
                 updatedARs[indexOf].CancelRequests.push(response);
 

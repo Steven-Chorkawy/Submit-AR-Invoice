@@ -13,6 +13,13 @@ export enum InvoiceStatus {
   'Completed' = 'Completed'
 }
 
+export enum InvoiceActionResponseStatus {
+  Approved = 'Approved',
+  Rejected = 'Rejected',
+  Denied = 'Denied',
+  Waiting = 'Waiting'
+}
+
 export enum MyGridStrings {
   DateFilter = '{0: MM/dd/yyyy}',
 }

@@ -1,3 +1,5 @@
+import { InvoiceActionRequiredResponseStatus } from "./IInvoiceActionRequired";
+
 interface IPersonField {
   // Users Email
   EMail: string;
@@ -27,7 +29,7 @@ export interface IInvoiceAction {
   StartDate?: Date;
   Request_x0020_Type: string;
   Response_x0020_Message?: string;
-  Response_x0020_Status: string;
+  Response_x0020_Status: InvoiceActionRequiredResponseStatus;
   Response_x0020_Summary?: string;
   Status: string;
 }
