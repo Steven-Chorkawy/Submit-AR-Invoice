@@ -2,8 +2,8 @@ export interface IInvoiceActionRequired {
   AR_x0020_InvoiceId?: number;
   AR_x0020_Invoice_x0020_RequestId: number;
   Title: string;
-  AssignedTo: number;
-  Description: string;
+  AssignedToId: number;
+  Body: string;
   Request_x0020_Type: InvoiceActionRequiredRequestType;
   Response_x0020_Message?: string;
   Response_x0020_Status: InvoiceActionRequiredResponseStatus;

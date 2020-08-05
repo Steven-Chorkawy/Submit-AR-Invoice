@@ -141,8 +141,8 @@ export class MyForm extends React.Component<IMyFormProps, any> {
         let newAction: IInvoiceActionRequired = {
           AR_x0020_Invoice_x0020_RequestId: arInvoiceRequstListItem.data.ID,
           Title: 'Approval Required',
-          AssignedTo: element.Id,
-          Description: 'Approval Required',
+          AssignedToId: element.Id,
+          Body: 'Approval Required',
           Request_x0020_Type: InvoiceActionRequiredRequestType.DepartmentApprovalRequired,
           Response_x0020_Status: InvoiceActionRequiredResponseStatus.Waiting
         }
