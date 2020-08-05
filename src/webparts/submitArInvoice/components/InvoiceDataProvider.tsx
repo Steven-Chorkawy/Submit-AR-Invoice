@@ -16,6 +16,7 @@ import { IFile } from '@pnp/sp/files';
 import { MyLists } from './enums/MyLists';
 import { filter } from '@progress/kendo-data-query/dist/npm/transducers';
 import { MyContentTypes } from './enums/MyEnums';
+import { IInvoiceItem } from './interface/InvoiceItem';
 
 /** End PnP Imports */
 
@@ -34,6 +35,14 @@ interface IInvoiceDataProviderProps {
   onCurrentUserDataReceived: any;
 }
 
+interface IInvoiceDataProviderState {
+  processedResponse: IProcessedResponse;
+}
+
+interface IProcessedResponse {
+  data: Array<IInvoiceItem>;
+}
+
 
 /***********************************
  *
@@ -48,7 +57,7 @@ interface IInvoiceDataProviderProps {
  ***********************************/
 enum ARLoadQuery {
   GLAccounts = 0,
-  ApprovalResponses = 1,
+  InvoiceActions = 1,
   RelatedAttachments = 2,
   FilesRelatedAttachments = 3,
   CancelRequests = 4,
@@ -71,7 +80,7 @@ class LoadingPanel extends React.Component {
 }
 
 
-class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any> {
+class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IInvoiceDataProviderState> {
   constructor(props) {
     super(props);
   }
@@ -105,7 +114,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
         });
 
         console.log('processedResponse');
-        console.log(response);
+        console.log(this.state.processedResponse);
 
         // Hold the list of invoice IDs that will be used to pull related accounts.
         var invoiceIds = [];                // filter for accounts
@@ -154,6 +163,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
             .getAll(),
         ])
           .then((values) => {
+            debugger;
             /***********************************
              *
              * 0 = G/L Accounts.
@@ -179,8 +189,8 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
                 this.state.processedResponse.data[index].AccountDetails = values[ARLoadQuery.GLAccounts]
                   .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].ID) || [];
 
-                this.state.processedResponse.data[index].Approvals = values[ARLoadQuery.ApprovalResponses]
-                  .filter(f => Number(f.InvoiceID) === this.state.processedResponse.data[index].ID) || [];
+                this.state.processedResponse.data[index].Actions = values[ARLoadQuery.InvoiceActions]
+                  .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].ID) || [];
 
                 this.state.processedResponse.data[index].RelatedAttachments = values[ARLoadQuery.RelatedAttachments]
                   .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].ID) || [];
@@ -193,8 +203,8 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, any
                 this.state.processedResponse.data[index].AccountDetails = values[ARLoadQuery.GLAccounts]
                   .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].AR_x0020_RequestId) || [];
 
-                this.state.processedResponse.data[index].Approvals = values[ARLoadQuery.ApprovalResponses]
-                  .filter(f => Number(f.InvoiceID) === this.state.processedResponse.data[index].AR_x0020_RequestId) || [];
+                this.state.processedResponse.data[index].Actions = values[ARLoadQuery.InvoiceActions]
+                  .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].AR_x0020_RequestId) || [];
 
                 this.state.processedResponse.data[index].RelatedAttachments = values[ARLoadQuery.RelatedAttachments]
                   .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === this.state.processedResponse.data[index].AR_x0020_RequestId) || [];

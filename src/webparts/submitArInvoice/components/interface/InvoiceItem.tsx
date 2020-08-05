@@ -1,3 +1,36 @@
+interface IRequestedBy {
+  // Users Email
+  EMAil: string;
+  // Users Name.  Last, First
+  Title: string;
+}
+
+/**
+ * Structure for Invoice Actions.
+ */
+export interface IInvoiceAction {
+  ID: number;
+  Id: number;
+  ContentTypeId: string;
+  AuthorId: number;
+  Created: Date;
+  EditorId: number;
+  Modified: Date;
+
+  AR_x0020_InvoiceId?: number;
+  AR_x0020_Invoice_x0020_RequestId: number;
+  AssignedToId: number;
+  Title: string;
+  Body: number;
+  DueDate?: Date;
+  StartDate?: Date;
+  Request_x0020_Type: string;
+  Response_x0020_Message?: string;
+  Response_x0020_Status: string;
+  Response_x0020_Summary?: string;
+  Status: string;
+}
+
 /**
  * Response that we get from SharePoint for Invoice Requests items and Invoices items
  */
@@ -47,6 +80,12 @@ export interface IInvoiceItem extends IInvoiceQueryItem {
 
   CancelRequests: Array<IInvoiceCancelRequest>;
 
+  AccountDetails: Array<any>;
+
+  Actions: Array<IInvoiceAction>;
+
+  RelatedAttachments: Array<any>;
+
 
   // This is used by Kendo components to show or hide more details.
   expanded: boolean;
@@ -76,9 +115,6 @@ export interface IInvoiceCancelRequest {
   Created: Date;
 }
 
-interface IRequestedBy {
-  // Users Email
-  EMAil: string;
-  // Users Name.  Last, First
-  Title: string;
-}
+
+
+
