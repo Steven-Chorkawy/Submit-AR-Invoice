@@ -93,6 +93,16 @@ class DepartmentListView extends React.Component<any, any> {
       receivedData: invoices.data
     });
   }
+  public arDataReceived = (invoices) => {
+    console.log('arDataReceived');
+    console.log(invoices);
+    this.setState({
+      ...this.state,
+      data: invoices,
+      receivedData: invoices.data
+    });
+  }
+
   //#endregion
 
   //#region Pager Methods
@@ -137,6 +147,8 @@ class DepartmentListView extends React.Component<any, any> {
         <InvoiceDataProvider
           dataState={this.state.dataState}
           onDataReceived={this.dataReceived}
+          onARRequestDataReceived={this.arDataReceived}
+
 
           statusDataState={this.state.statusData}
           onStatusDataReceived={this.statusDataReceived}

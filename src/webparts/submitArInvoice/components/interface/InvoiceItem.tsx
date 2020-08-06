@@ -7,6 +7,11 @@ interface IPersonField {
   Title: string;
 }
 
+interface ICustomerField {
+  Customer_x0020_Name: string;
+  CustomerDetails: string;
+}
+
 /**
  * Structure for Invoice Actions.
  */
@@ -90,6 +95,7 @@ export interface IInvoiceItem extends IInvoiceQueryItem {
 
   RelatedAttachments: Array<any>;
 
+  Customer: ICustomerField;
 
   // This is used by Kendo components to show or hide more details.
   expanded: boolean;
