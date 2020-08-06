@@ -10,22 +10,34 @@ import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/
 
 // Custom Imports
 import { MyFinanceGlAccounts } from './MyFinanceGLAccounts';
-import { ApprovalResponseComponent } from './ApprovalResponseComponent';
+import { ActionResponseComponent } from './ActionResponseComponent';
+import { IInvoiceItem } from './interface/InvoiceItem';
 
 export class InvoiceGridDetailComponent extends GridDetailRow {
 
   constructor(props) {
     super(props);
+    this.detailItem = this.props.dataItem;
   }
+
+  private detailItem: IInvoiceItem;
+
 
   public render() {
     return (
       <div style={{ marginBottom: '3em;' }}>
-        {this.props.dataItem.CancelRequests.length > 0 &&
+        <h3>G/L Accounts</h3>
+        <MyFinanceGlAccounts
+          value={this.detailItem.AccountDetails}
+          showCommandCell={false}
+          style={{ 'maxWidth': '1200px' }} />
+        <hr />
+
+        {this.detailItem.CancelRequests && <div> {this.detailItem.CancelRequests.length > 0 &&
           <div>
             <h3>Cancel Requests</h3>
             <Card style={{ width: 600 }} type='error'>
-              {this.props.dataItem.CancelRequests.map(cancelReq => {
+              {this.detailItem.CancelRequests.map(cancelReq => {
                 return (
                   <CardBody>
                     <CardTitle>{cancelReq.Requested_x0020_By.EMail} - {cancelReq.Created}</CardTitle>
@@ -36,19 +48,10 @@ export class InvoiceGridDetailComponent extends GridDetailRow {
               })}
             </Card>
           </div>
-        }
+        }</div>}
 
-        <h3>G/L Accounts</h3>
-        <MyFinanceGlAccounts
-          value={this.props.dataItem.AccountDetails}
-          showCommandCell={false}
-          style={{ 'maxWidth': '1200px' }} />
-        <hr />
-
-        <h3>Approval Responses</h3>
-        <ApprovalResponseComponent
-          approvals={this.props.dataItem.Approvals}
-        />
+        <h3>Actions Required</h3>
+        <ActionResponseComponent actions={this.detailItem.Actions}/>
       </div>
     );
   }

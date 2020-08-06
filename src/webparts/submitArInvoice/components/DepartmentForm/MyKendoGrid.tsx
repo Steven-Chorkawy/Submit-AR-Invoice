@@ -29,6 +29,9 @@ import { InvoiceDataProvider } from '../InvoiceDataProvider';
 import { InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
 import { ConvertQueryParamsToKendoFilter } from '../MyHelperMethods';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
+import { MyLists } from '../enums/MyLists';
+import { MyContentTypes } from '../enums/MyEnums';
+import { FileRefCell } from '../FileRefCell';
 
 type MyKendoGridState = {
   data: any;
@@ -44,24 +47,6 @@ type MyKendoGridState = {
 };
 
 
-/**
- * Used to Render a url to the current file.
- */
-class CustomCell extends React.Component<GridCellProps> {
-  public render() {
-    return (this.props.dataItem.Invoice_x0020_Status === InvoiceStatus["Entered into GP"] || this.props.dataItem.Invoice_x0020_Status === InvoiceStatus.Completed) ? (
-      <td title={'Click to view invoice.'}>
-        <a href={this.props.dataItem.ServerRedirectedEmbedUrl} target='_blank' >
-          <Button primary={true} /*icon="hyperlink-open"*/ icon="folder"></Button>
-        </a>
-      </td>
-    ) : (
-        <td title={'Invoice not processed...'}>
-          <Button primary={true} /*icon="hyperlink-open"*/ icon="folder" disabled={true}></Button>
-        </td>
-      );
-  }
-}
 
 export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   constructor(props) {
@@ -97,7 +82,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   private CommandCell;
 
   //#region Methods
-  public MyCustomCell = (props) => <CustomCell {...props} />;
+  public MyCustomCell = (props) => <FileRefCell {...props} />;
 
   public dataStateChange = (e) => {
     this.setState({
@@ -147,6 +132,16 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
     });
   }
 
+  public arDataReceived = (invoices) => {
+    console.log('arDataReceived');
+    console.log(invoices);
+    this.setState({
+      ...this.state,
+      data: invoices,
+      receivedData: invoices.data
+    });
+  }
+
   public onFilterChange = (e) => {
     var newData = filterBy(this.state.receivedData, e.filter);
 
@@ -175,6 +170,9 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
 
   public save = () => {
     const dataItem = this.state.productInEdit;
+    console.log("saving this data");
+    console.log(dataItem);
+
 
     const invoices = this.state.data.data.slice();
     // const isNewProduct = dataItem.ProductID === undefined;
@@ -187,27 +185,12 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       invoices.splice(index, 1, dataItem);
     }
 
-    this.setState({
-      data: {
-        data: invoices,
-        total: invoices.length
-      },
-      productInEdit: undefined
-    });
-    debugger;
+
+
     let updateObject = {
       Department: dataItem.Department,
       Date: dataItem.Date,
       Requested_x0020_ById: dataItem.Requested_x0020_ById,
-      Requires_x0020_Authorization_x0020_ById: {
-        'results': dataItem.Requires_x0020_Authorization_x0020_ById.map((user) => {
-          if (Number.isInteger(user)) {
-            return user;
-          } else {
-            return user.Id;
-          }
-        })
-      },
       Urgent: dataItem.Urgent,
       CustomerId: dataItem.CustomerId,
       MiscCustomerName: dataItem.CustomerId === null ? dataItem.Customer.Customer_x0020_Name : null,
@@ -218,9 +201,36 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       Standard_x0020_Terms: dataItem.Standard_x0020_Terms,
     };
 
-    debugger;
 
-    sp.web.lists.getByTitle('AR Invoices').items.getById(dataItem.ID).update(updateObject);
+    // Update request item.
+    if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
+      updateObject['Requires_x0020_Department_x0020_Id'] = {
+        'results': dataItem.Requires_x0020_Department_x0020_Id.map((user) => {
+          if (Number.isInteger(user)) {
+            return user;
+          }
+          else {
+            return user.Id
+          }
+        })
+      };
+      sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(dataItem.ID).update(updateObject)
+    }
+    // Update document item.
+    else {
+      updateObject['Requires_x0020_Authorization_x0020_ById'] = {
+        'results': dataItem.Requires_x0020_Authorization_x0020_ById.map((user) => {
+          if (Number.isInteger(user)) {
+            return user;
+          }
+          else {
+            return user.Id
+          }
+        })
+      };
+      sp.web.lists.getByTitle(MyLists["AR Invoices"]).items.getById(dataItem.ID).update(updateObject)
+    }
+
 
     if (dataItem.RelatedInvoiceAttachments) {
 
@@ -231,35 +241,98 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
           .then(fileRes => {
             fileRes.file.getItem()
               .then(item => {
-
                 const itemProxy: any = Object.assign({}, item);
-                sp.web.lists.getByTitle('RelatedInvoiceAttachments').items.getById(itemProxy.ID).update({
-                  ARInvoiceId: dataItem.ID,
+                let relatedAttachmentUpdateObject = {
                   Title: element.name
-                });
+                };
+
+                if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
+                  relatedAttachmentUpdateObject['AR_x0020_Invoice_x0020_RequestId'] = dataItem.ID
+                }
+                else {
+                  relatedAttachmentUpdateObject['ARInvoiceId'] = dataItem.ID;
+                }
+
+                sp.web.lists.getByTitle('RelatedInvoiceAttachments').items.getById(itemProxy.ID).update(relatedAttachmentUpdateObject);
               });
           });
       }
     }
+
+
+    // Query the new record to get all the new info.
+    //TODO: Include more related records here.
+    sp.web.lists.getByTitle(MyLists["AR Invoice Requests"])
+      .items.getById(dataItem.ID)
+      .get()
+      .then(response => {
+        const index = invoices.findIndex(p => p.ID === dataItem.ID);
+        invoices.splice(index, 1, response);
+        this.setState({
+          data: {
+            data: invoices,
+            total: invoices.length
+          },
+          productInEdit: undefined
+        });
+      });
   }
 
   public sendCancelRequest = () => {
     sp.web.currentUser.get()
       .then(currentUser => {
-
         const dataItem = this.state.productInCancel;
-        sp.web.lists.getByTitle('Cancel Invoice Request')
+
+        var cancelReqUpdateObj = {
+          Title: 'Invoice Cancel Request',
+          //Invoice_x0020_NumberId: dataItem.ID,
+          Requested_x0020_ById: currentUser.Id,
+          Requester_x0020_Comments: dataItem.CancelComment
+        };
+
+        if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
+          cancelReqUpdateObj['AR_x0020_Invoice_x0020_RequestId'] = dataItem.Id
+        }
+        else {
+          cancelReqUpdateObj['Invoice_x0020_NumberId'] = dataItem.Id
+          cancelReqUpdateObj['AR_x0020_Invoice_x0020_RequestId'] = dataItem.AR_x0020_RequestId
+        }
+
+        sp.web.lists.getByTitle(MyLists["Cancel Invoice Request"])
           .items
-          .add({
-            Title: 'Invoice Cancel Request',
-            Invoice_x0020_NumberId: dataItem.ID,
-            Requested_x0020_ById: currentUser.Id,
-            Requester_x0020_Comments: dataItem.CancelComment
-          })
-          .then(_ => {
-            this.setState({
-              productInCancel: undefined
-            });
+          .add(cancelReqUpdateObj)
+          .then(createRes => {
+
+            var indexOf = -1;
+            var arReqId = -1;
+
+            if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
+              indexOf = this.state.data.data.findIndex(f => f.ID === dataItem.Id);
+              arReqId = dataItem.Id;
+            }
+            else {
+              indexOf = this.state.data.data.findIndex(f => f.AR_x0020_RequestId === dataItem.AR_x0020_RequestId);
+              arReqId = dataItem.AR_x0020_RequestId;
+            }
+
+            sp.web.lists.getByTitle(MyLists["Cancel Invoice Request"])
+              .items.getById(createRes.data.Id)
+              .select('*, Requested_x0020_By/EMail, Requested_x0020_By/Title')
+              .expand('Requested_x0020_By')
+              .get()
+              .then(response => {
+
+                var updatedARs = this.state.data.data;
+                updatedARs[indexOf].CancelRequests.push(response);
+
+                this.setState({
+                  data: {
+                    data: updatedARs,
+                    total: updatedARs.length
+                  },
+                  productInCancel: undefined
+                });
+              });
           });
       });
   }
@@ -352,6 +425,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
         <InvoiceDataProvider
           dataState={this.state.dataState}
           onDataReceived={this.dataReceived}
+          onARRequestDataReceived={this.arDataReceived}
 
           statusDataState={this.state.statusData}
           onStatusDataReceived={this.statusDataReceived}

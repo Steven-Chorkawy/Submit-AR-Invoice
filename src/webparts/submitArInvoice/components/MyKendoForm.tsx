@@ -18,7 +18,10 @@ import { IMyFormProps } from './IMyFormProps';
 import { IUploadingFile } from './IMyFormState';
 import * as MyValidators from './validators.jsx';
 import { MyGLAccountComponent } from './MyGLAccountComponent';
-import { BuildGUID } from './MyHelperMethods';
+import { BuildGUID, ConvertQueryParamsToKendoFilter } from './MyHelperMethods';
+import { MyLists } from './enums/MyLists';
+import { IItemAddResult } from '@pnp/sp/items';
+import { IInvoiceActionRequired, InvoiceActionRequiredRequestType, InvoiceActionRequiredResponseStatus } from '../components/interface/IInvoiceActionRequired';
 
 
 
@@ -38,10 +41,11 @@ export interface IARFormModel {
 
 
 export interface IARAccountDetails {
-  AR_x0020_InvoiceId: number;   //ID of Invoice
-  Account_x0020_Code: string; // GL Code
-  Amount: number;             // Amount for account
-  HST_x0020_Taxable: boolean; // Is amount taxable?
+  AR_x0020_InvoiceId?: number;               //ID of Invoice
+  AR_x0020_Invoice_x0020_RequestId: number; // ID of AR Request
+  Account_x0020_Code: string;               // GL Code
+  Amount: number;                           // Amount for account
+  HST_x0020_Taxable: boolean;               // Is amount taxable?
 }
 
 
@@ -73,87 +77,99 @@ export class MyForm extends React.Component<IMyFormProps, any> {
    * @param dataItem Data from form
    */
   public handleSubmit = async (dataItem) => {
-
-    if (!dataItem.hasOwnProperty('RequestedBy')) {
-      return;
-    }
-
     // We will use this to update states later.
     let currentFiles: IUploadingFile[] = this.state.MyFiles;
-
-    let web = Web(this._siteUrl);
-
-    let currentYear = new Date().getFullYear();
-    const newARTitle = currentYear + "-AR-" + BuildGUID();
-    let finalFileName = newARTitle + '.pdf'; // .pdf because GP exports pdf files.  Finance will replace this place holder file in the future.
-    // TODO: Remove this hard coded value! Can we possibly get this from the web parts properties window? That would allow this web part to be used in multiple locations.
-    //? Can i upload a string as file content?
-    let uploadRes = await web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/')
-      .files
-      .add(finalFileName, "Placeholder file until invoice from GP is uploaded", true);
-
-    // Gets the file that we just uploaded.  This will be used later to update the metadata.
-    let newUploadedFile = await uploadRes.file.getItem();
-    const uploadedFile: any = Object.assign({}, newUploadedFile);
+    console.log("handleSubmit data");
+    console.log(dataItem);
 
 
-    // Set the data for the invoice
-    var myData = {
-      Title: newARTitle,
-      Department: dataItem.Department,
-      Date: dataItem.Date,
-      Requested_x0020_ById: dataItem.RequestedBy.Id,
-      Requires_x0020_Authorization_x0020_ById: {
-        'results': dataItem.RequiresAuthorizationBy.map((user) => { return user.Id; })
-      },
-      //CustomerId: dataItem.Customer.Id,
-      Comment: dataItem.Comment,
-      Customer_x0020_PO_x0020_Number: dataItem.CustomerPONumber,
-      Invoice_x0020_Details: dataItem.InvoiceDetails,
-      Standard_x0020_Terms: dataItem.StandardTerms,
-      Urgent: dataItem.Urgent
-    };
+    try {
+      if (!dataItem.hasOwnProperty('RequestedBy')) {
+        return;
+      }
 
-    // Add customer data.
-    // dataItem.Customer.ID is undefined when a custom customer is added.
+      let web = Web(this._siteUrl);
 
-    if (dataItem.Customer.ID === undefined) {
-      myData['MiscCustomerDetails'] = this.state.MiscCustomerDetails;
-      myData['MiscCustomerName'] = dataItem.Customer.Customer_x0020_Name;
-    }
-    else {
-      myData['CustomerId'] = dataItem.Customer.Id;
-    }
+      let currentYear = new Date().getFullYear();
+      const newARTitle = currentYear + "-AR-" + BuildGUID();
+      let finalFileName = newARTitle + '.pdf';
+
+      // Set the data for the invoice
+      var myData = {
+        Title: newARTitle,
+        Department: dataItem.Department,
+        Date: dataItem.Date,
+        Requested_x0020_ById: dataItem.RequestedBy.Id,
+        Requires_x0020_Authorization_x0020_ById: {
+          'results': dataItem.RequiresAuthorizationBy.map((user) => { return user.Id; })
+        },
+        //CustomerId: dataItem.Customer.Id,
+        Comment: dataItem.Comment,
+        Customer_x0020_PO_x0020_Number: dataItem.CustomerPONumber,
+        Invoice_x0020_Details: dataItem.InvoiceDetails,
+        Standard_x0020_Terms: dataItem.StandardTerms,
+        Urgent: dataItem.Urgent
+      };
 
 
-    const accounts: IARAccountDetails = { ...dataItem.GLAccounts };
+      // Add customer data.
+      // dataItem.Customer.ID is undefined when a custom customer is added.
+      if (dataItem.Customer.ID === undefined) {
+        myData['MiscCustomerDetails'] = this.state.MiscCustomerDetails;
+        myData['MiscCustomerName'] = dataItem.Customer.Customer_x0020_Name;
+      }
+      else {
+        myData['CustomerId'] = dataItem.Customer.Id;
+      }
 
-    var output = await (await sp.web.lists.getByTitle('AR Invoices').items.getById(uploadedFile.ID).update(myData)).item;
+      var arInvoiceRequestListItemData = {
+        ...myData,
+        Requires_x0020_Department_x0020_Id: myData.Requires_x0020_Authorization_x0020_ById
+      };
 
-    output.get().then(innerFile => {
-      currentFiles.push({
-        FileName: innerFile.Name,
-        UploadSuccessful: true,
-        ErrorMessage: null,
-        LinkToFile: `${this._siteUrl}/SitePages/Department-AR-Search-Page.aspx/?FilterField1=ID&FilterValue1=${innerFile.ID}`
-      });
-      this.setState({
-        MyFiles: currentFiles
-      });
+      delete arInvoiceRequestListItemData.Requires_x0020_Authorization_x0020_ById;
+
+      let arInvoiceRequstListItem = await web.lists
+        .getByTitle(MyLists["AR Invoice Requests"])
+        .items.add(arInvoiceRequestListItemData);
+
+      // Create an approval request.
+      // For each requires approval from.
+      for (let index = 0; index < dataItem.RequiresAuthorizationBy.length; index++) {
+
+        const element = dataItem.RequiresAuthorizationBy[index];
+        let newAction: IInvoiceActionRequired = {
+          AR_x0020_Invoice_x0020_RequestId: arInvoiceRequstListItem.data.ID,
+          Title: 'Approval Required',
+          AssignedToId: element.Id,
+          Body: 'Approval Required',
+          Request_x0020_Type: InvoiceActionRequiredRequestType.DepartmentApprovalRequired,
+          Response_x0020_Status: InvoiceActionRequiredResponseStatus.Waiting
+        }
+
+        web.lists.getByTitle(MyLists.InvoiceActionRequired)
+          .items
+          .add(newAction);
+      }
+
+      const accounts: IARAccountDetails = { ...dataItem.GLAccounts };
 
       // Set the data for the account details.
       let accountDetails: IARAccountDetails[] = [];
       dataItem.GLAccounts.map(account => {
         accountDetails.push({
-          AR_x0020_InvoiceId: innerFile.ID,
+          // AR_x0020_InvoiceId: innerFile.ID,
+          AR_x0020_Invoice_x0020_RequestId: arInvoiceRequstListItem.data.ID,
           Account_x0020_Code: account.GLCode,
           HST_x0020_Taxable: account.HSTTaxable,
           Amount: account.Amount
         });
       });
 
-      this.addAccountCodes(accountDetails, output);
+      // Add Account Codes
+      this.addAccountCodesToListItem(accountDetails, arInvoiceRequstListItem);
 
+      // Add related items
       if (dataItem.RelatedInvoiceAttachments) {
         for (let index = 0; index < dataItem.RelatedInvoiceAttachments.length; index++) {
           const element = dataItem.RelatedInvoiceAttachments[index];
@@ -164,23 +180,50 @@ export class MyForm extends React.Component<IMyFormProps, any> {
               uploadResponse.file.getItem()
                 .then(item => {
                   const itemProxy: any = Object.assign({}, item);
-                  sp.web.lists.getByTitle('RelatedInvoiceAttachments').items.getById(itemProxy.ID).update({
-                    ARInvoiceId: innerFile.ID,
+                  sp.web.lists.getByTitle(MyLists["Related Invoice Attachments"]).items.getById(itemProxy.ID).update({
+                    AR_x0020_Invoice_x0020_RequestId: arInvoiceRequstListItem.data.ID,
                     Title: element.name
                   });
                 });
             });
         }
       }
-    });
 
-    // Force a re render.
-    this.setState({
-      stateHolder: this.state.stateHolder + 1
-    });
+      // Provide a success message back to the user.
+      currentFiles.push({
+        FileName: 'To be set',
+        UploadSuccessful: true,
+        ErrorMessage: null,
+        LinkToFile: `${this._siteUrl}/SitePages/Department-AR-Search-Page.aspx/?FilterField1=ID&FilterValue1=${arInvoiceRequstListItem.data.ID}`
+      });
 
-    this.forceUpdate();
+      // Force a re render.
+      this.setState({
+        stateHolder: this.state.stateHolder + 1,
+        MyFiles: currentFiles
+      });
+
+      this.forceUpdate();
+
+    } catch (error) {
+
+      console.log("Something went wrong!");
+      console.log(error);
+
+      currentFiles.push({
+        FileName: '',
+        UploadSuccessful: false,
+        ErrorMessage: "Something went wrong!",
+        LinkToFile: null
+      });
+      this.setState({
+        MyFiles: currentFiles
+      });
+
+      throw error;
+    }
   }
+
 
   /**
    * handleSubmit2
@@ -188,7 +231,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
   public handleSubmit2 = async (event) => {
     event.preventDefault();
   }
-
 
 
 
@@ -214,17 +256,12 @@ export class MyForm extends React.Component<IMyFormProps, any> {
     }
   }
 
-  /**
-   * Create the accounts for this invoice.
-   *
-   * @param accountDetails IARAccountDetails
-   */
-  public addAccountCodes = async (accountDetails: IARAccountDetails[], file) => {
+
+  public addAccountCodesToListItem = async (accountDetails: IARAccountDetails[], listItem: IItemAddResult) => {
     accountDetails.map(account => {
-      sp.web.lists.getByTitle('AR Invoice Accounts').items.add(account)
+      sp.web.lists.getByTitle(MyLists["AR Invoice Accounts"]).items.add(account)
         .then(f => {
-          // Connect the account to the document list.
-          file.update({
+          listItem.item.update({
             AccountDetailsId: {
               results: [f.data.ID]
             }
@@ -382,7 +419,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                 label="* Customer"
                 wrapperStyle={{ width: '100%' }}
                 data={this.state.customerList}
-                dataItemKey="ID"
+                dataItemKey="Id"
                 textField="Customer_x0020_Name"
                 validator={MyValidators.requiresCustomer}
                 allowCustom={true}

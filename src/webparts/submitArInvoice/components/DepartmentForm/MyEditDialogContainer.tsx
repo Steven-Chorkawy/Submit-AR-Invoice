@@ -17,19 +17,41 @@ import * as MyValidators from '../validators.jsx';
 import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceGLAccounts';
 import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
 import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
-import { MyCustomerCardComponent } from '../MyCustomerCardComponent';
+import { IInvoiceItem } from '../interface/InvoiceItem';
+import { InvoiceActionRequiredResponseStatus } from '../interface/IInvoiceActionRequired';
 
+interface IMyEditDialogContainerState {
+  productInEdit: IInvoiceItem;
+  selectedReqApprovers: any;
+  selectedCustomer: any;
+  customerList: any;
+  receivedCustomerList: any;
+  MiscCustomerDetails?: any;
+  loading?: boolean;
+}
 
-export class MyEditDialogContainer extends React.Component<any, any> {
+export class MyEditDialogContainer extends React.Component<any, IMyEditDialogContainerState> {
   constructor(props) {
     super(props);
-    this.props.dataItem.Requires_x0020_Authorization_x0020_ById.map(reqAuthId => {
-      this._selectedReqApprovers.push(this.props.siteUsers.find(s => s.Id === reqAuthId));
-    });
+    console.log("MyEditDialogContainer");
+    console.log(props);
+
+
+    if (this.props.dataItem.Requires_x0020_Authorization_x0020_ById) {
+      this.props.dataItem.Requires_x0020_Authorization_x0020_ById.map(reqAuthId => {
+        this._selectedReqApprovers.push(this.props.siteUsers.find(s => s.Id === reqAuthId));
+      });
+    }
+    else if (this.props.dataItem.Requires_x0020_Department_x0020_Id) {
+      this.props.dataItem.Requires_x0020_Department_x0020_Id.map(reqAuthId => {
+        this._selectedReqApprovers.push(this.props.siteUsers.find(s => s.Id === reqAuthId));
+      });
+    }
 
     this.state = {
       productInEdit: this.props.dataItem || null,
       selectedReqApprovers: this._selectedReqApprovers,
+      selectedCustomer: this.props.dataItem.Customer,
       customerList: this.props.customers,
       receivedCustomerList: this.props.customers
     };
@@ -46,6 +68,7 @@ export class MyEditDialogContainer extends React.Component<any, any> {
     return React.cloneElement(li, li.props, itemChildren);
   }
   public onCustomCustomerChange = (event) => {
+
     let target = event.target;
     let value = target.type === 'checkbox' ? target.checked : target.value;
     debugger;
@@ -113,10 +136,13 @@ export class MyEditDialogContainer extends React.Component<any, any> {
         });
         break;
       case 'Customer':
-        var prod = this.state.productInEdit;
-        value.Id === undefined ? prod.CustomerId = null : prod.CustomerId = value.Id;
+        name = 'CustomerId';
+        value = value.Id;
         this.setState({
-          productInEdit: prod
+          selectedCustomer: {
+            Customer_x0020_Name: value.Customer_x0020_Name,
+            ID: value.Id
+          }
         });
         break;
       case 'CustomerPONumber':
@@ -137,13 +163,30 @@ export class MyEditDialogContainer extends React.Component<any, any> {
     });
   }
 
+  public onActionResponseSent = (e) => {
+    console.log('before update');
+    console.log(this.state.productInEdit.Actions);
+    this.forceUpdate();
+  }
+
   public render() {
     return (
       <Dialog onClose={this.props.cancel} title={"Edit AR Invoice Request"} minWidth="200px" width="80%" height="80%">
-        <ApprovalRequiredComponent
-          productInEdit={this.state.productInEdit}
-          currentUser={this.props.currentUser}
-        />
+        {
+          this.state.productInEdit.Actions
+            .filter(f => f.AuthorId === this.props.currentUser.Id && f.Response_x0020_Status === InvoiceActionRequiredResponseStatus.Waiting)
+            .map(action => {
+
+              return (<ApprovalRequiredComponent
+                action={action}
+                productInEdit={this.state.productInEdit}
+                currentUser={this.props.currentUser}
+                onActionSentCallBack={this.onActionResponseSent}
+              />);
+            })
+        }
+
+
         <Form
           //onSubmit={this.handleSubmit}
           onSubmit={this.handleSubmit}
@@ -244,19 +287,15 @@ export class MyEditDialogContainer extends React.Component<any, any> {
                 data={this.state.customerList}
                 textField="Customer_x0020_Name"
                 //validator={MyValidators.requiresCustomer}
+                value={this.props.customers.find(f => f.Id === this.state.productInEdit.CustomerId)}
                 allowCustom={true}
                 itemRender={this.customerItemRender}
                 component={MyFormComponents.CustomerComboBox}
                 filterable={true}
                 suggest={true}
                 onFilterChange={this.customerFilterChange}
-                onCustomCustomerChange={this.onCustomCustomerChange}
                 onChange={this.onDialogInputChange}
-                value={
-                  this.state.productInEdit.CustomerId === null
-                    ? this.state.productInEdit.Customer
-                    : this.props.customers.find(f => f.Id === this.state.productInEdit.CustomerId)
-                }
+                onCustomCusteromChange={this.onCustomCustomerChange}
               />
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
