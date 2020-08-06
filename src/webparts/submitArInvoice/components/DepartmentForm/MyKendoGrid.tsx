@@ -169,6 +169,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   }
 
   public handleSubmit = (event) => {
+    var tester = event;
     debugger;
   }
 

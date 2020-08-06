@@ -30,6 +30,25 @@ interface IMyEditDialogContainerState {
   loading?: boolean;
 }
 
+function GridButtons(props) {
+  return <div className="k-form-buttons">
+    <Button
+      type={"submit"}
+      style={{ width: '50%' }}
+      className="k-button k-primary"
+      icon="save"
+    // disabled={!formRenderProps.allowSubmit}
+    >Save</Button>
+    <Button
+      // type={"submit"}
+      style={{ width: '50%' }}
+      className="k-button"
+      onClick={props.cancel}
+      icon="cancel"
+    >Cancel</Button>
+  </div>;
+}
+
 export class MyEditDialogContainer extends React.Component<any, IMyEditDialogContainerState> {
   constructor(props) {
     super(props);
@@ -164,9 +183,11 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
     this.forceUpdate();
   }
 
+
   public render() {
     return (
       <Dialog onClose={this.props.cancel} title={"Edit AR Invoice Request"} minWidth="200px" width="80%" height="80%">
+
         {
           this.state.productInEdit.Actions
             .filter(f => f.AuthorId === this.props.currentUser.Id && f.Response_x0020_Status === InvoiceActionRequiredResponseStatus.Waiting)
@@ -181,18 +202,10 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
         }
 
         <Form
-          onSubmit={this.props.handleSubmit}
-
-          initialValues={{
-            Date: new Date(),
-            Urgent: false,
-            StandardTerms: 'NET 30, 1% INTEREST CHARGED',
-            GLAccounts: [],
-          }}
-
+          onSubmit={this.props.onSubmit}
+          initialValues={{ ...this.state.productInEdit }}
           render={(formRenderProps) => (
-            <FormElement >
-              <legend className={'k-form-legend'}>ACCOUNTS RECEIVABLE - INVOICE REQUISITION </legend>
+            <FormElement>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
                   id="Department"
@@ -217,146 +230,22 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                   value={this.state.productInEdit.Department}
                   onChange={this.onDialogInputChange}
                 />
-
-                <Field
-                  id={'Date'}
-                  name={'Date'}
-                  label={'* Date'}
-                  component={MyFormComponents.FormDatePicker}
-                  //validator={MyValidators.dateValidator}
-                  wrapperStyle={{ width: '50%' }}
-                  value={new Date(this.state.productInEdit.Date)}
-                  onChange={this.onDialogInputChange}
-                />
+                <div className="k-form-buttons">
+                  <button
+                    type={"submit"}
+                    className="k-button k-primary"
+                  >Save</button>
+                  <button
+                    type={"submit"}
+                    className="k-button"
+                    onClick={this.props.cancel}
+                  >Cancel</button>
+                </div>
               </div>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Field
-                  id="RequestedBy"
-                  name="RequestedBy"
-                  label="* Requested By"
-                  wrapperStyle={{ width: '50%', marginRight: '18px' }}
-                  data={this.props.siteUsers}
-                  dataItemKey="Email"
-                  textField="Title"
-                  //validator={MyValidators.requestedByValidator}
-                  component={MyFormComponents.FormComboBox}
-                  value={this.props.siteUsers.find(s => s.Id === this.state.productInEdit.Requested_x0020_ById)}
-                  onChange={this.onDialogInputChange}
-                />
-
-                <Field
-                  id="RequiresAuthorizationBy"
-                  name="RequiresAuthorizationBy"
-                  label="* Requires Authorization By"
-                  wrapperStyle={{ width: '50%' }}
-                  data={this.props.siteUsers}
-                  dataItemKey="Email"
-                  textField="Title"
-                  component={MyFormComponents.FormMultiSelect}
-                  value={this.state.selectedReqApprovers}
-                  onChange={this.onDialogInputChange}
-                />
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Field
-                  id="Urgent"
-                  name="Urgent"
-                  label="Urgent"
-                  onLabel="Yes"
-                  offLabel="No"
-                  component={MyFormComponents.FormSwitch}
-                  defaultChecked={this.state.productInEdit.Urgent}
-                  onChange={this.onDialogInputChange}
-                />
-              </div>
-              <Field
-                id="Customer"
-                name="Customer"
-                label="* Customer"
-                wrapperStyle={{ width: '100%' }}
-                data={this.state.customerList}
-                textField="Customer_x0020_Name"
-                //validator={MyValidators.requiresCustomer}
-                value={this.props.customers.find(f => f.Id === this.state.productInEdit.CustomerId)}
-                allowCustom={true}
-                itemRender={this.customerItemRender}
-                component={MyFormComponents.CustomerComboBox}
-                filterable={true}
-                suggest={true}
-                onFilterChange={this.customerFilterChange}
-                onChange={this.onDialogInputChange}
-                onCustomCusteromChange={this.onCustomCustomerChange}
-              />
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Field
-                  id="CustomerPONumber"
-                  name="CustomerPONumber"
-                  label="Customer PO Number"
-                  ////validator={MyValidators.requiresCustomerPONUmber}
-                  component={MyFormComponents.FormInput}
-                  value={this.state.productInEdit.Customer_x0020_PO_x0020_Number}
-                  onChange={this.onDialogInputChange}
-                />
-
-                <Field
-                  id="StandardTerms"
-                  name="StandardTerms"
-                  label="Standard Terms"
-                  wrapperStyle={{ width: '50%', marginRight: '18px' }}
-                  defaultValue='NET 30, 1% INTEREST CHARGED'
-                  data={[
-                    'NET 30, 1% INTEREST CHARGED'
-                  ]}
-                  component={MyFormComponents.FormDropDownList}
-                  onChange={this.onDialogInputChange}
-                />
-              </div>
-
-              <Field
-                id="Comment"
-                name="Comment"
-                label="Comments"
-                value={this.state.productInEdit.Comment}
-                component={MyFormComponents.FormTextArea}
-                onChange={this.onDialogInputChange}
-              />
-
-              <Field
-                id="InvoiceDetails"
-                name="InvoiceDetails"
-                label="Invoice Details"
-                component={MyFormComponents.FormTextArea}
-                value={this.state.productInEdit.Invoice_x0020_Details}
-                onChange={this.onDialogInputChange}
-              />
-
-              <div style={{ width: '100%' }}>
-                <FieldArray
-                  name="GLAccounts"
-                  component={MyFinanceGlAccountsComponent}
-                  value={this.state.productInEdit.AccountDetails}
-                />
-              </div>
-
-              <hr />
-              <MyRelatedAttachmentComponent
-                productInEdit={this.state.productInEdit}
-                onChange={this.onDialogInputChange}
-              />
             </FormElement>
-          )} />
-        {/* <DialogActionsBar>
-          <button
-            className="k-button k-primary"
-            onClick={this.props.save}
-          >Save</button>
-          <button
-            className="k-button"
-            onClick={this.props.cancel}
-          >Cancel</button>
-        </DialogActionsBar> */}
+          )}
+        >
+        </Form>
       </Dialog>
     );
   }
