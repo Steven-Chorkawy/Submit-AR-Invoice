@@ -48,7 +48,6 @@ type MyKendoGridState = {
 
 
 
-
 export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   constructor(props) {
     super(props);
@@ -126,9 +125,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   }
 
   public dataReceived = (invoices) => {
-    console.log("dataReceived");
-    console.log(invoices);
-
     this.setState({
       ...this.state,
       data: invoices,
@@ -197,6 +193,8 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       Requested_x0020_ById: dataItem.Requested_x0020_ById,
       Urgent: dataItem.Urgent,
       CustomerId: dataItem.CustomerId,
+      MiscCustomerName: dataItem.CustomerId === null ? dataItem.Customer.Customer_x0020_Name : null,
+      MiscCustomerDetails: dataItem.CustomerId === null ? dataItem.Customer.CustomerDetails : null,
       Comment: dataItem.Comment,
       Invoice_x0020_Details: dataItem.Invoice_x0020_Details,
       Customer_x0020_PO_x0020_Number: dataItem.Customer_x0020_PO_x0020_Number,

@@ -133,6 +133,22 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
           // idsForRelatedAttachments.push(`AR_x0020_Invoice_x0020_Request/ID eq ${element.ID}`);
           // idsForCancelRequests.push(`AR_x0020_Invoice_x0020_Request/ID eq ${element.ID}`);
           idsForARDocuments.push(`AR_x0020_RequestId eq ${element.ID}`);
+
+          // Format data of this.state.processedResponse.
+          this.state.processedResponse.data[index].Date = new Date(this.state.processedResponse.data[index].Date);
+          this.state.processedResponse.data[index].Created = new Date(this.state.processedResponse.data[index].Created);
+
+
+          // If CustomerId isn't present and MisCustomerName isn't null that means the user has entered a random customer.
+          // By building a Customer object out of the misc customer info it will be much easier to display real customers and mis customers together.
+
+          if ((this.state.processedResponse.data[index].CustomerId === undefined || this.state.processedResponse.data[index].CustomerId === null) && this.state.processedResponse.data[index].MiscCustomerName !== null) {
+
+            this.state.processedResponse.data[index].Customer = {
+              "Customer_x0020_Name": this.state.processedResponse.data[index].MiscCustomerName,
+              "CustomerDetails": this.state.processedResponse.data[index].MiscCustomerDetails
+            };
+          }
         }
 
         Promise.all([

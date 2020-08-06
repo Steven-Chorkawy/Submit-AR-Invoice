@@ -505,6 +505,7 @@ export const CustomerComboBox = (fieldRenderProps) => {
           valid={valid}
           id={id}
           disabled={disabled}
+          onChange={fieldRenderProps.onChange}
           {...others}
         />
         {
@@ -516,7 +517,7 @@ export const CustomerComboBox = (fieldRenderProps) => {
           <Error id={errorId}>{validationMessage}</Error>
         }
       </FieldWrapper>
-      <MyCustomerCardComponent selectedCustomer={selectedCustomer} onCustomCusteromChange={fieldRenderProps.onCustomCusteromChange}/>
+      <MyCustomerCardComponent selectedCustomer={selectedCustomer} onCustomCustomerChange={fieldRenderProps.onCustomCustomerChange}/>
 
     </div>
   );

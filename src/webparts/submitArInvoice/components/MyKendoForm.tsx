@@ -437,7 +437,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   label="Customer PO Number"
                   //validator={MyValidators.requiresCustomerPONUmber}
                   component={MyFormComponents.FormInput}
-                //onchange={this.onDialogInputChange}
                 />
 
                 <Field
@@ -450,7 +449,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                     'NET 30, 1% INTEREST CHARGED'
                   ]}
                   component={MyFormComponents.FormDropDownList}
-                //onchange={this.onDialogInputChange}
                 />
               </div>
 

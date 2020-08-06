@@ -7,6 +7,10 @@ import { Form, FormElement, Field, FieldArray } from '@progress/kendo-react-form
 import { Button } from '@progress/kendo-react-buttons';
 import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/kendo-react-layout';
 import { filterBy } from '@progress/kendo-data-query';
+import { Label, Error, Hint, FloatingLabel } from '@progress/kendo-react-labels';
+import { FieldWrapper } from '@progress/kendo-react-form';
+import { DropDownList, AutoComplete, MultiSelect, ComboBox } from '@progress/kendo-react-dropdowns';
+
 
 import * as MyFormComponents from '../MyFormComponents';
 import * as MyValidators from '../validators.jsx';
@@ -67,9 +71,18 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
 
     let target = event.target;
     let value = target.type === 'checkbox' ? target.checked : target.value;
+    debugger;
+
+    let customer = {
+      ...this.state.productInEdit.Customer,
+      CustomerDetails: value
+    };
+
+    let edited = this.state.productInEdit;
+    edited.Customer = customer;
 
     this.setState({
-      MiscCustomerDetails: value
+      productInEdit: edited
     });
   }
 
@@ -89,10 +102,12 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
   //#endregion
 
   public handleSubmit(event) {
+    debugger;
     event.preventDefault();
   }
 
   public onDialogInputChange = (event) => {
+    debugger;
     let target = event.target;
     let value = target.type === 'checkbox' ? target.checked : target.value;
     let name = (target.props && target.props.name !== undefined) ? target.props.name : (target.name !== undefined) ? target.name : target.props.id;
@@ -185,9 +200,7 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
 
           render={(formRenderProps) => (
             <FormElement >
-
               <legend className={'k-form-legend'}>ACCOUNTS RECEIVABLE - INVOICE REQUISITION </legend>
-
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
                   id="Department"
@@ -272,7 +285,6 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                 label="* Customer"
                 wrapperStyle={{ width: '100%' }}
                 data={this.state.customerList}
-                dataItemKey="ID"
                 textField="Customer_x0020_Name"
                 //validator={MyValidators.requiresCustomer}
                 value={this.props.customers.find(f => f.Id === this.state.productInEdit.CustomerId)}
