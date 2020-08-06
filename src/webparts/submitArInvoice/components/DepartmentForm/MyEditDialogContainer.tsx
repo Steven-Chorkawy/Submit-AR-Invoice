@@ -101,11 +101,6 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
   }
   //#endregion
 
-  public handleSubmit(event) {
-    debugger;
-    event.preventDefault();
-  }
-
   public onDialogInputChange = (event) => {
     debugger;
     let target = event.target;
@@ -176,7 +171,6 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
           this.state.productInEdit.Actions
             .filter(f => f.AuthorId === this.props.currentUser.Id && f.Response_x0020_Status === InvoiceActionRequiredResponseStatus.Waiting)
             .map(action => {
-
               return (<ApprovalRequiredComponent
                 action={action}
                 productInEdit={this.state.productInEdit}
@@ -186,10 +180,8 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
             })
         }
 
-
         <Form
-          //onSubmit={this.handleSubmit}
-          onSubmit={this.handleSubmit}
+          onSubmit={this.props.handleSubmit}
 
           initialValues={{
             Date: new Date(),
@@ -355,7 +347,7 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
               />
             </FormElement>
           )} />
-        <DialogActionsBar>
+        {/* <DialogActionsBar>
           <button
             className="k-button k-primary"
             onClick={this.props.save}
@@ -364,7 +356,7 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
             className="k-button"
             onClick={this.props.cancel}
           >Cancel</button>
-        </DialogActionsBar>
+        </DialogActionsBar> */}
       </Dialog>
     );
   }

@@ -168,6 +168,10 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
     });
   }
 
+  public handleSubmit = (event) => {
+    debugger;
+  }
+
   public save = () => {
     const dataItem = this.state.productInEdit;
     console.log("saving this data");
@@ -410,7 +414,8 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
               customers={this.props.customers}
               siteUsers={this.props.siteUsers}
               currentUser={this.state.currentUser}
-              save={this.save}
+              // save={this.save}
+              onSubmit={this.handleSubmit}
               cancel={this.cancel}
             />
             : this.state.productInCancel ?
