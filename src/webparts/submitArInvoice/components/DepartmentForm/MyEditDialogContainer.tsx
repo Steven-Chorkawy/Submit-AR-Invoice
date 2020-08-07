@@ -30,7 +30,7 @@ interface IMyEditDialogContainerState {
   loading?: boolean;
 }
 
-function GridButtons(props) {
+function GridButtons({ cancel }) {
   return <div className="k-form-buttons">
     <Button
       type={"submit"}
@@ -43,7 +43,7 @@ function GridButtons(props) {
       // type={"submit"}
       style={{ width: '50%' }}
       className="k-button"
-      onClick={props.cancel}
+      onClick={cancel}
       icon="cancel"
     >Cancel</Button>
   </div>;
@@ -206,6 +206,7 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
           initialValues={{ ...this.state.productInEdit }}
           render={(formRenderProps) => (
             <FormElement>
+              {GridButtons(this.props.cancel)}
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
                   id="Department"
@@ -225,23 +226,10 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                     'Operations',
                     'Planning Services'
                   ]}
-                  //validator={MyValidators.departmentValidator}
                   component={MyFormComponents.FormDropDownList}
-                  value={this.state.productInEdit.Department}
-                  onChange={this.onDialogInputChange}
                 />
-                <div className="k-form-buttons">
-                  <button
-                    type={"submit"}
-                    className="k-button k-primary"
-                  >Save</button>
-                  <button
-                    type={"submit"}
-                    className="k-button"
-                    onClick={this.props.cancel}
-                  >Cancel</button>
-                </div>
               </div>
+              {GridButtons(this.props.cancel)}
             </FormElement>
           )}
         >
