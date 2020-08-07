@@ -67,13 +67,19 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
       });
     }
 
+
     this.state = {
-      productInEdit: this.props.dataItem || null,
+      productInEdit: {
+        ...this.props.dataItem,
+        RequiresAuthorizationBy: this._selectedReqApprovers
+      },
       selectedReqApprovers: this._selectedReqApprovers,
       selectedCustomer: this.props.dataItem.Customer,
       customerList: this.props.customers,
       receivedCustomerList: this.props.customers
     };
+
+    console.log(this.state.productInEdit);
     this._selectedReqApprovers = [];
   }
 
@@ -228,13 +234,126 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                   ]}
                   component={MyFormComponents.FormDropDownList}
                 />
+                <Field
+                  id={'Date'}
+                  name={'Date'}
+                  label={'* Date'}
+                  component={MyFormComponents.FormDatePicker}
+                  validator={MyValidators.dateValidator}
+                  wrapperStyle={{ width: '50%' }}
+                />
               </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Field
+                  id="RequestedBy"
+                  name="RequestedBy"
+                  label="* Requested By"
+                  wrapperStyle={{ width: '50%', marginRight: '18px' }}
+                  data={this.props.siteUsers}
+                  dataItemKey="Email"
+                  textField="Title"
+                  validator={MyValidators.requestedByValidator}
+                  component={MyFormComponents.FormComboBox}
+                />
+
+                <Field
+                  id="RequiresAuthorizationBy"
+                  name="RequiresAuthorizationBy"
+                  label="* Requires Authorization By"
+                  wrapperStyle={{ width: '50%' }}
+                  data={this.props.siteUsers}
+                  dataItemKey="Email"
+                  textField="Title"
+                  component={MyFormComponents.FormMultiSelect}
+                  validator={MyValidators.requiresApprovalFrom}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Field
+                  id="Urgent"
+                  name="Urgent"
+                  label="Urgent"
+                  onLabel="Yes"
+                  offLabel="No"
+                  component={MyFormComponents.FormSwitch}
+                  //defaultChecked={this.state.productInEdit.Urgent}
+                />
+              </div>
+              <Field
+                id="Customer"
+                name="Customer"
+                label="* Customer"
+                wrapperStyle={{ width: '100%' }}
+                data={this.state.customerList}
+                textField="Customer_x0020_Name"
+                //validator={MyValidators.requiresCustomer}
+                //value={this.props.customers.find(f => f.Id === this.state.productInEdit.CustomerId)}
+                allowCustom={true}
+                itemRender={this.customerItemRender}
+                component={MyFormComponents.CustomerComboBox}
+                filterable={true}
+                suggest={true}
+                // onFilterChange={this.customerFilterChange}
+                // onChange={this.onDialogInputChange}
+                // onCustomCusteromChange={this.onCustomCustomerChange}
+              />
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Field
+                  id="CustomerPONumber"
+                  name="CustomerPONumber"
+                  label="Customer PO Number"
+                  component={MyFormComponents.FormInput}
+                />
+
+                <Field
+                  id="StandardTerms"
+                  name="StandardTerms"
+                  label="Standard Terms"
+                  wrapperStyle={{ width: '50%', marginRight: '18px' }}
+                  defaultValue='NET 30, 1% INTEREST CHARGED'
+                  data={[
+                    'NET 30, 1% INTEREST CHARGED'
+                  ]}
+                  component={MyFormComponents.FormDropDownList}
+                />
+              </div>
+
+              <Field
+                id="Comment"
+                name="Comment"
+                label="Comments"
+                value={this.state.productInEdit.Comment}
+                component={MyFormComponents.FormTextArea}
+              />
+
+              <Field
+                id="InvoiceDetails"
+                name="InvoiceDetails"
+                label="Invoice Details"
+                component={MyFormComponents.FormTextArea}
+                value={this.state.productInEdit.Invoice_x0020_Details}
+              />
+
+              <div style={{ width: '100%' }}>
+                <FieldArray
+                  name="GLAccounts"
+                  component={MyFinanceGlAccountsComponent}
+                  value={this.state.productInEdit.AccountDetails}
+                />
+              </div>
+
+              <hr />
+              <MyRelatedAttachmentComponent
+                productInEdit={this.state.productInEdit}
+                onChange={this.onDialogInputChange}
+              />
               {GridButtons(this.props.cancel)}
             </FormElement>
           )}
         >
         </Form>
-      </Dialog>
+      </Dialog >
     );
   }
 }
