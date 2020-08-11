@@ -206,7 +206,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
     }
     else {
       // If a custom ID is present then we will need to update the Customer ID property incase it's been changed.
-      if(currentEditItem.CustomerId !== currentEditItem.Customer.Id) {
+      if (currentEditItem.CustomerId !== currentEditItem.Customer.Id) {
         currentEditItem.CustomerId = currentEditItem.Customer.Id
       }
     }
@@ -248,8 +248,9 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       .getById(currentEditItem.ID)
       .update(currentEditItem)
       .then(f => {
-        var res = f;
-        debugger;
+        this.setState({
+          productInEdit: null
+        });
       })
       .catch(e => {
         var res = e;
