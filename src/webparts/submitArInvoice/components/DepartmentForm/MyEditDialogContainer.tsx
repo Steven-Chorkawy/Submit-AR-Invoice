@@ -22,8 +22,6 @@ import { InvoiceActionRequiredResponseStatus } from '../interface/IInvoiceAction
 
 interface IMyEditDialogContainerState {
   productInEdit: IInvoiceItem;
-  selectedReqApprovers: any;
-  selectedCustomer: any;
   customerList: any;
   receivedCustomerList: any;
   MiscCustomerDetails?: any;
@@ -55,35 +53,19 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
     console.log("MyEditDialogContainer");
     console.log(props);
 
-
-    if (this.props.dataItem.Requires_x0020_Authorization_x0020_ById) {
-      this.props.dataItem.Requires_x0020_Authorization_x0020_ById.map(reqAuthId => {
-        this._selectedReqApprovers.push(this.props.siteUsers.find(s => s.Id === reqAuthId));
-      });
-    }
-    else if (this.props.dataItem.Requires_x0020_Department_x0020_Id) {
-      this.props.dataItem.Requires_x0020_Department_x0020_Id.map(reqAuthId => {
-        this._selectedReqApprovers.push(this.props.siteUsers.find(s => s.Id === reqAuthId));
-      });
-    }
-
-
     this.state = {
       productInEdit: {
         ...this.props.dataItem,
-        RequiresAuthorizationBy: this._selectedReqApprovers
       },
-      selectedReqApprovers: this._selectedReqApprovers,
-      selectedCustomer: this.props.dataItem.Customer,
       customerList: this.props.customers,
       receivedCustomerList: this.props.customers
     };
 
+    console.log('productInEdit')
     console.log(this.state.productInEdit);
-    this._selectedReqApprovers = [];
   }
 
-  private _selectedReqApprovers = [];
+
 
   //#region Customer Component Methods
   private customerItemRender = (li, itemProps) => {
@@ -126,62 +108,6 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
   }
   //#endregion
 
-  public onDialogInputChange = (event) => {
-    debugger;
-    let target = event.target;
-    let value = target.type === 'checkbox' ? target.checked : target.value;
-    let name = (target.props && target.props.name !== undefined) ? target.props.name : (target.name !== undefined) ? target.name : target.props.id;
-
-    // last chance.
-    if (name === "" && target.id !== undefined) {
-      name = target.id;
-    }
-
-    switch (name) {
-      case 'RequestedBy':
-        name = 'Requested_x0020_ById';
-        value = value.Id;
-        break;
-      case 'RequiresAuthorizationBy':
-        name = 'Requires_x0020_Authorization_x0020_ById';
-        // Clear temp variable.
-        this._selectedReqApprovers = [];
-        // map each selected user into the temp variable.
-        value.map(user => {
-          this._selectedReqApprovers.push(this.props.siteUsers.find(s => s.Id === user.Id));
-        });
-        // Set the whole users object in the state which is used by the dropdown.
-        this.setState({
-          selectedReqApprovers: this._selectedReqApprovers
-        });
-        break;
-      case 'Customer':
-        name = 'CustomerId';
-        value = value.Id;
-        this.setState({
-          selectedCustomer: {
-            Customer_x0020_Name: value.Customer_x0020_Name,
-            ID: value.Id
-          }
-        });
-        break;
-      case 'CustomerPONumber':
-        name = 'Customer_x0020_PO_x0020_Number';
-        break;
-      case 'InvoiceDetails':
-        name = 'Invoice_x0020_Details';
-        break;
-      default:
-        break;
-    }
-
-    const edited = this.state.productInEdit;
-    edited[name] = value;
-
-    this.setState({
-      productInEdit: edited
-    });
-  }
 
   public onActionResponseSent = (e) => {
     console.log('before update');
@@ -277,7 +203,7 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                   onLabel="Yes"
                   offLabel="No"
                   component={MyFormComponents.FormSwitch}
-                  //defaultChecked={this.state.productInEdit.Urgent}
+                //defaultChecked={this.state.productInEdit.Urgent}
                 />
               </div>
               <Field
@@ -294,9 +220,9 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                 component={MyFormComponents.CustomerComboBox}
                 filterable={true}
                 suggest={true}
-                // onFilterChange={this.customerFilterChange}
-                // onChange={this.onDialogInputChange}
-                // onCustomCusteromChange={this.onCustomCustomerChange}
+              // onFilterChange={this.customerFilterChange}
+              // onChange={this.onDialogInputChange}
+              // onCustomCusteromChange={this.onCustomCustomerChange}
               />
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
@@ -344,10 +270,19 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
               </div>
 
               <hr />
-              <MyRelatedAttachmentComponent
+              //TODO: See if this related attachments upload still works.
+              <Field
+                id='RelatedAttachments'
+                name='RelatedAttachments'
+                label='Related Attachments'
+                component={MyRelatedAttachmentComponent}
+              />
+
+              {/* <MyRelatedAttachmentComponent
                 productInEdit={this.state.productInEdit}
                 onChange={this.onDialogInputChange}
-              />
+              /> */}
+
               {GridButtons(this.props.cancel)}
             </FormElement>
           )}
