@@ -183,8 +183,8 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                 />
 
                 <Field
-                  id="RequiresAuthorizationBy"
-                  name="RequiresAuthorizationBy"
+                  id="Requires_x0020_Department_x0020_"
+                  name="Requires_x0020_Department_x0020_"
                   label="* Requires Authorization By"
                   wrapperStyle={{ width: '50%' }}
                   data={this.props.siteUsers}
@@ -271,12 +271,12 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
 
               <hr />
               //TODO: See if this related attachments upload still works.
-              <Field
+              {/* <Field
                 id='RelatedAttachments'
                 name='RelatedAttachments'
                 label='Related Attachments'
                 component={MyRelatedAttachmentComponent}
-              />
+              /> */}
 
               {/* <MyRelatedAttachmentComponent
                 productInEdit={this.state.productInEdit}
