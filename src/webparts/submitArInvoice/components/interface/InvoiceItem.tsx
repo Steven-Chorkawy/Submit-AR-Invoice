@@ -99,6 +99,8 @@ export interface IInvoiceItem extends IInvoiceQueryItem {
 
   RequiresAuthorizationBy?: any;
 
+  RequestedBy?: any;
+
   // This is used by Kendo components to show or hide more details.
   expanded: boolean;
 }
