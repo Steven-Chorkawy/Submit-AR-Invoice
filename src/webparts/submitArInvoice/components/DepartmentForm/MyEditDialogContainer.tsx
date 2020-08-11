@@ -203,9 +203,9 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                   onLabel="Yes"
                   offLabel="No"
                   component={MyFormComponents.FormSwitch}
-                //defaultChecked={this.state.productInEdit.Urgent}
                 />
               </div>
+
               <Field
                 id="Customer"
                 name="Customer"
@@ -213,17 +213,14 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                 wrapperStyle={{ width: '100%' }}
                 data={this.state.customerList}
                 textField="Customer_x0020_Name"
-                //validator={MyValidators.requiresCustomer}
-                //value={this.props.customers.find(f => f.Id === this.state.productInEdit.CustomerId)}
+                validator={MyValidators.requiresCustomer}
                 allowCustom={true}
                 itemRender={this.customerItemRender}
                 component={MyFormComponents.CustomerComboBox}
                 filterable={true}
                 suggest={true}
-              // onFilterChange={this.customerFilterChange}
-              // onChange={this.onDialogInputChange}
-              // onCustomCusteromChange={this.onCustomCustomerChange}
               />
+
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
                   id="CustomerPONumber"
