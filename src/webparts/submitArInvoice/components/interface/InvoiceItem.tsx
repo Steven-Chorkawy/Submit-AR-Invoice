@@ -1,6 +1,7 @@
 import { InvoiceActionRequiredResponseStatus } from "./IInvoiceActionRequired";
 
 interface IPersonField {
+  ID: number;
   // Users Email
   EMail: string;
   // Users Name.  Last, First
@@ -96,6 +97,11 @@ export interface IInvoiceItem extends IInvoiceQueryItem {
   RelatedAttachments: Array<any>;
 
   Customer: ICustomerField;
+
+  RequiresAuthorizationBy?: any;
+
+  Requested_x0020_By?: IPersonField;
+  Requires_x0020_Department_x0020_?: IPersonField
 
   // This is used by Kendo components to show or hide more details.
   expanded: boolean;

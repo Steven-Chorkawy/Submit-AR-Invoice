@@ -97,10 +97,24 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
 
     this.pending = toODataString(this.props.dataState);
 
+    const includeString = `*,
+    Customer/Customer_x0020_Name,
+    Customer/ID,
+    Requested_x0020_By/ID,
+    Requested_x0020_By/Title,
+    Requested_x0020_By/EMail,
+    Requires_x0020_Department_x0020_/ID,
+    Requires_x0020_Department_x0020_/Title,
+    Requires_x0020_Department_x0020_/EMail`;
+
+    const expandString = `
+    Customer,
+    Requested_x0020_By,
+    Requires_x0020_Department_x0020_`;
+
     sp.web.lists.getByTitle(MyLists["AR Invoice Requests"])
       .items
-      .select('*, Customer/Customer_x0020_Name, Customer/ID')
-      .expand('Customer')
+      .select(includeString).expand(expandString)
       .getAll()
       .then(async response => {
         this.lastSuccess = this.pending;
@@ -118,9 +132,6 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
 
         // Hold the list of invoice IDs that will be used to pull related accounts.
         var invoiceIds = [];                // filter for accounts
-        //var idsForApproval = [];            // filter for approval requests.
-        //var idsForRelatedAttachments = [];  // filter for related attachments.
-        //var idsForCancelRequests = [];      // filter for cancel requests.
         var idsForARDocuments = [];
 
         // Iterate through processedResponse instead of response because if you don't this will generate a URL that over
@@ -129,21 +140,15 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
         for (let index = 0; index < this.state.processedResponse.data.length; index++) {
           const element = this.state.processedResponse.data[index];
           invoiceIds.push(`AR_x0020_Invoice_x0020_Request/ID eq ${element.ID}`);
-          // idsForApproval.push(`AR_x0020_Invoice_x0020_Request eq '${element.ID}'`);
-          // idsForRelatedAttachments.push(`AR_x0020_Invoice_x0020_Request/ID eq ${element.ID}`);
-          // idsForCancelRequests.push(`AR_x0020_Invoice_x0020_Request/ID eq ${element.ID}`);
           idsForARDocuments.push(`AR_x0020_RequestId eq ${element.ID}`);
 
           // Format data of this.state.processedResponse.
           this.state.processedResponse.data[index].Date = new Date(this.state.processedResponse.data[index].Date);
           this.state.processedResponse.data[index].Created = new Date(this.state.processedResponse.data[index].Created);
 
-
           // If CustomerId isn't present and MisCustomerName isn't null that means the user has entered a random customer.
           // By building a Customer object out of the misc customer info it will be much easier to display real customers and mis customers together.
-
           if ((this.state.processedResponse.data[index].CustomerId === undefined || this.state.processedResponse.data[index].CustomerId === null) && this.state.processedResponse.data[index].MiscCustomerName !== null) {
-
             this.state.processedResponse.data[index].Customer = {
               "Customer_x0020_Name": this.state.processedResponse.data[index].MiscCustomerName,
               "CustomerDetails": this.state.processedResponse.data[index].MiscCustomerDetails
@@ -241,7 +246,6 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
                 }
               });
 
-
               // Convert dates from strings to dates.... thanks SharePoint.
               this.state.processedResponse.data[index].Date = new Date(this.state.processedResponse.data[index].Date);
               this.state.processedResponse.data[index].Created = new Date(this.state.processedResponse.data[index].Created);
@@ -265,123 +269,6 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
       });
   }
 
-
-  // public requestDataIfNeeded = () => {
-
-  //   // If pending is set OR dateSate === lastDataState
-  //   if (this.pending || toODataString(this.props.dataState) === this.lastSuccess) {
-  //     return;
-  //   }
-
-  //   this.pending = toODataString(this.props.dataState);
-
-  //   sp.web.lists.getByTitle(MyLists["AR Invoices"])
-  //     .items
-  //     .select('*, Customer/Customer_x0020_Name')
-  //     .expand('Customer')
-  //     .getAll()
-  //     .then(async response => {
-  //       this.lastSuccess = this.pending;
-  //       this.pending = '';
-
-
-  //       let filteredResponse = filterBy(response, this.props.filterState);
-
-  //       // Apply Kendo grids filters.
-  //       var processedResponse = process(filteredResponse, this.props.dataState);
-
-  //       // Hold the list of invoice IDs that will be used to pull related accounts.
-  //       var invoiceIds = [];
-  //       var idsForApproval = [];
-  //       var idsForRelatedAttachments = [];
-  //       var idsForCancelRequests = [];
-
-  //       // Iterate through processedResponse instead of response because if you don't this will generate a URL that over
-  //       // 2000 characters long.
-  //       // That is too big for SharePoint to handle.
-  //       for (let index = 0; index < processedResponse.data.length; index++) {
-  //         const element = processedResponse.data[index];
-  //         invoiceIds.push(`AR_x0020_InvoiceId eq ${element.ID}`);
-  //         idsForApproval.push(`InvoiceID eq '${element.ID}'`);
-  //         idsForRelatedAttachments.push(`ARInvoice/ID eq ${element.ID}`);
-  //         idsForCancelRequests.push(`Invoice_x0020_Number/ID eq ${element.ID}`);
-
-  //         processedResponse.data[index].Date = new Date(processedResponse.data[index].Date);
-  //         processedResponse.data[index].Created = new Date(processedResponse.data[index].Created);
-  //       }
-
-  //       //#region Query the required account details for this invoice.
-
-  //       Promise.all([
-  //         sp.web.lists.getByTitle('AR Invoice Accounts')
-  //           .items
-  //           .filter(invoiceIds.join(' or '))
-  //           .get(),
-  //           // TODO: Add a query from the new list here.
-  //         null,
-  //         // sp.web.lists.getByTitle(MyLists.ApprovalRequestsSent)
-  //         //   .items
-  //         //   .filter(idsForApproval.join(' or '))
-  //         //   .get(),
-  //         sp.web.lists.getByTitle('RelatedInvoiceAttachments')
-  //           .items
-  //           .filter(idsForRelatedAttachments.join(' or '))
-  //           .getAll(),
-  //         //TODO: How can I filter these results? I don't need every file.
-  //         sp.web.getFolderByServerRelativePath("RelatedInvoiceAttachments")
-  //           .files(),
-  //         sp.web.lists.getByTitle('Cancel Invoice Request')
-  //           .items
-  //           .select('*, Requested_x0020_By/EMail, Requested_x0020_By/Title')
-  //           .expand('Requested_x0020_By')
-  //           .filter(idsForCancelRequests.join(' or '))
-  //           .getAll()
-  //       ])
-  //         .then((values) => {
-  //           /***********************************
-  //            *
-  //            * 0 = G/L Accounts.
-  //            * 1 = Approval Responses.
-  //            * 2 = Related Attachments.
-  //            * 3 = Files from RelatedAttachments.
-  //            *      This is used to get the URL to the files.
-  //            * 4 = Cancel Requests.
-  //            *
-  //            ***********************************/
-
-  //           // Using each of the accounts that we found we will not attach them to the invoice object.
-  //           response.map(invoice => {
-
-  //             invoice.AccountDetails = values[0].filter(f => Number(f.AR_x0020_InvoiceId) === invoice.ID) || [];
-  //             invoice.Approvals = values[1].filter(f => Number(f.InvoiceID) === invoice.ID) || [];
-  //             invoice.RelatedAttachments = values[2].filter(f => Number(f.ARInvoiceId) === invoice.ID) || [];
-  //             invoice.CancelRequests = values[4].filter(f => Number(f.Invoice_x0020_NumberId) === invoice.ID) || [];
-
-  //             // Add ServerDirectUrl if required.
-  //             invoice.RelatedAttachments.map(relatedAttachments => {
-  //               if (relatedAttachments.ServerRedirectedEmbedUrl === "") {
-  //                 var url = values[3].find(f => f.Title === relatedAttachments.Title).ServerRelativeUrl;
-  //                 relatedAttachments.ServerRedirectedEmbedUrl = url;
-  //                 relatedAttachments.ServerRedirectedEmbedUri = url;
-  //               }
-  //             });
-  //           });
-
-  //           // This is something from Kendo demos.
-  //           if (toODataString(this.props.dataState) === this.lastSuccess) {
-
-  //             this.props.onDataReceived.call(undefined, {
-  //               // Add the filtered, sorted data.
-  //               data: processedResponse.data,
-  //               // Add the total amount of records found prior to filters and sorts being applied.
-  //               total: processedResponse.total
-  //             });
-  //           } else {
-  //             this.requestDataIfNeeded();
-  //           }
-  //         });
-  //     });
-  // }
 
   public requestStatusData = () => {
 

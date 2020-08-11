@@ -22,12 +22,29 @@ import { InvoiceActionRequiredResponseStatus } from '../interface/IInvoiceAction
 
 interface IMyEditDialogContainerState {
   productInEdit: IInvoiceItem;
-  selectedReqApprovers: any;
-  selectedCustomer: any;
   customerList: any;
   receivedCustomerList: any;
   MiscCustomerDetails?: any;
   loading?: boolean;
+}
+
+function GridButtons({ cancel }) {
+  return <div className="k-form-buttons">
+    <Button
+      type={"submit"}
+      style={{ width: '50%' }}
+      className="k-button k-primary"
+      icon="save"
+    // disabled={!formRenderProps.allowSubmit}
+    >Save</Button>
+    <Button
+      // type={"submit"}
+      style={{ width: '50%' }}
+      className="k-button"
+      onClick={cancel}
+      icon="cancel"
+    >Cancel</Button>
+  </div>;
 }
 
 export class MyEditDialogContainer extends React.Component<any, IMyEditDialogContainerState> {
@@ -36,29 +53,19 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
     console.log("MyEditDialogContainer");
     console.log(props);
 
-
-    if (this.props.dataItem.Requires_x0020_Authorization_x0020_ById) {
-      this.props.dataItem.Requires_x0020_Authorization_x0020_ById.map(reqAuthId => {
-        this._selectedReqApprovers.push(this.props.siteUsers.find(s => s.Id === reqAuthId));
-      });
-    }
-    else if (this.props.dataItem.Requires_x0020_Department_x0020_Id) {
-      this.props.dataItem.Requires_x0020_Department_x0020_Id.map(reqAuthId => {
-        this._selectedReqApprovers.push(this.props.siteUsers.find(s => s.Id === reqAuthId));
-      });
-    }
-
     this.state = {
-      productInEdit: this.props.dataItem || null,
-      selectedReqApprovers: this._selectedReqApprovers,
-      selectedCustomer: this.props.dataItem.Customer,
+      productInEdit: {
+        ...this.props.dataItem,
+      },
       customerList: this.props.customers,
       receivedCustomerList: this.props.customers
     };
-    this._selectedReqApprovers = [];
+
+    console.log('productInEdit')
+    console.log(this.state.productInEdit);
   }
 
-  private _selectedReqApprovers = [];
+
 
   //#region Customer Component Methods
   private customerItemRender = (li, itemProps) => {
@@ -101,67 +108,6 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
   }
   //#endregion
 
-  public handleSubmit(event) {
-    debugger;
-    event.preventDefault();
-  }
-
-  public onDialogInputChange = (event) => {
-    debugger;
-    let target = event.target;
-    let value = target.type === 'checkbox' ? target.checked : target.value;
-    let name = (target.props && target.props.name !== undefined) ? target.props.name : (target.name !== undefined) ? target.name : target.props.id;
-
-    // last chance.
-    if (name === "" && target.id !== undefined) {
-      name = target.id;
-    }
-
-    switch (name) {
-      case 'RequestedBy':
-        name = 'Requested_x0020_ById';
-        value = value.Id;
-        break;
-      case 'RequiresAuthorizationBy':
-        name = 'Requires_x0020_Authorization_x0020_ById';
-        // Clear temp variable.
-        this._selectedReqApprovers = [];
-        // map each selected user into the temp variable.
-        value.map(user => {
-          this._selectedReqApprovers.push(this.props.siteUsers.find(s => s.Id === user.Id));
-        });
-        // Set the whole users object in the state which is used by the dropdown.
-        this.setState({
-          selectedReqApprovers: this._selectedReqApprovers
-        });
-        break;
-      case 'Customer':
-        name = 'CustomerId';
-        value = value.Id;
-        this.setState({
-          selectedCustomer: {
-            Customer_x0020_Name: value.Customer_x0020_Name,
-            ID: value.Id
-          }
-        });
-        break;
-      case 'CustomerPONumber':
-        name = 'Customer_x0020_PO_x0020_Number';
-        break;
-      case 'InvoiceDetails':
-        name = 'Invoice_x0020_Details';
-        break;
-      default:
-        break;
-    }
-
-    const edited = this.state.productInEdit;
-    edited[name] = value;
-
-    this.setState({
-      productInEdit: edited
-    });
-  }
 
   public onActionResponseSent = (e) => {
     console.log('before update');
@@ -169,14 +115,15 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
     this.forceUpdate();
   }
 
+
   public render() {
     return (
       <Dialog onClose={this.props.cancel} title={"Edit AR Invoice Request"} minWidth="200px" width="80%" height="80%">
+
         {
           this.state.productInEdit.Actions
             .filter(f => f.AuthorId === this.props.currentUser.Id && f.Response_x0020_Status === InvoiceActionRequiredResponseStatus.Waiting)
             .map(action => {
-
               return (<ApprovalRequiredComponent
                 action={action}
                 productInEdit={this.state.productInEdit}
@@ -186,21 +133,12 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
             })
         }
 
-
         <Form
-          //onSubmit={this.handleSubmit}
-          onSubmit={this.handleSubmit}
-
-          initialValues={{
-            Date: new Date(),
-            Urgent: false,
-            StandardTerms: 'NET 30, 1% INTEREST CHARGED',
-            GLAccounts: [],
-          }}
-
+          onSubmit={this.props.onSubmit}
+          initialValues={{ ...this.state.productInEdit }}
           render={(formRenderProps) => (
-            <FormElement >
-              <legend className={'k-form-legend'}>ACCOUNTS RECEIVABLE - INVOICE REQUISITION </legend>
+            <FormElement>
+              {GridButtons(this.props.cancel)}
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
                   id="Department"
@@ -220,50 +158,40 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                     'Operations',
                     'Planning Services'
                   ]}
-                  //validator={MyValidators.departmentValidator}
                   component={MyFormComponents.FormDropDownList}
-                  value={this.state.productInEdit.Department}
-                  onChange={this.onDialogInputChange}
                 />
-
                 <Field
                   id={'Date'}
                   name={'Date'}
                   label={'* Date'}
                   component={MyFormComponents.FormDatePicker}
-                  //validator={MyValidators.dateValidator}
+                  validator={MyValidators.dateValidator}
                   wrapperStyle={{ width: '50%' }}
-                  value={new Date(this.state.productInEdit.Date)}
-                  onChange={this.onDialogInputChange}
                 />
               </div>
-
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
-                  id="RequestedBy"
-                  name="RequestedBy"
+                  id="Requested_x0020_By"
+                  name="Requested_x0020_By"
                   label="* Requested By"
                   wrapperStyle={{ width: '50%', marginRight: '18px' }}
                   data={this.props.siteUsers}
                   dataItemKey="Email"
                   textField="Title"
-                  //validator={MyValidators.requestedByValidator}
+                  validator={MyValidators.requestedByValidator}
                   component={MyFormComponents.FormComboBox}
-                  value={this.props.siteUsers.find(s => s.Id === this.state.productInEdit.Requested_x0020_ById)}
-                  onChange={this.onDialogInputChange}
                 />
 
                 <Field
-                  id="RequiresAuthorizationBy"
-                  name="RequiresAuthorizationBy"
+                  id="Requires_x0020_Department_x0020_"
+                  name="Requires_x0020_Department_x0020_"
                   label="* Requires Authorization By"
                   wrapperStyle={{ width: '50%' }}
                   data={this.props.siteUsers}
                   dataItemKey="Email"
                   textField="Title"
                   component={MyFormComponents.FormMultiSelect}
-                  value={this.state.selectedReqApprovers}
-                  onChange={this.onDialogInputChange}
+                  validator={MyValidators.requiresApprovalFrom}
                 />
               </div>
 
@@ -275,10 +203,9 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                   onLabel="Yes"
                   offLabel="No"
                   component={MyFormComponents.FormSwitch}
-                  defaultChecked={this.state.productInEdit.Urgent}
-                  onChange={this.onDialogInputChange}
                 />
               </div>
+
               <Field
                 id="Customer"
                 name="Customer"
@@ -286,26 +213,20 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                 wrapperStyle={{ width: '100%' }}
                 data={this.state.customerList}
                 textField="Customer_x0020_Name"
-                //validator={MyValidators.requiresCustomer}
-                value={this.props.customers.find(f => f.Id === this.state.productInEdit.CustomerId)}
+                validator={MyValidators.requiresCustomer}
                 allowCustom={true}
                 itemRender={this.customerItemRender}
                 component={MyFormComponents.CustomerComboBox}
                 filterable={true}
                 suggest={true}
-                onFilterChange={this.customerFilterChange}
-                onChange={this.onDialogInputChange}
-                onCustomCusteromChange={this.onCustomCustomerChange}
               />
+
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
                   id="CustomerPONumber"
                   name="CustomerPONumber"
                   label="Customer PO Number"
-                  ////validator={MyValidators.requiresCustomerPONUmber}
                   component={MyFormComponents.FormInput}
-                  value={this.state.productInEdit.Customer_x0020_PO_x0020_Number}
-                  onChange={this.onDialogInputChange}
                 />
 
                 <Field
@@ -318,7 +239,6 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                     'NET 30, 1% INTEREST CHARGED'
                   ]}
                   component={MyFormComponents.FormDropDownList}
-                  onChange={this.onDialogInputChange}
                 />
               </div>
 
@@ -328,7 +248,6 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                 label="Comments"
                 value={this.state.productInEdit.Comment}
                 component={MyFormComponents.FormTextArea}
-                onChange={this.onDialogInputChange}
               />
 
               <Field
@@ -337,7 +256,6 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                 label="Invoice Details"
                 component={MyFormComponents.FormTextArea}
                 value={this.state.productInEdit.Invoice_x0020_Details}
-                onChange={this.onDialogInputChange}
               />
 
               <div style={{ width: '100%' }}>
@@ -349,23 +267,17 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
               </div>
 
               <hr />
+
               <MyRelatedAttachmentComponent
                 productInEdit={this.state.productInEdit}
-                onChange={this.onDialogInputChange}
               />
+
+              {GridButtons(this.props.cancel)}
             </FormElement>
-          )} />
-        <DialogActionsBar>
-          <button
-            className="k-button k-primary"
-            onClick={this.props.save}
-          >Save</button>
-          <button
-            className="k-button"
-            onClick={this.props.cancel}
-          >Cancel</button>
-        </DialogActionsBar>
-      </Dialog>
+          )}
+        >
+        </Form>
+      </Dialog >
     );
   }
 }
