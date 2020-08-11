@@ -96,11 +96,12 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
     }
 
     this.pending = toODataString(this.props.dataState);
+    const includeString = '*, Customer/Customer_x0020_Name, Customer/ID, Requested_x0020_By/ID, Requested_x0020_By/Title, Requested_x0020_By/EMail';
+    const expandString = 'Customer, Requested_x0020_By'
 
     sp.web.lists.getByTitle(MyLists["AR Invoice Requests"])
       .items
-      .select('*, Customer/Customer_x0020_Name, Customer/ID')
-      .expand('Customer')
+      .select(includeString).expand(expandString)
       .getAll()
       .then(async response => {
         this.lastSuccess = this.pending;

@@ -245,8 +245,8 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
-                  id="RequestedBy"
-                  name="RequestedBy"
+                  id="Requested_x0020_By"
+                  name="Requested_x0020_By"
                   label="* Requested By"
                   wrapperStyle={{ width: '50%', marginRight: '18px' }}
                   data={this.props.siteUsers}
