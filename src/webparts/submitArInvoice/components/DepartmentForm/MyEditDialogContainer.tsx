@@ -267,18 +267,10 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
               </div>
 
               <hr />
-              //TODO: See if this related attachments upload still works.
-              {/* <Field
-                id='RelatedAttachments'
-                name='RelatedAttachments'
-                label='Related Attachments'
-                component={MyRelatedAttachmentComponent}
-              /> */}
 
-              {/* <MyRelatedAttachmentComponent
+              <MyRelatedAttachmentComponent
                 productInEdit={this.state.productInEdit}
-                onChange={this.onDialogInputChange}
-              /> */}
+              />
 
               {GridButtons(this.props.cancel)}
             </FormElement>

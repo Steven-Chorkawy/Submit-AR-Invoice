@@ -36,13 +36,11 @@ export class MyRelatedAttachmentComponent extends React.Component<any, any> {
           }
           <hr />
           <Field
-            id="RelatedInvoiceAttachments"
-            name="RelatedInvoiceAttachments"
-            // label="Upload Related Attachments"
+            id="RelatedAttachments"
+            name="RelatedAttachments"
             batch={false}
             multiple={true}
             component={MyFormComponents.FormUpload}
-            myOnChange={this.props.onChange}
           />
         </CardBody>
       </Card>
