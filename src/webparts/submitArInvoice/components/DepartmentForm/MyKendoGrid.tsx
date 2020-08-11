@@ -10,6 +10,8 @@ import {
   GridCellProps,
 } from '@progress/kendo-react-grid';
 import { Button } from '@progress/kendo-react-buttons';
+import { Notification, NotificationGroup } from '@progress/kendo-react-notification'
+import { Animation, Expand, Fade, Push, Slide, Zoom, Reveal } from '@progress/kendo-react-animation'
 
 //PnPjs Imports
 import { sp } from "@pnp/sp";
@@ -32,6 +34,8 @@ import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { MyContentTypes } from '../enums/MyEnums';
 import { FileRefCell } from '../FileRefCell';
+import { IInvoiceItem } from '../interface/InvoiceItem';
+import { IMySaveResult } from '../interface/IMySaveResult';
 
 type MyKendoGridState = {
   data: any;
@@ -44,6 +48,7 @@ type MyKendoGridState = {
   statusData: any;
   siteUsersData: any;
   currentUser?: any;
+  saveResult?: IMySaveResult;
 };
 
 
@@ -168,9 +173,96 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
     });
   }
 
+  // Handle custom customer change event.
+  public onCustomCustomerChange = (event) => {
+    let target = event.target;
+    let value = target.type === 'checkbox' ? target.checked : target.value;
+
+    this.setState({
+      productInEdit: {
+        ...this.state.productInEdit,
+        MiscCustomerDetails: value
+      }
+    });
+  }
+
   public handleSubmit = (event) => {
-    var tester = event;
-    debugger;
+    let currentEditItem: IInvoiceItem = event;
+    console.log('Updating invoice data from form');
+    console.log(currentEditItem);
+
+    // Used to determine if we're updating an invoice request or an invoice.
+    let listName = '';
+
+    // Check to see if the submitted customer contains an ID field.
+    // If it does not that means that we're taking in a Misc Customer and will need to parse out the data.
+    if (!currentEditItem.Customer.hasOwnProperty('ID')) {
+      // This means we need to take out the customer name.
+      currentEditItem.MiscCustomerName = currentEditItem.Customer.Customer_x0020_Name;
+      currentEditItem.MiscCustomerDetails = this.state.productInEdit.Customer.MiscCustomerDetails;
+
+      // If a customer was previously selected it's ID will still be present.
+      currentEditItem.CustomerId = null;
+    }
+    else {
+      // If a custom ID is present then we will need to update the Customer ID property incase it's been changed.
+      if(currentEditItem.CustomerId !== currentEditItem.Customer.Id) {
+        currentEditItem.CustomerId = currentEditItem.Customer.Id
+      }
+    }
+    // After the customer data has been sorted out, we can delete the Customer property so SharePoint doesn't get mad at us.
+    delete currentEditItem.Customer;
+
+    // Update the Requires_x0020_Department_x0020_Id property
+    currentEditItem.Requires_x0020_Department_x0020_Id = [];
+    for (let index = 0; index < currentEditItem.Requires_x0020_Department_x0020_.length; index++) {
+      const element = currentEditItem.Requires_x0020_Department_x0020_[index];
+      currentEditItem.Requires_x0020_Department_x0020_Id.push(element.Id);
+    }
+    // Removing the Requires_x0020_Department_x0020_ so it does not throw an error while updating.
+    delete currentEditItem.Requires_x0020_Department_x0020_;
+
+    // Update the Requested_x0020_ById so it's equal to the Requested_x0020_By property.
+    // This is done because the kendo form updates Requested_x0020_By instead of Requested_x0020_ById.
+    currentEditItem.Requested_x0020_ById = currentEditItem.Requested_x0020_By.Id;
+    // Removing the Requested_x0020_By property so it does not throw an error.
+    delete currentEditItem.Requested_x0020_By;
+
+
+    // This is where we are checking to see what type of invoice (request, or not) we are editing.
+    if (currentEditItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
+      // Update a request item.
+      listName = MyLists["AR Invoice Requests"];
+    }
+    else {
+      // Update a document item.
+      listName = MyLists["AR Invoices"];
+    }
+
+    console.log('Updating this invoice');
+    console.log(currentEditItem);
+
+    sp.web.lists
+      .getByTitle(listName)
+      .items
+      .getById(currentEditItem.ID)
+      .update(currentEditItem)
+      .then(f => {
+        var res = f;
+        debugger;
+      })
+      .catch(e => {
+        var res = e;
+        console.log('Error while updating invoice');
+        console.log(e);
+        debugger;
+        this.setState({
+          saveResult: {
+            success: false,
+            message: "Could not save your changes.  Please contact help desk."
+          }
+        });
+      });
   }
 
   public save = () => {
@@ -415,8 +507,9 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
               customers={this.props.customers}
               siteUsers={this.props.siteUsers}
               currentUser={this.state.currentUser}
-              // save={this.save}
+              saveResult={this.state.saveResult}
               onSubmit={this.handleSubmit}
+              onCustomCustomerChange={this.onCustomCustomerChange}
               cancel={this.cancel}
             />
             : this.state.productInCancel ?
