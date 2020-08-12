@@ -340,7 +340,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       };
 
       if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
-        updateObject['Requires_x0020_Accountant_x0020_Id'] = dataItem.Requires_x0020_Accountant_x0020_ApprovalId ? dataItem.Requires_x0020_Accountant_x0020_ApprovalId.Id : null
+        updateObject['Requires_x0020_Accountant_x0020_Id'] = dataItem.Requires_x0020_Accountant_x0020_ApprovalId ? dataItem.Requires_x0020_Accountant_x0020_ApprovalId.Id : null;
         delete updateObject.Requires_x0020_Accountant_x0020_ApprovalId;
         sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(dataItem.ID).update(updateObject);
       }
@@ -411,7 +411,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                       Title: element.name,
                       ...copiedMetadata
                     })
-                    .then(f => {
+                    .then(arInvUpdateRes => {
                       // Update all related records.
                       // this update will add the documents id to the files.
                       // this will allow us to get all related data for this document without having to use the request record.
@@ -423,7 +423,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                         this._updateApprovalRequests(editItemId, itemProxy.ID)
                       ])
                         .then(value => {
-                          const indexOf = invoices.findIndex(f => f.AR_x0020_RequestId === editItemId);
+                          const indexOf = invoices.findIndex(fInvoice => fInvoice.AR_x0020_RequestId === editItemId);
                           invoices[indexOf].Id = itemProxy.ID;
                           invoices[indexOf].ID = itemProxy.ID;
                           this.setState({

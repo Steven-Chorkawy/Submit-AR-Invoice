@@ -184,11 +184,11 @@ const hstCell = (props) => {
   return (
     <td>
       <NumericTextBox
-            // defaultValue={CalculateHSTAmount(props)}
-            value={CalculateHSTAmount(props)}
-            format="c2"
-            disabled={true}
-          />
+        // defaultValue={CalculateHSTAmount(props)}
+        value={CalculateHSTAmount(props)}
+        format="c2"
+        disabled={true}
+      />
     </td>
   );
 };
@@ -202,7 +202,8 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
   constructor(props) {
     super(props);
 
-    props.value ? '' : props.value = [];
+    if (!props.hasOwnProperty('value'))
+      props.value = [];
 
     this.state = {
       data: props.value.map(a => ({ InvoiceID: a.AR_x0020_InvoiceId, ID: a.ID, GLCode: a.Account_x0020_Code, Amount: a.Amount, HSTTaxable: a.HST_x0020_Taxable, HST: a.HST, TotalInvoice: a.Total_x0020_Invoice })),
@@ -255,7 +256,7 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
         this.updateItem(this.state.receivedData, updatedItem);
 
         //TODO: Check what happens when this function is undefined.
-        if(this.props.onUpdateAccount) {
+        if (this.props.onUpdateAccount) {
           this.props.onUpdateAccount(data);
         }
 

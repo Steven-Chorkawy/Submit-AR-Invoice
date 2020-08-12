@@ -69,7 +69,7 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
       .update(updateObj)
       .then(res => {
 
-        var updated = { ...this.state.action, ...updateObj }
+        var updated = { ...this.state.action, ...updateObj };
 
 
         const index = this.state.productInEdit.Actions.findIndex(a => a.ID === this.state.action.ID);
@@ -130,7 +130,7 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
             <CardTitle><b>Your Response is Required</b></CardTitle>
             <p>From: {this.state.action.Author.Title} - {this.state.action.Created}</p>
             <p>"{this.state.action.Body}"</p>
-            <hr/>
+            <hr />
             <p>Your Response</p>
             {this.state.approvalRequestError && <h4 className="k-text-error">Something went wrong, cannot send your response at the moment.</h4>}
             <textarea disabled={this.state.approvalRequestError} style={{ width: '100%' }} id={'ApprovalNote'} onChange={this.onApprovalDialogInputChange}></textarea>

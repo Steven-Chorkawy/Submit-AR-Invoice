@@ -141,7 +141,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
           Body: 'Approval Required',
           Request_x0020_Type: InvoiceActionRequiredRequestType.DepartmentApprovalRequired,
           Response_x0020_Status: InvoiceActionRequiredResponseStatus.Waiting
-        }
+        };
 
         web.lists.getByTitle(MyLists.InvoiceActionRequired)
           .items

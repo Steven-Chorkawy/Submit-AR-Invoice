@@ -62,7 +62,7 @@ enum ARLoadQuery {
   FilesRelatedAttachments = 3,
   CancelRequests = 4,
   ARInvoiceDocuments = 5,
-};
+}
 
 class LoadingPanel extends React.Component {
   public render() {
@@ -201,7 +201,6 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
              ***********************************/
             // Using each of the accounts that we found we will not attach them to the invoice object.
             for (let index = 0; index < this.state.processedResponse.data.length; index++) {
-              this.state.processedResponse.data[index];
 
               // Replace a request record with an AR Invoice record.
               if (values[ARLoadQuery.ARInvoiceDocuments].filter(f => Number(f.AR_x0020_RequestId) === this.state.processedResponse.data[index].ID).length > 0) {

@@ -10,7 +10,7 @@ import { InvoiceActionRequiredResponseStatus } from './interface/IInvoiceActionR
 
 interface IActionResponseComponentProps {
   actions: Array<IInvoiceAction>;
-};
+}
 
 interface IMyItemCardRender {
   dataItem: IInvoiceAction;

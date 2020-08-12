@@ -7,11 +7,9 @@ import {
   GridColumn as Column,
   GridCell,
   GridToolbar,
-  GridCellProps,
 } from '@progress/kendo-react-grid';
 import { Button } from '@progress/kendo-react-buttons';
-import { Notification, NotificationGroup } from '@progress/kendo-react-notification'
-import { Animation, Expand, Fade, Push, Slide, Zoom, Reveal } from '@progress/kendo-react-animation'
+
 
 //PnPjs Imports
 import { sp } from "@pnp/sp";
@@ -223,7 +221,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
     else {
       // If a custom ID is present then we will need to update the Customer ID property incase it's been changed.
       if (currentEditItem.CustomerId !== event.Customer.Id) {
-        currentEditItem.CustomerId = event.Customer.Id
+        currentEditItem.CustomerId = event.Customer.Id;
       }
     }
 
@@ -247,7 +245,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
 
         // Update the invoices in the state.
         let allInvoices = this.state.data.data;
-        const invoiceIndex = allInvoices.findIndex(f => f.ID === currentEditItem.ID);
+        const invoiceIndex = allInvoices.findIndex(fInvoice => fInvoice.ID === currentEditItem.ID);
         let oldInvoiceData = allInvoices[invoiceIndex];
         oldInvoiceData = { ...oldInvoiceData, ...currentEditItem };
 
@@ -315,11 +313,11 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
             return user;
           }
           else {
-            return user.Id
+            return user.Id;
           }
         })
       };
-      sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(dataItem.ID).update(updateObject)
+      sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(dataItem.ID).update(updateObject);
     }
     // Update document item.
     else {
@@ -329,11 +327,11 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
             return user;
           }
           else {
-            return user.Id
+            return user.Id;
           }
         })
       };
-      sp.web.lists.getByTitle(MyLists["AR Invoices"]).items.getById(dataItem.ID).update(updateObject)
+      sp.web.lists.getByTitle(MyLists["AR Invoices"]).items.getById(dataItem.ID).update(updateObject);
     }
 
 
@@ -352,7 +350,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
                 };
 
                 if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
-                  relatedAttachmentUpdateObject['AR_x0020_Invoice_x0020_RequestId'] = dataItem.ID
+                  relatedAttachmentUpdateObject['AR_x0020_Invoice_x0020_RequestId'] = dataItem.ID;
                 }
                 else {
                   relatedAttachmentUpdateObject['ARInvoiceId'] = dataItem.ID;
@@ -396,11 +394,11 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
         };
 
         if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
-          cancelReqUpdateObj['AR_x0020_Invoice_x0020_RequestId'] = dataItem.Id
+          cancelReqUpdateObj['AR_x0020_Invoice_x0020_RequestId'] = dataItem.Id;
         }
         else {
-          cancelReqUpdateObj['Invoice_x0020_NumberId'] = dataItem.Id
-          cancelReqUpdateObj['AR_x0020_Invoice_x0020_RequestId'] = dataItem.AR_x0020_RequestId
+          cancelReqUpdateObj['Invoice_x0020_NumberId'] = dataItem.Id;
+          cancelReqUpdateObj['AR_x0020_Invoice_x0020_RequestId'] = dataItem.AR_x0020_RequestId;
         }
 
         sp.web.lists.getByTitle(MyLists["Cancel Invoice Request"])
