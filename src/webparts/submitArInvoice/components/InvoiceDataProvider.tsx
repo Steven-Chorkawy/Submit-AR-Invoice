@@ -100,10 +100,10 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
     const includeString = `*,
     Customer/Customer_x0020_Name,
     Customer/ID,
-    Requested_x0020_By/ID,
+    Requested_x0020_By/Id,
     Requested_x0020_By/Title,
     Requested_x0020_By/EMail,
-    Requires_x0020_Department_x0020_/ID,
+    Requires_x0020_Department_x0020_/Id,
     Requires_x0020_Department_x0020_/Title,
     Requires_x0020_Department_x0020_/EMail`;
 

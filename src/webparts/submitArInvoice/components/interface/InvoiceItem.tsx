@@ -17,7 +17,7 @@ interface ICustomerField {
 /**
  * Structure for Invoice Actions.
  */
-export interface IInvoiceAction {
+interface IInvoiceAction {
   ID: number;
   Id: number;
   ContentTypeId: string;
@@ -45,7 +45,7 @@ export interface IInvoiceAction {
 /**
  * Response that we get from SharePoint for Invoice Requests items and Invoices items
  */
-export interface IInvoiceQueryItem {
+interface IInvoiceQueryItem {
   Id: number;
   ID: number;
   FileSystemObjectType: number;       // Do we really need this?
@@ -87,7 +87,7 @@ export interface IInvoiceQueryItem {
 /**
  * This is the result that we will be returning to be used through out the app.
  */
-export interface IInvoiceItem extends IInvoiceQueryItem {
+interface IInvoiceItem extends IInvoiceQueryItem {
 
   CancelRequests: Array<IInvoiceCancelRequest>;
 
@@ -111,7 +111,7 @@ export interface IInvoiceItem extends IInvoiceQueryItem {
 /**
  * CancelRequest that is attached to the invoice output object.
  */
-export interface IInvoiceCancelRequest {
+interface IInvoiceCancelRequest {
   Requested_x0020_By: IPersonField;
   Id: number;
   ID: number;
@@ -132,6 +132,6 @@ export interface IInvoiceCancelRequest {
   Created: Date;
 }
 
-
+export { IPersonField, ICustomerField, IInvoiceAction, IInvoiceQueryItem, IInvoiceItem, IInvoiceCancelRequest };
 
 

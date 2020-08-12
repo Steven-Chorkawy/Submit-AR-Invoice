@@ -34,8 +34,9 @@ import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { MyContentTypes } from '../enums/MyEnums';
 import { FileRefCell } from '../FileRefCell';
-import { IInvoiceItem } from '../interface/InvoiceItem';
+import { IInvoiceItem, IPersonField } from '../interface/InvoiceItem';
 import { IMySaveResult } from '../interface/IMySaveResult';
+
 
 type MyKendoGridState = {
   data: any;
@@ -216,7 +217,8 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
     // Update the Requires_x0020_Department_x0020_Id property
     currentEditItem.Requires_x0020_Department_x0020_Id = [];
     for (let index = 0; index < currentEditItem.Requires_x0020_Department_x0020_.length; index++) {
-      const element = currentEditItem.Requires_x0020_Department_x0020_[index];
+      const element: IPersonField = currentEditItem.Requires_x0020_Department_x0020_[index];
+      debugger;
       currentEditItem.Requires_x0020_Department_x0020_Id.push(element.Id);
     }
     // Removing the Requires_x0020_Department_x0020_ so it does not throw an error while updating.
@@ -241,6 +243,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
 
     console.log('Updating this invoice');
     console.log(currentEditItem);
+    debugger;
 
     sp.web.lists
       .getByTitle(listName)
