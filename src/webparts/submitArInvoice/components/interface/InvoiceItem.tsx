@@ -1,5 +1,6 @@
 import { InvoiceActionRequiredResponseStatus } from "./IInvoiceActionRequired";
 
+
 interface IPersonField {
   Id: number;
   // Users Email
@@ -12,6 +13,10 @@ interface ICustomerField {
   Customer_x0020_Name: string;
   CustomerDetails: string;
   Id?: number;
+}
+
+interface IUpdateLookupField {
+  results: Array<number>;
 }
 
 /**
@@ -102,11 +107,41 @@ interface IInvoiceItem extends IInvoiceQueryItem {
   RequiresAuthorizationBy?: any;
 
   Requested_x0020_By?: IPersonField;
+
   Requires_x0020_Department_x0020_?: Array<IPersonField>;
 
   // This is used by Kendo components to show or hide more details.
   expanded: boolean;
 }
+
+
+interface IInvoiceUpdateItem {
+  Id: number;
+  ID: number;
+  Department: string;
+  Date: Date;
+  Requested_x0020_ById: number;
+  // Users who's approval is required.
+  Requires_x0020_Department_x0020_Id: IUpdateLookupField;
+  Urgent: boolean;
+  CustomerId: number;
+  Customer_x0020_PO_x0020_Number: string;
+  Comment: string;
+  Invoice_x0020_Details: string;
+  // Accountant_x0020_ApprovalId: number;
+  // Requires_x0020_Accountant_x0020_ApprovalId: number;
+  // Completed_x0020_ApprovalId: number;
+  // Requires_x0020_Completed_x0020_ApprovalId: number;
+  // Batch_x0020_Number: string;
+  //Invoice_x0020_Status: string;
+  //Standard_x0020_Terms: string;
+  //AccountDetailsId: Array<any>;// TODO: Change type of any to number or object.
+  MiscCustomerName: string;
+  MiscCustomerDetails: string;
+  DirtyField: Date;
+  //AR_x0020_RequestId: number;
+}
+
 
 /**
  * CancelRequest that is attached to the invoice output object.
@@ -132,6 +167,13 @@ interface IInvoiceCancelRequest {
   Created: Date;
 }
 
-export { IPersonField, ICustomerField, IInvoiceAction, IInvoiceQueryItem, IInvoiceItem, IInvoiceCancelRequest };
-
-
+export {
+  IPersonField,
+  ICustomerField,
+  IInvoiceAction,
+  IInvoiceQueryItem,
+  IInvoiceItem,
+  IInvoiceCancelRequest,
+  IUpdateLookupField,
+  IInvoiceUpdateItem
+};

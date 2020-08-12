@@ -34,7 +34,7 @@ import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { MyContentTypes } from '../enums/MyEnums';
 import { FileRefCell } from '../FileRefCell';
-import { IInvoiceItem, IPersonField } from '../interface/InvoiceItem';
+import { IInvoiceItem, IPersonField, IInvoiceUpdateItem } from '../interface/InvoiceItem';
 import { IMySaveResult } from '../interface/IMySaveResult';
 
 
@@ -188,18 +188,37 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   }
 
   public handleSubmit = (event) => {
-    let currentEditItem: IInvoiceItem = event;
-    console.log('Updating invoice data from form');
-    console.log(currentEditItem);
-
     // Used to determine if we're updating an invoice request or an invoice.
     let listName = '';
 
+    let currentEditItem: IInvoiceUpdateItem = {
+      Id: event.Id,
+      ID: event.ID,
+      Department: event.Department,
+      Date: event.Date,
+      Requested_x0020_ById: event.Requested_x0020_ById,
+      Urgent: event.Urgent,
+      CustomerId: event.CustomerId,
+      Customer_x0020_PO_x0020_Number: event.Customer_x0020_PO_x0020_Number,
+      Comment: event.Comment,
+      Invoice_x0020_Details: event.Invoice_x0020_Details,
+      MiscCustomerName: event.MiscCustomerName,
+      MiscCustomerDetails: event.MiscCustomerDetails,
+      DirtyField: event.DirtyField,
+      Requires_x0020_Department_x0020_Id: {
+        results: event.Requires_x0020_Department_x0020_.map(f => f.Id)
+      }
+    };
+    console.log('Updating invoice data from form');
+    console.log(currentEditItem);
+
+
     // Check to see if the submitted customer contains an ID field.
     // If it does not that means that we're taking in a Misc Customer and will need to parse out the data.
-    if (!currentEditItem.Customer.hasOwnProperty('ID')) {
+    if (!event.Customer.hasOwnProperty('ID')) {
       // This means we need to take out the customer name.
-      currentEditItem.MiscCustomerName = currentEditItem.Customer.Customer_x0020_Name;
+      currentEditItem.MiscCustomerName = event.Customer.Customer_x0020_Name;
+      currentEditItem.DirtyField = new Date();
       currentEditItem.MiscCustomerDetails = this.state.productInEdit.Customer.MiscCustomerDetails;
 
       // If a customer was previously selected it's ID will still be present.
@@ -207,32 +226,14 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
     }
     else {
       // If a custom ID is present then we will need to update the Customer ID property incase it's been changed.
-      if (currentEditItem.CustomerId !== currentEditItem.Customer.Id) {
-        currentEditItem.CustomerId = currentEditItem.Customer.Id
+      if (currentEditItem.CustomerId !== event.Customer.Id) {
+        currentEditItem.CustomerId = event.Customer.Id
       }
     }
-    // After the customer data has been sorted out, we can delete the Customer property so SharePoint doesn't get mad at us.
-    delete currentEditItem.Customer;
-
-    // Update the Requires_x0020_Department_x0020_Id property
-    currentEditItem.Requires_x0020_Department_x0020_Id = [];
-    for (let index = 0; index < currentEditItem.Requires_x0020_Department_x0020_.length; index++) {
-      const element: IPersonField = currentEditItem.Requires_x0020_Department_x0020_[index];
-      debugger;
-      currentEditItem.Requires_x0020_Department_x0020_Id.push(element.Id);
-    }
-    // Removing the Requires_x0020_Department_x0020_ so it does not throw an error while updating.
-    delete currentEditItem.Requires_x0020_Department_x0020_;
-
-    // Update the Requested_x0020_ById so it's equal to the Requested_x0020_By property.
-    // This is done because the kendo form updates Requested_x0020_By instead of Requested_x0020_ById.
-    currentEditItem.Requested_x0020_ById = currentEditItem.Requested_x0020_By.Id;
-    // Removing the Requested_x0020_By property so it does not throw an error.
-    delete currentEditItem.Requested_x0020_By;
 
 
     // This is where we are checking to see what type of invoice (request, or not) we are editing.
-    if (currentEditItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
+    if (event.ContentTypeId === MyContentTypes["AR Request List Item"]) {
       // Update a request item.
       listName = MyLists["AR Invoice Requests"];
     }
@@ -241,9 +242,11 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       listName = MyLists["AR Invoices"];
     }
 
+
     console.log('Updating this invoice');
     console.log(currentEditItem);
     debugger;
+
 
     sp.web.lists
       .getByTitle(listName)
@@ -251,7 +254,21 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       .getById(currentEditItem.ID)
       .update(currentEditItem)
       .then(f => {
+        debugger;
+        // Update the invoices in the state.
+        let allInvoices = this.state.data.data;
+        const invoiceIndex = allInvoices.findIndex(f => f.ID === currentEditItem.ID);
+        let oldInvoiceData = allInvoices[invoiceIndex];
+        oldInvoiceData = { ...oldInvoiceData, ...currentEditItem };
+
+        allInvoices.splice(invoiceIndex, 1, oldInvoiceData);
+        debugger;
+
         this.setState({
+          data: {
+            data: allInvoices,
+            total: allInvoices.length
+          },
           productInEdit: null
         });
       })
