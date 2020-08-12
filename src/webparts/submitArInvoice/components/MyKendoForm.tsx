@@ -79,9 +79,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
   public handleSubmit = async (dataItem) => {
     // We will use this to update states later.
     let currentFiles: IUploadingFile[] = this.state.MyFiles;
-    console.log("handleSubmit data");
-    console.log(dataItem);
-
 
     try {
       if (!dataItem.hasOwnProperty('RequestedBy')) {
@@ -110,7 +107,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
         Standard_x0020_Terms: dataItem.StandardTerms,
         Urgent: dataItem.Urgent
       };
-
 
       // Add customer data.
       // dataItem.Customer.ID is undefined when a custom customer is added.
@@ -145,7 +141,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
           Body: 'Approval Required',
           Request_x0020_Type: InvoiceActionRequiredRequestType.DepartmentApprovalRequired,
           Response_x0020_Status: InvoiceActionRequiredResponseStatus.Waiting
-        }
+        };
 
         web.lists.getByTitle(MyLists.InvoiceActionRequired)
           .items

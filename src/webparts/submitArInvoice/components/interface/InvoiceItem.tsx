@@ -1,7 +1,8 @@
 import { InvoiceActionRequiredResponseStatus } from "./IInvoiceActionRequired";
 
+
 interface IPersonField {
-  ID: number;
+  Id: number;
   // Users Email
   EMail: string;
   // Users Name.  Last, First
@@ -11,12 +12,17 @@ interface IPersonField {
 interface ICustomerField {
   Customer_x0020_Name: string;
   CustomerDetails: string;
+  Id?: number;
+}
+
+interface IUpdateLookupField {
+  results: Array<number>;
 }
 
 /**
  * Structure for Invoice Actions.
  */
-export interface IInvoiceAction {
+interface IInvoiceAction {
   ID: number;
   Id: number;
   ContentTypeId: string;
@@ -44,7 +50,7 @@ export interface IInvoiceAction {
 /**
  * Response that we get from SharePoint for Invoice Requests items and Invoices items
  */
-export interface IInvoiceQueryItem {
+interface IInvoiceQueryItem {
   Id: number;
   ID: number;
   FileSystemObjectType: number;       // Do we really need this?
@@ -86,7 +92,7 @@ export interface IInvoiceQueryItem {
 /**
  * This is the result that we will be returning to be used through out the app.
  */
-export interface IInvoiceItem extends IInvoiceQueryItem {
+interface IInvoiceItem extends IInvoiceQueryItem {
 
   CancelRequests: Array<IInvoiceCancelRequest>;
 
@@ -101,16 +107,46 @@ export interface IInvoiceItem extends IInvoiceQueryItem {
   RequiresAuthorizationBy?: any;
 
   Requested_x0020_By?: IPersonField;
-  Requires_x0020_Department_x0020_?: IPersonField
+
+  Requires_x0020_Department_x0020_?: Array<IPersonField>;
 
   // This is used by Kendo components to show or hide more details.
   expanded: boolean;
 }
 
+
+interface IInvoiceUpdateItem {
+  Id: number;
+  ID: number;
+  Department: string;
+  Date: Date;
+  Requested_x0020_ById: number;
+  // Users who's approval is required.
+  Requires_x0020_Department_x0020_Id: IUpdateLookupField;
+  Urgent: boolean;
+  CustomerId: number;
+  Customer_x0020_PO_x0020_Number: string;
+  Comment: string;
+  Invoice_x0020_Details: string;
+  // Accountant_x0020_ApprovalId: number;
+  // Requires_x0020_Accountant_x0020_ApprovalId: number;
+  // Completed_x0020_ApprovalId: number;
+  // Requires_x0020_Completed_x0020_ApprovalId: number;
+  // Batch_x0020_Number: string;
+  //Invoice_x0020_Status: string;
+  //Standard_x0020_Terms: string;
+  //AccountDetailsId: Array<any>;// TODO: Change type of any to number or object.
+  MiscCustomerName: string;
+  MiscCustomerDetails: string;
+  DirtyField: Date;
+  //AR_x0020_RequestId: number;
+}
+
+
 /**
  * CancelRequest that is attached to the invoice output object.
  */
-export interface IInvoiceCancelRequest {
+interface IInvoiceCancelRequest {
   Requested_x0020_By: IPersonField;
   Id: number;
   ID: number;
@@ -131,6 +167,13 @@ export interface IInvoiceCancelRequest {
   Created: Date;
 }
 
-
-
-
+export {
+  IPersonField,
+  ICustomerField,
+  IInvoiceAction,
+  IInvoiceQueryItem,
+  IInvoiceItem,
+  IInvoiceCancelRequest,
+  IUpdateLookupField,
+  IInvoiceUpdateItem
+};

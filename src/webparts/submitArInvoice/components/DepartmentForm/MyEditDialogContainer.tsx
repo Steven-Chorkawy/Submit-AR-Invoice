@@ -28,31 +28,42 @@ interface IMyEditDialogContainerState {
   loading?: boolean;
 }
 
-function GridButtons({ cancel }) {
-  return <div className="k-form-buttons">
-    <Button
-      type={"submit"}
-      style={{ width: '50%' }}
-      className="k-button k-primary"
-      icon="save"
-    // disabled={!formRenderProps.allowSubmit}
-    >Save</Button>
-    <Button
-      // type={"submit"}
-      style={{ width: '50%' }}
-      className="k-button"
-      onClick={cancel}
-      icon="cancel"
-    >Cancel</Button>
-  </div>;
+function GridButtons({ cancel, saveResult }) {
+  return (
+    <div>
+      {saveResult && saveResult.success === false &&
+        <div>
+          <Card style={{ width: 600 }} type={'error'}>
+            <CardBody>
+              <CardTitle>Something went wrong!</CardTitle>
+              <hr />
+              <p>{saveResult.message}</p>
+            </CardBody>
+          </Card>
+        </div>}
+      <div className="k-form-buttons">
+        <Button
+          type={"submit"}
+          style={{ width: '50%' }}
+          className="k-button k-primary"
+          icon="save"
+        // disabled={!formRenderProps.allowSubmit}
+        >Save</Button>
+        <Button
+          // type={"submit"}
+          style={{ width: '50%' }}
+          className="k-button"
+          onClick={cancel}
+          icon="cancel"
+        >Cancel</Button>
+      </div>
+    </div>
+  );
 }
 
 export class MyEditDialogContainer extends React.Component<any, IMyEditDialogContainerState> {
   constructor(props) {
     super(props);
-    console.log("MyEditDialogContainer");
-    console.log(props);
-
     this.state = {
       productInEdit: {
         ...this.props.dataItem,
@@ -60,9 +71,6 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
       customerList: this.props.customers,
       receivedCustomerList: this.props.customers
     };
-
-    console.log('productInEdit')
-    console.log(this.state.productInEdit);
   }
 
 
@@ -74,24 +82,7 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
 
     return React.cloneElement(li, li.props, itemChildren);
   }
-  public onCustomCustomerChange = (event) => {
 
-    let target = event.target;
-    let value = target.type === 'checkbox' ? target.checked : target.value;
-    debugger;
-
-    let customer = {
-      ...this.state.productInEdit.Customer,
-      CustomerDetails: value
-    };
-
-    let edited = this.state.productInEdit;
-    edited.Customer = customer;
-
-    this.setState({
-      productInEdit: edited
-    });
-  }
 
   public customerFilterChange = (event) => {
     setTimeout(() => {
@@ -110,8 +101,6 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
 
 
   public onActionResponseSent = (e) => {
-    console.log('before update');
-    console.log(this.state.productInEdit.Actions);
     this.forceUpdate();
   }
 
@@ -119,7 +108,6 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
   public render() {
     return (
       <Dialog onClose={this.props.cancel} title={"Edit AR Invoice Request"} minWidth="200px" width="80%" height="80%">
-
         {
           this.state.productInEdit.Actions
             .filter(f => f.AuthorId === this.props.currentUser.Id && f.Response_x0020_Status === InvoiceActionRequiredResponseStatus.Waiting)
@@ -138,7 +126,7 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
           initialValues={{ ...this.state.productInEdit }}
           render={(formRenderProps) => (
             <FormElement>
-              {GridButtons(this.props.cancel)}
+              {GridButtons({ cancel: this.props.cancel, saveResult: this.props.saveResult })}
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
                   id="Department"
@@ -194,7 +182,6 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                   validator={MyValidators.requiresApprovalFrom}
                 />
               </div>
-
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
                   id="Urgent"
@@ -217,6 +204,7 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                 allowCustom={true}
                 itemRender={this.customerItemRender}
                 component={MyFormComponents.CustomerComboBox}
+                onCustomCustomerChange={this.props.onCustomCustomerChange}
                 filterable={true}
                 suggest={true}
               />
@@ -272,7 +260,7 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                 productInEdit={this.state.productInEdit}
               />
 
-              {GridButtons(this.props.cancel)}
+              {GridButtons({ cancel: this.props.cancel, saveResult: this.props.saveResult })}
             </FormElement>
           )}
         >

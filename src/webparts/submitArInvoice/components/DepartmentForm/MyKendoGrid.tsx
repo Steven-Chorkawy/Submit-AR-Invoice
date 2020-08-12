@@ -7,9 +7,9 @@ import {
   GridColumn as Column,
   GridCell,
   GridToolbar,
-  GridCellProps,
 } from '@progress/kendo-react-grid';
 import { Button } from '@progress/kendo-react-buttons';
+
 
 //PnPjs Imports
 import { sp } from "@pnp/sp";
@@ -32,6 +32,9 @@ import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { MyContentTypes } from '../enums/MyEnums';
 import { FileRefCell } from '../FileRefCell';
+import { IInvoiceItem, IPersonField, IInvoiceUpdateItem } from '../interface/InvoiceItem';
+import { IMySaveResult } from '../interface/IMySaveResult';
+
 
 type MyKendoGridState = {
   data: any;
@@ -44,6 +47,7 @@ type MyKendoGridState = {
   statusData: any;
   siteUsersData: any;
   currentUser?: any;
+  saveResult?: IMySaveResult;
 };
 
 
@@ -133,8 +137,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   }
 
   public arDataReceived = (invoices) => {
-    console.log('arDataReceived');
-    console.log(invoices);
     this.setState({
       ...this.state,
       data: invoices,
@@ -168,16 +170,112 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
     });
   }
 
+  // Handle custom customer change event.
+  public onCustomCustomerChange = (event) => {
+    let target = event.target;
+    let value = target.type === 'checkbox' ? target.checked : target.value;
+
+    this.setState({
+      productInEdit: {
+        ...this.state.productInEdit,
+        MiscCustomerDetails: value
+      }
+    });
+  }
+
   public handleSubmit = (event) => {
-    var tester = event;
-    debugger;
+    // Used to determine if we're updating an invoice request or an invoice.
+    let listName = '';
+
+    let currentEditItem: IInvoiceUpdateItem = {
+      Id: event.Id,
+      ID: event.ID,
+      Department: event.Department,
+      Date: event.Date,
+      Requested_x0020_ById: event.Requested_x0020_ById,
+      Urgent: event.Urgent,
+      CustomerId: event.CustomerId,
+      Customer_x0020_PO_x0020_Number: event.Customer_x0020_PO_x0020_Number,
+      Comment: event.Comment,
+      Invoice_x0020_Details: event.Invoice_x0020_Details,
+      MiscCustomerName: event.MiscCustomerName,
+      MiscCustomerDetails: event.MiscCustomerDetails,
+      DirtyField: event.DirtyField,
+      Requires_x0020_Department_x0020_Id: {
+        results: event.Requires_x0020_Department_x0020_.map(f => f.Id)
+      }
+    };
+
+
+    // Check to see if the submitted customer contains an ID field.
+    // If it does not that means that we're taking in a Misc Customer and will need to parse out the data.
+    if (!event.Customer.hasOwnProperty('ID')) {
+      // This means we need to take out the customer name.
+      currentEditItem.MiscCustomerName = event.Customer.Customer_x0020_Name;
+      currentEditItem.DirtyField = new Date();
+      currentEditItem.MiscCustomerDetails = this.state.productInEdit.Customer.MiscCustomerDetails;
+
+      // If a customer was previously selected it's ID will still be present.
+      currentEditItem.CustomerId = null;
+    }
+    else {
+      // If a custom ID is present then we will need to update the Customer ID property incase it's been changed.
+      if (currentEditItem.CustomerId !== event.Customer.Id) {
+        currentEditItem.CustomerId = event.Customer.Id;
+      }
+    }
+
+
+    // This is where we are checking to see what type of invoice (request, or not) we are editing.
+    if (event.ContentTypeId === MyContentTypes["AR Request List Item"]) {
+      // Update a request item.
+      listName = MyLists["AR Invoice Requests"];
+    }
+    else {
+      // Update a document item.
+      listName = MyLists["AR Invoices"];
+    }
+
+    sp.web.lists
+      .getByTitle(listName)
+      .items
+      .getById(currentEditItem.ID)
+      .update(currentEditItem)
+      .then(f => {
+
+        // Update the invoices in the state.
+        let allInvoices = this.state.data.data;
+        const invoiceIndex = allInvoices.findIndex(fInvoice => fInvoice.ID === currentEditItem.ID);
+        let oldInvoiceData = allInvoices[invoiceIndex];
+        oldInvoiceData = { ...oldInvoiceData, ...currentEditItem };
+
+        allInvoices.splice(invoiceIndex, 1, oldInvoiceData);
+
+
+        this.setState({
+          data: {
+            data: allInvoices,
+            total: allInvoices.length
+          },
+          productInEdit: null
+        });
+      })
+      .catch(e => {
+        var res = e;
+        console.log('Error while updating invoice');
+        console.log(e);
+
+        this.setState({
+          saveResult: {
+            success: false,
+            message: "Could not save your changes.  Please contact help desk."
+          }
+        });
+      });
   }
 
   public save = () => {
     const dataItem = this.state.productInEdit;
-    console.log("saving this data");
-    console.log(dataItem);
-
 
     const invoices = this.state.data.data.slice();
     // const isNewProduct = dataItem.ProductID === undefined;
@@ -215,11 +313,11 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
             return user;
           }
           else {
-            return user.Id
+            return user.Id;
           }
         })
       };
-      sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(dataItem.ID).update(updateObject)
+      sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(dataItem.ID).update(updateObject);
     }
     // Update document item.
     else {
@@ -229,11 +327,11 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
             return user;
           }
           else {
-            return user.Id
+            return user.Id;
           }
         })
       };
-      sp.web.lists.getByTitle(MyLists["AR Invoices"]).items.getById(dataItem.ID).update(updateObject)
+      sp.web.lists.getByTitle(MyLists["AR Invoices"]).items.getById(dataItem.ID).update(updateObject);
     }
 
 
@@ -252,7 +350,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
                 };
 
                 if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
-                  relatedAttachmentUpdateObject['AR_x0020_Invoice_x0020_RequestId'] = dataItem.ID
+                  relatedAttachmentUpdateObject['AR_x0020_Invoice_x0020_RequestId'] = dataItem.ID;
                 }
                 else {
                   relatedAttachmentUpdateObject['ARInvoiceId'] = dataItem.ID;
@@ -296,11 +394,11 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
         };
 
         if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
-          cancelReqUpdateObj['AR_x0020_Invoice_x0020_RequestId'] = dataItem.Id
+          cancelReqUpdateObj['AR_x0020_Invoice_x0020_RequestId'] = dataItem.Id;
         }
         else {
-          cancelReqUpdateObj['Invoice_x0020_NumberId'] = dataItem.Id
-          cancelReqUpdateObj['AR_x0020_Invoice_x0020_RequestId'] = dataItem.AR_x0020_RequestId
+          cancelReqUpdateObj['Invoice_x0020_NumberId'] = dataItem.Id;
+          cancelReqUpdateObj['AR_x0020_Invoice_x0020_RequestId'] = dataItem.AR_x0020_RequestId;
         }
 
         sp.web.lists.getByTitle(MyLists["Cancel Invoice Request"])
@@ -415,8 +513,9 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
               customers={this.props.customers}
               siteUsers={this.props.siteUsers}
               currentUser={this.state.currentUser}
-              // save={this.save}
+              saveResult={this.state.saveResult}
               onSubmit={this.handleSubmit}
+              onCustomCustomerChange={this.onCustomCustomerChange}
               cancel={this.cancel}
             />
             : this.state.productInCancel ?

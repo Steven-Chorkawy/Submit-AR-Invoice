@@ -4,10 +4,6 @@ import { Card, CardTitle, CardBody, CardActions } from '@progress/kendo-react-la
 
 
 export class MyCustomerCardComponent extends React.Component<any, any> {
-
-  /**
-   *
-   */
   constructor(props) {
     super(props);
 
