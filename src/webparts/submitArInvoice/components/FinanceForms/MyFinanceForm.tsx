@@ -158,8 +158,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   public arDataReceived = (invoices) => {
-    console.log('arDataReceived');
-    console.log(invoices);
     var dataHolder: any = filterBy(invoices.data, this.state.filter);
 
     this.setState({

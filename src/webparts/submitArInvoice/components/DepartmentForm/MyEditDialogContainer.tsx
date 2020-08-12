@@ -64,9 +64,6 @@ function GridButtons({ cancel, saveResult }) {
 export class MyEditDialogContainer extends React.Component<any, IMyEditDialogContainerState> {
   constructor(props) {
     super(props);
-    console.log("MyEditDialogContainer");
-    console.log(props);
-
     this.state = {
       productInEdit: {
         ...this.props.dataItem,
@@ -74,9 +71,6 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
       customerList: this.props.customers,
       receivedCustomerList: this.props.customers
     };
-
-    console.log('productInEdit')
-    console.log(this.state.productInEdit);
   }
 
 
@@ -107,8 +101,6 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
 
 
   public onActionResponseSent = (e) => {
-    console.log('before update');
-    console.log(this.state.productInEdit.Actions);
     this.forceUpdate();
   }
 

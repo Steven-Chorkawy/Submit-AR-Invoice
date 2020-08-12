@@ -94,8 +94,6 @@ class DepartmentListView extends React.Component<any, any> {
     });
   }
   public arDataReceived = (invoices) => {
-    console.log('arDataReceived');
-    console.log(invoices);
     this.setState({
       ...this.state,
       data: invoices,

@@ -139,8 +139,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   }
 
   public arDataReceived = (invoices) => {
-    console.log('arDataReceived');
-    console.log(invoices);
     this.setState({
       ...this.state,
       data: invoices,
@@ -209,8 +207,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
         results: event.Requires_x0020_Department_x0020_.map(f => f.Id)
       }
     };
-    console.log('Updating invoice data from form');
-    console.log(currentEditItem);
 
 
     // Check to see if the submitted customer contains an ID field.
@@ -242,19 +238,13 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       listName = MyLists["AR Invoices"];
     }
 
-
-    console.log('Updating this invoice');
-    console.log(currentEditItem);
-    debugger;
-
-
     sp.web.lists
       .getByTitle(listName)
       .items
       .getById(currentEditItem.ID)
       .update(currentEditItem)
       .then(f => {
-        debugger;
+
         // Update the invoices in the state.
         let allInvoices = this.state.data.data;
         const invoiceIndex = allInvoices.findIndex(f => f.ID === currentEditItem.ID);
@@ -262,7 +252,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
         oldInvoiceData = { ...oldInvoiceData, ...currentEditItem };
 
         allInvoices.splice(invoiceIndex, 1, oldInvoiceData);
-        debugger;
+
 
         this.setState({
           data: {
@@ -276,7 +266,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
         var res = e;
         console.log('Error while updating invoice');
         console.log(e);
-        debugger;
+
         this.setState({
           saveResult: {
             success: false,
@@ -288,9 +278,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
 
   public save = () => {
     const dataItem = this.state.productInEdit;
-    console.log("saving this data");
-    console.log(dataItem);
-
 
     const invoices = this.state.data.data.slice();
     // const isNewProduct = dataItem.ProductID === undefined;

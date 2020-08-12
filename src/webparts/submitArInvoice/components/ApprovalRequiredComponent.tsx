@@ -37,9 +37,6 @@ interface IApprovalRequiredComponentState {
 class ApprovalRequiredComponent extends React.Component<IApprovalRequiredComponentProps, IApprovalRequiredComponentState> {
   constructor(props) {
     super(props);
-    console.log('new action!');
-    console.log(props.action);
-
     this.state = {
       action: props.action,
       productInEdit: props.productInEdit

@@ -60,8 +60,6 @@ interface IInvoiceEditFormProps {
 export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any> {
   constructor(props) {
     super(props);
-    console.log('InvoiceEditForm');
-    console.log(props);
     this.state = {
       productInEdit: this.props.dataItem || null,
       visible: false,
