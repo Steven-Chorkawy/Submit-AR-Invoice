@@ -68,7 +68,6 @@ interface IInvoiceQueryItem {
   Urgent: boolean;
   CustomerId: number;
   Customer_x0020_PO_x0020_Number: string;
-  Comment: string;
   Invoice_x0020_Details: string;
   Accountant_x0020_ApprovalId: number;
   Requires_x0020_Accountant_x0020_ApprovalId: number;
@@ -126,7 +125,6 @@ interface IInvoiceUpdateItem {
   Urgent: boolean;
   CustomerId: number;
   Customer_x0020_PO_x0020_Number: string;
-  Comment: string;
   Invoice_x0020_Details: string;
   // Accountant_x0020_ApprovalId: number;
   // Requires_x0020_Accountant_x0020_ApprovalId: number;

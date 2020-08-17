@@ -196,7 +196,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       Urgent: event.Urgent,
       CustomerId: event.CustomerId,
       Customer_x0020_PO_x0020_Number: event.Customer_x0020_PO_x0020_Number,
-      Comment: event.Comment,
       Invoice_x0020_Details: event.Invoice_x0020_Details,
       MiscCustomerName: event.MiscCustomerName,
       MiscCustomerDetails: event.MiscCustomerDetails,
