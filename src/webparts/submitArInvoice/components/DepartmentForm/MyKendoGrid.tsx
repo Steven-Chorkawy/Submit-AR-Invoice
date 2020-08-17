@@ -278,7 +278,9 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
                         .items.getById(itemProxy.ID)
                         .update(relatedAttachmentUpdateObject)
                         .then(rAttachmentRes => {
-                          let currentRAttachmentIds = event.RelatedAttachments.filter(f => f.hasOwnProperty('Id')).map(f => f.Id);
+                          let currentRAttachmentIds = event.RelatedAttachments
+                            .filter(fromRelatedAttachments => fromRelatedAttachments.hasOwnProperty('Id'))
+                            .map(fromRelatedAttachmentsMap => fromRelatedAttachmentsMap.Id);
                           currentRAttachmentIds.push(itemProxy.ID);
                           debugger;
                           // Update the request item with this new object.
