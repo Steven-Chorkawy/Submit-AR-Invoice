@@ -101,6 +101,7 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
 
 
   public onActionResponseSent = (e) => {
+    this.props.cancel();
     this.forceUpdate();
   }
 
