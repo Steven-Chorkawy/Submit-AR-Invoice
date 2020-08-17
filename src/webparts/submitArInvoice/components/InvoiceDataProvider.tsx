@@ -105,12 +105,16 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
     Requested_x0020_By/EMail,
     Requires_x0020_Department_x0020_/Id,
     Requires_x0020_Department_x0020_/Title,
-    Requires_x0020_Department_x0020_/EMail`;
+    Requires_x0020_Department_x0020_/EMail,
+    RelatedAttachments/Title,
+    RelatedAttachments/Id,
+    RelatedAttachments/ID`;
 
     const expandString = `
     Customer,
     Requested_x0020_By,
-    Requires_x0020_Department_x0020_`;
+    Requires_x0020_Department_x0020_,
+    RelatedAttachments`;
 
     sp.web.lists.getByTitle(MyLists["AR Invoice Requests"])
       .items
@@ -119,6 +123,8 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
       .then(async response => {
         this.lastSuccess = this.pending;
         this.pending = '';
+        console.log('raw Res');
+        console.log(response);
 
         let filteredResponse = filterBy(response, this.props.filterState);
 
