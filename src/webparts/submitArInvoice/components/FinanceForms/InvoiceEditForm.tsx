@@ -57,6 +57,39 @@ interface IInvoiceEditFormProps {
   save;
 }
 
+function GridButtons({ cancel, saveResult }) {
+  return (
+    <div>
+      {saveResult && saveResult.success === false &&
+        <div>
+          <Card style={{ width: 600 }} type={'error'}>
+            <CardBody>
+              <CardTitle>Something went wrong!</CardTitle>
+              <hr />
+              <p>{saveResult.message}</p>
+            </CardBody>
+          </Card>
+        </div>}
+      <div className="k-form-buttons">
+        <Button
+          type={"submit"}
+          style={{ width: '50%' }}
+          className="k-button k-primary"
+          icon="save"
+        // disabled={!formRenderProps.allowSubmit}
+        >Save</Button>
+        <Button
+          // type={"submit"}
+          style={{ width: '50%' }}
+          className="k-button"
+          onClick={cancel}
+          icon="cancel"
+        >Cancel</Button>
+      </div>
+    </div>
+  );
+}
+
 export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any> {
   constructor(props) {
     super(props);
