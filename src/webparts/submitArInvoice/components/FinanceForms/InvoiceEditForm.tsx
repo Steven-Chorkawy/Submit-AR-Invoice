@@ -137,6 +137,7 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
         }
         <Form
           onSubmit={this.props.onSubmit}
+          initialValues={{ ...this.state.productInEdit }}
           render={(formRenderProps) => (
             <FormElement style={{ width: '100%' }}>
               {GridButtons({ cancel: this.props.cancel, saveResult: this.props.saveResult })}
@@ -146,9 +147,7 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                     id={'Invoice_x0020_Status'}
                     name={'Invoice_x0020_Status'}
                     label={'Status'}
-                    value={this.state.productInEdit.Invoice_x0020_Status}
                     data={this.props.statusData}
-                    onChange={this.onDialogInputChange}
                     component={MyFormComponents.FormDropDownList}
                   />
                 </div>
@@ -160,8 +159,6 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                     data={this.props.siteUsersData}
                     dataItemKey="Id"
                     textField="Title"
-                    value={this.state.productInEdit.Requires_x0020_Accountant_x0020_ApprovalId}
-                    onChange={this.onDialogInputChange}
                     disabled={this.state.productInEdit.Invoice_x0020_Status !== 'Accountant Approval Required'}
                     component={MyFormComponents.FormComboBox}
                   />
@@ -171,8 +168,6 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                     id={'Invoice_x0020_Number'}
                     name={'Invoice_x0020_Number'}
                     label={'Invoice Number'}
-                    value={this.state.productInEdit.Invoice_x0020_Number}
-                    onChange={this.onDialogInputChange}
                     component={MyFormComponents.FormInput}
                   />
                 </div>
@@ -181,8 +176,6 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                     id={'Batch_x0020_Number'}
                     name={'Batch_x0020_Number'}
                     label={'Batch Number'}
-                    value={this.state.productInEdit.Batch_x0020_Number}
-                    onChange={this.onDialogInputChange}
                     component={MyFormComponents.FormInput}
                   />
                 </div>
@@ -221,19 +214,6 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
             </FormElement>
           )}
         />
-        {/* <DialogActionsBar>
-          <Button
-            className="k-button k-primary"
-            icon="save"
-            primary={true}
-            onClick={this.props.save}
-          >Save</Button>
-          <Button
-            className="k-button"
-            icon="cancel"
-            onClick={this.props.cancel}
-          >Cancel</Button>
-        </DialogActionsBar> */}
       </Dialog>
     );
   }
