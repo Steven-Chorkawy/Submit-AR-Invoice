@@ -188,7 +188,7 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
             </FormElement>
           )}
         />
-        <DialogActionsBar>
+        {/* <DialogActionsBar>
           <Button
             className="k-button k-primary"
             icon="save"
@@ -200,7 +200,7 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
             icon="cancel"
             onClick={this.props.cancel}
           >Cancel</Button>
-        </DialogActionsBar>
+        </DialogActionsBar> */}
       </Dialog>
     );
   }
