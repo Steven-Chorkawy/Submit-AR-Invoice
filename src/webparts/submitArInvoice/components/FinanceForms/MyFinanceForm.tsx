@@ -381,6 +381,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
 
                   // Remove unwanted fields
+                  // These fields should either not be updated here, or they cause SharePoint to throw errors at us.
                   this.removeFields(copiedMetadata,
                     [
                       'ContentTypeId',
