@@ -333,6 +333,9 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     const isNewProduct = false; // TODO: Add this if we plan on letting users create from this form.
     const invoices = this.state.invoices.data.slice();
     try {
+
+      // Determine if we're creating a new record or editing an existing one.
+      // * at the moment we are only editing existing records here since Finance doesn't create invoice on this form.
       if (isNewProduct) {
         //products.unshift(this.newProduct(data));
       } else {
@@ -348,6 +351,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         Requires_x0020_Accountant_x0020_ApprovalId: data.Requires_x0020_Accountant_x0020_ApprovalId ? data.Requires_x0020_Accountant_x0020_ApprovalId.Id : null
       };
 
+      // Update the record.
+      // This will either update the request or the invoice record.
       if (data.ContentTypeId === MyContentTypes["AR Request List Item"]) {
         updateObject['Requires_x0020_Accountant_x0020_Id'] = data.Requires_x0020_Accountant_x0020_ApprovalId ? data.Requires_x0020_Accountant_x0020_ApprovalId.Id : null;
         delete updateObject.Requires_x0020_Accountant_x0020_ApprovalId;
@@ -358,6 +363,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       }
 
       // Check to see if there is a file that we can update.
+      // If a files is present that means we need to convert the 'Invoice Request' into an 'Invoice'.
+      // This means taking all the metadata from the request and applying it to this file.
       if (data.InvoiceAttachments) {
         for (let index = 0; index < data.InvoiceAttachments.length; index++) {
           const element = data.InvoiceAttachments[index];
@@ -379,6 +386,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                     results: data.RelatedAttachmentsId
                   };
 
+                  // TODO: Maps 'Requires_x0020_Department_x0020_' from request to 'Requires_x0020_Authorization_x0020_By' in the invoice.
                   // Remove unwanted fields
                   // These fields should either not be updated here, or they cause SharePoint to throw errors at us.
                   this.removeFields(copiedMetadata, [
