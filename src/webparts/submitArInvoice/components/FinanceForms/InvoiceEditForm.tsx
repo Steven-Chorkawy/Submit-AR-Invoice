@@ -48,13 +48,13 @@ export interface IGPAttachmentProps {
 
 interface IInvoiceEditFormProps {
   GPAttachmentWidgetProps: IGPAttachmentProps;
-  dataItem;
-  cancel;
-  currentUser;
-  statusData;
-  siteUsersData;
-  onUpdateAccount;
-  save;
+  dataItem: any;
+  cancel: any;
+  saveResult: any;
+  currentUser: any;
+  statusData: any;
+  siteUsersData: any;
+  onUpdateAccount: any;
 }
 
 function GridButtons({ cancel, saveResult }) {
@@ -141,6 +141,7 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
           onSubmit={this.handleSubmit}
           render={(formRenderProps) => (
             <FormElement style={{ width: '100%' }}>
+              {GridButtons({ cancel: this.props.cancel, saveResult: this.props.saveResult })}
               <fieldset className={'k-form-fieldset'}>
                 <div style={{ marginBottom: "2px" }}>
                   <Field
@@ -218,6 +219,7 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                   />
                 </div>
               </fieldset>
+              {GridButtons({ cancel: this.props.cancel, saveResult: this.props.saveResult })}
             </FormElement>
           )}
         />
