@@ -124,7 +124,7 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
 
     return (
       <Dialog onClose={this.props.cancel} title={"Edit AR Invoice"} minWidth="200px" width="80%" height="80%" >
-        {this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"] ? "Content Type: Invoice Requst" : "Invoice Document"}
+        {this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"] ? "Content Type: Invoice Request" : "Invoice Document"}
         {
           this.state.productInEdit.Actions
             .filter(f => f.AuthorId === this.props.currentUser.Id && f.Response_x0020_Status === InvoiceActionRequiredResponseStatus.Waiting)
@@ -161,7 +161,7 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                     data={this.props.siteUsersData}
                     dataItemKey="Id"
                     textField="Title"
-                    // valueGetter is a very nice method! No need to set the state anymore.
+                    // * valueGetter is a very nice method! No need to set the state anymore.
                     disabled={formRenderProps.valueGetter('Invoice_x0020_Status') !== 'Accountant Approval Required'}
                     component={MyFormComponents.FormComboBox}
                   />
