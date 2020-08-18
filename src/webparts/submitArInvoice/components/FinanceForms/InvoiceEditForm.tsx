@@ -49,6 +49,7 @@ export interface IGPAttachmentProps {
 interface IInvoiceEditFormProps {
   GPAttachmentWidgetProps: IGPAttachmentProps;
   dataItem: any;
+  onSubmit: any;
   cancel: any;
   saveResult: any;
   currentUser: any;
@@ -100,9 +101,6 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
     };
   }
 
-  public handleSubmit(event) {
-    event.preventDefault();
-  }
 
   public onDialogInputChange = (event) => {
     let target = event.target;
@@ -138,7 +136,7 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
             })
         }
         <Form
-          onSubmit={this.handleSubmit}
+          onSubmit={this.props.onSubmit}
           render={(formRenderProps) => (
             <FormElement style={{ width: '100%' }}>
               {GridButtons({ cancel: this.props.cancel, saveResult: this.props.saveResult })}

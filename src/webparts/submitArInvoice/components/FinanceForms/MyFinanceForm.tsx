@@ -39,6 +39,7 @@ import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { InvoiceEditForm, IGPAttachmentProps } from './InvoiceEditForm';
 import { FileRefCell } from '../FileRefCell';
+import { IMySaveResult } from '../interface/IMySaveResult';
 
 
 interface IMyFinanceFormState {
@@ -52,7 +53,7 @@ interface IMyFinanceFormState {
   //sort: any;
   allRowsExpanded: boolean;
   currentUser?: any;
-
+  saveResult: IMySaveResult;
   gpAttachmentProps: IGPAttachmentProps;
 }
 
@@ -102,6 +103,10 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       gpAttachmentProps: {
         type: null,
         errorMessage: null
+      },
+      saveResult: {
+        success: true,
+        message: null
       }
     };
 
@@ -316,6 +321,15 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         data: data
       }
     });
+  }
+
+  /**
+   * Handle the Finance Edit Form submit.
+   * @param data Data from the Invoice Edit Form
+   */
+  public onSubmit = (data) => {
+    console.log('onSubmit!');
+    console.log(data);
   }
 
   public saveEditForm = () => {
@@ -544,7 +558,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           await sp.web.lists
             .getByTitle(MyLists["AR Invoice Requests"])
             .items.getById(item[0].Id)
-            .update({AR_x0020_InvoiceId: docId});
+            .update({ AR_x0020_InvoiceId: docId });
         }
       });
   }
@@ -742,7 +756,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
             dataItem={this.state.productInEdit}
             statusData={this.state.statusData}
             siteUsersData={this.state.siteUsersData}
-            save={this.saveEditForm}
+            onSubmit={this.onSubmit}
+            saveResult={this.state.saveResult}
             cancel={this.cancelEditForm}
             onUpdateAccount={this.updateAccount}
             GPAttachmentWidgetProps={this.state.gpAttachmentProps}
