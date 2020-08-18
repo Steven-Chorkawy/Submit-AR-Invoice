@@ -325,11 +325,20 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
   /**
    * Handle the Finance Edit Form submit.
-   * @param data Data from the Invoice Edit Form
+   * @param data Object of the current item in edit.
    */
   public onSubmit = (data) => {
     console.log('onSubmit!');
     console.log(data);
+
+    var updateObject = {
+      Invoice_x0020_Status: data.Invoice_x0020_Status,
+      Invoice_x0020_Number: data.Invoice_x0020_Number,
+      Batch_x0020_Number: data.Batch_x0020_Number,
+      Requires_x0020_Accountant_x0020_ApprovalId: data.Requires_x0020_Accountant_x0020_ApprovalId ? data.Requires_x0020_Accountant_x0020_ApprovalId.Id : null
+    };
+
+
   }
 
   public saveEditForm = () => {

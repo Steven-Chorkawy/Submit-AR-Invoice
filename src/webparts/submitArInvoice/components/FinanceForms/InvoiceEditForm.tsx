@@ -119,7 +119,9 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
     });
   }
 
+  private _statusValue = null;
   public render() {
+
     return (
       <Dialog onClose={this.props.cancel} title={"Edit AR Invoice"} minWidth="200px" width="80%" height="80%" >
         {this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"] ? "Content Type: Invoice Requst" : "Invoice Document"}
@@ -159,7 +161,8 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                     data={this.props.siteUsersData}
                     dataItemKey="Id"
                     textField="Title"
-                    disabled={this.state.productInEdit.Invoice_x0020_Status !== 'Accountant Approval Required'}
+                    // valueGetter is a very nice method! No need to set the state anymore.
+                    disabled={formRenderProps.valueGetter('Invoice_x0020_Status') !== 'Accountant Approval Required'}
                     component={MyFormComponents.FormComboBox}
                   />
                 </div>
