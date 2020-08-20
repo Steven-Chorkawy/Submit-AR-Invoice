@@ -94,6 +94,7 @@ function GridButtons({ cancel, saveResult }) {
 export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any> {
   constructor(props) {
     super(props);
+    console.log(this.props.dataItem);
     this.state = {
       productInEdit: this.props.dataItem || null,
       visible: false,
@@ -195,6 +196,15 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                     <CardBody>
                       <CardTitle><b>Upload GP Attachment</b></CardTitle>
                       <p>{this.props.GPAttachmentWidgetProps.errorMessage}</p>
+                      {this.state.productInEdit.ContentTypeId === MyContentTypes["AR Invoice Document Item"] &&
+                        <a target='_blank' href={this.state.productInEdit.ServerRedirectedEmbedUrl} style={{ margin: '2px' }}>
+                          <div className='k-chip k-chip-filled k-chip-info'>
+                            <div className='k-chip-content'>
+                              {this.state.productInEdit.Title}
+                            </div>
+                          </div>
+                        </a>
+                      }
                       <Field
                         id="InvoiceAttachments"
                         name="InvoiceAttachments"
