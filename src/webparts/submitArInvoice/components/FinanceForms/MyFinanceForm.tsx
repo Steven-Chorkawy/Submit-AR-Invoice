@@ -328,12 +328,10 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * @param data Object of the current item in edit.
    */
   public onSubmit = (data) => {
-    console.log('onSubmit!');
-    console.log(data);
+
     const isNewProduct = false; // TODO: Add this if we plan on letting users create from this form.
     const invoices = this.state.invoices.data.slice();
     try {
-
       // Determine if we're creating a new record or editing an existing one.
       // * at the moment we are only editing existing records here since Finance doesn't create invoice on this form.
       if (isNewProduct) {
@@ -376,7 +374,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                   const itemProxy: any = Object.assign({}, item);
                   const editItemId: number = data.ID;
                   // ! Transfer metadata from AR Request to AR Invoice.
-                  // ! THIS IS A 'YUGE' STEP!
+                  // ! THIS IS A HUGE STEP!
                   var copiedMetadata = data;
 
                   // Add extra fields.
@@ -424,8 +422,15 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                     'Actions'
                   ]);
 
-                  console.log('updating with this object');
-                  console.log(copiedMetadata);
+                  // Adding these fields to copiedMetadata because they aren't coming through in the submitted object.
+                  copiedMetadata['Requires_x0020_Authorization_x0020_ById'] = {
+                    results: this.state.productInEdit.Requires_x0020_Department_x0020_Id
+                  };
+                  copiedMetadata['AccountDetailsId'] = {
+                    results: this.state.productInEdit.AccountDetailsId
+                  };
+
+
                   // Copy the meta data from the AR Req to the AR Invoice.
                   sp.web.lists.getByTitle(MyLists["AR Invoices"]).items.getById(itemProxy.ID)
                     .update({
@@ -434,7 +439,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                       ...copiedMetadata
                     })
                     .then(arInvUpdateRes => {
-                      debugger;
+
                       // Update all related records.
                       // this update will add the documents id to the files.
                       // this will allow us to get all related data for this document without having to use the request record.
@@ -446,7 +451,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                         this._updateApprovalRequests(editItemId, itemProxy.ID)
                       ])
                         .then(value => {
-                          debugger;
+
                           const indexOf = invoices.findIndex(fInvoice => fInvoice.AR_x0020_RequestId === editItemId);
                           invoices[indexOf].Id = itemProxy.ID;
                           invoices[indexOf].ID = itemProxy.ID;
@@ -514,7 +519,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
   // Add docId to related documents.
   private _updateRelatedDocuments = async (reqId, docId) => {
-    debugger;
+
     // Get the related attachments that for this request.
     await sp.web.lists
       .getByTitle(MyLists["Related Invoice Attachments"])
@@ -523,7 +528,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       .get()
       .then(async (items: any[]) => {
         if (items.length > 0) {
-          debugger;
+
           // Update the related attachment so it is now related to the AR Invoice.
           await sp.web.lists
             .getByTitle(MyLists["Related Invoice Attachments"])
@@ -746,9 +751,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           <GridColumn field="Invoice_x0020_Number" title="Invoice #" width={this._columnWidth} />
           <GridColumn field="Batch_x0020_Number" title="Batch #" width={this._columnWidth} />
           <GridColumn field="Urgent" title="Urgent" width={this._columnWidth} cell={this.MyCustomUrgentCell} />
-
-          {/* <GridColumn field="Type_x0020_of_x0020_Request" title="Type" width={this._columnWidth} />
-          <GridColumn field="Customer_x0020_PO_x0020_Number" title="Customer PO #" width={this._columnWidth} /> */}
 
           <GridColumn cell={this.CommandCell} width={"110px"} locked={true} resizable={false} filterable={false} sortable={false} />
         </Grid>

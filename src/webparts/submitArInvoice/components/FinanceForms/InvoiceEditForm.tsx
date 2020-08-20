@@ -120,8 +120,8 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
   }
 
   private _statusValue = null;
-  public render() {
 
+  public render() {
     return (
       <Dialog onClose={this.props.cancel} title={"Edit AR Invoice"} minWidth="200px" width="80%" height="80%" >
         {this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"] ? "Content Type: Invoice Request" : "Invoice Document"}
