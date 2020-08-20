@@ -205,14 +205,27 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                           </div>
                         </a>
                       }
-                      <Field
-                        id="InvoiceAttachments"
-                        name="InvoiceAttachments"
-                        batch={false}
-                        multiple={false}
-                        myOnChange={this.onDialogInputChange}
-                        component={MyFormComponents.FormUpload}
-                      />
+
+                      {
+                        /**
+                         * Only show this upload box if we're working with a request. If it not a request that means the file has already been uploaded.
+                         *
+                         * If Finance ever needs to re upload a file they should delete this one and restart the upload process.
+                         * This is because the meta data will be applied to the NEW file.
+                         * */
+                        this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"] &&
+                        <Field
+                          id="InvoiceAttachments"
+                          name="InvoiceAttachments"
+                          batch={false}
+                          multiple={false}
+                          restrictions={{
+                            allowedExtensions: ['.pdf']
+                          }}
+                          myOnChange={this.onDialogInputChange}
+                          component={MyFormComponents.FormUpload}
+                        />
+                      }
                     </CardBody>
                   </Card>
                 </div>
