@@ -126,7 +126,7 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
     return (
       <Dialog onClose={this.props.cancel} title={"Edit AR Invoice"} minWidth="200px" width="80%" height="80%" >
         {this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"] ? "Content Type: Invoice Request" : "Invoice Document"}
-        {
+        {this.state.productInEdit.Actions &&
           this.state.productInEdit.Actions
             .filter(f => f.AuthorId === this.props.currentUser.Id && f.Response_x0020_Status === InvoiceActionRequiredResponseStatus.Waiting)
             .map(action => {
