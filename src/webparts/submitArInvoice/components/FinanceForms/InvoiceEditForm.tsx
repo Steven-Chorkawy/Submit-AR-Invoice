@@ -219,9 +219,6 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                           name="InvoiceAttachments"
                           batch={false}
                           multiple={false}
-                          restrictions={{
-                            allowedExtensions: ['.pdf']
-                          }}
                           myOnChange={this.onDialogInputChange}
                           component={MyFormComponents.FormUpload}
                         />
