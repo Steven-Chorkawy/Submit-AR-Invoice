@@ -430,7 +430,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                     results: this.state.productInEdit.AccountDetailsId
                   };
 
-
                   // Copy the meta data from the AR Req to the AR Invoice.
                   sp.web.lists.getByTitle(MyLists["AR Invoices"]).items.getById(itemProxy.ID)
                     .update({
@@ -439,7 +438,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                       ...copiedMetadata
                     })
                     .then(arInvUpdateRes => {
-
                       // Update all related records.
                       // this update will add the documents id to the files.
                       // this will allow us to get all related data for this document without having to use the request record.
@@ -451,7 +449,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                         this._updateApprovalRequests(editItemId, itemProxy.ID)
                       ])
                         .then(value => {
-
                           const indexOf = invoices.findIndex(fInvoice => fInvoice.AR_x0020_RequestId === editItemId);
                           invoices[indexOf].Id = itemProxy.ID;
                           invoices[indexOf].ID = itemProxy.ID;
@@ -519,7 +516,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
   // Add docId to related documents.
   private _updateRelatedDocuments = async (reqId, docId) => {
-
     // Get the related attachments that for this request.
     await sp.web.lists
       .getByTitle(MyLists["Related Invoice Attachments"])
@@ -528,7 +524,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       .get()
       .then(async (items: any[]) => {
         if (items.length > 0) {
-
           // Update the related attachment so it is now related to the AR Invoice.
           await sp.web.lists
             .getByTitle(MyLists["Related Invoice Attachments"])
