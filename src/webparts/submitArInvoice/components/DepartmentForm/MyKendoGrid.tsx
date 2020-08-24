@@ -241,7 +241,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       .getById(currentEditItem.ID)
       .update(currentEditItem)
       .then(f => {
-
         // Update the invoices in the state.
         let allInvoices = this.state.data.data;
         const invoiceIndex = allInvoices.findIndex(fInvoice => fInvoice.ID === currentEditItem.ID);
@@ -249,6 +248,55 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
         oldInvoiceData = { ...oldInvoiceData, ...currentEditItem };
 
         allInvoices.splice(invoiceIndex, 1, oldInvoiceData);
+
+        if (event.RelatedAttachments) {
+          for (let index = 0; index < event.RelatedAttachments.length; index++) {
+            const element = event.RelatedAttachments[index];
+
+            // If the attachment does not have an ID that means it is a new attachment.
+            if (!element.hasOwnProperty('Id')) {
+              sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/').files
+                .add(element.name, element.getRawFile(), true)
+                .then(fileRes => {
+                  fileRes.file.getItem()
+                    .then(item => {
+                      const itemProxy: any = Object.assign({}, item);
+                      let relatedAttachmentUpdateObject = {
+                        Title: element.name,
+                        AR_x0020_Invoice_x0020_RequestId: event.Id
+                      };
+
+                      if (event.ContentTypeId === MyContentTypes["AR Request List Item"]) {
+                        relatedAttachmentUpdateObject['AR_x0020_Invoice_x0020_RequestId'] = event.ID;
+                      }
+                      else {
+                        relatedAttachmentUpdateObject['ARInvoiceId'] = event.ID;
+                      }
+
+                      sp.web.lists.getByTitle(MyLists["Related Invoice Attachments"])
+                        .items.getById(itemProxy.ID)
+                        .update(relatedAttachmentUpdateObject)
+                        .then(rAttachmentRes => {
+                          let currentRAttachmentIds = event.RelatedAttachments
+                            .filter(fromRelatedAttachments => fromRelatedAttachments.hasOwnProperty('Id'))
+                            .map(fromRelatedAttachmentsMap => fromRelatedAttachmentsMap.Id);
+                          currentRAttachmentIds.push(itemProxy.ID);
+                          debugger;
+                          // Update the request item with this new object.
+                          sp.web.lists.getByTitle(MyLists["AR Invoice Requests"])
+                            .items.getById(event.Id)
+                            .update({
+                              RelatedAttachmentsId: {
+                                results: currentRAttachmentIds
+                              }
+                            });
+                        });
+                    });
+                });
+            }
+          }
+        }
+
 
 
         this.setState({
@@ -334,11 +382,11 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
     }
 
 
-    if (dataItem.RelatedInvoiceAttachments) {
+    if (dataItem.RelatedAttachments) {
 
-      for (let index = 0; index < dataItem.RelatedInvoiceAttachments.length; index++) {
-        const element = dataItem.RelatedInvoiceAttachments[index];
-        sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/').files
+      for (let index = 0; index < dataItem.RelatedAttachments.length; index++) {
+        const element = dataItem.RelatedAttachments[index];
+        sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedAttachments/').files
           .add(element.name, element.getRawFile(), true)
           .then(fileRes => {
             fileRes.file.getItem()
@@ -355,7 +403,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
                   relatedAttachmentUpdateObject['ARInvoiceId'] = dataItem.ID;
                 }
 
-                sp.web.lists.getByTitle('RelatedInvoiceAttachments').items.getById(itemProxy.ID).update(relatedAttachmentUpdateObject);
+                sp.web.lists.getByTitle('RelatedAttachments').items.getById(itemProxy.ID).update(relatedAttachmentUpdateObject);
               });
           });
       }

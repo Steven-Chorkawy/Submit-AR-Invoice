@@ -19,6 +19,16 @@ interface IUpdateLookupField {
   results: Array<number>;
 }
 
+interface IRelatedAttachment {
+  ARInvoiceId?: number;
+  AR_x0020_Invoice_x0020_RequestId: number;
+  ID: number;
+  Id: number;
+  ServerRedirectedEmbedUri: string;
+  ServerRedirectedEmbedUrl: string;
+  Title: string;
+}
+
 /**
  * Structure for Invoice Actions.
  */
@@ -99,7 +109,7 @@ interface IInvoiceItem extends IInvoiceQueryItem {
 
   Actions: Array<IInvoiceAction>;
 
-  RelatedAttachments: Array<any>;
+  RelatedAttachments: Array<IRelatedAttachment>;
 
   Customer: ICustomerField;
 
