@@ -31,7 +31,6 @@ export interface IARFormModel {
   Date: Date;
   Requested_x0020_ById: number;
   Requires_x0020_Authorization_x0020_ById: any;
-  Comment: string;
   Invoice_x0020_Details: string;
   CustomerId: number;
   Standard_x0020_Terms: string;
@@ -101,7 +100,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
           'results': dataItem.RequiresAuthorizationBy.map((user) => { return user.Id; })
         },
         //CustomerId: dataItem.Customer.Id,
-        Comment: dataItem.Comment,
         Customer_x0020_PO_x0020_Number: dataItem.CustomerPONumber,
         Invoice_x0020_Details: dataItem.InvoiceDetails,
         Standard_x0020_Terms: dataItem.StandardTerms,
@@ -447,14 +445,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   component={MyFormComponents.FormDropDownList}
                 />
               </div>
-
-              <Field
-                id="Comment"
-                name="Comment"
-                label="Comments"
-                component={MyFormComponents.FormTextArea}
-              //onchange={this.onDialogInputChange}
-              />
 
               <Field
                 id="InvoiceDetails"
