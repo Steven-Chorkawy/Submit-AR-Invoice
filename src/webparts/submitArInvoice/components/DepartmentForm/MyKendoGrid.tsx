@@ -50,11 +50,11 @@ type MyKendoGridState = {
   saveResult?: IMySaveResult;
 };
 
-
-
 export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   constructor(props) {
     super(props);
+
+    var defaultFilters = ConvertQueryParamsToKendoFilter([{ FilterField: 'FILTERFIELD1', FilterValue: 'FILTERVALUE1' }]);
 
     this.state = {
       data: [],
@@ -62,9 +62,8 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       statusData: [],
       siteUsersData: [],
       filter: {
-        //filters: []
         logic: "and",
-        filters: ConvertQueryParamsToKendoFilter([{ FilterField: 'FILTERFIELD1', FilterValue: 'FILTERVALUE1' }])
+        filters: defaultFilters
       },
       productInEdit: undefined,
       productInCancel: undefined,
@@ -129,23 +128,33 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   }
 
   public dataReceived = (invoices) => {
+    var fData = this._filterMyData(invoices.data, this.state.filter);
+
     this.setState({
       ...this.state,
-      data: invoices,
+      data: {
+        data: fData,
+        total: fData.length
+      },
       receivedData: invoices.data
     });
   }
 
   public arDataReceived = (invoices) => {
+    var fData = this._filterMyData(invoices.data, this.state.filter);
+
     this.setState({
       ...this.state,
-      data: invoices,
+      data: {
+        data: fData,
+        total: fData.length
+      },
       receivedData: invoices.data
     });
   }
 
   public onFilterChange = (e) => {
-    var newData = filterBy(this.state.receivedData, e.filter);
+    var newData = this._filterMyData(this.state.receivedData, e.filter);
 
     var newStateData = {
       data: newData,
@@ -156,6 +165,10 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       filter: e.filter,
       data: newStateData
     });
+  }
+
+  private _filterMyData(data, filter) {
+    return filterBy(data, filter);
   }
   //#endregion
 
@@ -205,7 +218,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       }
     };
 
-
     // Check to see if the submitted customer contains an ID field.
     // If it does not that means that we're taking in a Misc Customer and will need to parse out the data.
     if (!event.Customer.hasOwnProperty('ID')) {
@@ -223,7 +235,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
         currentEditItem.CustomerId = event.Customer.Id;
       }
     }
-
 
     // This is where we are checking to see what type of invoice (request, or not) we are editing.
     if (event.ContentTypeId === MyContentTypes["AR Request List Item"]) {
@@ -281,7 +292,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
                             .filter(fromRelatedAttachments => fromRelatedAttachments.hasOwnProperty('Id'))
                             .map(fromRelatedAttachmentsMap => fromRelatedAttachmentsMap.Id);
                           currentRAttachmentIds.push(itemProxy.ID);
-                          debugger;
+
                           // Update the request item with this new object.
                           sp.web.lists.getByTitle(MyLists["AR Invoice Requests"])
                             .items.getById(event.Id)
@@ -296,8 +307,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
             }
           }
         }
-
-
 
         this.setState({
           data: {
@@ -541,7 +550,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
           </GridToolbar>
 
           <Column width="75px" field="FileRef" title="" filterable={false} sortable={false} cell={this.MyCustomCell} />
-          <Column field="Id" title="Id" width="75px" filterable={false} />
+          <Column field="ID" title="ID" width="75px" filterable={false} />
           <Column field="Created" width="250px" title="Created Date" filter="date" format={MyGridStrings.DateFilter} />
           <Column field="Customer.Customer_x0020_Name" width="250px" title="Customer" />
           <Column field="Invoice_x0020_Status" width="250px" title="Status" />

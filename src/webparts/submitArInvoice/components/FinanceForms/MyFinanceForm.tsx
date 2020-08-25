@@ -79,7 +79,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     super(props);
 
     let defaultFilters = ConvertQueryParamsToKendoFilter([{ FilterField: 'FILTERFIELD1', FilterValue: 'FILTERVALUE1' }]);
-    //defaultFilters.push({ field: "Invoice_x0020_Status", operator: "neq", value: InvoiceStatus.Submitted });
 
     this.state = {
       invoices: { data: [], total: 0 },
