@@ -31,7 +31,6 @@ export interface IARFormModel {
   Date: Date;
   Requested_x0020_ById: number;
   Requires_x0020_Authorization_x0020_ById: any;
-  Comment: string;
   Invoice_x0020_Details: string;
   CustomerId: number;
   Standard_x0020_Terms: string;
@@ -101,7 +100,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
           'results': dataItem.RequiresAuthorizationBy.map((user) => { return user.Id; })
         },
         //CustomerId: dataItem.Customer.Id,
-        Comment: dataItem.Comment,
         Customer_x0020_PO_x0020_Number: dataItem.CustomerPONumber,
         Invoice_x0020_Details: dataItem.InvoiceDetails,
         Standard_x0020_Terms: dataItem.StandardTerms,
@@ -167,22 +165,41 @@ export class MyForm extends React.Component<IMyFormProps, any> {
 
       // Add related items
       if (dataItem.RelatedInvoiceAttachments) {
+        let relatedInvoiceAttachmentIds = [];
         for (let index = 0; index < dataItem.RelatedInvoiceAttachments.length; index++) {
           const element = dataItem.RelatedInvoiceAttachments[index];
-          web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/')
+          await web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/')
             .files
             .add(element.name, element.getRawFile(), true)
-            .then(uploadResponse => {
-              uploadResponse.file.getItem()
-                .then(item => {
+            .then(async uploadResponse => {
+              await uploadResponse.file.getItem()
+                .then(async item => {
                   const itemProxy: any = Object.assign({}, item);
-                  sp.web.lists.getByTitle(MyLists["Related Invoice Attachments"]).items.getById(itemProxy.ID).update({
-                    AR_x0020_Invoice_x0020_RequestId: arInvoiceRequstListItem.data.ID,
-                    Title: element.name
-                  });
+
+                  // Add the AR Request ID to the attachment
+                  await sp.web.lists.getByTitle(MyLists["Related Invoice Attachments"])
+                    .items
+                    .getById(itemProxy.ID)
+                    .update({
+                      AR_x0020_Invoice_x0020_RequestId: arInvoiceRequstListItem.data.ID,
+                      Title: element.name
+                    });
+
+                  relatedInvoiceAttachmentIds.push(itemProxy.ID);
                 });
             });
         }
+
+        // Add the attachments ID to the AR Request.
+        debugger;
+        sp.web.lists.getByTitle(MyLists["AR Invoice Requests"])
+          .items
+          .getById(arInvoiceRequstListItem.data.Id)
+          .update({
+            RelatedAttachmentsId: {
+              results: relatedInvoiceAttachmentIds
+            }
+          });
       }
 
       // Provide a success message back to the user.
@@ -447,14 +464,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   component={MyFormComponents.FormDropDownList}
                 />
               </div>
-
-              <Field
-                id="Comment"
-                name="Comment"
-                label="Comments"
-                component={MyFormComponents.FormTextArea}
-              //onchange={this.onDialogInputChange}
-              />
 
               <Field
                 id="InvoiceDetails"

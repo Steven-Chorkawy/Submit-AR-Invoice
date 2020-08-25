@@ -4,6 +4,7 @@ import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import { ListView, ListViewHeader, ListViewFooter } from '@progress/kendo-react-listview';
 import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/kendo-react-layout';
 import { Button } from '@progress/kendo-react-buttons';
+import { Label, Error, Hint, FloatingLabel } from '@progress/kendo-react-labels';
 
 
 //PnPjs Imports
@@ -31,6 +32,7 @@ interface IApprovalRequiredComponentState {
   action: IInvoiceAction;
   productInEdit: IInvoiceItem;
   approvalNotes?;
+  approvalNotesRequired: boolean;
   approvalRequestError?;
 }
 
@@ -39,18 +41,28 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
     super(props);
     this.state = {
       action: props.action,
+      approvalNotesRequired: false,
       productInEdit: props.productInEdit
     };
   }
 
   public sendApproval = (event) => {
+    this.setState({
+      approvalNotesRequired: false
+    });
 
     this.sendApprovalResponse(InvoiceActionResponseStatus.Approved);
   }
 
   public sendReject = (event) => {
-
-    this.sendApprovalResponse(InvoiceActionRequiredResponseStatus.Denied);
+    if (this.state.approvalNotes) {
+      this.sendApprovalResponse(InvoiceActionRequiredResponseStatus.Denied);
+    }
+    else {
+      this.setState({
+        approvalNotesRequired: true
+      });
+    }
   }
 
 
@@ -133,7 +145,9 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
             <hr />
             <p>Your Response</p>
             {this.state.approvalRequestError && <h4 className="k-text-error">Something went wrong, cannot send your response at the moment.</h4>}
+
             <textarea disabled={this.state.approvalRequestError} style={{ width: '100%' }} id={'ApprovalNote'} onChange={this.onApprovalDialogInputChange}></textarea>
+            {this.state.approvalNotesRequired && <Error>* Please enter a reason to reject this invoice.</Error>}
           </CardBody>
           <CardActions className="row">
             <Button className="k-text-success col-sm-6" icon="check" disabled={this.state.approvalRequestError} onClick={this.sendApproval}>Approve</Button>

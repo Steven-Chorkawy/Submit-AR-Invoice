@@ -19,6 +19,16 @@ interface IUpdateLookupField {
   results: Array<number>;
 }
 
+interface IRelatedAttachment {
+  ARInvoiceId?: number;
+  AR_x0020_Invoice_x0020_RequestId: number;
+  ID: number;
+  Id: number;
+  ServerRedirectedEmbedUri: string;
+  ServerRedirectedEmbedUrl: string;
+  Title: string;
+}
+
 /**
  * Structure for Invoice Actions.
  */
@@ -68,7 +78,6 @@ interface IInvoiceQueryItem {
   Urgent: boolean;
   CustomerId: number;
   Customer_x0020_PO_x0020_Number: string;
-  Comment: string;
   Invoice_x0020_Details: string;
   Accountant_x0020_ApprovalId: number;
   Requires_x0020_Accountant_x0020_ApprovalId: number;
@@ -100,7 +109,7 @@ interface IInvoiceItem extends IInvoiceQueryItem {
 
   Actions: Array<IInvoiceAction>;
 
-  RelatedAttachments: Array<any>;
+  RelatedAttachments: Array<IRelatedAttachment>;
 
   Customer: ICustomerField;
 
@@ -126,7 +135,6 @@ interface IInvoiceUpdateItem {
   Urgent: boolean;
   CustomerId: number;
   Customer_x0020_PO_x0020_Number: string;
-  Comment: string;
   Invoice_x0020_Details: string;
   // Accountant_x0020_ApprovalId: number;
   // Requires_x0020_Accountant_x0020_ApprovalId: number;
