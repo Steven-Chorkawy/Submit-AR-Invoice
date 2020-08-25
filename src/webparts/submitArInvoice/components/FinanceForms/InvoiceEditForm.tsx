@@ -48,18 +48,53 @@ export interface IGPAttachmentProps {
 
 interface IInvoiceEditFormProps {
   GPAttachmentWidgetProps: IGPAttachmentProps;
-  dataItem;
-  cancel;
-  currentUser;
-  statusData;
-  siteUsersData;
-  onUpdateAccount;
-  save;
+  dataItem: any;
+  onSubmit: any;
+  cancel: any;
+  saveResult: any;
+  currentUser: any;
+  statusData: any;
+  siteUsersData: any;
+  onUpdateAccount: any;
+}
+
+function GridButtons({ cancel, saveResult }) {
+  return (
+    <div>
+      {saveResult && saveResult.success === false &&
+        <div>
+          <Card style={{ width: 600 }} type={'error'}>
+            <CardBody>
+              <CardTitle>Something went wrong!</CardTitle>
+              <hr />
+              <p>{saveResult.message}</p>
+            </CardBody>
+          </Card>
+        </div>}
+      <div className="k-form-buttons">
+        <Button
+          type={"submit"}
+          style={{ width: '50%' }}
+          className="k-button k-primary"
+          icon="save"
+        // disabled={!formRenderProps.allowSubmit}
+        >Save</Button>
+        <Button
+          // type={"submit"}
+          style={{ width: '50%' }}
+          className="k-button"
+          onClick={cancel}
+          icon="cancel"
+        >Cancel</Button>
+      </div>
+    </div>
+  );
 }
 
 export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any> {
   constructor(props) {
     super(props);
+    console.log(this.props.dataItem);
     this.state = {
       productInEdit: this.props.dataItem || null,
       visible: false,
@@ -67,9 +102,6 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
     };
   }
 
-  public handleSubmit(event) {
-    event.preventDefault();
-  }
 
   public onDialogInputChange = (event) => {
     let target = event.target;
@@ -88,11 +120,13 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
     });
   }
 
+  private _statusValue = null;
+
   public render() {
     return (
       <Dialog onClose={this.props.cancel} title={"Edit AR Invoice"} minWidth="200px" width="80%" height="80%" >
-        {this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"] ? "Content Type: Invoice Requst" : "Invoice Document"}
-        {
+        {this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"] ? "Content Type: Invoice Request" : "Invoice Document"}
+        {this.state.productInEdit.Actions &&
           this.state.productInEdit.Actions
             .filter(f => f.AuthorId === this.props.currentUser.Id && f.Response_x0020_Status === InvoiceActionRequiredResponseStatus.Waiting)
             .map(action => {
@@ -105,18 +139,18 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
             })
         }
         <Form
-          onSubmit={this.handleSubmit}
+          onSubmit={this.props.onSubmit}
+          initialValues={{ ...this.state.productInEdit }}
           render={(formRenderProps) => (
             <FormElement style={{ width: '100%' }}>
+              {GridButtons({ cancel: this.props.cancel, saveResult: this.props.saveResult })}
               <fieldset className={'k-form-fieldset'}>
                 <div style={{ marginBottom: "2px" }}>
                   <Field
                     id={'Invoice_x0020_Status'}
                     name={'Invoice_x0020_Status'}
                     label={'Status'}
-                    value={this.state.productInEdit.Invoice_x0020_Status}
                     data={this.props.statusData}
-                    onChange={this.onDialogInputChange}
                     component={MyFormComponents.FormDropDownList}
                   />
                 </div>
@@ -128,9 +162,8 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                     data={this.props.siteUsersData}
                     dataItemKey="Id"
                     textField="Title"
-                    value={this.state.productInEdit.Requires_x0020_Accountant_x0020_ApprovalId}
-                    onChange={this.onDialogInputChange}
-                    disabled={this.state.productInEdit.Invoice_x0020_Status !== 'Accountant Approval Required'}
+                    // * valueGetter is a very nice method! No need to set the state anymore.
+                    disabled={formRenderProps.valueGetter('Invoice_x0020_Status') !== 'Accountant Approval Required'}
                     component={MyFormComponents.FormComboBox}
                   />
                 </div>
@@ -139,8 +172,6 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                     id={'Invoice_x0020_Number'}
                     name={'Invoice_x0020_Number'}
                     label={'Invoice Number'}
-                    value={this.state.productInEdit.Invoice_x0020_Number}
-                    onChange={this.onDialogInputChange}
                     component={MyFormComponents.FormInput}
                   />
                 </div>
@@ -149,8 +180,6 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                     id={'Batch_x0020_Number'}
                     name={'Batch_x0020_Number'}
                     label={'Batch Number'}
-                    value={this.state.productInEdit.Batch_x0020_Number}
-                    onChange={this.onDialogInputChange}
                     component={MyFormComponents.FormInput}
                   />
                 </div>
@@ -167,14 +196,33 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                     <CardBody>
                       <CardTitle><b>Upload GP Attachment</b></CardTitle>
                       <p>{this.props.GPAttachmentWidgetProps.errorMessage}</p>
-                      <Field
-                        id="InvoiceAttachments"
-                        name="InvoiceAttachments"
-                        batch={false}
-                        multiple={false}
-                        myOnChange={this.onDialogInputChange}
-                        component={MyFormComponents.FormUpload}
-                      />
+                      {this.state.productInEdit.ContentTypeId === MyContentTypes["AR Invoice Document Item"] &&
+                        <a target='_blank' href={this.state.productInEdit.ServerRedirectedEmbedUrl} style={{ margin: '2px' }}>
+                          <div className='k-chip k-chip-filled k-chip-info'>
+                            <div className='k-chip-content'>
+                              {this.state.productInEdit.Title}
+                            </div>
+                          </div>
+                        </a>
+                      }
+
+                      {
+                        /**
+                         * Only show this upload box if we're working with a request. If it not a request that means the file has already been uploaded.
+                         *
+                         * If Finance ever needs to re upload a file they should delete this one and restart the upload process.
+                         * This is because the meta data will be applied to the NEW file.
+                         * */
+                        this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"] &&
+                        <Field
+                          id="InvoiceAttachments"
+                          name="InvoiceAttachments"
+                          batch={false}
+                          multiple={false}
+                          myOnChange={this.onDialogInputChange}
+                          component={MyFormComponents.FormUpload}
+                        />
+                      }
                     </CardBody>
                   </Card>
                 </div>
@@ -185,22 +233,10 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                   />
                 </div>
               </fieldset>
+              {GridButtons({ cancel: this.props.cancel, saveResult: this.props.saveResult })}
             </FormElement>
           )}
         />
-        <DialogActionsBar>
-          <Button
-            className="k-button k-primary"
-            icon="save"
-            primary={true}
-            onClick={this.props.save}
-          >Save</Button>
-          <Button
-            className="k-button"
-            icon="cancel"
-            onClick={this.props.cancel}
-          >Cancel</Button>
-        </DialogActionsBar>
       </Dialog>
     );
   }

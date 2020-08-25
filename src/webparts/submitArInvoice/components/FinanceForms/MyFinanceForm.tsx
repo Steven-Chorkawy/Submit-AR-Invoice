@@ -39,6 +39,7 @@ import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { InvoiceEditForm, IGPAttachmentProps } from './InvoiceEditForm';
 import { FileRefCell } from '../FileRefCell';
+import { IMySaveResult } from '../interface/IMySaveResult';
 
 
 interface IMyFinanceFormState {
@@ -52,7 +53,7 @@ interface IMyFinanceFormState {
   //sort: any;
   allRowsExpanded: boolean;
   currentUser?: any;
-
+  saveResult: IMySaveResult;
   gpAttachmentProps: IGPAttachmentProps;
 }
 
@@ -102,6 +103,10 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       gpAttachmentProps: {
         type: null,
         errorMessage: null
+      },
+      saveResult: {
+        success: true,
+        message: null
       }
     };
 
@@ -318,91 +323,112 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     });
   }
 
-  public saveEditForm = () => {
-    const dataItem = this.state.productInEdit;
-    const invoices = this.state.invoices.data.slice();
-    // const isNewProduct = dataItem.ProductID === undefined;
-    const isNewProduct = false; // TODO: Add this if we plan on letting users create from this form.
+  /**
+   * Handle the Finance Edit Form submit.
+   * @param data Object of the current item in edit.
+   */
+  public onSubmit = (data) => {
 
+    const isNewProduct = false; // TODO: Add this if we plan on letting users create from this form.
+    const invoices = this.state.invoices.data.slice();
     try {
+      // Determine if we're creating a new record or editing an existing one.
+      // * at the moment we are only editing existing records here since Finance doesn't create invoice on this form.
       if (isNewProduct) {
-        //products.unshift(this.newProduct(dataItem));
+        //products.unshift(this.newProduct(data));
       } else {
-        const index = invoices.findIndex(p => p.ID === dataItem.ID);
-        invoices.splice(index, 1, dataItem);
+        const index = invoices.findIndex(p => p.ID === data.ID);
+        invoices.splice(index, 1, data);
       }
 
+      // These are the fields that can be modified on this form.
       var updateObject = {
-        Invoice_x0020_Status: dataItem.Invoice_x0020_Status,
-        Invoice_x0020_Number: dataItem.Invoice_x0020_Number,
-        Batch_x0020_Number: dataItem.Batch_x0020_Number,
-        Requires_x0020_Accountant_x0020_ApprovalId: dataItem.Requires_x0020_Accountant_x0020_ApprovalId ? dataItem.Requires_x0020_Accountant_x0020_ApprovalId.Id : null
+        Invoice_x0020_Status: data.Invoice_x0020_Status,
+        Invoice_x0020_Number: data.Invoice_x0020_Number,
+        Batch_x0020_Number: data.Batch_x0020_Number,
+        Requires_x0020_Accountant_x0020_ApprovalId: data.Requires_x0020_Accountant_x0020_ApprovalId ? data.Requires_x0020_Accountant_x0020_ApprovalId.Id : null
       };
 
-      if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
-        updateObject['Requires_x0020_Accountant_x0020_Id'] = dataItem.Requires_x0020_Accountant_x0020_ApprovalId ? dataItem.Requires_x0020_Accountant_x0020_ApprovalId.Id : null;
+      // Update the record.
+      // This will either update the request or the invoice record.
+      if (data.ContentTypeId === MyContentTypes["AR Request List Item"]) {
+        updateObject['Requires_x0020_Accountant_x0020_Id'] = data.Requires_x0020_Accountant_x0020_ApprovalId ? data.Requires_x0020_Accountant_x0020_ApprovalId.Id : null;
         delete updateObject.Requires_x0020_Accountant_x0020_ApprovalId;
-        sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(dataItem.ID).update(updateObject);
+        sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(data.ID).update(updateObject);
       }
       else {
-        sp.web.lists.getByTitle(MyLists["AR Invoices"]).items.getById(dataItem.ID).update(updateObject);
+        sp.web.lists.getByTitle(MyLists["AR Invoices"]).items.getById(data.ID).update(updateObject);
       }
 
-
       // Check to see if there is a file that we can update.
-      if (dataItem.InvoiceAttachments) {
-        for (let index = 0; index < dataItem.InvoiceAttachments.length; index++) {
-          const element = dataItem.InvoiceAttachments[index];
-
+      // If a files is present that means we need to convert the 'Invoice Request' into an 'Invoice'.
+      // This means taking all the metadata from the request and applying it to this file.
+      if (data.InvoiceAttachments) {
+        for (let index = 0; index < data.InvoiceAttachments.length; index++) {
+          const element = data.InvoiceAttachments[index];
           sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/').files
             .add(element.name, element.getRawFile(), true)
             .then(f => {
               f.file.getItem()
                 .then(item => {
                   const itemProxy: any = Object.assign({}, item);
-                  const editItemId: number = dataItem.ID;
+                  const editItemId: number = data.ID;
                   // ! Transfer metadata from AR Request to AR Invoice.
-                  // ! THIS IS A 'YUGE' STEP!
-                  var copiedMetadata = dataItem;
+                  // ! THIS IS A HUGE STEP!
+                  var copiedMetadata = data;
 
                   // Add extra fields.
                   copiedMetadata['AR_x0020_RequestId'] = editItemId;
-                  copiedMetadata['Requires_x0020_Accountant_x0020_ApprovalId'] = dataItem.Requires_x0020_Accountant_x0020_Id;
-                  //copiedMetadata['Requires_x0020_Completed_x0020_ApprovalId'] = dataItem.Requires_x0020_Completed_x0020_AId;
-                  copiedMetadata['Requires_x0020_Authorization_x0020_ById'] = {
-                    results: dataItem.Requires_x0020_Department_x0020_Id
+                  copiedMetadata['Requires_x0020_Accountant_x0020_ApprovalId'] = data.Requires_x0020_Accountant_x0020_Id;
+                  copiedMetadata['RelatedAttachmentsId'] = {
+                    results: data.RelatedAttachmentsId
                   };
 
+                  // TODO: Maps 'Requires_x0020_Department_x0020_' from request to 'Requires_x0020_Authorization_x0020_By' in the invoice.
                   // Remove unwanted fields
-                  this.removeFields(copiedMetadata,
-                    [
-                      'ContentTypeId',
-                      'FileSystemObjectType',
-                      'ServerRedirectedEmbedUri',
-                      'ServerRedirectedEmbedUrl',
-                      'ComplianceAssetId',
-                      'Title',
-                      'Requires_x0020_Accountant_x0020_Id',
-                      'Requires_x0020_Accountant_x0020_StringId',
-                      'Requires_x0020_Authorization_x0020_ByStringId',
-                      'Requires_x0020_Accountant_x0020_ApprovalId',
-                      'Requires_x0020_Accountant_x0020_ApprovalStringId',
-                      'Requires_x0020_Completed_x0020_AId',
-                      'Requires_x0020_Completed_x0020_AStringId',
-                      'CancelRequests',
-                      'RelatedAttachments',
-                      'Approvals',
-                      'AccountDetails',
-                      'AccountDetailsId',
-                      'InvoiceAttachments',
-                      'ID',
-                      'Id',
-                      'Requires_x0020_Department_x0020_Id',
-                      'Requires_x0020_Department_x0020_StringId',
-                      'Attachments',
-                      'AR_x0020_InvoiceId'
-                    ]
-                  );
+                  // These fields should either not be updated here, or they cause SharePoint to throw errors at us.
+                  this.removeFields(copiedMetadata, [
+                    'ContentTypeId',
+                    'FileSystemObjectType',
+                    'ServerRedirectedEmbedUri',
+                    'ServerRedirectedEmbedUrl',
+                    'ComplianceAssetId',
+                    'Title',
+                    'Requires_x0020_Accountant_x0020_Id',
+                    'Requires_x0020_Accountant_x0020_StringId',
+                    'Requires_x0020_Authorization_x0020_ByStringId',
+                    'Requires_x0020_Accountant_x0020_ApprovalId',
+                    'Requires_x0020_Accountant_x0020_ApprovalStringId',
+                    'Requires_x0020_Completed_x0020_AId',
+                    'Requires_x0020_Completed_x0020_AStringId',
+                    'CancelRequests',
+                    'RelatedAttachments',
+                    'Approvals',
+                    'AccountDetails',
+                    'AccountDetailsId',
+                    'InvoiceAttachments',
+                    'ID',
+                    'Id',
+                    'Attachments',
+                    'AR_x0020_InvoiceId',
+                    'Requires_x0020_Department_x0020_',
+                    'Requires_x0020_Department_x0020_StringId',
+                    'Completed_x0020_ApprovalId',
+                    'Completed_x0020_ApprovalStringId',
+                    'Requires_x0020_Department_x0020_Id',
+                    'EditorId',
+                    'Created',
+                    'AuthorId',
+                    'Actions'
+                  ]);
+
+                  // Adding these fields to copiedMetadata because they aren't coming through in the submitted object.
+                  copiedMetadata['Requires_x0020_Authorization_x0020_ById'] = {
+                    results: this.state.productInEdit.Requires_x0020_Department_x0020_Id
+                  };
+                  copiedMetadata['AccountDetailsId'] = {
+                    results: this.state.productInEdit.AccountDetailsId
+                  };
 
                   // Copy the meta data from the AR Req to the AR Invoice.
                   sp.web.lists.getByTitle(MyLists["AR Invoices"]).items.getById(itemProxy.ID)
@@ -451,9 +477,9 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       }
 
       // Upload Any related attachments
-      if (dataItem.RelatedInvoiceAttachments) {
-        for (let index = 0; index < dataItem.RelatedInvoiceAttachments.length; index++) {
-          const element = dataItem.RelatedInvoiceAttachments[index];
+      if (data.RelatedInvoiceAttachments) {
+        for (let index = 0; index < data.RelatedInvoiceAttachments.length; index++) {
+          const element = data.RelatedInvoiceAttachments[index];
           sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/').files
             .add(element.name, element.getRawFile(), true)
             .then(fileRes => {
@@ -461,22 +487,13 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                 .then(item => {
                   const itemProxy: any = Object.assign({}, item);
                   sp.web.lists.getByTitle(MyLists["Related Invoice Attachments"]).items.getById(itemProxy.ID).update({
-                    ARInvoiceId: dataItem.ID,
+                    ARInvoiceId: data.ID,
                     Title: element.name
                   });
                 });
             });
         }
       }
-
-      this.setState({
-        invoices: {
-          data: invoices,
-          total: invoices.length
-        },
-        productInEdit: undefined
-      });
-
     } catch (error) {
       console.log('Throwing the error here');
       this.setState({
@@ -488,6 +505,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       throw error;
     }
   }
+
 
   private removeFields(input, fields) {
     for (let index = 0; index < fields.length; index++) {
@@ -544,7 +562,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           await sp.web.lists
             .getByTitle(MyLists["AR Invoice Requests"])
             .items.getById(item[0].Id)
-            .update({AR_x0020_InvoiceId: docId});
+            .update({ AR_x0020_InvoiceId: docId });
         }
       });
   }
@@ -729,9 +747,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           <GridColumn field="Batch_x0020_Number" title="Batch #" width={this._columnWidth} />
           <GridColumn field="Urgent" title="Urgent" width={this._columnWidth} cell={this.MyCustomUrgentCell} />
 
-          {/* <GridColumn field="Type_x0020_of_x0020_Request" title="Type" width={this._columnWidth} />
-          <GridColumn field="Customer_x0020_PO_x0020_Number" title="Customer PO #" width={this._columnWidth} /> */}
-
           <GridColumn cell={this.CommandCell} width={"110px"} locked={true} resizable={false} filterable={false} sortable={false} />
         </Grid>
 
@@ -742,7 +757,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
             dataItem={this.state.productInEdit}
             statusData={this.state.statusData}
             siteUsersData={this.state.siteUsersData}
-            save={this.saveEditForm}
+            onSubmit={this.onSubmit}
+            saveResult={this.state.saveResult}
             cancel={this.cancelEditForm}
             onUpdateAccount={this.updateAccount}
             GPAttachmentWidgetProps={this.state.gpAttachmentProps}

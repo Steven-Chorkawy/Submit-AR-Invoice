@@ -133,9 +133,6 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
           processedResponse: process(filteredResponse, this.props.dataState)
         });
 
-        console.log('processedResponse');
-        console.log(this.state.processedResponse);
-
         // Hold the list of invoice IDs that will be used to pull related accounts.
         var invoiceIds = [];                // filter for accounts
         var idsForARDocuments = [];
