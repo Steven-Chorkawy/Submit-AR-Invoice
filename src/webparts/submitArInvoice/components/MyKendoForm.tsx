@@ -47,16 +47,11 @@ export interface IARAccountDetails {
   HST_x0020_Taxable: boolean;               // Is amount taxable?
 }
 
-
 export class MyForm extends React.Component<IMyFormProps, any> {
   private _siteUrl: string;
 
-  /**
-   *
-   */
   constructor(props) {
     super(props);
-
 
     this._siteUrl = props.ctx.pageContext.web.absoluteUrl;
 
@@ -175,7 +170,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
               await uploadResponse.file.getItem()
                 .then(async item => {
                   const itemProxy: any = Object.assign({}, item);
-
                   // Add the AR Request ID to the attachment
                   await sp.web.lists.getByTitle(MyLists["Related Invoice Attachments"])
                     .items
@@ -191,7 +185,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
         }
 
         // Add the attachments ID to the AR Request.
-        debugger;
         sp.web.lists.getByTitle(MyLists["AR Invoice Requests"])
           .items
           .getById(arInvoiceRequstListItem.data.Id)
