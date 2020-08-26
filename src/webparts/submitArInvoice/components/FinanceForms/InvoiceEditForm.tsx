@@ -37,7 +37,6 @@ import { ConvertQueryParamsToKendoFilter, BuildGUID } from '../MyHelperMethods';
 import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
-import { deleteable } from '@pnp/sp/sharepointqueryable';
 import { InvoiceActionRequiredResponseStatus } from '../interface/IInvoiceActionRequired';
 
 
@@ -77,7 +76,6 @@ function GridButtons({ cancel, saveResult }) {
           style={{ width: '50%' }}
           className="k-button k-primary"
           icon="save"
-        // disabled={!formRenderProps.allowSubmit}
         >Save</Button>
         <Button
           // type={"submit"}
