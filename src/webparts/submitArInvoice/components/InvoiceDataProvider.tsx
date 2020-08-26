@@ -106,6 +106,9 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
     Requires_x0020_Department_x0020_/Id,
     Requires_x0020_Department_x0020_/Title,
     Requires_x0020_Department_x0020_/EMail,
+    Requires_x0020_Accountant_x0020_/Id,
+    Requires_x0020_Accountant_x0020_/Title,
+    Requires_x0020_Accountant_x0020_/EMail,
     RelatedAttachments/Title,
     RelatedAttachments/Id,
     RelatedAttachments/ID`;
@@ -114,6 +117,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
     Customer,
     Requested_x0020_By,
     Requires_x0020_Department_x0020_,
+    Requires_x0020_Accountant_x0020_,
     RelatedAttachments`;
 
     sp.web.lists.getByTitle(MyLists["AR Invoice Requests"])
