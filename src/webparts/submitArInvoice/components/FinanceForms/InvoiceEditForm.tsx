@@ -37,7 +37,6 @@ import { ConvertQueryParamsToKendoFilter, BuildGUID } from '../MyHelperMethods';
 import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
-import { deleteable } from '@pnp/sp/sharepointqueryable';
 import { InvoiceActionRequiredResponseStatus } from '../interface/IInvoiceActionRequired';
 
 
@@ -77,7 +76,6 @@ function GridButtons({ cancel, saveResult }) {
           style={{ width: '50%' }}
           className="k-button k-primary"
           icon="save"
-        // disabled={!formRenderProps.allowSubmit}
         >Save</Button>
         <Button
           // type={"submit"}
@@ -94,7 +92,6 @@ function GridButtons({ cancel, saveResult }) {
 export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any> {
   constructor(props) {
     super(props);
-    console.log(this.props.dataItem);
     this.state = {
       productInEdit: this.props.dataItem || null,
       visible: false,
@@ -156,8 +153,8 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                 </div>
                 <div style={{ marginBottom: "2px" }}>
                   <Field
-                    id="Requires_x0020_Accountant_x0020_ApprovalId"
-                    name="Requires_x0020_Accountant_x0020_ApprovalId"
+                    id="Requires_x0020_Accountant_x0020_"
+                    name="Requires_x0020_Accountant_x0020_"
                     label="Requires Approval From Accountant"
                     data={this.props.siteUsersData}
                     dataItemKey="Id"

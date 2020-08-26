@@ -40,6 +40,7 @@ import { MyLists } from '../enums/MyLists';
 import { InvoiceEditForm, IGPAttachmentProps } from './InvoiceEditForm';
 import { FileRefCell } from '../FileRefCell';
 import { IMySaveResult } from '../interface/IMySaveResult';
+import { NumericFilterCell } from '@progress/kendo-react-data-tools';
 
 
 interface IMyFinanceFormState {
@@ -281,7 +282,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     });
   }
 
-
   /**
    * Edit form edit event.
    * @param dataItem Invoice to edit.
@@ -327,9 +327,9 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * @param data Object of the current item in edit.
    */
   public onSubmit = (data) => {
-
     const isNewProduct = false; // TODO: Add this if we plan on letting users create from this form.
     const invoices = this.state.invoices.data.slice();
+
     try {
       // Determine if we're creating a new record or editing an existing one.
       // * at the moment we are only editing existing records here since Finance doesn't create invoice on this form.
@@ -345,18 +345,59 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         Invoice_x0020_Status: data.Invoice_x0020_Status,
         Invoice_x0020_Number: data.Invoice_x0020_Number,
         Batch_x0020_Number: data.Batch_x0020_Number,
-        Requires_x0020_Accountant_x0020_ApprovalId: data.Requires_x0020_Accountant_x0020_ApprovalId ? data.Requires_x0020_Accountant_x0020_ApprovalId.Id : null
+        Requires_x0020_Accountant_x0020_Id: data.Requires_x0020_Accountant_x0020_ ? data.Requires_x0020_Accountant_x0020_.Id : null
       };
 
       // Update the record.
       // This will either update the request or the invoice record.
       if (data.ContentTypeId === MyContentTypes["AR Request List Item"]) {
-        updateObject['Requires_x0020_Accountant_x0020_Id'] = data.Requires_x0020_Accountant_x0020_ApprovalId ? data.Requires_x0020_Accountant_x0020_ApprovalId.Id : null;
-        delete updateObject.Requires_x0020_Accountant_x0020_ApprovalId;
-        sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(data.ID).update(updateObject);
+        sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items
+          .getById(data.ID)
+          .update(updateObject)
+          .then(async afterUpdate => {
+            // This gets the result of the updated item.
+            let updatedItem = await afterUpdate.item.get();
+            if (data.Requires_x0020_Accountant_x0020_) {
+              updatedItem['Requires_x0020_Accountant_x0020_'] = data.Requires_x0020_Accountant_x0020_;
+            }
+
+            // Insert the updated object into the list of objects stored in state.
+            let allInvoices = this.state.invoices.data;
+            const invoiceIndex = allInvoices.findIndex(fIndex => fIndex.ID === updatedItem.ID);
+            let oldInvoice = allInvoices[invoiceIndex];
+            oldInvoice = { ...oldInvoice, ...updatedItem };
+            allInvoices.splice(invoiceIndex, 1, oldInvoice);
+
+            this.setState({
+              invoices: {
+                data: allInvoices,
+                total: allInvoices.length
+              }
+            });
+          });
       }
       else {
-        sp.web.lists.getByTitle(MyLists["AR Invoices"]).items.getById(data.ID).update(updateObject);
+        sp.web.lists.getByTitle(MyLists["AR Invoices"]).items
+          .getById(data.ID)
+          .update(updateObject)
+          .then(async afterUpdate => {
+            // This gets the result of the updated item.
+            const updatedItem = await afterUpdate.item.get();
+
+            // Insert the updated object into the list of objects stored in state.
+            let allInvoices = this.state.invoices.data;
+            const invoiceIndex = allInvoices.findIndex(fIndex => fIndex.ID === updatedItem.ID);
+            let oldInvoice = allInvoices[invoiceIndex];
+            oldInvoice = { ...oldInvoice, ...updatedItem };
+            allInvoices.splice(invoiceIndex, 1, oldInvoice);
+
+            this.setState({
+              invoices: {
+                data: allInvoices,
+                total: allInvoices.length
+              }
+            });
+          });
       }
 
       // Check to see if there is a file that we can update.
@@ -493,6 +534,12 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
             });
         }
       }
+
+      // if everything else has ran successfully we can close this edit form.
+      this.setState({
+        productInEdit: null
+      });
+
     } catch (error) {
       console.log('Throwing the error here');
       this.setState({
@@ -504,7 +551,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       throw error;
     }
   }
-
 
   private removeFields(input, fields) {
     for (let index = 0; index < fields.length; index++) {
@@ -576,7 +622,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     //TODO: Test Approval process with new list.
   }
 
-
   public updateItem = (data, item) => {
     let index = data.findIndex(p => p === item || (item.ID && p.ID === item.ID));
     if (index >= 0) {
@@ -626,20 +671,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         data: data
       }
     });
-  }
-
-  //TODO: Remove this method.  We should not be allowed to add new items in this form.
-  /**
-   * Create a new row on the grid.
-   * This new row is where we can enter new invoices.
-   */
-  public addNew = () => {
-    throw "Don't let this happen.";
-    // const newDataItem = { inEdit: true, Discontinued: false };
-
-    // this.setState({
-    //   data: [newDataItem, ...this.state.invoices.data]
-    // });
   }
 
   /**
