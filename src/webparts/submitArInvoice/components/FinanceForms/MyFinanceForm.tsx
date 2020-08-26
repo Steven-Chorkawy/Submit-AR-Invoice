@@ -330,7 +330,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     const isNewProduct = false; // TODO: Add this if we plan on letting users create from this form.
     const invoices = this.state.invoices.data.slice();
 
-    debugger;
     try {
       // Determine if we're creating a new record or editing an existing one.
       // * at the moment we are only editing existing records here since Finance doesn't create invoice on this form.
@@ -357,7 +356,12 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           .update(updateObject)
           .then(async afterUpdate => {
             // This gets the result of the updated item.
-            const updatedItem = await afterUpdate.item.get();
+            let updatedItem = await afterUpdate.item.get();
+
+            debugger;
+            if (data.Requires_x0020_Accountant_x0020_) {
+              updatedItem['Requires_x0020_Accountant_x0020_'] = data.Requires_x0020_Accountant_x0020_;
+            }
 
             // Insert the updated object into the list of objects stored in state.
             let allInvoices = this.state.invoices.data;
