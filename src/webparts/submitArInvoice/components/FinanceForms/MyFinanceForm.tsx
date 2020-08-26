@@ -329,6 +329,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   public onSubmit = (data) => {
     const isNewProduct = false; // TODO: Add this if we plan on letting users create from this form.
     const invoices = this.state.invoices.data.slice();
+
+    debugger;
     try {
       // Determine if we're creating a new record or editing an existing one.
       // * at the moment we are only editing existing records here since Finance doesn't create invoice on this form.
@@ -344,14 +346,12 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         Invoice_x0020_Status: data.Invoice_x0020_Status,
         Invoice_x0020_Number: data.Invoice_x0020_Number,
         Batch_x0020_Number: data.Batch_x0020_Number,
-        Requires_x0020_Accountant_x0020_ApprovalId: data.Requires_x0020_Accountant_x0020_ApprovalId ? data.Requires_x0020_Accountant_x0020_ApprovalId.Id : null
+        Requires_x0020_Accountant_x0020_Id: data.Requires_x0020_Accountant_x0020_ ? data.Requires_x0020_Accountant_x0020_.Id : null
       };
 
       // Update the record.
       // This will either update the request or the invoice record.
       if (data.ContentTypeId === MyContentTypes["AR Request List Item"]) {
-        updateObject['Requires_x0020_Accountant_x0020_Id'] = data.Requires_x0020_Accountant_x0020_ApprovalId ? data.Requires_x0020_Accountant_x0020_ApprovalId.Id : null;
-        delete updateObject.Requires_x0020_Accountant_x0020_ApprovalId;
         sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items
           .getById(data.ID)
           .update(updateObject)
