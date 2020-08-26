@@ -92,8 +92,6 @@ function GridButtons({ cancel, saveResult }) {
 export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any> {
   constructor(props) {
     super(props);
-    console.log('InvoiceEditForm product in edit:');
-    console.log(this.props.dataItem);
     this.state = {
       productInEdit: this.props.dataItem || null,
       visible: false,

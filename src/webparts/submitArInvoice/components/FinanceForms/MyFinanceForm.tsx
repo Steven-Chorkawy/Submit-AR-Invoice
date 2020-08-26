@@ -357,8 +357,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           .then(async afterUpdate => {
             // This gets the result of the updated item.
             let updatedItem = await afterUpdate.item.get();
-
-            debugger;
             if (data.Requires_x0020_Accountant_x0020_) {
               updatedItem['Requires_x0020_Accountant_x0020_'] = data.Requires_x0020_Accountant_x0020_;
             }

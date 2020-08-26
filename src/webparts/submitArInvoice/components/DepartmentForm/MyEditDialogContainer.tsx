@@ -64,8 +64,6 @@ function GridButtons({ cancel, saveResult }) {
 export class MyEditDialogContainer extends React.Component<any, IMyEditDialogContainerState> {
   constructor(props) {
     super(props);
-    console.log('MyEditDialogContainer');
-    console.log(this.props.dataItem);
     this.state = {
       productInEdit: {
         ...this.props.dataItem,
