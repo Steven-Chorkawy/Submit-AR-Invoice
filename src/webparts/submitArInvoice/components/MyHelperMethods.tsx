@@ -64,6 +64,7 @@ export const BuildGUID = () => {
  * @param arInvoiceId AR Invoice ID (optional)
  */
 export const CreateInvoiceAction = (assignedToId: number, requestType: InvoiceActionRequiredRequestType, arRequestId: number, arInvoiceId?: number) => {
+  debugger;
   let newAction: IInvoiceActionRequired = {
     AR_x0020_Invoice_x0020_RequestId: arRequestId,
     AR_x0020_InvoiceId: arInvoiceId,

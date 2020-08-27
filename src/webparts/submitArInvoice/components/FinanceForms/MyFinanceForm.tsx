@@ -33,7 +33,7 @@ import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceG
 import { ActionResponseComponent } from '../ActionResponseComponent';
 import { InvoiceStatus, MyGridStrings, MyContentTypes } from '../enums/MyEnums';
 import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
-import { ConvertQueryParamsToKendoFilter, BuildGUID } from '../MyHelperMethods';
+import { ConvertQueryParamsToKendoFilter, BuildGUID, CreateInvoiceAction } from '../MyHelperMethods';
 import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
@@ -41,6 +41,7 @@ import { InvoiceEditForm, IGPAttachmentProps } from './InvoiceEditForm';
 import { FileRefCell } from '../FileRefCell';
 import { IMySaveResult } from '../interface/IMySaveResult';
 import { NumericFilterCell } from '@progress/kendo-react-data-tools';
+import { InvoiceActionRequiredRequestType } from '../interface/IInvoiceActionRequired';
 
 
 interface IMyFinanceFormState {
@@ -390,6 +391,12 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
             if (data.Requires_x0020_Accountant_x0020_) {
               updatedItem['Requires_x0020_Accountant_x0020_'] = data.Requires_x0020_Accountant_x0020_;
+              debugger;
+              CreateInvoiceAction(
+                data.Requires_x0020_Accountant_x0020_.Id,
+                InvoiceActionRequiredRequestType.AccountantApprovalRequired,
+                data.Id
+              );
             }
 
             this._updateInvoiceState(updatedItem);
@@ -405,6 +412,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
             if (data.Requires_x0020_Accountant_x0020_) {
               updatedItem['Requires_x0020_Accountant_x0020_'] = data.Requires_x0020_Accountant_x0020_;
+
+              //TODO: Use the CreateInvoiceAction function here.
             }
 
             this._updateInvoiceState(updatedItem);
