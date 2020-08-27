@@ -323,6 +323,36 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   /**
+   * Take an updated invoice and insert it into the invoice state object.
+   *
+   * @param updatedItem Invoice that has been submitted
+   */
+  private _updateInvoiceState = (updatedItem) => {
+    // Insert the updated object into the list of objects stored in state.
+    let allInvoices = this.state.invoices.data;
+    const invoiceIndex = allInvoices.findIndex(fIndex => fIndex.ID === updatedItem.ID);
+    let oldInvoice = allInvoices[invoiceIndex];
+    oldInvoice = { ...oldInvoice, ...updatedItem };
+    allInvoices.splice(invoiceIndex, 1, oldInvoice);
+
+    this.setState({
+      invoices: {
+        data: allInvoices,
+        total: allInvoices.length
+      }
+    });
+  }
+
+  /**
+   * Create an action for accountant approval.
+   *
+   * @param requiresAccountantApproval
+   */
+  private _createAccountantApproval = (requiresAccountantApproval) => {
+
+  }
+
+  /**
    * Handle the Finance Edit Form submit.
    * @param data Object of the current item in edit.
    */
@@ -357,23 +387,12 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           .then(async afterUpdate => {
             // This gets the result of the updated item.
             let updatedItem = await afterUpdate.item.get();
+
             if (data.Requires_x0020_Accountant_x0020_) {
               updatedItem['Requires_x0020_Accountant_x0020_'] = data.Requires_x0020_Accountant_x0020_;
             }
 
-            // Insert the updated object into the list of objects stored in state.
-            let allInvoices = this.state.invoices.data;
-            const invoiceIndex = allInvoices.findIndex(fIndex => fIndex.ID === updatedItem.ID);
-            let oldInvoice = allInvoices[invoiceIndex];
-            oldInvoice = { ...oldInvoice, ...updatedItem };
-            allInvoices.splice(invoiceIndex, 1, oldInvoice);
-
-            this.setState({
-              invoices: {
-                data: allInvoices,
-                total: allInvoices.length
-              }
-            });
+            this._updateInvoiceState(updatedItem);
           });
       }
       else {
@@ -382,21 +401,13 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           .update(updateObject)
           .then(async afterUpdate => {
             // This gets the result of the updated item.
-            const updatedItem = await afterUpdate.item.get();
+            let updatedItem = await afterUpdate.item.get();
 
-            // Insert the updated object into the list of objects stored in state.
-            let allInvoices = this.state.invoices.data;
-            const invoiceIndex = allInvoices.findIndex(fIndex => fIndex.ID === updatedItem.ID);
-            let oldInvoice = allInvoices[invoiceIndex];
-            oldInvoice = { ...oldInvoice, ...updatedItem };
-            allInvoices.splice(invoiceIndex, 1, oldInvoice);
+            if (data.Requires_x0020_Accountant_x0020_) {
+              updatedItem['Requires_x0020_Accountant_x0020_'] = data.Requires_x0020_Accountant_x0020_;
+            }
 
-            this.setState({
-              invoices: {
-                data: allInvoices,
-                total: allInvoices.length
-              }
-            });
+            this._updateInvoiceState(updatedItem);
           });
       }
 
