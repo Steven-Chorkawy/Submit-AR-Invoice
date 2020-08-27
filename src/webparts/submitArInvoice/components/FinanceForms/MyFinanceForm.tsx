@@ -24,7 +24,7 @@ import "@pnp/sp/lists";
 import "@pnp/sp/items";
 
 // Custom Imports
-import { InvoiceDataProvider } from '../InvoiceDataProvider';
+import { InvoiceDataProvider, QueryInvoiceData } from '../InvoiceDataProvider';
 import { MyCommandCell } from './MyCommandCell';
 import * as MyFormComponents from '../MyFormComponents';
 import { filterBy } from '@progress/kendo-data-query';
@@ -329,6 +329,14 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * @param updatedItem Invoice that has been submitted
    */
   private _updateInvoiceState = (updatedItem) => {
+    debugger;
+    var updatedInvoices = QueryInvoiceData(
+      {
+        filterState: this._NoSubmittedInvoiceFilter,
+        dataState: this.state.dataState
+      });
+    debugger;
+
     // Insert the updated object into the list of objects stored in state.
     let allInvoices = this.state.invoices.data;
     const invoiceIndex = allInvoices.findIndex(fIndex => fIndex.ID === updatedItem.ID);
@@ -387,16 +395,21 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           .update(updateObject)
           .then(async afterUpdate => {
             // This gets the result of the updated item.
+            // After we've updated this item we can start adding extra objects back to it.
+            // These extra objects are objects that the forms use but cannot be sent to SP for saving.
+            // e.x. The Actions property is not a property that SharePoint uses but it is used to display user requests.
             let updatedItem = await afterUpdate.item.get();
 
             if (data.Requires_x0020_Accountant_x0020_) {
               updatedItem['Requires_x0020_Accountant_x0020_'] = data.Requires_x0020_Accountant_x0020_;
-              debugger;
-              CreateInvoiceAction(
+
+              var newActionItem = await CreateInvoiceAction(
                 data.Requires_x0020_Accountant_x0020_.Id,
                 InvoiceActionRequiredRequestType.AccountantApprovalRequired,
                 data.Id
               );
+              debugger;
+              updatedItem.Actions = [{ ...newActionItem }];
             }
 
             this._updateInvoiceState(updatedItem);

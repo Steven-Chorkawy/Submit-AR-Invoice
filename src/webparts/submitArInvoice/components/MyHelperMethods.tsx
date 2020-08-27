@@ -63,8 +63,7 @@ export const BuildGUID = () => {
  * @param arRequestId AR Request ID
  * @param arInvoiceId AR Invoice ID (optional)
  */
-export const CreateInvoiceAction = (assignedToId: number, requestType: InvoiceActionRequiredRequestType, arRequestId: number, arInvoiceId?: number) => {
-  debugger;
+export const CreateInvoiceAction = async (assignedToId: number, requestType: InvoiceActionRequiredRequestType, arRequestId: number, arInvoiceId?: number) => {
   let newAction: IInvoiceActionRequired = {
     AR_x0020_Invoice_x0020_RequestId: arRequestId,
     AR_x0020_InvoiceId: arInvoiceId,
@@ -75,7 +74,10 @@ export const CreateInvoiceAction = (assignedToId: number, requestType: InvoiceAc
     Response_x0020_Status: InvoiceActionRequiredResponseStatus.Waiting
   };
 
-  sp.web.lists.getByTitle(MyLists.InvoiceActionRequired)
+  return await sp.web.lists.getByTitle(MyLists.InvoiceActionRequired)
     .items
-    .add(newAction);
+    .add(newAction)
+    .then(async result => {
+      return await result.item.get();
+    });
 }
