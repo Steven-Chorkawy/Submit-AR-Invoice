@@ -125,7 +125,7 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
         {this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"] ? "Content Type: Invoice Request" : "Invoice Document"}
         {this.state.productInEdit.Actions &&
           this.state.productInEdit.Actions
-            .filter(f => f.AuthorId === this.props.currentUser.Id && f.Response_x0020_Status === InvoiceActionRequiredResponseStatus.Waiting)
+            .filter(f => f.AssignedToId === this.props.currentUser.Id && f.Response_x0020_Status === InvoiceActionRequiredResponseStatus.Waiting)
             .map(action => {
               return (<ApprovalRequiredComponent
                 action={action}
