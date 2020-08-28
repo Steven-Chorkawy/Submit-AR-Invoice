@@ -79,6 +79,177 @@ class LoadingPanel extends React.Component {
   }
 }
 
+// TODO: Test that this function works by calling it in another method.
+// TODO: Replace the logic in the original calling method with this function.
+/**
+ * Run the query that populate all the invoices.
+ */
+const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
+
+  const includeString = `*,
+    Customer/Customer_x0020_Name,
+    Customer/ID,
+    Requested_x0020_By/Id,
+    Requested_x0020_By/Title,
+    Requested_x0020_By/EMail,
+    Requires_x0020_Department_x0020_/Id,
+    Requires_x0020_Department_x0020_/Title,
+    Requires_x0020_Department_x0020_/EMail,
+    Requires_x0020_Accountant_x0020_/Id,
+    Requires_x0020_Accountant_x0020_/Title,
+    Requires_x0020_Accountant_x0020_/EMail,
+    RelatedAttachments/Title,
+    RelatedAttachments/Id,
+    RelatedAttachments/ID`;
+
+  const expandString = `
+    Customer,
+    Requested_x0020_By,
+    Requires_x0020_Department_x0020_,
+    Requires_x0020_Accountant_x0020_,
+    RelatedAttachments`;
+
+  sp.web.lists.getByTitle(MyLists["AR Invoice Requests"])
+    .items
+    .select(includeString)
+    .expand(expandString)
+    .getAll()
+    .then(async response => {
+      console.log('raw Res');
+      console.log(response);
+
+      let filteredResponse = filterBy(response, filterState);
+
+      // Apply Kendo grids filters.
+      let processedResponse = process(filteredResponse, dataState);
+
+      // Hold the list of invoice IDs that will be used to pull related accounts.
+      var invoiceIds = [];                // filter for accounts
+      var idsForARDocuments = [];
+
+      // Iterate through processedResponse instead of response because if you don't this will generate a URL that over
+      // 2000 characters long.
+      // That is too big for SharePoint to handle.
+      for (let index = 0; index < processedResponse.data.length; index++) {
+        const element = processedResponse.data[index];
+        invoiceIds.push(`AR_x0020_Invoice_x0020_Request/ID eq ${element.ID}`);
+        idsForARDocuments.push(`AR_x0020_RequestId eq ${element.ID}`);
+
+        // Format data of processedResponse.
+        processedResponse.data[index].Date = new Date(processedResponse.data[index].Date);
+        processedResponse.data[index].Created = new Date(processedResponse.data[index].Created);
+
+        // If CustomerId isn't present and MisCustomerName isn't null that means the user has entered a random customer.
+        // By building a Customer object out of the misc customer info it will be much easier to display real customers and mis customers together.
+        if ((processedResponse.data[index].CustomerId === undefined || processedResponse.data[index].CustomerId === null) && processedResponse.data[index].MiscCustomerName !== null) {
+          processedResponse.data[index].Customer = {
+            "Customer_x0020_Name": processedResponse.data[index].MiscCustomerName,
+            "CustomerDetails": processedResponse.data[index].MiscCustomerDetails
+          };
+        }
+      }
+
+      Promise.all([
+        sp.web.lists.getByTitle(MyLists["AR Invoice Accounts"])
+          .items
+          .filter(invoiceIds.join(' or '))
+          .get(),
+        sp.web.lists.getByTitle(MyLists.InvoiceActionRequired)
+          .items
+          .select('*, AssignedTo/EMail, AssignedTo/Title, Author/EMail, Author/Title')
+          .expand('AssignedTo, Author')
+          .filter(invoiceIds.join(' or '))
+          .get(),
+        sp.web.lists.getByTitle('RelatedInvoiceAttachments')
+          .items
+          .filter(invoiceIds.join(' or '))
+          .getAll(),
+        //TODO: How can I filter these results? I don't need every file.
+        sp.web.getFolderByServerRelativePath(MyLists["Related Invoice Attachments"])
+          .files(),
+        sp.web.lists.getByTitle(MyLists["Cancel Invoice Request"])
+          .items
+          .select('*, Requested_x0020_By/EMail, Requested_x0020_By/Title')
+          .expand('Requested_x0020_By')
+          .filter(invoiceIds.join(' or '))
+          .getAll(),
+        sp.web.lists.getByTitle(MyLists["AR Invoices"])
+          .items
+          .filter(idsForARDocuments.join(' or '))
+          .getAll(),
+      ])
+        .then((values) => {
+          console.log('Raw Query Res');
+          console.log(values);
+          /***********************************
+           *
+           * 0 = G/L Accounts.
+           * 1 = Approval Responses.
+           * 2 = Related Attachments.
+           * 3 = Files from RelatedAttachments.
+           *      This is used to get the URL to the files.
+           * 4 = Cancel Requests.
+           * 5 = AR Invoice Documents.
+           *
+           ***********************************/
+          // Using each of the accounts that we found we will not attach them to the invoice object.
+          for (let index = 0; index < processedResponse.data.length; index++) {
+
+            // Replace a request record with an AR Invoice record.
+            if (values[ARLoadQuery.ARInvoiceDocuments].filter(f => Number(f.AR_x0020_RequestId) === processedResponse.data[index].ID).length > 0) {
+              processedResponse.data[index] = values[ARLoadQuery.ARInvoiceDocuments].filter(f => Number(f.AR_x0020_RequestId) === processedResponse.data[index].ID)[0];
+            }
+
+            // For Request Content Type
+            if (processedResponse.data[index].ContentTypeId === MyContentTypes["AR Request List Item"]) {
+              processedResponse.data[index].AccountDetails = values[ARLoadQuery.GLAccounts]
+                .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === processedResponse.data[index].ID) || [];
+
+              processedResponse.data[index].Actions = values[ARLoadQuery.InvoiceActions]
+                .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === processedResponse.data[index].ID) || [];
+
+              processedResponse.data[index].RelatedAttachments = values[ARLoadQuery.RelatedAttachments]
+                .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === processedResponse.data[index].ID) || [];
+
+              processedResponse.data[index].CancelRequests = values[ARLoadQuery.CancelRequests]
+                .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === processedResponse.data[index].ID) || [];
+            }
+            // For Invoice Document Content Type
+            else {
+              processedResponse.data[index].AccountDetails = values[ARLoadQuery.GLAccounts]
+                .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === processedResponse.data[index].AR_x0020_RequestId) || [];
+
+              processedResponse.data[index].Actions = values[ARLoadQuery.InvoiceActions]
+                .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === processedResponse.data[index].AR_x0020_RequestId) || [];
+
+              processedResponse.data[index].RelatedAttachments = values[ARLoadQuery.RelatedAttachments]
+                .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === processedResponse.data[index].AR_x0020_RequestId) || [];
+
+              processedResponse.data[index].CancelRequests = values[ARLoadQuery.CancelRequests]
+                .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === processedResponse.data[index].AR_x0020_RequestId) || [];
+            }
+
+            // Add ServerDirectUrl if required.
+            processedResponse.data[index].RelatedAttachments.map(relatedAttachments => {
+              if (relatedAttachments.ServerRedirectedEmbedUrl === "") {
+                var url = values[ARLoadQuery.FilesRelatedAttachments].find(f => f.Title === relatedAttachments.Title).ServerRelativeUrl;
+                relatedAttachments.ServerRedirectedEmbedUrl = url;
+                relatedAttachments.ServerRedirectedEmbedUri = url;
+              }
+            });
+
+            // Convert dates from strings to dates.... thanks SharePoint.
+            processedResponse.data[index].Date = new Date(processedResponse.data[index].Date);
+            processedResponse.data[index].Created = new Date(processedResponse.data[index].Created);
+          }
+
+          // Process data once more to place the ID's in the correct order.
+          var outputProcessedResponse = process(processedResponse.data, dataState);
+
+          callBack(outputProcessedResponse);
+        });
+    });
+};
 
 class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IInvoiceDataProviderState> {
   constructor(props) {
@@ -89,6 +260,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
   public lastSuccess = '';
   public lastForceGUID = '';
 
+  // TODO: Update this method so it uses QueryInvoiceData().
   public requestARRequestsIfNeeded = () => {
     // If pending is set OR dateSate === lastDataState
     if (this.pending || toODataString(this.props.dataState) === this.lastSuccess) {
@@ -343,4 +515,4 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
 
 
 
-export { InvoiceDataProvider };
+export { InvoiceDataProvider, QueryInvoiceData };

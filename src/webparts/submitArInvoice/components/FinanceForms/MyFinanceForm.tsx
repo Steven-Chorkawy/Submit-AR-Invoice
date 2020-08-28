@@ -5,15 +5,9 @@ import * as ReactDom from 'react-dom';
 import {
   Grid,
   GridColumn,
-  GridToolbar,
-  GridDetailRow
+  GridToolbar
 } from '@progress/kendo-react-grid';
 import { Button } from '@progress/kendo-react-buttons';
-import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
-import { Input, NumericTextBox } from '@progress/kendo-react-inputs';
-import { Form, Field, FormElement, FieldArray } from '@progress/kendo-react-form';
-import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/kendo-react-layout';
-
 //PnPjs Imports
 import { sp } from "@pnp/sp";
 import { Web } from "@pnp/sp/webs";
@@ -24,23 +18,17 @@ import "@pnp/sp/lists";
 import "@pnp/sp/items";
 
 // Custom Imports
-import { InvoiceDataProvider } from '../InvoiceDataProvider';
+import { InvoiceDataProvider, QueryInvoiceData } from '../InvoiceDataProvider';
 import { MyCommandCell } from './MyCommandCell';
-import * as MyFormComponents from '../MyFormComponents';
 import { filterBy } from '@progress/kendo-data-query';
-import { filterGroupByField } from '@progress/kendo-react-grid/dist/npm/columnMenu/GridColumnMenuFilter';
-import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceGLAccounts';
-import { ActionResponseComponent } from '../ActionResponseComponent';
 import { InvoiceStatus, MyGridStrings, MyContentTypes } from '../enums/MyEnums';
-import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
-import { ConvertQueryParamsToKendoFilter, BuildGUID } from '../MyHelperMethods';
-import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
+import { ConvertQueryParamsToKendoFilter, BuildGUID, CreateInvoiceAction } from '../MyHelperMethods';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { InvoiceEditForm, IGPAttachmentProps } from './InvoiceEditForm';
 import { FileRefCell } from '../FileRefCell';
 import { IMySaveResult } from '../interface/IMySaveResult';
-import { NumericFilterCell } from '@progress/kendo-react-data-tools';
+import { InvoiceActionRequiredRequestType } from '../interface/IInvoiceActionRequired';
 
 
 interface IMyFinanceFormState {
@@ -112,14 +100,11 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
     this.CommandCell = MyCommandCell({
       edit: this.edit,
-      remove: this.remove,
-
-      add: this.add,
-      discard: this.discard,
-
-      update: this.update,
+      remove: null,
+      add: null,
+      discard: null,
+      update: null,
       cancel: this.cancel,
-
       editField: this._editField
     });
   }
@@ -204,12 +189,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   public expandChange = (event) => {
-
     event.dataItem.expanded = !event.dataItem.expanded;
-
-    // myFunction is undefined....
-    //event.myFunction = this.itemChange;
-
     this.forceUpdate();
   }
 
@@ -222,10 +202,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       invoice.expanded = this.state.allRowsExpanded;
       this.expandChange({ dataItem: invoice });
     });
-  }
-
-  public cloneProduct(product) {
-    return Object.assign({}, product);
   }
 
   public onFilterChange = (e) => {
@@ -244,13 +220,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   //#endregion End Methods
 
   //#region CRUD Methods
-  public removeItem(data, item) {
-    let index = data.findIndex(p => p === item || (item.ID && p.ID === item.ID));
-    if (index >= 0) {
-      data.splice(index, 1);
-    }
-  }
-
   public itemChange = (event) => {
     const data = this.state.invoices.data.map(item =>
       item.ID === event.dataItem.ID ? { ...item, [event.field]: event.value } : item
@@ -265,80 +234,55 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   /**
-   * Grid Edit button click event.
-   * @param dataItem Invoice that will be sent to edit mode.
-   */
-  public enterEdit = (dataItem) => {
-    this.setState({
-      invoices: {
-        // Set any other properties of state.invoices
-        ...this.state.invoices,
-        // Update the data property.
-        // data property is where the invoice objects are held.
-        data: this.state.invoices.data.map(item =>
-          item.ID === dataItem.ID ? { ...item, inEdit: true } : item
-        )
-      }
-    });
-  }
-
-  /**
-   * Edit form edit event.
+   * Open the edit form.
    * @param dataItem Invoice to edit.
    */
   public edit = (dataItem) => {
-    this.setState({ productInEdit: this.cloneProduct(dataItem) });
+    console.log('editing');
+    console.log(dataItem);
+    this.setState({ productInEdit: Object.assign({}, dataItem) });
   }
 
   /**
-   * Add/Save new invoice.
-   * @param dataItem New Invoice
+   * Take an updated invoice and insert it into the invoice state object.
+   *
+   * @param updatedItem Invoice that has been submitted
    */
-  public add = (dataItem) => {
-    dataItem.inEdit = undefined;
-
-    this.setState({
-      invoices: {
-        ...this.state.invoices
-      }
-    });
+  private _updateInvoiceState = async (callBack: Function) => {
+    QueryInvoiceData(
+      {
+        filterState: this._NoSubmittedInvoiceFilter,
+        dataState: this.state.dataState
+      },
+      response => {
+        this.setState({
+          invoices: response,
+          receivedData: response.data
+        });
+        callBack();
+      });
   }
 
+  // TODO: Update complete this method.
   /**
-   * Inline Update method
-   * @param dataItem Invoice
+   * Create an action for accountant approval.
+   *
+   * @param requiresAccountantApproval
    */
-  public update = (dataItem) => {
-    const data = [...this.state.invoices.data];
-    const updatedItem = { ...dataItem, inEdit: undefined };
+  private _createAccountantApproval = (requiresAccountantApproval) => {
 
-    this.updateItem(data, updatedItem);
-
-    this.setState({
-      invoices: {
-        ...this.state.invoices,
-        data: data
-      }
-    });
   }
 
   /**
    * Handle the Finance Edit Form submit.
    * @param data Object of the current item in edit.
    */
-  public onSubmit = (data) => {
-    const isNewProduct = false; // TODO: Add this if we plan on letting users create from this form.
+  public onSubmit = async (data) => {
     const invoices = this.state.invoices.data.slice();
 
     try {
-      // Determine if we're creating a new record or editing an existing one.
-      // * at the moment we are only editing existing records here since Finance doesn't create invoice on this form.
-      if (isNewProduct) {
-        //products.unshift(this.newProduct(data));
-      } else {
-        const index = invoices.findIndex(p => p.ID === data.ID);
-        invoices.splice(index, 1, data);
-      }
+      const index = invoices.findIndex(p => p.ID === data.ID);
+      invoices.splice(index, 1, data);
 
       // These are the fields that can be modified on this form.
       var updateObject = {
@@ -351,61 +295,47 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       // Update the record.
       // This will either update the request or the invoice record.
       if (data.ContentTypeId === MyContentTypes["AR Request List Item"]) {
-        sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items
+        await sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items
           .getById(data.ID)
           .update(updateObject)
           .then(async afterUpdate => {
             // This gets the result of the updated item.
-            let updatedItem = await afterUpdate.item.get();
+            // After we've updated this item we can start adding extra objects back to it.
+            // These extra objects are objects that the forms use but cannot be sent to SP for saving.
+            // e.x. The Actions property is not a property that SharePoint uses but it is used to display user requests.
+            await afterUpdate.item.get();
+
+            debugger;
+            // Checks to see if Req Acc Approval exists.
             if (data.Requires_x0020_Accountant_x0020_) {
-              updatedItem['Requires_x0020_Accountant_x0020_'] = data.Requires_x0020_Accountant_x0020_;
-            }
-
-            // Insert the updated object into the list of objects stored in state.
-            let allInvoices = this.state.invoices.data;
-            const invoiceIndex = allInvoices.findIndex(fIndex => fIndex.ID === updatedItem.ID);
-            let oldInvoice = allInvoices[invoiceIndex];
-            oldInvoice = { ...oldInvoice, ...updatedItem };
-            allInvoices.splice(invoiceIndex, 1, oldInvoice);
-
-            this.setState({
-              invoices: {
-                data: allInvoices,
-                total: allInvoices.length
+              debugger;
+              // Checks to see if Req Acc Approval is the same that is already present in the state.
+              // If the Req Acc Approval ID is the same as the state objects that means we've already sent a task to that accountant.
+              // * This is here to prevent an InvoiceAction item from being created each time the invoice is modified.
+              if (this.state.productInEdit.Requires_x0020_Accountant_x0020_ === undefined || this.state.productInEdit.Requires_x0020_Accountant_x0020_.Id !== data.Requires_x0020_Accountant_x0020_.Id) {
+                debugger;
+                await CreateInvoiceAction(
+                  data.Requires_x0020_Accountant_x0020_.Id,
+                  InvoiceActionRequiredRequestType.AccountantApprovalRequired,
+                  data.Id
+                );
               }
-            });
+            }
           });
       }
       else {
+        // No need to create an action for AccountantApproval here because their approval would have already been given.
         sp.web.lists.getByTitle(MyLists["AR Invoices"]).items
           .getById(data.ID)
-          .update(updateObject)
-          .then(async afterUpdate => {
-            // This gets the result of the updated item.
-            const updatedItem = await afterUpdate.item.get();
-
-            // Insert the updated object into the list of objects stored in state.
-            let allInvoices = this.state.invoices.data;
-            const invoiceIndex = allInvoices.findIndex(fIndex => fIndex.ID === updatedItem.ID);
-            let oldInvoice = allInvoices[invoiceIndex];
-            oldInvoice = { ...oldInvoice, ...updatedItem };
-            allInvoices.splice(invoiceIndex, 1, oldInvoice);
-
-            this.setState({
-              invoices: {
-                data: allInvoices,
-                total: allInvoices.length
-              }
-            });
-          });
+          .update(updateObject);
       }
 
       // Check to see if there is a file that we can update.
       // If a files is present that means we need to convert the 'Invoice Request' into an 'Invoice'.
       // This means taking all the metadata from the request and applying it to this file.
       if (data.InvoiceAttachments) {
-        for (let index = 0; index < data.InvoiceAttachments.length; index++) {
-          const element = data.InvoiceAttachments[index];
+        for (let invoiceAttachmentIndex = 0; invoiceAttachmentIndex < data.InvoiceAttachments.length; invoiceAttachmentIndex++) {
+          const element = data.InvoiceAttachments[invoiceAttachmentIndex];
           sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/').files
             .add(element.name, element.getRawFile(), true)
             .then(f => {
@@ -518,8 +448,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
       // Upload Any related attachments
       if (data.RelatedInvoiceAttachments) {
-        for (let index = 0; index < data.RelatedInvoiceAttachments.length; index++) {
-          const element = data.RelatedInvoiceAttachments[index];
+        for (let relatedInvoiceAttachmentsIndex = 0; relatedInvoiceAttachmentsIndex < data.RelatedInvoiceAttachments.length; relatedInvoiceAttachmentsIndex++) {
+          const element = data.RelatedInvoiceAttachments[relatedInvoiceAttachmentsIndex];
           sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/').files
             .add(element.name, element.getRawFile(), true)
             .then(fileRes => {
@@ -536,10 +466,11 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       }
 
       // if everything else has ran successfully we can close this edit form.
-      this.setState({
-        productInEdit: null
+      this._updateInvoiceState(e => {
+        this.setState({
+          productInEdit: null
+        });
       });
-
     } catch (error) {
       console.log('Throwing the error here');
       this.setState({
@@ -552,7 +483,12 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     }
   }
 
-  private removeFields(input, fields) {
+  /**
+   * Remove a Field/ Property of a given object.
+   * @param input Object that contains unwanted fields.
+   * @param fields Fields/ Properties that need to be removed
+   */
+  private removeFields(input: Object, fields: Array<any>) {
     for (let index = 0; index < fields.length; index++) {
       delete input[fields[index]];
     }
@@ -622,13 +558,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     //TODO: Test Approval process with new list.
   }
 
-  public updateItem = (data, item) => {
-    let index = data.findIndex(p => p === item || (item.ID && p.ID === item.ID));
-    if (index >= 0) {
-      data[index] = { ...item };
-    }
-  }
-
   /**
    * Cancel and discard all changes made to the current edit.
    * @param dataItem Invoice item that we are no longer editing.
@@ -649,30 +578,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     this.setState({ productInEdit: undefined });
   }
 
-  public discard = (dataItem) => {
-    const data = [...this.state.invoices.data];
-    this.removeItem(data, dataItem);
-
-    this.setState({
-      invoices: {
-        ...this.state.invoices,
-        data: data
-      }
-    });
-  }
-
-  public remove = (dataItem) => {
-    const data = [...this.state.invoices.data];
-    this.removeItem(data, dataItem);
-
-    this.setState({
-      invoices: {
-        ...this.state.invoices,
-        data: data
-      }
-    });
-  }
-
   /**
    * Cancel all changes made.
    */
@@ -684,11 +589,9 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   public updateAccount = (item) => {
-
     let data = this.state.invoices.data;
 
     for (let index = 0; index < item.length; index++) {
-
       const currentAccount = item[index];
       let invoiceIndex = this.state.invoices.data.findIndex(p => p.ID === currentAccount.InvoiceID);
 
@@ -746,7 +649,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
               className="k-button"
               icon="plus"
               onClick={this.expandAllRows}>Toggle All Rows</Button>
-            {this.state.filter.filters.length > 0 && (
+            {this.state.filter && this.state.filter.filters.length > 0 && (
               <Button
                 title="Clear All Filters"
                 className="k-button"
