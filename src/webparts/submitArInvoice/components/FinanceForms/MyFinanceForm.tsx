@@ -234,28 +234,12 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   /**
-   * Grid Edit button click event.
-   * @param dataItem Invoice that will be sent to edit mode.
-   */
-  public enterEdit = (dataItem) => {
-    this.setState({
-      invoices: {
-        // Set any other properties of state.invoices
-        ...this.state.invoices,
-        // Update the data property.
-        // data property is where the invoice objects are held.
-        data: this.state.invoices.data.map(item =>
-          item.ID === dataItem.ID ? { ...item, inEdit: true } : item
-        )
-      }
-    });
-  }
-
-  /**
-   * Edit form edit event.
+   * Open the edit form.
    * @param dataItem Invoice to edit.
    */
   public edit = (dataItem) => {
+    console.log('editing');
+    console.log(dataItem);
     this.setState({ productInEdit: Object.assign({}, dataItem) });
   }
 
@@ -319,18 +303,20 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
             // After we've updated this item we can start adding extra objects back to it.
             // These extra objects are objects that the forms use but cannot be sent to SP for saving.
             // e.x. The Actions property is not a property that SharePoint uses but it is used to display user requests.
-            let updatedItem = await afterUpdate.item.get();
+            await afterUpdate.item.get();
 
+            // Checks to see if Req Acc Approval exists.
             if (data.Requires_x0020_Accountant_x0020_) {
-              updatedItem['Requires_x0020_Accountant_x0020_'] = data.Requires_x0020_Accountant_x0020_;
-
-              var newActionItem = await CreateInvoiceAction(
-                data.Requires_x0020_Accountant_x0020_.Id,
-                InvoiceActionRequiredRequestType.AccountantApprovalRequired,
-                data.Id
-              );
-
-              updatedItem.Actions = [{ ...newActionItem }];
+              // Checks to see if Req Acc Approval is the same that is already present in the state.
+              // If the Req Acc Approval ID is the same as the state objects that means we've already sent a task to that accountant.
+              // * This is here to prevent an InvoiceAction item from being created each time the invoice is modified.
+              if (this.state.productInEdit.Requires_x0020_Accountant_x0020_.Id !== data.Requires_x0020_Accountant_x0020_.Id) {
+                await CreateInvoiceAction(
+                  data.Requires_x0020_Accountant_x0020_.Id,
+                  InvoiceActionRequiredRequestType.AccountantApprovalRequired,
+                  data.Id
+                );
+              }
             }
           });
       }
