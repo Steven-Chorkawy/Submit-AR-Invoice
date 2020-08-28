@@ -171,6 +171,21 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   private _filterMyData(data, filter) {
     return filterBy(data, filter);
   }
+
+  /**
+   * Filter Invoices by a single click of a button.
+   * @param e Button click event
+   * @param showTheseInvoices The invoices that we want to display
+   */
+  public onFilterButtonClick = (e, showTheseInvoices) => {
+    debugger;
+    this.setState({
+      data: {
+        data: showTheseInvoices,
+        total: showTheseInvoices.length
+      }
+    });
+  }
   //#endregion
 
   //#region CRUD Methods
@@ -550,6 +565,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
             )}
             <QuickFilterButtonGroup
               invoices={this.state.receivedData}
+              onButtonClick={this.onFilterButtonClick}
             />
           </GridToolbar>
 
