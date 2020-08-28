@@ -5,15 +5,9 @@ import * as ReactDom from 'react-dom';
 import {
   Grid,
   GridColumn,
-  GridToolbar,
-  GridDetailRow
+  GridToolbar
 } from '@progress/kendo-react-grid';
 import { Button } from '@progress/kendo-react-buttons';
-import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
-import { Input, NumericTextBox } from '@progress/kendo-react-inputs';
-import { Form, Field, FormElement, FieldArray } from '@progress/kendo-react-form';
-import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/kendo-react-layout';
-
 //PnPjs Imports
 import { sp } from "@pnp/sp";
 import { Web } from "@pnp/sp/webs";
@@ -26,21 +20,14 @@ import "@pnp/sp/items";
 // Custom Imports
 import { InvoiceDataProvider, QueryInvoiceData } from '../InvoiceDataProvider';
 import { MyCommandCell } from './MyCommandCell';
-import * as MyFormComponents from '../MyFormComponents';
 import { filterBy } from '@progress/kendo-data-query';
-import { filterGroupByField } from '@progress/kendo-react-grid/dist/npm/columnMenu/GridColumnMenuFilter';
-import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceGLAccounts';
-import { ActionResponseComponent } from '../ActionResponseComponent';
 import { InvoiceStatus, MyGridStrings, MyContentTypes } from '../enums/MyEnums';
-import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
 import { ConvertQueryParamsToKendoFilter, BuildGUID, CreateInvoiceAction } from '../MyHelperMethods';
-import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { InvoiceEditForm, IGPAttachmentProps } from './InvoiceEditForm';
 import { FileRefCell } from '../FileRefCell';
 import { IMySaveResult } from '../interface/IMySaveResult';
-import { NumericFilterCell } from '@progress/kendo-react-data-tools';
 import { InvoiceActionRequiredRequestType } from '../interface/IInvoiceActionRequired';
 
 
@@ -113,14 +100,11 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
     this.CommandCell = MyCommandCell({
       edit: this.edit,
-      remove: this.remove,
-
-      add: this.add,
-      discard: this.discard,
-
-      update: this.update,
+      remove: null,
+      add: null,
+      discard: null,
+      update: null,
       cancel: this.cancel,
-
       editField: this._editField
     });
   }
@@ -205,12 +189,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   public expandChange = (event) => {
-
     event.dataItem.expanded = !event.dataItem.expanded;
-
-    // myFunction is undefined....
-    //event.myFunction = this.itemChange;
-
     this.forceUpdate();
   }
 
@@ -223,10 +202,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       invoice.expanded = this.state.allRowsExpanded;
       this.expandChange({ dataItem: invoice });
     });
-  }
-
-  public cloneProduct(product) {
-    return Object.assign({}, product);
   }
 
   public onFilterChange = (e) => {
@@ -245,13 +220,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   //#endregion End Methods
 
   //#region CRUD Methods
-  public removeItem(data, item) {
-    let index = data.findIndex(p => p === item || (item.ID && p.ID === item.ID));
-    if (index >= 0) {
-      data.splice(index, 1);
-    }
-  }
-
   public itemChange = (event) => {
     const data = this.state.invoices.data.map(item =>
       item.ID === event.dataItem.ID ? { ...item, [event.field]: event.value } : item
@@ -288,39 +256,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * @param dataItem Invoice to edit.
    */
   public edit = (dataItem) => {
-    this.setState({ productInEdit: this.cloneProduct(dataItem) });
-  }
-
-  /**
-   * Add/Save new invoice.
-   * @param dataItem New Invoice
-   */
-  public add = (dataItem) => {
-    dataItem.inEdit = undefined;
-
-    this.setState({
-      invoices: {
-        ...this.state.invoices
-      }
-    });
-  }
-
-  /**
-   * Inline Update method
-   * @param dataItem Invoice
-   */
-  public update = (dataItem) => {
-    const data = [...this.state.invoices.data];
-    const updatedItem = { ...dataItem, inEdit: undefined };
-
-    this.updateItem(data, updatedItem);
-
-    this.setState({
-      invoices: {
-        ...this.state.invoices,
-        data: data
-      }
-    });
+    this.setState({ productInEdit: Object.assign({}, dataItem) });
   }
 
   /**
@@ -343,6 +279,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       });
   }
 
+  // TODO: Update complete this method.
   /**
    * Create an action for accountant approval.
    *
@@ -357,18 +294,11 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * @param data Object of the current item in edit.
    */
   public onSubmit = async (data) => {
-    const isNewProduct = false; // TODO: Add this if we plan on letting users create from this form.
     const invoices = this.state.invoices.data.slice();
 
     try {
-      // Determine if we're creating a new record or editing an existing one.
-      // * at the moment we are only editing existing records here since Finance doesn't create invoice on this form.
-      if (isNewProduct) {
-        //products.unshift(this.newProduct(data));
-      } else {
-        const index = invoices.findIndex(p => p.ID === data.ID);
-        invoices.splice(index, 1, data);
-      }
+      const index = invoices.findIndex(p => p.ID === data.ID);
+      invoices.splice(index, 1, data);
 
       // These are the fields that can be modified on this form.
       var updateObject = {
@@ -564,7 +494,12 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     }
   }
 
-  private removeFields(input, fields) {
+  /**
+   * Remove a Field/ Property of a given object.
+   * @param input Object that contains unwanted fields.
+   * @param fields Fields/ Properties that need to be removed
+   */
+  private removeFields(input: Object, fields: Array<any>) {
     for (let index = 0; index < fields.length; index++) {
       delete input[fields[index]];
     }
@@ -634,13 +569,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     //TODO: Test Approval process with new list.
   }
 
-  public updateItem = (data, item) => {
-    let index = data.findIndex(p => p === item || (item.ID && p.ID === item.ID));
-    if (index >= 0) {
-      data[index] = { ...item };
-    }
-  }
-
   /**
    * Cancel and discard all changes made to the current edit.
    * @param dataItem Invoice item that we are no longer editing.
@@ -661,30 +589,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     this.setState({ productInEdit: undefined });
   }
 
-  public discard = (dataItem) => {
-    const data = [...this.state.invoices.data];
-    this.removeItem(data, dataItem);
-
-    this.setState({
-      invoices: {
-        ...this.state.invoices,
-        data: data
-      }
-    });
-  }
-
-  public remove = (dataItem) => {
-    const data = [...this.state.invoices.data];
-    this.removeItem(data, dataItem);
-
-    this.setState({
-      invoices: {
-        ...this.state.invoices,
-        data: data
-      }
-    });
-  }
-
   /**
    * Cancel all changes made.
    */
@@ -696,11 +600,9 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   public updateAccount = (item) => {
-
     let data = this.state.invoices.data;
 
     for (let index = 0; index < item.length; index++) {
-
       const currentAccount = item[index];
       let invoiceIndex = this.state.invoices.data.findIndex(p => p.ID === currentAccount.InvoiceID);
 
