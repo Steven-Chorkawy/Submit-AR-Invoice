@@ -334,8 +334,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       // If a files is present that means we need to convert the 'Invoice Request' into an 'Invoice'.
       // This means taking all the metadata from the request and applying it to this file.
       if (data.InvoiceAttachments) {
-        for (let index = 0; index < data.InvoiceAttachments.length; index++) {
-          const element = data.InvoiceAttachments[index];
+        for (let invoiceAttachmentIndex = 0; invoiceAttachmentIndex < data.InvoiceAttachments.length; invoiceAttachmentIndex++) {
+          const element = data.InvoiceAttachments[invoiceAttachmentIndex];
           sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/').files
             .add(element.name, element.getRawFile(), true)
             .then(f => {
@@ -448,8 +448,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
       // Upload Any related attachments
       if (data.RelatedInvoiceAttachments) {
-        for (let index = 0; index < data.RelatedInvoiceAttachments.length; index++) {
-          const element = data.RelatedInvoiceAttachments[index];
+        for (let relatedInvoiceAttachmentsIndex = 0; relatedInvoiceAttachmentsIndex < data.RelatedInvoiceAttachments.length; relatedInvoiceAttachmentsIndex++) {
+          const element = data.RelatedInvoiceAttachments[relatedInvoiceAttachmentsIndex];
           sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/').files
             .add(element.name, element.getRawFile(), true)
             .then(fileRes => {

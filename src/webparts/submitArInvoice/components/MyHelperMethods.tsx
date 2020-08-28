@@ -80,4 +80,4 @@ export const CreateInvoiceAction = async (assignedToId: number, requestType: Inv
     .then(async result => {
       return await result.item.get();
     });
-}
+};

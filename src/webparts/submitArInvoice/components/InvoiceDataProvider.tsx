@@ -121,7 +121,7 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
       let filteredResponse = filterBy(response, filterState);
 
       // Apply Kendo grids filters.
-      let processedResponse = process(filteredResponse, dataState)
+      let processedResponse = process(filteredResponse, dataState);
 
       // Hold the list of invoice IDs that will be used to pull related accounts.
       var invoiceIds = [];                // filter for accounts
@@ -249,7 +249,7 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
           callBack(outputProcessedResponse);
         });
     });
-}
+};
 
 class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IInvoiceDataProviderState> {
   constructor(props) {
