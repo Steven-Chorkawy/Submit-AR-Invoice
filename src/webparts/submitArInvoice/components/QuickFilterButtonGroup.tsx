@@ -32,5 +32,4 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
   }
 }
 
-
 export { QuickFilterButtonGroup };
