@@ -37,7 +37,7 @@ import { ConvertQueryParamsToKendoFilter, BuildGUID } from '../MyHelperMethods';
 import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
-import { InvoiceActionRequiredResponseStatus } from '../interface/IInvoiceActionRequired';
+import { InvoiceActionResponseStatus } from '../enums/MyEnums';
 
 
 export interface IGPAttachmentProps {
@@ -125,7 +125,7 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
         {this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"] ? "Content Type: Invoice Request" : "Invoice Document"}
         {this.state.productInEdit.Actions &&
           this.state.productInEdit.Actions
-            .filter(f => f.AssignedToId === this.props.currentUser.Id && f.Response_x0020_Status === InvoiceActionRequiredResponseStatus.Waiting)
+            .filter(f => f.AssignedToId === this.props.currentUser.Id && f.Response_x0020_Status === InvoiceActionResponseStatus.Waiting)
             .map(action => {
               return (<ApprovalRequiredComponent
                 action={action}

@@ -5,8 +5,7 @@ import { ListView, ListViewHeader, ListViewFooter } from '@progress/kendo-react-
 import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/kendo-react-layout';
 import { Button } from '@progress/kendo-react-buttons';
 import { IInvoiceAction } from './interface/InvoiceItem';
-import { InvoiceActionRequiredResponseStatus } from './interface/IInvoiceActionRequired';
-
+import { InvoiceActionResponseStatus } from './enums/MyEnums';
 
 interface IActionResponseComponentProps {
   actions: Array<IInvoiceAction>;
@@ -35,11 +34,11 @@ class MyItemCardRender extends React.Component<IMyItemCardRender, any> {
     let item = this.props.dataItem;
     let cardType = '';
     switch (item.Response_x0020_Status) {
-      case InvoiceActionRequiredResponseStatus.Approved:
+      case InvoiceActionResponseStatus.Approved:
         cardType = 'success';
         break;
-      case InvoiceActionRequiredResponseStatus.Rejected:
-      case InvoiceActionRequiredResponseStatus.Denied:
+      case InvoiceActionResponseStatus.Rejected:
+      case InvoiceActionResponseStatus.Denied:
         cardType = 'error';
         break;
       default:
