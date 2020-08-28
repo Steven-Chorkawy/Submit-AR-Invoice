@@ -539,7 +539,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
           rowRender={this.rowRender}
         >
           <GridToolbar>
-            {this.state.filter.filters.length > 0 && (
+            {this.state.filter && this.state.filter.filters.length > 0 && (
               <Button
                 title="Clear All Filters"
                 className="k-button"

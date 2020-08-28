@@ -305,12 +305,15 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
             // e.x. The Actions property is not a property that SharePoint uses but it is used to display user requests.
             await afterUpdate.item.get();
 
+            debugger;
             // Checks to see if Req Acc Approval exists.
             if (data.Requires_x0020_Accountant_x0020_) {
+              debugger;
               // Checks to see if Req Acc Approval is the same that is already present in the state.
               // If the Req Acc Approval ID is the same as the state objects that means we've already sent a task to that accountant.
               // * This is here to prevent an InvoiceAction item from being created each time the invoice is modified.
-              if (this.state.productInEdit.Requires_x0020_Accountant_x0020_.Id !== data.Requires_x0020_Accountant_x0020_.Id) {
+              if (this.state.productInEdit.Requires_x0020_Accountant_x0020_ === undefined || this.state.productInEdit.Requires_x0020_Accountant_x0020_.Id !== data.Requires_x0020_Accountant_x0020_.Id) {
+                debugger;
                 await CreateInvoiceAction(
                   data.Requires_x0020_Accountant_x0020_.Id,
                   InvoiceActionRequiredRequestType.AccountantApprovalRequired,
@@ -646,7 +649,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
               className="k-button"
               icon="plus"
               onClick={this.expandAllRows}>Toggle All Rows</Button>
-            {this.state.filter.filters.length > 0 && (
+            {this.state.filter && this.state.filter.filters.length > 0 && (
               <Button
                 title="Clear All Filters"
                 className="k-button"
