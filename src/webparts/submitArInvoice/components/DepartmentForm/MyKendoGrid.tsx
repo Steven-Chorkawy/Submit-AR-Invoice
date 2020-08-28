@@ -34,11 +34,12 @@ import { MyContentTypes } from '../enums/MyEnums';
 import { FileRefCell } from '../FileRefCell';
 import { IInvoiceItem, IPersonField, IInvoiceUpdateItem } from '../interface/InvoiceItem';
 import { IMySaveResult } from '../interface/IMySaveResult';
+import { QuickFilterButtonGroup } from '../QuickFilterButtonGroup';
 
 
 type MyKendoGridState = {
   data: any;
-  receivedData: IARInvoice[];
+  receivedData: Array<IInvoiceItem>;
   filter: any;
   result?: any;
   dataState?: any;
@@ -547,6 +548,9 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
                 onClick={_ => { this.onFilterChange({ filter: { ...this.state.filter, filters: [] } }); }}
               >Clear All Filters</Button>
             )}
+            <QuickFilterButtonGroup
+              invoices={this.state.receivedData}
+            />
           </GridToolbar>
 
           <Column width="75px" field="FileRef" title="" filterable={false} sortable={false} cell={this.MyCustomCell} />
