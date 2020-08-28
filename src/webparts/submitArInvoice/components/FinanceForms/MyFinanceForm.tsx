@@ -328,28 +328,19 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    *
    * @param updatedItem Invoice that has been submitted
    */
-  private _updateInvoiceState = (updatedItem) => {
-    debugger;
-    var updatedInvoices = QueryInvoiceData(
+  private _updateInvoiceState = async (callBack: Function) => {
+    QueryInvoiceData(
       {
         filterState: this._NoSubmittedInvoiceFilter,
         dataState: this.state.dataState
+      },
+      response => {
+        this.setState({
+          invoices: response,
+          receivedData: response.data
+        });
+        callBack();
       });
-    debugger;
-
-    // Insert the updated object into the list of objects stored in state.
-    let allInvoices = this.state.invoices.data;
-    const invoiceIndex = allInvoices.findIndex(fIndex => fIndex.ID === updatedItem.ID);
-    let oldInvoice = allInvoices[invoiceIndex];
-    oldInvoice = { ...oldInvoice, ...updatedItem };
-    allInvoices.splice(invoiceIndex, 1, oldInvoice);
-
-    this.setState({
-      invoices: {
-        data: allInvoices,
-        total: allInvoices.length
-      }
-    });
   }
 
   /**
@@ -365,7 +356,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * Handle the Finance Edit Form submit.
    * @param data Object of the current item in edit.
    */
-  public onSubmit = (data) => {
+  public onSubmit = async (data) => {
     const isNewProduct = false; // TODO: Add this if we plan on letting users create from this form.
     const invoices = this.state.invoices.data.slice();
 
@@ -390,7 +381,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       // Update the record.
       // This will either update the request or the invoice record.
       if (data.ContentTypeId === MyContentTypes["AR Request List Item"]) {
-        sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items
+        await sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items
           .getById(data.ID)
           .update(updateObject)
           .then(async afterUpdate => {
@@ -408,29 +399,16 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                 InvoiceActionRequiredRequestType.AccountantApprovalRequired,
                 data.Id
               );
-              debugger;
+
               updatedItem.Actions = [{ ...newActionItem }];
             }
-
-            this._updateInvoiceState(updatedItem);
           });
       }
       else {
+        // No need to create an action for AccountantApproval here because their approval would have already been given.
         sp.web.lists.getByTitle(MyLists["AR Invoices"]).items
           .getById(data.ID)
-          .update(updateObject)
-          .then(async afterUpdate => {
-            // This gets the result of the updated item.
-            let updatedItem = await afterUpdate.item.get();
-
-            if (data.Requires_x0020_Accountant_x0020_) {
-              updatedItem['Requires_x0020_Accountant_x0020_'] = data.Requires_x0020_Accountant_x0020_;
-
-              //TODO: Use the CreateInvoiceAction function here.
-            }
-
-            this._updateInvoiceState(updatedItem);
-          });
+          .update(updateObject);
       }
 
       // Check to see if there is a file that we can update.
@@ -569,10 +547,11 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       }
 
       // if everything else has ran successfully we can close this edit form.
-      this.setState({
-        productInEdit: null
+      this._updateInvoiceState(e => {
+        this.setState({
+          productInEdit: null
+        });
       });
-
     } catch (error) {
       console.log('Throwing the error here');
       this.setState({

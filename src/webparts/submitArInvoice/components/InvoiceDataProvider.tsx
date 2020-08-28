@@ -84,8 +84,8 @@ class LoadingPanel extends React.Component {
 /**
  * Run the query that populate all the invoices.
  */
-const QueryInvoiceData = async ({ filterState, dataState }) => {
-  debugger;
+const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
+
   const includeString = `*,
     Customer/Customer_x0020_Name,
     Customer/ID,
@@ -246,14 +246,9 @@ const QueryInvoiceData = async ({ filterState, dataState }) => {
           // Process data once more to place the ID's in the correct order.
           var outputProcessedResponse = process(processedResponse.data, dataState);
 
-          debugger;
-          return outputProcessedResponse;
+          callBack(outputProcessedResponse);
         });
     });
-
-  // TODO: What returns first? This return or the one above?
-  debugger;
-  return { 'test': 'hello world' };
 }
 
 class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IInvoiceDataProviderState> {
