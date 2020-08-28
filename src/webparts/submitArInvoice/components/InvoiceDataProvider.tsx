@@ -260,6 +260,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
   public lastSuccess = '';
   public lastForceGUID = '';
 
+  // TODO: Update this method so it uses QueryInvoiceData().
   public requestARRequestsIfNeeded = () => {
     // If pending is set OR dateSate === lastDataState
     if (this.pending || toODataString(this.props.dataState) === this.lastSuccess) {
