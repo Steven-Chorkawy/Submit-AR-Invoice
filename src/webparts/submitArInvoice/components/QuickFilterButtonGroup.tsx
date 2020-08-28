@@ -32,6 +32,7 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
     return this.props.invoices.filter(f => f.Invoice_x0020_Status === InvoiceStatus.Submitted);
   }
 
+  // TODO: Why can't I get the current user easily!!!!
   // Get invoices that have actions assigned to this user with a status of Waiting.
   private _invoicesForCurrentUser = () => {
     Promise.all([sp.web.currentUser])
