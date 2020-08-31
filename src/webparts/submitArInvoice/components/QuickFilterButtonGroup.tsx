@@ -12,40 +12,69 @@ import { Button, ButtonGroup } from '@progress/kendo-react-buttons';
 // Import my stuff
 import { IInvoiceItem } from './interface/InvoiceItem';
 import { InvoiceStatus, InvoiceActionResponseStatus } from './enums/MyEnums';
+import { ISiteUserInfo } from '@pnp/sp/site-users/types';
 
 interface IQuickFilterButtonGroupProps {
   invoices: Array<IInvoiceItem>;
   onButtonClick: any;
 }
 
-class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProps, any> {
+interface IQuickFilterButtonGroupState {
+  currentUser: ISiteUserInfo;
+  filterButtons: Array<IQuickFilterButton>;
+  selected: number;
+}
+
+/**
+ * Properties that we will use to render quick filter buttons.
+ */
+interface IQuickFilterButton {
+  text: string;
+  getData: Function;
+}
+
+class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProps, IQuickFilterButtonGroupState> {
   constructor(props) {
     super(props);
+
+    this.state = {
+      currentUser: null,
+      selected: 0,  // Select the first button by default.
+      filterButtons: [
+        { text: "Show All", getData: this._allInvoices },
+        { text: "For You", getData: this._invoicesForCurrentUser },
+        { text: "Submitted", getData: this._submittedInvoices },
+        { text: "Approved", getData: this._approvedInvoices },
+        { text: "Waiting Approval", getData: this._waitingApproval },
+      ]
+    };
+
+    sp.web.currentUser.get()
+      .then(user => {
+        this.setState({
+          currentUser: user
+        });
+      });
   }
 
-  private _getCurrentUser = () => {
-    return sp.web.currentUser.get()
-      .then(user => { return user; });
-  };
+  //#region Filter Invoice Methods
+  private _allInvoices = () => {
+    return this.props.invoices;
+  }
 
   private _submittedInvoices = () => {
     return this.props.invoices.filter(f => f.Invoice_x0020_Status === InvoiceStatus.Submitted);
   }
 
-  // TODO: Why can't I get the current user easily!!!!
   // Get invoices that have actions assigned to this user with a status of Waiting.
   private _invoicesForCurrentUser = () => {
-    Promise.all([sp.web.currentUser])
-      .then(res => {
-        res[0].Id
-      });
-
-    return this.props.invoices.filter(x =>
+    let output = this.props.invoices.filter(x =>
       x.Actions.some(y =>
         y.Response_x0020_Status === InvoiceActionResponseStatus.Waiting
-        && y.AssignedToId === this._getCurrentUser().Id
+        && y.AssignedToId === this.state.currentUser.Id
       )
     );
+    return output;
   }
 
   // return invoices that have all actions with a status of approved.
@@ -64,26 +93,42 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
       )
     );
   }
+  //#endregion Filter Invoice Methods
+
+  //#region Helper Methods
+  private _filterButtonClickEvent = (e) => {
+    this.setState({
+      selected: parseInt(e.target.id)
+    });
+    this.props.onButtonClick(e, this.state.filterButtons[parseInt(e.target.id)].getData());
+  }
+
+  /**
+   * This tells us which button is currently selected.
+   * Per Kendo Support: https://www.telerik.com/account/support-tickets/view-ticket/1482557
+   * @param index Index of Selected Button
+   */
+  private _isSelected = (index: number) => {
+    return index === this.state.selected ? true : false;
+  }
+  //#endregion Helper Methods
 
   public render() {
     return (
-      <div>
+      this.state.currentUser && <div>
         <ButtonGroup>
-          <Button onClick={e => { this.props.onButtonClick(e, this.props.invoices); }}>
-            Show All ({this.props.invoices.length})
-          </Button>
-          <Button>
-            For You ({this._invoicesForCurrentUser().length})
-          </Button>
-          <Button onClick={e => { this.props.onButtonClick(e, this._submittedInvoices()); }}>
-            Submitted ({this._submittedInvoices().length})
-          </Button>
-          <Button onClick={e => { this.props.onButtonClick(e, this._approvedInvoices()); }}>
-            Approved ({this._approvedInvoices().length})
-          </Button>
-          <Button onClick={e => { this.props.onButtonClick(e, this._waitingApproval()); }}>
-            Waiting Approval ({this._waitingApproval.length})
-          </Button>
+          {this.state.filterButtons.map((button, index) => {
+            return (
+              <Button
+                id={index.toString()}
+                togglable={true}
+                selected={this._isSelected(index)}
+                onClick={this._filterButtonClickEvent}
+              >
+                {button.text} ({button.getData().length})
+              </Button>
+            );
+          })}
         </ButtonGroup>
       </div>
     );

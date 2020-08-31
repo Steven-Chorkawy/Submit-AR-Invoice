@@ -178,7 +178,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
    * @param showTheseInvoices The invoices that we want to display
    */
   public onFilterButtonClick = (e, showTheseInvoices) => {
-    debugger;
     this.setState({
       data: {
         data: showTheseInvoices,
