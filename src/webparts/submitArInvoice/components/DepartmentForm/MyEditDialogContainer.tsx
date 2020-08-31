@@ -18,7 +18,7 @@ import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceG
 import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
 import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
 import { IInvoiceItem } from '../interface/InvoiceItem';
-import { InvoiceActionRequiredResponseStatus } from '../interface/IInvoiceActionRequired';
+import { InvoiceActionResponseStatus } from '../enums/MyEnums';
 
 interface IMyEditDialogContainerState {
   productInEdit: IInvoiceItem;
@@ -111,7 +111,7 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
       <Dialog onClose={this.props.cancel} title={"Edit AR Invoice Request"} minWidth="200px" width="80%" height="80%">
         {
           this.state.productInEdit.Actions
-            .filter(f => f.AssignedToId === this.props.currentUser.Id && f.Response_x0020_Status === InvoiceActionRequiredResponseStatus.Waiting)
+            .filter(f => f.AssignedToId === this.props.currentUser.Id && f.Response_x0020_Status === InvoiceActionResponseStatus.Waiting)
             .map(action => {
               return (<ApprovalRequiredComponent
                 action={action}

@@ -13,6 +13,10 @@ export enum InvoiceStatus {
   'Completed' = 'Completed'
 }
 
+/**
+ * These are the status that an InvoiceAction can have.
+ * InvoiceAction = approval or any other action needed by a user.
+ */
 export enum InvoiceActionResponseStatus {
   Approved = 'Approved',
   Rejected = 'Rejected',

@@ -1,4 +1,4 @@
-import { InvoiceActionRequiredResponseStatus } from "./IInvoiceActionRequired";
+import { InvoiceActionResponseStatus } from '../enums/MyEnums';
 
 
 interface IPersonField {
@@ -52,7 +52,7 @@ interface IInvoiceAction {
   StartDate?: Date;
   Request_x0020_Type: string;
   Response_x0020_Message?: string;
-  Response_x0020_Status: InvoiceActionRequiredResponseStatus;
+  Response_x0020_Status: InvoiceActionResponseStatus;
   Response_x0020_Summary?: string;
   Status: string;
 }

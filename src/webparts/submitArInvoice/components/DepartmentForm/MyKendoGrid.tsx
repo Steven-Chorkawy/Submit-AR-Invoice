@@ -34,11 +34,12 @@ import { MyContentTypes } from '../enums/MyEnums';
 import { FileRefCell } from '../FileRefCell';
 import { IInvoiceItem, IPersonField, IInvoiceUpdateItem } from '../interface/InvoiceItem';
 import { IMySaveResult } from '../interface/IMySaveResult';
+import { QuickFilterButtonGroup } from '../QuickFilterButtonGroup';
 
 
 type MyKendoGridState = {
   data: any;
-  receivedData: IARInvoice[];
+  receivedData: Array<IInvoiceItem>;
   filter: any;
   result?: any;
   dataState?: any;
@@ -169,6 +170,20 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
 
   private _filterMyData(data, filter) {
     return filterBy(data, filter);
+  }
+
+  /**
+   * Filter Invoices by a single click of a button.
+   * @param e Button click event
+   * @param showTheseInvoices The invoices that we want to display
+   */
+  public onFilterButtonClick = (e, showTheseInvoices) => {
+    this.setState({
+      data: {
+        data: showTheseInvoices,
+        total: showTheseInvoices.length
+      }
+    });
   }
   //#endregion
 
@@ -547,6 +562,10 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
                 onClick={_ => { this.onFilterChange({ filter: { ...this.state.filter, filters: [] } }); }}
               >Clear All Filters</Button>
             )}
+            <QuickFilterButtonGroup
+              invoices={this.state.receivedData}
+              onButtonClick={this.onFilterButtonClick}
+            />
           </GridToolbar>
 
           <Column width="75px" field="FileRef" title="" filterable={false} sortable={false} cell={this.MyCustomCell} />

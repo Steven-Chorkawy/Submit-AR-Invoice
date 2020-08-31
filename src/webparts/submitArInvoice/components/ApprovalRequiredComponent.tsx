@@ -17,7 +17,6 @@ import "@pnp/sp/lists";
 import "@pnp/sp/items";
 import { MyLists } from './enums/MyLists';
 import { IInvoiceItem, IInvoiceAction } from './interface/InvoiceItem';
-import { InvoiceActionRequiredResponseStatus } from './interface/IInvoiceActionRequired';
 import { InvoiceActionResponseStatus } from './enums/MyEnums';
 
 
@@ -56,7 +55,7 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
 
   public sendReject = (event) => {
     if (this.state.approvalNotes) {
-      this.sendApprovalResponse(InvoiceActionRequiredResponseStatus.Denied);
+      this.sendApprovalResponse(InvoiceActionResponseStatus.Denied);
     }
     else {
       this.setState({

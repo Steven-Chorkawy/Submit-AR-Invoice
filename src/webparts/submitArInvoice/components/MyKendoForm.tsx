@@ -21,7 +21,8 @@ import { MyGLAccountComponent } from './MyGLAccountComponent';
 import { BuildGUID, ConvertQueryParamsToKendoFilter } from './MyHelperMethods';
 import { MyLists } from './enums/MyLists';
 import { IItemAddResult } from '@pnp/sp/items';
-import { IInvoiceActionRequired, InvoiceActionRequiredRequestType, InvoiceActionRequiredResponseStatus } from '../components/interface/IInvoiceActionRequired';
+import { IInvoiceActionRequired, InvoiceActionRequiredRequestType } from '../components/interface/IInvoiceActionRequired';
+import { InvoiceActionResponseStatus } from './enums/MyEnums';
 
 
 
@@ -133,7 +134,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
           AssignedToId: element.Id,
           Body: 'Approval Required',
           Request_x0020_Type: InvoiceActionRequiredRequestType.DepartmentApprovalRequired,
-          Response_x0020_Status: InvoiceActionRequiredResponseStatus.Waiting
+          Response_x0020_Status: InvoiceActionResponseStatus.Waiting
         };
 
         web.lists.getByTitle(MyLists.InvoiceActionRequired)

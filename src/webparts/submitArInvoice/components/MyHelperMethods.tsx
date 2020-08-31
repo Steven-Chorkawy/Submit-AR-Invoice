@@ -1,5 +1,6 @@
 import { UrlQueryParameterCollection } from '@microsoft/sp-core-library';
-import { InvoiceActionRequiredRequestType, IInvoiceActionRequired, InvoiceActionRequiredResponseStatus } from './interface/IInvoiceActionRequired';
+import { InvoiceActionRequiredRequestType, IInvoiceActionRequired } from './interface/IInvoiceActionRequired';
+import { InvoiceActionResponseStatus } from './enums/MyEnums';
 import { sp } from "@pnp/sp";
 import { Web } from "@pnp/sp/webs";
 import "@pnp/sp/webs";
@@ -71,7 +72,7 @@ export const CreateInvoiceAction = async (assignedToId: number, requestType: Inv
     AssignedToId: assignedToId,
     Body: 'Approval Required',
     Request_x0020_Type: requestType,
-    Response_x0020_Status: InvoiceActionRequiredResponseStatus.Waiting
+    Response_x0020_Status: InvoiceActionResponseStatus.Waiting
   };
 
   return await sp.web.lists.getByTitle(MyLists.InvoiceActionRequired)
