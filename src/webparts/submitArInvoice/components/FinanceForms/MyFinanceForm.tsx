@@ -29,6 +29,7 @@ import { InvoiceEditForm, IGPAttachmentProps } from './InvoiceEditForm';
 import { FileRefCell } from '../FileRefCell';
 import { IMySaveResult } from '../interface/IMySaveResult';
 import { InvoiceActionRequiredRequestType } from '../interface/IInvoiceActionRequired';
+import { QuickFilterButtonGroup } from '../QuickFilterButtonGroup';
 
 
 interface IMyFinanceFormState {
@@ -134,6 +135,20 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   //#endregion
 
   //#region Methods
+  /**
+   * Filter Invoices by a single click of a button.
+   * @param e Button click event
+   * @param showTheseInvoices The invoices that we want to display
+   */
+  public onFilterButtonClick = (e, showTheseInvoices) => {
+    this.setState({
+      invoices: {
+        data: showTheseInvoices,
+        total: showTheseInvoices.length
+      }
+    });
+  }
+
   public dataReceived = (invoices) => {
     var dataHolder: any = filterBy(invoices.data, this.state.filter);
 
@@ -661,6 +676,9 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                 }
               >Clear All Filters</Button>
             )}
+
+            <QuickFilterButtonGroup invoices={this.state.receivedData.data} onButtonClick={this.onFilterButtonClick} />
+
             {hasEditedItem && (
               <Button
                 title="Cancel current changes"
