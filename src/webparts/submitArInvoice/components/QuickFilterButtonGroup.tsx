@@ -118,14 +118,16 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
       this.state.currentUser && <div>
         <ButtonGroup>
           {this.state.filterButtons.map((button, index) => {
+            let buttonDataLength = button.getData().length;
             return (
               <Button
                 id={index.toString()}
+                disabled={buttonDataLength > 0 ? false : true}
                 togglable={true}
                 selected={this._isSelected(index)}
                 onClick={this._filterButtonClickEvent}
               >
-                {button.text} ({button.getData().length})
+                {button.text} {buttonDataLength > 0 && `(${button.getData().length})`}
               </Button>
             );
           })}
