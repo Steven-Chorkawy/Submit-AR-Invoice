@@ -160,10 +160,13 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                     dataItemKey="Id"
                     textField="Title"
                     // * valueGetter is a very nice method! No need to set the state anymore.
-                    disabled={formRenderProps.valueGetter('Invoice_x0020_Status') !== 'Accountant Approval Required'}
+                    disabled={formRenderProps.valueGetter('Invoice_x0020_Status') !== InvoiceStatus["Accountant Approval Required"]}
                     component={MyFormComponents.FormComboBox}
                   />
                 </div>
+                {
+                  // TODO: Only show the second accountant approval if status is set to 'Entered into GP' aka 'InvoiceStatus["Entered into GP"]'
+                }
                 <div style={{ marginBottom: "2px" }}>
                   <Field
                     id={'Invoice_x0020_Number'}
