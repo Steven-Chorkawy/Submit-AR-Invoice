@@ -164,9 +164,11 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                     component={MyFormComponents.FormComboBox}
                   />
                 </div>
-                {
-                  // TODO: Only show the second accountant approval if status is set to 'Entered into GP' aka 'InvoiceStatus["Entered into GP"]'
-                }
+                <div style={{ marginBottom: '2px' }}>
+                  {
+                    //TODO: Add Accountant 2 approval here.
+                  }
+                </div>
                 <div style={{ marginBottom: "2px" }}>
                   <Field
                     id={'Invoice_x0020_Number'}
