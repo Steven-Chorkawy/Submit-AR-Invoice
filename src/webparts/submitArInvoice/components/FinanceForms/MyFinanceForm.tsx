@@ -272,7 +272,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       response => {
         this.setState({
           invoices: response,
-          receivedData: response.data
+          receivedData: response
         });
         callBack();
       });
@@ -294,6 +294,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    */
   public onSubmit = async (data) => {
     const invoices = this.state.invoices.data.slice();
+    console.log('onSubmit');
+    console.log(data);
 
     try {
       const index = invoices.findIndex(p => p.ID === data.ID);
@@ -304,7 +306,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         Invoice_x0020_Status: data.Invoice_x0020_Status,
         Invoice_x0020_Number: data.Invoice_x0020_Number,
         Batch_x0020_Number: data.Batch_x0020_Number,
-        Requires_x0020_Accountant_x0020_Id: data.Requires_x0020_Accountant_x0020_ ? data.Requires_x0020_Accountant_x0020_.Id : null
+        Requires_x0020_Accountant_x0020_Id: data.Requires_x0020_Accountant_x0020_ ? data.Requires_x0020_Accountant_x0020_.Id : null,
+        RequiresAccountingClerkTwoApprovId: data.RequiresAccountingClerkTwoApprov ? data.RequiresAccountingClerkTwoApprov.Id : null
       };
 
       // Update the record.
