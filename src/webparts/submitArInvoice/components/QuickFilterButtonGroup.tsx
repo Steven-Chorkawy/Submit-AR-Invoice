@@ -118,10 +118,8 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
         <ButtonGroup>
           {this.state.filterButtons.map((button, index) => {
             let buttonDataLength = 0;
-            debugger;
 
             if(button.getData()) {
-              debugger;
               buttonDataLength = button.getData().length;
             }
 

@@ -15,5 +15,6 @@ export interface IInvoiceActionRequired {
 export enum InvoiceActionRequiredRequestType {
   DepartmentApprovalRequired = 'Department Approval Required',
   AccountantApprovalRequired = 'Accountant Approval Required',
+  AccountingClerk2ApprovalRequired = 'Accounting Clerk2 Approval Required',
   EditRequired = 'Edit Required',
 }

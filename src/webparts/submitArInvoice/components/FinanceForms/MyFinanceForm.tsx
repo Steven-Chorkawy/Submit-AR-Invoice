@@ -278,16 +278,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       });
   }
 
-  // TODO: Update complete this method.
-  /**
-   * Create an action for accountant approval.
-   *
-   * @param requiresAccountantApproval
-   */
-  private _createAccountantApproval = (requiresAccountantApproval) => {
-
-  }
-
   /**
    * Handle the Finance Edit Form submit.
    * @param data Object of the current item in edit.
@@ -310,6 +300,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         RequiresAccountingClerkTwoApprovId: data.RequiresAccountingClerkTwoApprov ? data.RequiresAccountingClerkTwoApprov.Id : null
       };
 
+
       // Update the record.
       // This will either update the request or the invoice record.
       if (data.ContentTypeId === MyContentTypes["AR Request List Item"]) {
@@ -323,12 +314,27 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
             // e.x. The Actions property is not a property that SharePoint uses but it is used to display user requests.
             await afterUpdate.item.get();
 
+            // Check if we need to create an AccountingClerk2Approval.
+            // Only create a new action here if this is a new Clerk given.
+            if (data.RequiresAccountingClerkTwoApprovId === null && data.RequiresAccountingClerkTwoApprov) {
+              if (this.state.productInEdit.RequiresAccountingClerkTwoApprovId !== data.RequiresAccountingClerkTwoApprov.Id) {
+                // If the existing accounting clerk has been replaced we will need to delete the record.
+                // TODO: Remove the old accounting clerks actions ONLY if they're still on a waiting status.
+              }
+              await CreateInvoiceAction(
+                data.RequiresAccountingClerkTwoApprov.Id,
+                InvoiceActionRequiredRequestType.AccountingClerk2ApprovalRequired,
+                data.Id
+              );
+            }
+
             // Checks to see if Req Acc Approval exists.
             if (data.Requires_x0020_Accountant_x0020_) {
               // Checks to see if Req Acc Approval is the same that is already present in the state.
               // If the Req Acc Approval ID is the same as the state objects that means we've already sent a task to that accountant.
               // * This is here to prevent an InvoiceAction item from being created each time the invoice is modified.
-              if (this.state.productInEdit.Requires_x0020_Accountant_x0020_ === undefined || this.state.productInEdit.Requires_x0020_Accountant_x0020_.Id !== data.Requires_x0020_Accountant_x0020_.Id) {
+              if (this.state.productInEdit.Requires_x0020_Accountant_x0020_ === undefined
+                || this.state.productInEdit.Requires_x0020_Accountant_x0020_.Id !== data.Requires_x0020_Accountant_x0020_.Id) {
                 await CreateInvoiceAction(
                   data.Requires_x0020_Accountant_x0020_.Id,
                   InvoiceActionRequiredRequestType.AccountantApprovalRequired,
@@ -342,7 +348,23 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         // No need to create an action for AccountantApproval here because their approval would have already been given.
         sp.web.lists.getByTitle(MyLists["AR Invoices"]).items
           .getById(data.ID)
-          .update(updateObject);
+          .update(updateObject).then(async afterUpdate => {
+            // Check if we need to create an AccountingClerk2Approval.
+            // Only create a new action here if this is a new Clerk given.
+            if (data.RequiresAccountingClerkTwoApprovId === null && data.RequiresAccountingClerkTwoApprov) {
+              if (this.state.productInEdit.RequiresAccountingClerkTwoApprovId !== data.RequiresAccountingClerkTwoApprov.Id) {
+                // If the existing accounting clerk has been replaced we will need to delete the record.
+                // TODO: Remove the old accounting clerks actions ONLY if they're still on a waiting status.
+              }
+              debugger;
+              await CreateInvoiceAction(
+                data.RequiresAccountingClerkTwoApprov.Id,
+                InvoiceActionRequiredRequestType.AccountingClerk2ApprovalRequired,
+                data.AR_x0020_RequestId,
+                data.Id
+              );
+            }
+          });
       }
 
       // Check to see if there is a file that we can update.
