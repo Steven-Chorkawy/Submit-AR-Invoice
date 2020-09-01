@@ -38,6 +38,7 @@ import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { InvoiceActionResponseStatus } from '../enums/MyEnums';
+import { IInvoiceItem } from '../interface/InvoiceItem';
 
 
 export interface IGPAttachmentProps {
@@ -47,7 +48,7 @@ export interface IGPAttachmentProps {
 
 interface IInvoiceEditFormProps {
   GPAttachmentWidgetProps: IGPAttachmentProps;
-  dataItem: any;
+  dataItem: Array<IInvoiceItem>;
   onSubmit: any;
   cancel: any;
   saveResult: any;
@@ -92,6 +93,8 @@ function GridButtons({ cancel, saveResult }) {
 export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any> {
   constructor(props) {
     super(props);
+    console.log('InvoiceEditForm');
+    console.log(this.props.dataItem);
     this.state = {
       productInEdit: this.props.dataItem || null,
       visible: false,
@@ -164,10 +167,23 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                     component={MyFormComponents.FormComboBox}
                   />
                 </div>
-                <div style={{ marginBottom: '2px' }}>
-                  {
-                    //TODO: Add Accountant 2 approval here.
+                <div
+                  style={{ marginBottom: '2px' }}
+                  hidden={
+                    formRenderProps.valueGetter('Invoice_x0020_Status') !== InvoiceStatus["Entered into GP"]
+                    && this.state.productInEdit.RequiresAccountingClerkTwoApprovId === null
                   }
+                >
+                  <Field
+                    id="RequiresAccountingClerkTwoApprov"
+                    name="RequiresAccountingClerkTwoApprov"
+                    label="Requires Approval From Accounting Clerk 2"
+                    data={this.props.siteUsersData}
+                    dataItemKey="Id"
+                    textField="Title"
+                    disabled={formRenderProps.valueGetter('Invoice_x0020_Status') !== InvoiceStatus["Entered into GP"]}
+                    component={MyFormComponents.FormComboBox}
+                  />
                 </div>
                 <div style={{ marginBottom: "2px" }}>
                   <Field
