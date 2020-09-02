@@ -633,7 +633,7 @@ export function MyCommandCell({ edit, cancel }) {
 
       const isNewItem = dataItem.ID === undefined;
 
-      return (this.props.dataItem.Invoice_x0020_Status === InvoiceStatus.Hold || this.props.dataItem.Invoice_x0020_Status === InvoiceStatus.Submitted || this.props.dataItem.Invoice_x0020_Status === InvoiceStatus.Rejected)
+      return (this.props.dataItem.Invoice_x0020_Status === InvoiceStatus["Hold for Department"] || this.props.dataItem.Invoice_x0020_Status === InvoiceStatus.Submitted || this.props.dataItem.Invoice_x0020_Status === InvoiceStatus.Rejected)
         ? (
           <td className={this.props.className + " k-command-cell"} style={this.props.style}>
             <Button

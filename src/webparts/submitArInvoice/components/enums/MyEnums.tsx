@@ -7,7 +7,8 @@ export enum InvoiceStatus {
   'Approved' = 'Approved',
   'Rejected' = 'Rejected',
   'Accountant Approval Required' = 'Accountant Approval Required',
-  'Hold' = 'Hold',
+  'Hold for Department' = 'Hold for Department',
+  'Hold for Finance' = 'Hold for Finance',
   'Ready to Invoice' = 'Ready to Invoice',
   'Entered into GP' = 'Entered into GP',
   'Completed' = 'Completed'
