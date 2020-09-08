@@ -348,11 +348,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
    * @param userName Users 'id' that comes in a form of a string.
    */
   private _EnsureUser(userName: string): Promise<ISPUser> {
-    debugger;
-    console.log("SharePointDataProvider.EnsureUser( \"" + userName + "\" )");
     var data = { logonName: userName };
-    this.props.ctx;
-    debugger;
 
     return this.props.ctx.spHttpClient
       .post(
@@ -362,14 +358,10 @@ export class MyForm extends React.Component<IMyFormProps, any> {
       )
       .then(
         (value: SPHttpClientResponse) => {
-          debugger;
-          console.log("SharePointDataProvider.EnsureUser FullFill: statusText:\"" + value.statusText + "\"");
           return value.json();
         },
         (error: any) => console.log("SharePointDataProvider.EnsureUser Rejected: " + error)
       ).then((json: ISPUser) => {
-        debugger;
-        console.log("SharePointDataProvider.EnsureUser FullFill: Id:" + json.Id + " LoginName:\"" + json.LoginName + "\"");
         return json;
       });
   }
