@@ -361,7 +361,8 @@ export class MyForm extends React.Component<IMyFormProps, any> {
           return value.json();
         },
         (error: any) => console.log("SharePointDataProvider.EnsureUser Rejected: " + error)
-      ).then((json: ISPUser) => {
+      )
+      .then((json: ISPUser) => {
         return json;
       });
   }
