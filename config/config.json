@@ -15,6 +15,7 @@
     "react-dom/server": "node_modules/react-dom/umd/react-dom-server.browser.production.min.js"
   },
   "localizedResources": {
-    "SubmitArInvoiceWebPartStrings": "lib/webparts/submitArInvoice/loc/{locale}.js"
+    "SubmitArInvoiceWebPartStrings": "lib/webparts/submitArInvoice/loc/en-us.js",
+    "ControlStrings": "node_modules/@pnp/spfx-controls-react/lib/loc/en-us.js"
   }
 }

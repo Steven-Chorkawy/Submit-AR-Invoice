@@ -16,6 +16,9 @@ import { Label, Error, Hint, FloatingLabel } from '@progress/kendo-react-labels'
 import { Upload } from '@progress/kendo-react-upload';
 import { DropDownList, AutoComplete, MultiSelect, ComboBox } from '@progress/kendo-react-dropdowns';
 
+import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
+
+
 import { MyCustomerCardComponent } from './MyCustomerCardComponent';
 
 export const FormInput = (fieldRenderProps) => {
@@ -814,3 +817,31 @@ export const FormFloatingNumericTextBox = (fieldRenderProps) => {
   );
 };
 
+export const FormPeoplePicker = (fieldRenderProps) => {
+  console.log('FormPeoplePicker');
+  console.log(fieldRenderProps);
+  const { validationMessage, touched, label, id, valid, disabled, hint, optional, value, ...others } = fieldRenderProps;
+
+  const showValidationMessage = touched && validationMessage;
+  const showHint = !showValidationMessage && hint;
+  const hindId = showHint ? `${id}_hint` : '';
+  const errorId = showValidationMessage ? `${id}_error` : '';
+
+  return (
+    <FieldWrapper>
+      <PeoplePicker
+        context={fieldRenderProps.context}
+        titleText={label}
+        personSelectionLimit={1}
+        //groupName={"Team Site Owners"} // Leave this blank in case you want to filter from all users
+        showtooltip={true}
+        isRequired={true}
+        selectedItems={fieldRenderProps.selectedItems}
+        showHiddenInUI={false}
+        principalTypes={[PrincipalType.User]}
+        resolveDelay={1000}
+        //defaultSelectedUsers={['schorkawy@clarington.net']}
+      />
+    </FieldWrapper>
+  );
+}

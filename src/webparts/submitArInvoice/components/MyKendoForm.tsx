@@ -6,12 +6,19 @@ import { Card, CardTitle, CardBody, CardActions } from '@progress/kendo-react-la
 import { filterBy } from '@progress/kendo-data-query';
 
 import { sp } from "@pnp/sp";
+import {
+  SPHttpClient, SPHttpClientConfiguration, SPHttpClientResponse,
+  ISPHttpClientConfiguration
+} from '@microsoft/sp-http';
 import { Web } from "@pnp/sp/webs";
 import "@pnp/sp/webs";
 import "@pnp/sp/files";
 import "@pnp/sp/folders";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
+
+import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
+
 
 import * as MyFormComponents from './MyFormComponents';
 import { IMyFormProps } from './IMyFormProps';
@@ -23,8 +30,6 @@ import { MyLists } from './enums/MyLists';
 import { IItemAddResult } from '@pnp/sp/items';
 import { IInvoiceActionRequired, InvoiceActionRequiredRequestType } from '../components/interface/IInvoiceActionRequired';
 import { InvoiceActionResponseStatus } from './enums/MyEnums';
-
-
 
 export interface IARFormModel {
   Title: string;
@@ -39,13 +44,19 @@ export interface IARFormModel {
   Customer_x0020_PO_x0020_Number: any;
 }
 
-
 export interface IARAccountDetails {
   AR_x0020_InvoiceId?: number;               //ID of Invoice
   AR_x0020_Invoice_x0020_RequestId: number; // ID of AR Request
   Account_x0020_Code: string;               // GL Code
   Amount: number;                           // Amount for account
   HST_x0020_Taxable: boolean;               // Is amount taxable?
+}
+
+interface ISPUser {
+  Email: string;
+  Id: number;
+  LoginName: string;
+  Title: string;
 }
 
 export class MyForm extends React.Component<IMyFormProps, any> {
@@ -66,12 +77,12 @@ export class MyForm extends React.Component<IMyFormProps, any> {
     };
   }
 
-
   /**
    * Form Submit Event
    * @param dataItem Data from form
    */
   public handleSubmit = async (dataItem) => {
+    debugger;
     // We will use this to update states later.
     let currentFiles: IUploadingFile[] = this.state.MyFiles;
 
@@ -91,7 +102,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
         Title: newARTitle,
         Department: dataItem.Department,
         Date: dataItem.Date,
-        Requested_x0020_ById: dataItem.RequestedBy.Id,
+        Requested_x0020_ById: dataItem.RequestedBy.Id ? dataItem.RequestedBy.Id : dataItem.RequestedBy.id,
         Requires_x0020_Authorization_x0020_ById: {
           'results': dataItem.RequiresAuthorizationBy.map((user) => { return user.Id; })
         },
@@ -231,15 +242,12 @@ export class MyForm extends React.Component<IMyFormProps, any> {
     }
   }
 
-
   /**
    * handleSubmit2
    */
   public handleSubmit2 = async (event) => {
     event.preventDefault();
   }
-
-
 
   public uploadRelatedFiles = async (inputData, mainFile) => {
 
@@ -262,7 +270,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
         );
     }
   }
-
 
   public addAccountCodesToListItem = async (accountDetails: IARAccountDetails[], listItem: IItemAddResult) => {
     accountDetails.map(account => {
@@ -303,6 +310,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
 
     return React.cloneElement(li, li.props, itemChildren);
   }
+
   public onCustomCustomerChange = (event) => {
 
     let target = event.target;
@@ -326,6 +334,38 @@ export class MyForm extends React.Component<IMyFormProps, any> {
 
     const data = this.state.receivedCustomerList.slice();
     return filterBy(data, filter);
+  }
+
+  private _getPeoplePickerItems(items: any[]) {
+    console.log('Items:', items);
+  }
+
+
+  private _EnsureUser(userName: string): Promise<ISPUser> {
+    debugger;
+    console.log("SharePointDataProvider.EnsureUser( \"" + userName + "\" )");
+    var data = { logonName: userName };
+    this.props.ctx;
+    debugger;
+
+    return this.props.ctx.spHttpClient
+      .post(
+        `${this.props.ctx.pageContext.site.absoluteUrl}/_api/web/ensureuser`,
+        SPHttpClient.configurations.v1,
+        { body: JSON.stringify(data) }
+      )
+      .then(
+        (value: SPHttpClientResponse) => {
+          debugger;
+          console.log("SharePointDataProvider.EnsureUser FullFill: statusText:\"" + value.statusText + "\"");
+          return value.json();
+        },
+        (error: any) => console.log("SharePointDataProvider.EnsureUser Rejected: " + error)
+      ).then((json: ISPUser) => {
+        debugger;
+        console.log("SharePointDataProvider.EnsureUser FullFill: Id:" + json.Id + " LoginName:\"" + json.LoginName + "\"");
+        return json;
+      });
   }
 
   public render() {
@@ -385,6 +425,39 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                 <Field
                   id="RequestedBy"
                   name="RequestedBy"
+                  label="Requested By"
+                  wrapperStyle={{ width: '50%', marginRight: '18px' }}
+                  //data={this.props.siteUsers}
+                  selectedItems={e => {
+                    e && e.length > 0 &&
+                      this._EnsureUser(e[0].id)
+                        .then(response => {
+                          debugger;
+                          formRenderProps.onChange('RequestedBy', { value: response });
+                        });
+                  }}
+                  context={this.props.ctx}
+                  dataItemKey="Email"
+                  textField="Title"
+                  component={MyFormComponents.FormPeoplePicker}
+                />
+                {/* <PeoplePicker
+                  context={this.props.ctx}
+                  titleText="Requested By"
+                  personSelectionLimit={3}
+                  //groupName={"Team Site Owners"} // Leave this blank in case you want to filter from all users
+                  showtooltip={true}
+                  isRequired={true}
+                  selectedItems={this._getPeoplePickerItems}
+                  showHiddenInUI={false}
+                  principalTypes={[PrincipalType.User]}
+                  resolveDelay={1000}
+                  defaultSelectedUsers={['schorkawy@clarington.net']}
+                /> */}
+                <hr />
+                {/* <Field
+                  id="RequestedBy"
+                  name="RequestedBy"
                   label="* Requested By"
                   wrapperStyle={{ width: '50%', marginRight: '18px' }}
                   data={this.props.siteUsers}
@@ -393,7 +466,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   validator={MyValidators.requestedByValidator}
                   component={MyFormComponents.FormComboBox}
                 //onchange={this.onDialogInputChange}
-                />
+                /> */}
 
                 <Field
                   id="RequiresAuthorizationBy"
@@ -495,7 +568,10 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   primary={true}
                   type={'submit'}
                   icon="save"
-                  onClick={this.handleSubmit}
+                  onClick={e => {
+                    this._getPeoplePickerItems;
+                    this.handleSubmit;
+                  }}
                 >Submit AR Invoice Request</Button>
                 <Button onClick={formRenderProps.onFormReset}>Clear</Button>
               </div>
