@@ -327,6 +327,9 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           .update(updateObject);
       }
 
+      // ! September 08, 2020.
+      // ! This is failing!  Figure out why this isn't running properly.
+      // ! This is preventing me from converting an AR Request into an AR Invoice.
       // Check to see if there is a file that we can update.
       // If a files is present that means we need to convert the 'Invoice Request' into an 'Invoice'.
       // This means taking all the metadata from the request and applying it to this file.
