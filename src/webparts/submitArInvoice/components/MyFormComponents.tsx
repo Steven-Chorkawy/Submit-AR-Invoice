@@ -833,8 +833,7 @@ export const FormPeoplePicker = (fieldRenderProps) => {
         selectedItems={fieldRenderProps.selectedItems}
         showHiddenInUI={false}
         principalTypes={[PrincipalType.User]}
-      // TODO: Use this to populate this component.
-      //defaultSelectedUsers={['schorkawy@clarington.net']}
+        defaultSelectedUsers={fieldRenderProps.defaultSelectedUsers}
       />
     </FieldWrapper>
   );

@@ -426,46 +426,18 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   name="RequestedBy"
                   label="Requested By"
                   wrapperStyle={{ width: '50%', marginRight: '18px' }}
-                  //data={this.props.siteUsers}
                   selectedItems={e => {
                     e && e.length > 0 &&
                       this._EnsureUser(e[0].id)
-                        .then(response => {
-                          debugger;
-                          formRenderProps.onChange('RequestedBy', { value: response });
-                        });
+                        .then(response => { formRenderProps.onChange('RequestedBy', { value: response }); });
                   }}
                   context={this.props.ctx}
                   dataItemKey="Email"
                   textField="Title"
                   component={MyFormComponents.FormPeoplePicker}
+                  defaultSelectedUsers={[this.props.ctx.pageContext.user.email]}
                 />
-                {/* <PeoplePicker
-                  context={this.props.ctx}
-                  titleText="Requested By"
-                  personSelectionLimit={3}
-                  //groupName={"Team Site Owners"} // Leave this blank in case you want to filter from all users
-                  showtooltip={true}
-                  isRequired={true}
-                  selectedItems={this._getPeoplePickerItems}
-                  showHiddenInUI={false}
-                  principalTypes={[PrincipalType.User]}
-                  resolveDelay={1000}
-                  defaultSelectedUsers={['schorkawy@clarington.net']}
-                /> */}
                 <hr />
-                {/* <Field
-                  id="RequestedBy"
-                  name="RequestedBy"
-                  label="* Requested By"
-                  wrapperStyle={{ width: '50%', marginRight: '18px' }}
-                  data={this.props.siteUsers}
-                  dataItemKey="Email"
-                  textField="Title"
-                  validator={MyValidators.requestedByValidator}
-                  component={MyFormComponents.FormComboBox}
-                //onchange={this.onDialogInputChange}
-                /> */}
 
                 <Field
                   id="RequiresAuthorizationBy"
