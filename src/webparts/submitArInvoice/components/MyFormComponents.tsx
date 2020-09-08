@@ -822,9 +822,11 @@ export const FormPeoplePicker = (fieldRenderProps) => {
 
   return (
     <FieldWrapper>
+      <Label>
+        {label}
+      </Label>
       <PeoplePicker
         context={fieldRenderProps.context}
-        titleText={label}
         showtooltip={false}
         isRequired={true}
         // * selectedItems is essentially the onChange event.
