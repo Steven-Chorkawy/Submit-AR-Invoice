@@ -341,6 +341,12 @@ export class MyForm extends React.Component<IMyFormProps, any> {
   }
 
 
+  /**
+   * Convert the user object that we receive from the SPFx PeoplePicker control to a UserId.
+   * @tutorial https://techcommunity.microsoft.com/t5/sharepoint-developer/how-to-set-a-people-field-in-a-list-e-g-convert-accountname-to/m-p/87641
+   * @returns ISPUser Interface.
+   * @param userName Users 'id' that comes in a form of a string.
+   */
   private _EnsureUser(userName: string): Promise<ISPUser> {
     debugger;
     console.log("SharePointDataProvider.EnsureUser( \"" + userName + "\" )");
