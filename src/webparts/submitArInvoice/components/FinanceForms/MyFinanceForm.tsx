@@ -278,7 +278,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * @param data Object of the current item in edit.
    */
   public onSubmit = async (data) => {
-    debugger;
     const invoices = this.state.invoices.data.slice();
 
     try {
@@ -334,6 +333,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       // Check to see if there is a file that we can update.
       // If a files is present that means we need to convert the 'Invoice Request' into an 'Invoice'.
       // This means taking all the metadata from the request and applying it to this file.
+      debugger;
       if (data.InvoiceAttachments) {
         // TODO: Remove this for loop.  It was only here because I was allowing multiple files to be uploaded at one point.  Now we only allow one file.
         for (let invoiceAttachmentIndex = 0; invoiceAttachmentIndex < data.InvoiceAttachments.length; invoiceAttachmentIndex++) {
@@ -357,6 +357,9 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                   copiedMetadata['RelatedAttachmentsId'] = {
                     results: data.RelatedAttachmentsId
                   };
+
+                  // I don't know why these two fields are different but they are....
+                  copiedMetadata['RequiresAccountingClerkTwoApprovalId'] = data['RequiresAccountingClerkTwoApprovId'];
 
                   // TODO: Maps 'Requires_x0020_Department_x0020_' from request to 'Requires_x0020_Authorization_x0020_By' in the invoice.
                   // Remove unwanted fields
@@ -395,6 +398,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                     'AuthorId',
                     'Actions',
                     'RequiresAccountingClerkTwoApprovStringId',
+                    'RequiresAccountingClerkTwoApprovId',
                     'Accountant_x0020_ApprovalStringId'
                   ]);
 
