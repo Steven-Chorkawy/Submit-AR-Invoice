@@ -278,6 +278,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * @param data Object of the current item in edit.
    */
   public onSubmit = async (data) => {
+    debugger;
     const invoices = this.state.invoices.data.slice();
 
     try {
@@ -334,9 +335,12 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       // If a files is present that means we need to convert the 'Invoice Request' into an 'Invoice'.
       // This means taking all the metadata from the request and applying it to this file.
       if (data.InvoiceAttachments) {
+        // TODO: Remove this for loop.  It was only here because I was allowing multiple files to be uploaded at one point.  Now we only allow one file.
         for (let invoiceAttachmentIndex = 0; invoiceAttachmentIndex < data.InvoiceAttachments.length; invoiceAttachmentIndex++) {
           const element = data.InvoiceAttachments[invoiceAttachmentIndex];
-          sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/').files
+          // TODO: Make this string configurable in the web apps settings.
+          // ! Do this before we go live.
+          await sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/').files
             .add(element.name, element.getRawFile(), true)
             .then(f => {
               f.file.getItem()
@@ -389,9 +393,12 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                     'EditorId',
                     'Created',
                     'AuthorId',
-                    'Actions'
+                    'Actions',
+                    'RequiresAccountingClerkTwoApprovStringId',
+                    'Accountant_x0020_ApprovalStringId'
                   ]);
 
+                  debugger;
                   // Adding these fields to copiedMetadata because they aren't coming through in the submitted object.
                   copiedMetadata['Requires_x0020_Authorization_x0020_ById'] = {
                     results: this.state.productInEdit.Requires_x0020_Department_x0020_Id
@@ -400,14 +407,17 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                     results: this.state.productInEdit.AccountDetailsId
                   };
 
+                  debugger;
                   // Copy the meta data from the AR Req to the AR Invoice.
                   sp.web.lists.getByTitle(MyLists["AR Invoices"]).items.getById(itemProxy.ID)
                     .update({
                       StrTitle: element.name,
                       Title: element.name,
+                      // ? This step right here should be applying the metadata... but its nots?
                       ...copiedMetadata
                     })
                     .then(arInvUpdateRes => {
+                      debugger;
                       // Update all related records.
                       // this update will add the documents id to the files.
                       // this will allow us to get all related data for this document without having to use the request record.
@@ -419,6 +429,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                         this._updateApprovalRequests(editItemId, itemProxy.ID)
                       ])
                         .then(value => {
+                          debugger;
                           const indexOf = invoices.findIndex(fInvoice => fInvoice.AR_x0020_RequestId === editItemId);
                           invoices[indexOf].Id = itemProxy.ID;
                           invoices[indexOf].ID = itemProxy.ID;
@@ -432,6 +443,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                         });
                     })
                     .catch(e => {
+                      debugger;
                       console.error("Error Mapping AR Invoice!");
                       this.setState({
                         gpAttachmentProps: {
@@ -441,6 +453,16 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                       });
                       throw e;
                     });
+                })
+                .catch(e => {
+                  debugger;
+                  this.setState({
+                    gpAttachmentProps: {
+                      type: 'error',
+                      errorMessage: 'Cannot Save GP Invoice'
+                    }
+                  });
+                  throw e;
                 });
             });
         }
