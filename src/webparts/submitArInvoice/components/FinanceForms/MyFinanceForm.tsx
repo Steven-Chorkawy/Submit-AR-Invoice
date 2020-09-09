@@ -219,6 +219,162 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
   //#endregion End Methods
 
+  //#region Update Methods
+  /**
+   * Remove a Field/ Property of a given object.
+   * @param input Object that contains unwanted fields.
+   * @param fields Fields/ Properties that need to be removed
+   */
+  private removeFields(input: Object, fields: Array<any>) {
+    for (let index = 0; index < fields.length; index++) {
+      delete input[fields[index]];
+    }
+    return input;
+  }
+
+  // Add docId to related documents.
+  private _updateRelatedDocuments = async (reqId, docId) => {
+    // Get the related attachments that for this request.
+    await sp.web.lists
+      .getByTitle(MyLists["Related Invoice Attachments"])
+      .items
+      .filter(`AR_x0020_Invoice_x0020_Request/ID eq ${reqId}`)
+      .get()
+      .then(async (items: any[]) => {
+        if (items.length > 0) {
+          // Update the related attachment so it is now related to the AR Invoice.
+          await sp.web.lists
+            .getByTitle(MyLists["Related Invoice Attachments"])
+            .items.getById(items[0].Id)
+            .update({ ARInvoiceId: docId });
+        }
+      });
+  }
+
+  /**
+   * Upload any new related documents that have been uploaded by a user.
+   * @param data Data submitted by the Kendo Form.
+   */
+  private _uploadRelatedDocuments = async (data) => {
+    debugger;
+    if (data.RelatedInvoiceAttachments) {
+      for (let relatedInvoiceAttachmentsIndex = 0; relatedInvoiceAttachmentsIndex < data.RelatedInvoiceAttachments.length; relatedInvoiceAttachmentsIndex++) {
+        const element = data.RelatedInvoiceAttachments[relatedInvoiceAttachmentsIndex];
+        // TODO: Get this string from the web parts config settings.
+        await sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/').files
+          .add(element.name, element.getRawFile(), true)
+          .then(fileRes => {
+            fileRes.file.getItem()
+              .then(item => {
+                const itemProxy: any = Object.assign({}, item);
+                sp.web.lists.getByTitle(MyLists["Related Invoice Attachments"]).items
+                  .getById(itemProxy.ID)
+                  .update({
+                    // TODO: Confirm that I should be using the ARInvoiceId property here.  I think I should be using Request ID.
+                    ARInvoiceId: data.ID,
+                    Title: element.name
+                  });
+              });
+          });
+      }
+    }
+  }
+
+  // Add docId to related accounts.
+  private _updateInvoiceAccounts = async (reqId, docId) => {
+    await sp.web.lists
+      .getByTitle(MyLists["AR Invoice Accounts"])
+      .items
+      .filter(`AR_x0020_Invoice_x0020_Request/ID eq ${reqId}`)
+      .get()
+      .then(async (item: any[]) => {
+        if (item.length > 0) {
+          await sp.web.lists
+            .getByTitle(MyLists["AR Invoice Accounts"])
+            .items.getById(item[0].Id)
+            .update({ AR_x0020_InvoiceId: docId });
+        }
+      });
+  }
+
+  // Add docId to related invoice request.
+  private _updateInvoiceRequest = async (reqId, docId) => {
+    await sp.web.lists
+      .getByTitle(MyLists["AR Invoice Requests"])
+      .items
+      .filter(`ID eq ${reqId}`)
+      .get()
+      .then(async (item: any[]) => {
+        if (item.length > 0) {
+          await sp.web.lists
+            .getByTitle(MyLists["AR Invoice Requests"])
+            .items.getById(item[0].Id)
+            .update({ AR_x0020_InvoiceId: docId });
+        }
+      });
+  }
+
+  // Add docId to related cancel requests.
+  private _updateCancelRequests = async (reqId, docId) => {
+    //TODO: Test Cancel requests with this new list.
+  }
+
+  // Add docId to related approval requests.
+  private _updateApprovalRequests = async (reqId, docId) => {
+    //TODO: Test Approval process with new list.
+  }
+
+  /**
+   * Update the fields that are present on the form.
+   * @param data Data submitted from the Kendo Form.
+   */
+  private _updateFormFields = async (data) => {
+    // These are the fields that can be modified on this form.
+    let updateObject = {
+      Invoice_x0020_Status: data.Invoice_x0020_Status,
+      Invoice_x0020_Number: data.Invoice_x0020_Number,
+      Batch_x0020_Number: data.Batch_x0020_Number,
+      Requires_x0020_Accountant_x0020_Id: data.Requires_x0020_Accountant_x0020_ ? data.Requires_x0020_Accountant_x0020_.Id : null
+    };
+
+    // Update the record.
+    // This will either update the request or the invoice record.
+    if (data.ContentTypeId === MyContentTypes["AR Request List Item"]) {
+      await sp.web.lists.getByTitle(MyLists["AR Invoice Requests"])
+        .items
+        .getById(data.ID)
+        .update(updateObject)
+        .then(async afterUpdate => {
+          // This gets the result of the updated item.
+          // After we've updated this item we can start adding extra objects back to it.
+          // These extra objects are objects that the forms use but cannot be sent to SP for saving.
+          // e.x. The Actions property is not a property that SharePoint uses but it is used to display user requests.
+          await afterUpdate.item.get();
+
+          // Checks to see if Req Acc Approval exists.
+          if (data.Requires_x0020_Accountant_x0020_) {
+            // Checks to see if Req Acc Approval is the same that is already present in the state.
+            // If the Req Acc Approval ID is the same as the state objects that means we've already sent a task to that accountant.
+            // * This is here to prevent an InvoiceAction item from being created each time the invoice is modified.
+            if (this.state.productInEdit.Requires_x0020_Accountant_x0020_ === undefined || this.state.productInEdit.Requires_x0020_Accountant_x0020_.Id !== data.Requires_x0020_Accountant_x0020_.Id) {
+              await CreateInvoiceAction(
+                data.Requires_x0020_Accountant_x0020_.Id,
+                InvoiceActionRequiredRequestType.AccountantApprovalRequired,
+                data.Id
+              );
+            }
+          }
+        });
+    }
+    else {
+      // No need to create an action for AccountantApproval here because their approval would have already been given.
+      sp.web.lists.getByTitle(MyLists["AR Invoices"]).items
+        .getById(data.ID)
+        .update(updateObject);
+    }
+  }
+  //#endregion Update Methods
+
   //#region CRUD Methods
   public itemChange = (event) => {
     const data = this.state.invoices.data.map(item =>
@@ -271,6 +427,47 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    */
   private _createAccountantApproval = (requiresAccountantApproval) => {
 
+  }
+
+  /**
+   * Handle the Finance Edit form submit event.
+   * @param data JSON Object sent from the Kendo Form.
+   */
+  public onSubmit2 = async (data) => {
+    debugger;
+    // Get all the invoices found in the state.  We will use this local variable later.
+    const invoices = this.state.invoices.data.slice();
+
+    try {
+      // Get the index of the current invoice we're modifying.
+      // We will use this later to update the state.
+      const index = invoices.findIndex(f => f.ID === data.ID);
+
+      /******************************************************************************
+       *
+       * Update the various properties and related records of the invoice here.
+       *
+       * 1. Update any properties that the form can edit.
+       * 2. Upload any new related attachments.
+       * 3.
+       *
+       ******************************************************************************/
+      await this._updateFormFields(data);
+      await this._uploadRelatedDocuments(data);
+
+
+      // TODO: After everything is said and done this is where I can set the productInEdit variable to null, which will close the edit form.
+    } catch (error) {
+      // Let the user know that something has gone wrong and the upload failed.
+      console.log('Throwing the error here');
+      this.setState({
+        gpAttachmentProps: {
+          type: 'error',
+          errorMessage: 'Cannot Save GP Invoice'
+        }
+      });
+      throw error;
+    }
   }
 
   /**
@@ -333,7 +530,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       // Check to see if there is a file that we can update.
       // If a files is present that means we need to convert the 'Invoice Request' into an 'Invoice'.
       // This means taking all the metadata from the request and applying it to this file.
-
       if (data.InvoiceAttachments) {
         // TODO: Remove this for loop.  It was only here because I was allowing multiple files to be uploaded at one point.  Now we only allow one file.
         for (let invoiceAttachmentIndex = 0; invoiceAttachmentIndex < data.InvoiceAttachments.length; invoiceAttachmentIndex++) {
@@ -476,6 +672,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       if (data.RelatedInvoiceAttachments) {
         for (let relatedInvoiceAttachmentsIndex = 0; relatedInvoiceAttachmentsIndex < data.RelatedInvoiceAttachments.length; relatedInvoiceAttachmentsIndex++) {
           const element = data.RelatedInvoiceAttachments[relatedInvoiceAttachmentsIndex];
+          // TODO: Get this string from the web parts config settings.
           sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/').files
             .add(element.name, element.getRawFile(), true)
             .then(fileRes => {
@@ -507,81 +704,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       });
       throw error;
     }
-  }
-
-  /**
-   * Remove a Field/ Property of a given object.
-   * @param input Object that contains unwanted fields.
-   * @param fields Fields/ Properties that need to be removed
-   */
-  private removeFields(input: Object, fields: Array<any>) {
-    for (let index = 0; index < fields.length; index++) {
-      delete input[fields[index]];
-    }
-    return input;
-  }
-
-  // Add docId to related documents.
-  private _updateRelatedDocuments = async (reqId, docId) => {
-    // Get the related attachments that for this request.
-    await sp.web.lists
-      .getByTitle(MyLists["Related Invoice Attachments"])
-      .items
-      .filter(`AR_x0020_Invoice_x0020_Request/ID eq ${reqId}`)
-      .get()
-      .then(async (items: any[]) => {
-        if (items.length > 0) {
-          // Update the related attachment so it is now related to the AR Invoice.
-          await sp.web.lists
-            .getByTitle(MyLists["Related Invoice Attachments"])
-            .items.getById(items[0].Id)
-            .update({ ARInvoiceId: docId });
-        }
-      });
-  }
-
-  // Add docId to related accounts.
-  private _updateInvoiceAccounts = async (reqId, docId) => {
-    await sp.web.lists
-      .getByTitle(MyLists["AR Invoice Accounts"])
-      .items
-      .filter(`AR_x0020_Invoice_x0020_Request/ID eq ${reqId}`)
-      .get()
-      .then(async (item: any[]) => {
-        if (item.length > 0) {
-          await sp.web.lists
-            .getByTitle(MyLists["AR Invoice Accounts"])
-            .items.getById(item[0].Id)
-            .update({ AR_x0020_InvoiceId: docId });
-        }
-      });
-  }
-
-  // Add docId to related invoice request.
-  private _updateInvoiceRequest = async (reqId, docId) => {
-    await sp.web.lists
-      .getByTitle(MyLists["AR Invoice Requests"])
-      .items
-      .filter(`ID eq ${reqId}`)
-      .get()
-      .then(async (item: any[]) => {
-        if (item.length > 0) {
-          await sp.web.lists
-            .getByTitle(MyLists["AR Invoice Requests"])
-            .items.getById(item[0].Id)
-            .update({ AR_x0020_InvoiceId: docId });
-        }
-      });
-  }
-
-  // Add docId to related cancel requests.
-  private _updateCancelRequests = async (reqId, docId) => {
-    //TODO: Test Cancel requests with this new list.
-  }
-
-  // Add docId to related approval requests.
-  private _updateApprovalRequests = async (reqId, docId) => {
-    //TODO: Test Approval process with new list.
   }
 
   /**
@@ -716,7 +838,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
             dataItem={this.state.productInEdit}
             statusData={this.state.statusData}
             siteUsersData={this.state.siteUsersData}
-            onSubmit={this.onSubmit}
+            // onSubmit={this.onSubmit}
+            onSubmit={this.onSubmit2}
             saveResult={this.state.saveResult}
             cancel={this.cancelEditForm}
             onUpdateAccount={this.updateAccount}
