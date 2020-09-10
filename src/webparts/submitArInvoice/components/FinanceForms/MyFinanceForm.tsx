@@ -232,6 +232,156 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     return input;
   }
 
+  // TODO: Test this method.
+  private _uploadInvoiceDocument = async (data) => {
+    const invoices = this.state.invoices.data;
+
+
+    // ! September 08, 2020.
+    // ! This is failing!  Figure out why this isn't running properly.
+    // ! This is preventing me from converting an AR Request into an AR Invoice.
+    // Check to see if there is a file that we can update.
+    // If a files is present that means we need to convert the 'Invoice Request' into an 'Invoice'.
+    // This means taking all the metadata from the request and applying it to this file.
+    if (data.InvoiceAttachments) {
+      // TODO: Remove this for loop.  It was only here because I was allowing multiple files to be uploaded at one point.  Now we only allow one file.
+      for (let invoiceAttachmentIndex = 0; invoiceAttachmentIndex < data.InvoiceAttachments.length; invoiceAttachmentIndex++) {
+        const element = data.InvoiceAttachments[invoiceAttachmentIndex];
+        // TODO: Make this string configurable in the web apps settings.
+        // ! Do this before we go live.
+        await sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/AR%20Invoices/').files
+          .add(element.name, element.getRawFile(), true)
+          .then(f => {
+            f.file.getItem()
+              .then(item => {
+                const itemProxy: any = Object.assign({}, item);
+                const editItemId: number = data.ID;
+                // ! Transfer metadata from AR Request to AR Invoice.
+                // ! THIS IS A HUGE STEP!
+                var copiedMetadata = data;
+
+                // Add extra fields.
+                copiedMetadata['AR_x0020_RequestId'] = editItemId;
+                copiedMetadata['Requires_x0020_Accountant_x0020_ApprovalId'] = data.Requires_x0020_Accountant_x0020_Id;
+                copiedMetadata['RelatedAttachmentsId'] = {
+                  results: data.RelatedAttachmentsId
+                };
+
+                // I don't know why these two fields are different but they are....
+                copiedMetadata['RequiresAccountingClerkTwoApprovalId'] = data['RequiresAccountingClerkTwoApprovId'];
+
+                // TODO: Maps 'Requires_x0020_Department_x0020_' from request to 'Requires_x0020_Authorization_x0020_By' in the invoice.
+                // Remove unwanted fields
+                // These fields should either not be updated here, or they cause SharePoint to throw errors at us.
+                this.removeFields(copiedMetadata, [
+                  'ContentTypeId',
+                  'FileSystemObjectType',
+                  'ServerRedirectedEmbedUri',
+                  'ServerRedirectedEmbedUrl',
+                  'ComplianceAssetId',
+                  'Title',
+                  'Requires_x0020_Accountant_x0020_Id',
+                  'Requires_x0020_Accountant_x0020_StringId',
+                  'Requires_x0020_Authorization_x0020_ByStringId',
+                  'Requires_x0020_Accountant_x0020_ApprovalId',
+                  'Requires_x0020_Accountant_x0020_ApprovalStringId',
+                  'Requires_x0020_Completed_x0020_AId',
+                  'Requires_x0020_Completed_x0020_AStringId',
+                  'CancelRequests',
+                  'RelatedAttachments',
+                  'Approvals',
+                  'AccountDetails',
+                  'AccountDetailsId',
+                  'InvoiceAttachments',
+                  'ID',
+                  'Id',
+                  'Attachments',
+                  'AR_x0020_InvoiceId',
+                  'Requires_x0020_Department_x0020_',
+                  'Requires_x0020_Department_x0020_StringId',
+                  'Completed_x0020_ApprovalId',
+                  'Completed_x0020_ApprovalStringId',
+                  'Requires_x0020_Department_x0020_Id',
+                  'EditorId',
+                  'Created',
+                  'AuthorId',
+                  'Actions',
+                  'RequiresAccountingClerkTwoApprovStringId',
+                  'RequiresAccountingClerkTwoApprovId',
+                  'Accountant_x0020_ApprovalStringId'
+                ]);
+
+
+                // Adding these fields to copiedMetadata because they aren't coming through in the submitted object.
+                copiedMetadata['Requires_x0020_Authorization_x0020_ById'] = {
+                  results: this.state.productInEdit.Requires_x0020_Department_x0020_Id
+                };
+                copiedMetadata['AccountDetailsId'] = {
+                  results: this.state.productInEdit.AccountDetailsId
+                };
+
+
+                // Copy the meta data from the AR Req to the AR Invoice.
+                sp.web.lists.getByTitle(MyLists["AR Invoices"]).items.getById(itemProxy.ID)
+                  .update({
+                    StrTitle: element.name,
+                    Title: element.name,
+                    // ? This step right here should be applying the metadata... but its nots?
+                    ...copiedMetadata
+                  })
+                  .then(arInvUpdateRes => {
+
+                    // Update all related records.
+                    // this update will add the documents id to the files.
+                    // this will allow us to get all related data for this document without having to use the request record.
+                    Promise.all([
+                      this._updateRelatedDocuments(editItemId, itemProxy.ID),
+                      this._updateInvoiceAccounts(editItemId, itemProxy.ID),
+                      this._updateInvoiceRequest(editItemId, itemProxy.ID),
+                      this._updateCancelRequests(editItemId, itemProxy.ID),
+                      this._updateApprovalRequests(editItemId, itemProxy.ID)
+                    ])
+                      .then(value => {
+
+                        const indexOf = invoices.findIndex(fInvoice => fInvoice.AR_x0020_RequestId === editItemId);
+                        invoices[indexOf].Id = itemProxy.ID;
+                        invoices[indexOf].ID = itemProxy.ID;
+                        this.setState({
+                          invoices: {
+                            data: invoices,
+                            total: invoices.length
+                          },
+                          productInEdit: undefined
+                        });
+                      });
+                  })
+                  .catch(e => {
+
+                    console.error("Error Mapping AR Invoice!");
+                    this.setState({
+                      gpAttachmentProps: {
+                        type: 'error',
+                        errorMessage: 'Cannot Upload GP Invoice'
+                      }
+                    });
+                    throw e;
+                  });
+              })
+              .catch(e => {
+
+                this.setState({
+                  gpAttachmentProps: {
+                    type: 'error',
+                    errorMessage: 'Cannot Save GP Invoice'
+                  }
+                });
+                throw e;
+              });
+          });
+      }
+    }
+  }
+
   // Add docId to related documents.
   private _updateRelatedDocuments = async (reqId, docId) => {
     // Get the related attachments that for this request.
@@ -256,7 +406,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * @param data Data submitted by the Kendo Form.
    */
   private _uploadRelatedDocuments = async (data) => {
-    debugger;
+
     if (data.RelatedInvoiceAttachments) {
       for (let relatedInvoiceAttachmentsIndex = 0; relatedInvoiceAttachmentsIndex < data.RelatedInvoiceAttachments.length; relatedInvoiceAttachmentsIndex++) {
         const element = data.RelatedInvoiceAttachments[relatedInvoiceAttachmentsIndex];
@@ -340,17 +490,12 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     // Update the record.
     // This will either update the request or the invoice record.
     if (data.ContentTypeId === MyContentTypes["AR Request List Item"]) {
-      await sp.web.lists.getByTitle(MyLists["AR Invoice Requests"])
+
+      return await sp.web.lists.getByTitle(MyLists["AR Invoice Requests"])
         .items
         .getById(data.ID)
         .update(updateObject)
         .then(async afterUpdate => {
-          // This gets the result of the updated item.
-          // After we've updated this item we can start adding extra objects back to it.
-          // These extra objects are objects that the forms use but cannot be sent to SP for saving.
-          // e.x. The Actions property is not a property that SharePoint uses but it is used to display user requests.
-          await afterUpdate.item.get();
-
           // Checks to see if Req Acc Approval exists.
           if (data.Requires_x0020_Accountant_x0020_) {
             // Checks to see if Req Acc Approval is the same that is already present in the state.
@@ -364,11 +509,18 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
               );
             }
           }
+
+          // This gets the result of the updated item.
+          // After we've updated this item we can start adding extra objects back to it.
+          // These extra objects are objects that the forms use but cannot be sent to SP for saving.
+          // e.x. The Actions property is not a property that SharePoint uses but it is used to display user requests.
+          return await afterUpdate.item.get();
         });
     }
     else {
+
       // No need to create an action for AccountantApproval here because their approval would have already been given.
-      sp.web.lists.getByTitle(MyLists["AR Invoices"]).items
+      return await sp.web.lists.getByTitle(MyLists["AR Invoices"]).items
         .getById(data.ID)
         .update(updateObject);
     }
@@ -434,7 +586,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * @param data JSON Object sent from the Kendo Form.
    */
   public onSubmit2 = async (data) => {
-    debugger;
+
     // Get all the invoices found in the state.  We will use this local variable later.
     const invoices = this.state.invoices.data.slice();
 
@@ -449,12 +601,20 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
        *
        * 1. Update any properties that the form can edit.
        * 2. Upload any new related attachments.
-       * 3.
+       * 3. UPload the GP Attachment document if one is present.
        *
        ******************************************************************************/
-      await this._updateFormFields(data);
-      await this._uploadRelatedDocuments(data);
-
+      Promise.all([
+        this._updateFormFields(data),
+        this._uploadRelatedDocuments(data),
+        this._uploadInvoiceDocument(data)
+      ])
+        .then(response => {
+          debugger;
+        })
+        .catch(e => {
+          debugger;
+        });
 
       // TODO: After everything is said and done this is where I can set the productInEdit variable to null, which will close the edit form.
     } catch (error) {
