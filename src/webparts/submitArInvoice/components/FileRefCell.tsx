@@ -13,6 +13,12 @@ import { MyContentTypes } from './enums/MyEnums';
 
 
 export class FileRefCell extends React.Component<GridCellProps> {
+
+  constructor(props) {
+    debugger;
+    super(props);
+  }
+
   public render() {
     return (this.props.dataItem.ContentTypeId === MyContentTypes["AR Invoice Document Item"]) ? (
       <td title={'Click to view invoice.'}>

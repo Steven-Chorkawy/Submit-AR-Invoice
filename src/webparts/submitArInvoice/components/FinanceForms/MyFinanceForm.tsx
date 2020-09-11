@@ -401,33 +401,52 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       });
   }
 
+
+  //TODO: Test this method when uploading an attachment to an invoice document.
   /**
    * Upload any new related documents that have been uploaded by a user.
    * @param data Data submitted by the Kendo Form.
    */
   private _uploadRelatedDocuments = async (data) => {
+    var relatedDocsOutput = [];
 
-    if (data.RelatedInvoiceAttachments) {
-      for (let relatedInvoiceAttachmentsIndex = 0; relatedInvoiceAttachmentsIndex < data.RelatedInvoiceAttachments.length; relatedInvoiceAttachmentsIndex++) {
-        const element = data.RelatedInvoiceAttachments[relatedInvoiceAttachmentsIndex];
-        // TODO: Get this string from the web parts config settings.
-        await sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/').files
-          .add(element.name, element.getRawFile(), true)
-          .then(fileRes => {
-            fileRes.file.getItem()
-              .then(item => {
-                const itemProxy: any = Object.assign({}, item);
-                sp.web.lists.getByTitle(MyLists["Related Invoice Attachments"]).items
-                  .getById(itemProxy.ID)
-                  .update({
-                    // TODO: Confirm that I should be using the ARInvoiceId property here.  I think I should be using Request ID.
-                    ARInvoiceId: data.ID,
-                    Title: element.name
-                  });
-              });
-          });
+    if (data.RelatedAttachments) {
+      for (let relatedInvoiceAttachmentsIndex = 0; relatedInvoiceAttachmentsIndex < data.RelatedAttachments.length; relatedInvoiceAttachmentsIndex++) {
+        const element = data.RelatedAttachments[relatedInvoiceAttachmentsIndex];
+
+        // If element has an ID property that means it has already been uploaded.
+        if (!element.ID) {
+          debugger;
+          // TODO: Get this string from the web parts config settings.
+          // ? This is throwing an exception when uploading a related attachment to an invoice document.
+          let fileUploadResult = await sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/').files
+            .add(element.name, element.getRawFile(), true);
+
+          const itemProxy: any = Object.assign({}, await fileUploadResult.file.getItem());
+
+          // These are the properties of the related document that we want to update.
+          let updateThis = {
+            Title: element.name,
+            AR_x0020_Invoice_x0020_RequestId:
+              data.ContentTypeId === MyContentTypes["AR Request List Item"]
+                ? data.ID
+                : data.AR_x0020_RequestId,
+            ARInvoiceId:
+              data.ContentTypeId === MyContentTypes["AR Request List Item"]
+                ? null
+                : data.ID
+          };
+
+          let updateResult = await sp.web.lists.getByTitle(MyLists["Related Invoice Attachments"]).items
+            .getById(itemProxy.ID)
+            .update(updateThis);
+
+          relatedDocsOutput.push(Object.assign({}, updateResult.item));
+        }
       }
     }
+
+    return relatedDocsOutput;
   }
 
   // Add docId to related accounts.
@@ -479,17 +498,18 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * @param data Data submitted from the Kendo Form.
    */
   private _updateFormFields = async (data) => {
+    debugger;
     // These are the fields that can be modified on this form.
     let updateObject = {
       Invoice_x0020_Status: data.Invoice_x0020_Status,
       Invoice_x0020_Number: data.Invoice_x0020_Number,
-      Batch_x0020_Number: data.Batch_x0020_Number,
-      Requires_x0020_Accountant_x0020_Id: data.Requires_x0020_Accountant_x0020_ ? data.Requires_x0020_Accountant_x0020_.Id : null
+      Batch_x0020_Number: data.Batch_x0020_Number
     };
 
     // Update the record.
     // This will either update the request or the invoice record.
     if (data.ContentTypeId === MyContentTypes["AR Request List Item"]) {
+      updateObject['Requires_x0020_Accountant_x0020_Id'] = data.Requires_x0020_Accountant_x0020_ ? data.Requires_x0020_Accountant_x0020_.Id : null;
 
       return await sp.web.lists.getByTitle(MyLists["AR Invoice Requests"])
         .items
@@ -518,11 +538,15 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         });
     }
     else {
-
+      debugger;
+      updateObject['Requires_x0020_Accountant_x0020_ApprovalId'] = data.Requires_x0020_Accountant_x0020_ ? data.Requires_x0020_Accountant_x0020_.Id : null;
       // No need to create an action for AccountantApproval here because their approval would have already been given.
-      return await sp.web.lists.getByTitle(MyLists["AR Invoices"]).items
+      var output = await sp.web.lists.getByTitle(MyLists["AR Invoices"]).items
         .getById(data.ID)
         .update(updateObject);
+
+      debugger;
+      return output;
     }
   }
   //#endregion Update Methods
@@ -613,6 +637,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
           debugger;
         })
         .catch(e => {
+          console.log(e);
+          //TODO: Display an error message to the user.
           debugger;
         });
 

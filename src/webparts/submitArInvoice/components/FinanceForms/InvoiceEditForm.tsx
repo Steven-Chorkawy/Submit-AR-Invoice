@@ -92,6 +92,7 @@ function GridButtons({ cancel, saveResult }) {
 export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any> {
   constructor(props) {
     super(props);
+    debugger;
     this.state = {
       productInEdit: this.props.dataItem || null,
       visible: false,
@@ -153,8 +154,16 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                 </div>
                 <div style={{ marginBottom: "2px" }}>
                   <Field
-                    id="Requires_x0020_Accountant_x0020_"
-                    name="Requires_x0020_Accountant_x0020_"
+                    id={
+                      this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"]
+                        ? 'Requires_x0020_Accountant_x0020_'
+                        : 'Requires_x0020_Accountant_x0020_Approval'
+                    }
+                    name={
+                      this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"]
+                        ? 'Requires_x0020_Accountant_x0020_'
+                        : 'Requires_x0020_Accountant_x0020_Approval'
+                    }
                     label="Requires Approval From Accountant"
                     data={this.props.siteUsersData}
                     dataItemKey="Id"

@@ -175,10 +175,12 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
           .getAll(),
         sp.web.lists.getByTitle(MyLists["AR Invoices"])
           .items
+          .select('*, Requires_x0020_Accountant_x0020_Approval/ID, Requires_x0020_Accountant_x0020_Approval/Title, Requires_x0020_Accountant_x0020_Approval/EMail')
+          .expand('Requires_x0020_Accountant_x0020_Approval')
           .filter(idsForARDocuments.join(' or '))
           .getAll(),
       ])
-        .then((values) => {
+        .then(async (values) => {
           console.log('Raw Query Res');
           console.log(values);
           /***********************************
@@ -196,7 +198,9 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
           for (let index = 0; index < processedResponse.data.length; index++) {
 
             // Replace a request record with an AR Invoice record.
+            debugger;
             if (values[ARLoadQuery.ARInvoiceDocuments].filter(f => Number(f.AR_x0020_RequestId) === processedResponse.data[index].ID).length > 0) {
+              let file = await sp.web.getFolderByServerRelativePath(MyLists["AR Invoices"]).files();
               processedResponse.data[index] = values[ARLoadQuery.ARInvoiceDocuments].filter(f => Number(f.AR_x0020_RequestId) === processedResponse.data[index].ID)[0];
             }
 
