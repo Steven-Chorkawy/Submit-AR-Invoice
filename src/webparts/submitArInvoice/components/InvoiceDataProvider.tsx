@@ -179,10 +179,13 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
           .expand('Requires_x0020_Accountant_x0020_Approval')
           .filter(idsForARDocuments.join(' or '))
           .getAll(),
+        sp.web.getFolderByServerRelativePath(MyLists["AR Invoices"])
+          .files()
       ])
         .then(async (values) => {
           console.log('Raw Query Res');
           console.log(values);
+          debugger;
           /***********************************
            *
            * 0 = G/L Accounts.
@@ -193,6 +196,8 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
            * 4 = Cancel Requests.
            * 5 = AR Invoice Documents.
            *
+           * ? This is working.  Just need to add it to the ARLoadQuery enum.
+           * ? 6 = TESTING.  Will this give me a link to documents?
            ***********************************/
           // Using each of the accounts that we found we will not attach them to the invoice object.
           for (let index = 0; index < processedResponse.data.length; index++) {
@@ -202,6 +207,10 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
             if (values[ARLoadQuery.ARInvoiceDocuments].filter(f => Number(f.AR_x0020_RequestId) === processedResponse.data[index].ID).length > 0) {
               let file = await sp.web.getFolderByServerRelativePath(MyLists["AR Invoices"]).files();
               processedResponse.data[index] = values[ARLoadQuery.ARInvoiceDocuments].filter(f => Number(f.AR_x0020_RequestId) === processedResponse.data[index].ID)[0];
+              let url = values[6].find(f => f.Title === processedResponse.data[index].Title).ServerRelativeUrl;
+              debugger;
+              processedResponse.data[index].ServerRedirectedEmbedUrl = url;
+              processedResponse.data[index].ServerRedirectedEmbedUri = url;
             }
 
             // For Request Content Type
