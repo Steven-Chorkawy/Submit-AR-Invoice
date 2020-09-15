@@ -165,6 +165,7 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                     // * valueGetter is a very nice method! No need to set the state anymore.
                     disabled={formRenderProps.valueGetter('Invoice_x0020_Status') !== InvoiceStatus["Accountant Approval Required"]}
                     component={MyFormComponents.FormComboBox}
+                    hint={`To enable set status to 'Accountant Approval Required'`}
                   />
                 </div>
                 <div
@@ -183,6 +184,7 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                     textField="Title"
                     disabled={formRenderProps.valueGetter('Invoice_x0020_Status') !== InvoiceStatus["Entered into GP"]}
                     component={MyFormComponents.FormComboBox}
+                    hint={`To enable set status to 'Entered into GP'`}
                   />
                 </div>
                 <div style={{ marginBottom: "2px" }}>
