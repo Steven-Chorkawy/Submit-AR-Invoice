@@ -120,11 +120,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         field: "Invoice_x0020_Status",
         operator: "neq",
         value: InvoiceStatus.Submitted
-      },
-      {
-        field: "Invoice_x0020_Status",
-        operator: "neq",
-        value: InvoiceStatus.Completed
       }
     ]
   };
