@@ -2,7 +2,6 @@ import { UrlQueryParameterCollection } from '@microsoft/sp-core-library';
 import { InvoiceActionRequiredRequestType, IInvoiceActionRequired } from './interface/IInvoiceActionRequired';
 import { InvoiceActionResponseStatus } from './enums/MyEnums';
 import { sp } from "@pnp/sp";
-import { Web } from "@pnp/sp/webs";
 import "@pnp/sp/webs";
 import "@pnp/sp/files";
 import "@pnp/sp/folders";
@@ -64,13 +63,13 @@ export const BuildGUID = () => {
  * @param arRequestId AR Request ID
  * @param arInvoiceId AR Invoice ID (optional)
  */
-export const CreateInvoiceAction = async (assignedToId: number, requestType: InvoiceActionRequiredRequestType, arRequestId: number, arInvoiceId?: number) => {
+export const CreateInvoiceAction = async (assignedToId: number, requestType: InvoiceActionRequiredRequestType, arRequestId: number, arInvoiceId?: number, message?: string) => {
   let newAction: IInvoiceActionRequired = {
     AR_x0020_Invoice_x0020_RequestId: arRequestId,
     AR_x0020_InvoiceId: arInvoiceId,
     Title: 'Approval Required',
     AssignedToId: assignedToId,
-    Body: 'Approval Required',
+    Body: message ? message : 'Approval Required',
     Request_x0020_Type: requestType,
     Response_x0020_Status: InvoiceActionResponseStatus.Waiting
   };
@@ -82,3 +81,4 @@ export const CreateInvoiceAction = async (assignedToId: number, requestType: Inv
       return await result.item.get();
     });
 };
+

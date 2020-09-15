@@ -48,7 +48,7 @@ export interface IGPAttachmentProps {
 
 interface IInvoiceEditFormProps {
   GPAttachmentWidgetProps: IGPAttachmentProps;
-  dataItem: Array<IInvoiceItem>;
+  dataItem: IInvoiceItem;
   onSubmit: any;
   cancel: any;
   saveResult: any;
@@ -56,6 +56,7 @@ interface IInvoiceEditFormProps {
   statusData: any;
   siteUsersData: any;
   onUpdateAccount: any;
+  onNoteToDepChange?: any;
 }
 
 function GridButtons({ cancel, saveResult }) {
@@ -153,6 +154,24 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                     data={this.props.statusData}
                     component={MyFormComponents.FormDropDownList}
                   />
+                  {
+                    formRenderProps.valueGetter('Invoice_x0020_Status') === InvoiceStatus["Hold for Department"] &&
+                    this.state.productInEdit.Requested_x0020_By &&
+                    this.props.dataItem.Invoice_x0020_Status !== InvoiceStatus["Hold for Department"] &&
+                    < div >
+                      <hr />
+                      <Card style={{ paddingTop: '10px' }}>
+                        <CardTitle style={{ marginBottom: '0px' }}>Send note to {this.state.productInEdit.Requested_x0020_By.Title}</CardTitle>
+                        <CardBody>
+                          <textarea style={{ width: '100%' }} onChange={this.props.onNoteToDepChange}></textarea>
+                        </CardBody>
+                        <CardActions orientation='vertical'>
+                          <Button>{'Send & Save'}</Button>
+                        </CardActions>
+                      </Card>
+                      <hr />
+                    </div>
+                  }
                 </div>
                 <div style={{ marginBottom: "2px" }}>
                   <Field
@@ -184,8 +203,16 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                   }
                 >
                   <Field
-                    id="RequiresAccountingClerkTwoApprov"
-                    name="RequiresAccountingClerkTwoApprov"
+                    id={
+                      this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"]
+                        ? 'RequiresAccountingClerkTwoApprov'
+                        : 'RequiresAccountingClerkTwoApproval'
+                    }
+                    name={
+                      this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"]
+                        ? 'RequiresAccountingClerkTwoApprov'
+                        : 'RequiresAccountingClerkTwoApproval'
+                    }
                     label="Requires Approval From Accounting Clerk 2"
                     data={this.props.siteUsersData}
                     dataItemKey="Id"
