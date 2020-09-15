@@ -45,6 +45,9 @@ interface IMyFinanceFormState {
   currentUser?: any;
   saveResult: IMySaveResult;
   gpAttachmentProps: IGPAttachmentProps;
+
+  // If Finance needs to send a note.
+  noteForDepartment?: string;
 }
 
 interface IInvoicesDataState {
@@ -546,6 +549,21 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
             }
           }
 
+          debugger;
+
+          // Check to see if we need to send an approval request to the department requester.
+          // This means that Finance requires more information.
+          if (data.Invoice_x0020_Status === InvoiceStatus["Hold for Department"]) {
+            debugger;
+            await CreateInvoiceAction(
+              this.state.productInEdit.Requested_x0020_By.Id,
+              InvoiceActionRequiredRequestType.EditRequired,
+              data.Id,
+              null,
+              this.state.noteForDepartment
+            );
+          }
+
           // This gets the result of the updated item.
           // After we've updated this item we can start adding extra objects back to it.
           // These extra objects are objects that the forms use but cannot be sent to SP for saving.
@@ -577,6 +595,12 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
       return output;
     }
+  }
+
+  public onNoteToDepChange = (e) => {
+    this.setState({
+      noteForDepartment: e.target.value
+    });
   }
   //#endregion Update Methods
 
@@ -1089,6 +1113,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
             statusData={this.state.statusData}
             siteUsersData={this.state.siteUsersData}
             // onSubmit={this.onSubmit}
+            onNoteToDepChange={this.onNoteToDepChange}
             onSubmit={this.onSubmit2}
             saveResult={this.state.saveResult}
             cancel={this.cancelEditForm}
