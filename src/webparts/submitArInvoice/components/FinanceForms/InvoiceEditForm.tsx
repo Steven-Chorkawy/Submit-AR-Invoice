@@ -201,7 +201,9 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                     <CardBody>
                       <CardTitle><b>Upload GP Attachment</b></CardTitle>
                       <p>{this.props.GPAttachmentWidgetProps.errorMessage}</p>
-                      {this.state.productInEdit.ContentTypeId === MyContentTypes["AR Invoice Document Item"] &&
+                      {
+                        this.state.productInEdit.ContentTypeId === MyContentTypes["AR Invoice Document Item"] &&
+                        this.state.productInEdit.ServerRedirectedEmbedUrl &&
                         <a target='_blank' href={this.state.productInEdit.ServerRedirectedEmbedUrl} style={{ margin: '2px' }}>
                           <div className='k-chip k-chip-filled k-chip-info'>
                             <div className='k-chip-content'>
