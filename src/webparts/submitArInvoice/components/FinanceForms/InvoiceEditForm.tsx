@@ -184,8 +184,16 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                   }
                 >
                   <Field
-                    id="RequiresAccountingClerkTwoApprov"
-                    name="RequiresAccountingClerkTwoApprov"
+                    id={
+                      this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"]
+                        ? 'RequiresAccountingClerkTwoApprov'
+                        : 'RequiresAccountingClerkTwoApproval'
+                    }
+                    name={
+                      this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"]
+                        ? 'RequiresAccountingClerkTwoApprov'
+                        : 'RequiresAccountingClerkTwoApproval'
+                    }
                     label="Requires Approval From Accounting Clerk 2"
                     data={this.props.siteUsersData}
                     dataItemKey="Id"

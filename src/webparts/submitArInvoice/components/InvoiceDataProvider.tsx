@@ -114,6 +114,18 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
     RequiresAccountingClerkTwoApprov,
     RelatedAttachments`;
 
+  // Same as 'includeString' but with slight differences.
+  const includeARDocumentString = `*,
+  Requires_x0020_Accountant_x0020_Approval/ID,
+  Requires_x0020_Accountant_x0020_Approval/Title,
+  Requires_x0020_Accountant_x0020_Approval/EMail,
+  RequiresAccountingClerkTwoApproval/ID,
+  RequiresAccountingClerkTwoApproval/Title,
+  RequiresAccountingClerkTwoApproval/EMail`;
+
+  // Same as 'expandString' but with slight differences.
+  const expandStringARDocumentString = `Requires_x0020_Accountant_x0020_Approval, RequiresAccountingClerkTwoApproval`;
+
   sp.web.lists.getByTitle(MyLists["AR Invoice Requests"])
     .items
     .select(includeString)
@@ -180,8 +192,8 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
           .getAll(),
         sp.web.lists.getByTitle(MyLists["AR Invoices"])
           .items
-          .select('*, Requires_x0020_Accountant_x0020_Approval/ID, Requires_x0020_Accountant_x0020_Approval/Title, Requires_x0020_Accountant_x0020_Approval/EMail')
-          .expand('Requires_x0020_Accountant_x0020_Approval')
+          .select(includeARDocumentString)
+          .expand(expandStringARDocumentString)
           .filter(idsForARDocuments.join(' or '))
           .getAll(),
         sp.web.getFolderByServerRelativePath(MyLists["AR Invoices"]).files()
