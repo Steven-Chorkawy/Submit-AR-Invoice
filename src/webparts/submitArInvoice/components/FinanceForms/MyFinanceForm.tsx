@@ -416,7 +416,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
         // If element has an ID property that means it has already been uploaded.
         if (!element.ID) {
-          debugger;
+
           // TODO: Get this string from the web parts config settings.
           // ? This is throwing an exception when uploading a related attachment to an invoice document.
           let fileUploadResult = await sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/').files
@@ -498,7 +498,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * @param data Data submitted from the Kendo Form.
    */
   private _updateFormFields = async (data) => {
-    debugger;
+
     // These are the fields that can be modified on this form.
     let updateObject = {
       Invoice_x0020_Status: data.Invoice_x0020_Status,
@@ -538,14 +538,14 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         });
     }
     else {
-      debugger;
+
       updateObject['Requires_x0020_Accountant_x0020_ApprovalId'] = data.Requires_x0020_Accountant_x0020_ ? data.Requires_x0020_Accountant_x0020_.Id : null;
       // No need to create an action for AccountantApproval here because their approval would have already been given.
       var output = await sp.web.lists.getByTitle(MyLists["AR Invoices"]).items
         .getById(data.ID)
         .update(updateObject);
 
-      debugger;
+
       return output;
     }
   }

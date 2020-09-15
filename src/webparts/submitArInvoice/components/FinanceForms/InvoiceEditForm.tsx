@@ -92,7 +92,6 @@ function GridButtons({ cancel, saveResult }) {
 export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any> {
   constructor(props) {
     super(props);
-    debugger;
     this.state = {
       productInEdit: this.props.dataItem || null,
       visible: false,

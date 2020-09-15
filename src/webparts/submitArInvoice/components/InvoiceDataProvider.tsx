@@ -62,6 +62,7 @@ enum ARLoadQuery {
   FilesRelatedAttachments = 3,
   CancelRequests = 4,
   ARInvoiceDocuments = 5,
+  ARInvoiceLink = 6,
 }
 
 class LoadingPanel extends React.Component {
@@ -179,13 +180,12 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
           .expand('Requires_x0020_Accountant_x0020_Approval')
           .filter(idsForARDocuments.join(' or '))
           .getAll(),
-        sp.web.getFolderByServerRelativePath(MyLists["AR Invoices"])
-          .files()
+        sp.web.getFolderByServerRelativePath(MyLists["AR Invoices"]).files()
       ])
         .then(async (values) => {
           console.log('Raw Query Res');
           console.log(values);
-          debugger;
+
           /***********************************
            *
            * 0 = G/L Accounts.
@@ -195,20 +195,14 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
            *      This is used to get the URL to the files.
            * 4 = Cancel Requests.
            * 5 = AR Invoice Documents.
-           *
-           * ? This is working.  Just need to add it to the ARLoadQuery enum.
-           * ? 6 = TESTING.  Will this give me a link to documents?
+           * 6 = Get links to AR Invoice Documents
            ***********************************/
           // Using each of the accounts that we found we will not attach them to the invoice object.
           for (let index = 0; index < processedResponse.data.length; index++) {
-
             // Replace a request record with an AR Invoice record.
-            debugger;
             if (values[ARLoadQuery.ARInvoiceDocuments].filter(f => Number(f.AR_x0020_RequestId) === processedResponse.data[index].ID).length > 0) {
-              let file = await sp.web.getFolderByServerRelativePath(MyLists["AR Invoices"]).files();
               processedResponse.data[index] = values[ARLoadQuery.ARInvoiceDocuments].filter(f => Number(f.AR_x0020_RequestId) === processedResponse.data[index].ID)[0];
-              let url = values[6].find(f => f.Title === processedResponse.data[index].Title).ServerRelativeUrl;
-              debugger;
+              let url = values[ARLoadQuery.ARInvoiceLink].find(f => f.Title === processedResponse.data[index].Title).ServerRelativeUrl;
               processedResponse.data[index].ServerRedirectedEmbedUrl = url;
               processedResponse.data[index].ServerRedirectedEmbedUri = url;
             }
