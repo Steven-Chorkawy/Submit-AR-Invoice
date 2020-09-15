@@ -59,39 +59,38 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
 
   //#region Filter Invoice Methods
   private _allInvoices = () => {
-    return this.props.invoices;
+    return  this.props.invoices ? this.props.invoices : null;
   }
 
   private _submittedInvoices = () => {
-    return this.props.invoices.filter(f => f.Invoice_x0020_Status === InvoiceStatus.Submitted);
+    return this.props.invoices ? this.props.invoices.filter(f => f.Invoice_x0020_Status === InvoiceStatus.Submitted) : null;
   }
 
   // Get invoices that have actions assigned to this user with a status of Waiting.
   private _invoicesForCurrentUser = () => {
-    let output = this.props.invoices.filter(x =>
+    return this.props.invoices ? this.props.invoices.filter(x =>
       x.Actions.some(y =>
         y.Response_x0020_Status === InvoiceActionResponseStatus.Waiting
         && y.AssignedToId === this.state.currentUser.Id
       )
-    );
-    return output;
+    ) : null;
   }
 
   // return invoices that have all actions with a status of approved.
   private _approvedInvoices = () => {
-    return this.props.invoices
+    return this.props.invoices ? this.props.invoices
       .filter(
         f => f.Actions.filter(ff => ff.Response_x0020_Status === InvoiceActionResponseStatus.Approved)
           .length === f.Actions.length && f.Actions.length > 0
-      );
+      ) : null;
   }
 
   private _waitingApproval = () => {
-    return this.props.invoices.filter(x =>
+    return this.props.invoices ? this.props.invoices.filter(x =>
       x.Actions.some(y =>
         y.Response_x0020_Status === InvoiceActionResponseStatus.Waiting
       )
-    );
+    ) : null;
   }
   //#endregion Filter Invoice Methods
 
@@ -118,7 +117,12 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
       this.state.currentUser && <div>
         <ButtonGroup>
           {this.state.filterButtons.map((button, index) => {
-            let buttonDataLength = button.getData().length;
+            let buttonDataLength = 0;
+
+            if(button.getData()) {
+              buttonDataLength = button.getData().length;
+            }
+
             return (
               <Button
                 id={index.toString()}

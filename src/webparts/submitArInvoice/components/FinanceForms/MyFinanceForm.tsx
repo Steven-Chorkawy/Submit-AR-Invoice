@@ -29,6 +29,7 @@ import { InvoiceEditForm, IGPAttachmentProps } from './InvoiceEditForm';
 import { FileRefCell } from '../FileRefCell';
 import { IMySaveResult } from '../interface/IMySaveResult';
 import { InvoiceActionRequiredRequestType } from '../interface/IInvoiceActionRequired';
+import { QuickFilterButtonGroup } from '../QuickFilterButtonGroup';
 
 
 interface IMyFinanceFormState {
@@ -134,6 +135,20 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   //#endregion
 
   //#region Methods
+  /**
+   * Filter Invoices by a single click of a button.
+   * @param e Button click event
+   * @param showTheseInvoices The invoices that we want to display
+   */
+  public onFilterButtonClick = (e, showTheseInvoices) => {
+    this.setState({
+      invoices: {
+        data: showTheseInvoices,
+        total: showTheseInvoices.length
+      }
+    });
+  }
+
   public dataReceived = (invoices) => {
     var dataHolder: any = filterBy(invoices.data, this.state.filter);
 
@@ -589,20 +604,10 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       response => {
         this.setState({
           invoices: response,
-          receivedData: response.data
+          receivedData: response
         });
         callBack();
       });
-  }
-
-  // TODO: Update complete this method.
-  /**
-   * Create an action for accountant approval.
-   *
-   * @param requiresAccountantApproval
-   */
-  private _createAccountantApproval = (requiresAccountantApproval) => {
-
   }
 
   /**
@@ -662,6 +667,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    */
   public onSubmit = async (data) => {
     const invoices = this.state.invoices.data.slice();
+    console.log('onSubmit');
+    console.log(data);
 
     try {
       const index = invoices.findIndex(p => p.ID === data.ID);
@@ -672,8 +679,10 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         Invoice_x0020_Status: data.Invoice_x0020_Status,
         Invoice_x0020_Number: data.Invoice_x0020_Number,
         Batch_x0020_Number: data.Batch_x0020_Number,
-        Requires_x0020_Accountant_x0020_Id: data.Requires_x0020_Accountant_x0020_ ? data.Requires_x0020_Accountant_x0020_.Id : null
+        Requires_x0020_Accountant_x0020_Id: data.Requires_x0020_Accountant_x0020_ ? data.Requires_x0020_Accountant_x0020_.Id : null,
+        RequiresAccountingClerkTwoApprovId: data.RequiresAccountingClerkTwoApprov ? data.RequiresAccountingClerkTwoApprov.Id : null
       };
+
 
       // Update the record.
       // This will either update the request or the invoice record.
@@ -688,12 +697,27 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
             // e.x. The Actions property is not a property that SharePoint uses but it is used to display user requests.
             await afterUpdate.item.get();
 
+            // Check if we need to create an AccountingClerk2Approval.
+            // Only create a new action here if this is a new Clerk given.
+            if (data.RequiresAccountingClerkTwoApprovId === null && data.RequiresAccountingClerkTwoApprov) {
+              if (this.state.productInEdit.RequiresAccountingClerkTwoApprovId !== data.RequiresAccountingClerkTwoApprov.Id) {
+                // If the existing accounting clerk has been replaced we will need to delete the record.
+                // TODO: Remove the old accounting clerks actions ONLY if they're still on a waiting status.
+              }
+              await CreateInvoiceAction(
+                data.RequiresAccountingClerkTwoApprov.Id,
+                InvoiceActionRequiredRequestType.AccountingClerk2ApprovalRequired,
+                data.Id
+              );
+            }
+
             // Checks to see if Req Acc Approval exists.
             if (data.Requires_x0020_Accountant_x0020_) {
               // Checks to see if Req Acc Approval is the same that is already present in the state.
               // If the Req Acc Approval ID is the same as the state objects that means we've already sent a task to that accountant.
               // * This is here to prevent an InvoiceAction item from being created each time the invoice is modified.
-              if (this.state.productInEdit.Requires_x0020_Accountant_x0020_ === undefined || this.state.productInEdit.Requires_x0020_Accountant_x0020_.Id !== data.Requires_x0020_Accountant_x0020_.Id) {
+              if (this.state.productInEdit.Requires_x0020_Accountant_x0020_ === undefined
+                || this.state.productInEdit.Requires_x0020_Accountant_x0020_.Id !== data.Requires_x0020_Accountant_x0020_.Id) {
                 await CreateInvoiceAction(
                   data.Requires_x0020_Accountant_x0020_.Id,
                   InvoiceActionRequiredRequestType.AccountantApprovalRequired,
@@ -707,7 +731,23 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         // No need to create an action for AccountantApproval here because their approval would have already been given.
         sp.web.lists.getByTitle(MyLists["AR Invoices"]).items
           .getById(data.ID)
-          .update(updateObject);
+          .update(updateObject).then(async afterUpdate => {
+            // Check if we need to create an AccountingClerk2Approval.
+            // Only create a new action here if this is a new Clerk given.
+            if (data.RequiresAccountingClerkTwoApprovId === null && data.RequiresAccountingClerkTwoApprov) {
+              if (this.state.productInEdit.RequiresAccountingClerkTwoApprovId !== data.RequiresAccountingClerkTwoApprov.Id) {
+                // If the existing accounting clerk has been replaced we will need to delete the record.
+                // TODO: Remove the old accounting clerks actions ONLY if they're still on a waiting status.
+              }
+              debugger;
+              await CreateInvoiceAction(
+                data.RequiresAccountingClerkTwoApprov.Id,
+                InvoiceActionRequiredRequestType.AccountingClerk2ApprovalRequired,
+                data.AR_x0020_RequestId,
+                data.Id
+              );
+            }
+          });
       }
 
       // ! September 08, 2020.
@@ -995,6 +1035,9 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                 }
               >Clear All Filters</Button>
             )}
+
+            <QuickFilterButtonGroup invoices={this.state.receivedData.data} onButtonClick={this.onFilterButtonClick} />
+
             {hasEditedItem && (
               <Button
                 title="Cancel current changes"

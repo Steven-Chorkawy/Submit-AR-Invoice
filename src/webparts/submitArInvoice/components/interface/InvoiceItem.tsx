@@ -81,6 +81,7 @@ interface IInvoiceQueryItem {
   Invoice_x0020_Details: string;
   Accountant_x0020_ApprovalId: number;
   Requires_x0020_Accountant_x0020_ApprovalId: number;
+  RequiresAccountingClerkTwoApprovId: number;
   Completed_x0020_ApprovalId: number;
   Requires_x0020_Completed_x0020_ApprovalId: number;
   Batch_x0020_Number: string;
@@ -118,6 +119,10 @@ interface IInvoiceItem extends IInvoiceQueryItem {
   Requested_x0020_By?: IPersonField;
 
   Requires_x0020_Department_x0020_?: Array<IPersonField>;
+
+  Requires_x0020_Accountant_x0020_?: IPersonField;
+
+  RequiresAccountingClerkTwoApprov?: IPersonField;
 
   // This is used by Kendo components to show or hide more details.
   expanded: boolean;

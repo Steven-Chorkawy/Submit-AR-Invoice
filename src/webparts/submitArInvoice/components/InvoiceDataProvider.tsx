@@ -99,6 +99,9 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
     Requires_x0020_Accountant_x0020_/Id,
     Requires_x0020_Accountant_x0020_/Title,
     Requires_x0020_Accountant_x0020_/EMail,
+    RequiresAccountingClerkTwoApprov/Id,
+    RequiresAccountingClerkTwoApprov/Title,
+    RequiresAccountingClerkTwoApprov/EMail,
     RelatedAttachments/Title,
     RelatedAttachments/Id,
     RelatedAttachments/ID`;
@@ -108,6 +111,7 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
     Requested_x0020_By,
     Requires_x0020_Department_x0020_,
     Requires_x0020_Accountant_x0020_,
+    RequiresAccountingClerkTwoApprov,
     RelatedAttachments`;
 
   sp.web.lists.getByTitle(MyLists["AR Invoice Requests"])
