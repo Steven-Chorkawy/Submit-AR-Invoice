@@ -536,7 +536,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
             // Checks to see if Req Acc Approval is the same that is already present in the state.
             // If the Req Acc Approval ID is the same as the state objects that means we've already sent a task to that accountant.
             // * This is here to prevent an InvoiceAction item from being created each time the invoice is modified.
-            if (this.state.productInEdit.Requires_x0020_Accountant_x0020_ === undefined || this.state.productInEdit.Requires_x0020_Accountant_x0020_.Id !== data.Requires_x0020_Accountant_x0020_.Id) {
+            if (this.state.productInEdit.Requires_x0020_Accountant_x0020_ === undefined
+              || this.state.productInEdit.Requires_x0020_Accountant_x0020_.Id !== data.Requires_x0020_Accountant_x0020_.Id) {
               await CreateInvoiceAction(
                 data.Requires_x0020_Accountant_x0020_.Id,
                 InvoiceActionRequiredRequestType.AccountantApprovalRequired,
@@ -555,13 +556,24 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     else {
       debugger;
       updateObject['Requires_x0020_Accountant_x0020_ApprovalId'] = data.Requires_x0020_Accountant_x0020_ ? data.Requires_x0020_Accountant_x0020_.Id : null;
-      updateObject['RequiresAccountingClerkTwoApprovalId'] = data.RequiresAccountingClerkTwoApprov ? data.RequiresAccountingClerkTwoApprov.Id : null;
+      updateObject['RequiresAccountingClerkTwoApprovalId'] = data.RequiresAccountingClerkTwoApproval ? data.RequiresAccountingClerkTwoApproval.Id : null;
 
       // No need to create an action for AccountantApproval here because their approval would have already been given.
       var output = await sp.web.lists.getByTitle(MyLists["AR Invoices"]).items
         .getById(data.ID)
         .update(updateObject);
 
+      // Check to see if the RequiresAccountingClerkTwoApprovalId already existed.
+      // if it didn't then we need to send an InvoiceAction.
+      if (this.state.productInEdit.RequiresAccountingClerkTwoApproval === undefined
+        || this.state.productInEdit.RequiresAccountingClerkTwoApproval.Id !== data.RequiresAccountingClerkTwoApproval.Id) {
+        await CreateInvoiceAction(
+          data.RequiresAccountingClerkTwoApproval.Id,
+          InvoiceActionRequiredRequestType.AccountingClerk2ApprovalRequired,
+          data.AR_x0020_RequestId,
+          data.Id
+        );
+      }
 
       return output;
     }
