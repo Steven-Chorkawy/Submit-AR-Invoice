@@ -513,7 +513,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * @param data Data submitted from the Kendo Form.
    */
   private _updateFormFields = async (data) => {
-
+    debugger;
     // These are the fields that can be modified on this form.
     let updateObject = {
       Invoice_x0020_Status: data.Invoice_x0020_Status,
@@ -553,8 +553,10 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         });
     }
     else {
-
+      debugger;
       updateObject['Requires_x0020_Accountant_x0020_ApprovalId'] = data.Requires_x0020_Accountant_x0020_ ? data.Requires_x0020_Accountant_x0020_.Id : null;
+      updateObject['RequiresAccountingClerkTwoApprovalId'] = data.RequiresAccountingClerkTwoApprov ? data.RequiresAccountingClerkTwoApprov.Id : null;
+
       // No need to create an action for AccountantApproval here because their approval would have already been given.
       var output = await sp.web.lists.getByTitle(MyLists["AR Invoices"]).items
         .getById(data.ID)
@@ -640,6 +642,13 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       ])
         .then(response => {
           debugger;
+
+          // TODO: Confirm everything has saved correctly.
+
+          // After everything has been confirmed close the edit window.
+          this.setState({
+            productInEdit: null
+          });
         })
         .catch(e => {
           console.log(e);
