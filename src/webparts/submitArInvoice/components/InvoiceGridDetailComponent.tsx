@@ -11,6 +11,7 @@ import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/
 // Custom Imports
 import { MyFinanceGlAccounts } from './MyFinanceGLAccounts';
 import { ActionResponseComponent } from './ActionResponseComponent';
+import { ActionStepsComponent } from './ActionStepsComponent';
 import { IInvoiceItem } from './interface/InvoiceItem';
 
 export class InvoiceGridDetailComponent extends GridDetailRow {
@@ -51,7 +52,9 @@ export class InvoiceGridDetailComponent extends GridDetailRow {
         }</div>}
 
         <h3>Actions Required</h3>
-        <ActionResponseComponent actions={this.detailItem.Actions}/>
+        {/* <ActionResponseComponent actions={this.detailItem.Actions} />
+        <hr /> */}
+        <ActionStepsComponent actions={this.detailItem.Actions} />
       </div>
     );
   }
