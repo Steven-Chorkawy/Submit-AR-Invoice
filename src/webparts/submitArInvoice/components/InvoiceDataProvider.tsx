@@ -121,10 +121,15 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
   Requires_x0020_Accountant_x0020_Approval/EMail,
   RequiresAccountingClerkTwoApproval/ID,
   RequiresAccountingClerkTwoApproval/Title,
-  RequiresAccountingClerkTwoApproval/EMail`;
+  RequiresAccountingClerkTwoApproval/EMail,
+  Requires_x0020_Authorization_x0020_By/Id`;
 
   // Same as 'expandString' but with slight differences.
-  const expandStringARDocumentString = `Requires_x0020_Accountant_x0020_Approval, RequiresAccountingClerkTwoApproval`;
+  const expandStringARDocumentString = `
+  Requires_x0020_Accountant_x0020_Approval,
+  RequiresAccountingClerkTwoApproval,
+  Requires_x0020_Authorization_x0020_By
+  `;
 
   sp.web.lists.getByTitle(MyLists["AR Invoice Requests"])
     .items

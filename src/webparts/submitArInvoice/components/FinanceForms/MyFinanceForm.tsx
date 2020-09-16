@@ -254,7 +254,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   private _uploadInvoiceDocument = async (data) => {
     const invoices = this.state.invoices.data;
 
-
     // ! September 08, 2020.
     // ! This is failing!  Figure out why this isn't running properly.
     // ! This is preventing me from converting an AR Request into an AR Invoice.
@@ -361,7 +360,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                     ])
                       .then(value => {
 
-                        const indexOf = invoices.findIndex(fInvoice => fInvoice.AR_x0020_RequestId === editItemId);
+                        const indexOf = invoices.findIndex(fInvoice => fInvoice.ID === editItemId);
+
                         invoices[indexOf].Id = itemProxy.ID;
                         invoices[indexOf].ID = itemProxy.ID;
                         this.setState({
@@ -369,7 +369,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                             data: invoices,
                             total: invoices.length
                           },
-                          productInEdit: undefined
+                          productInEdit: null
                         });
                       });
                   })
@@ -516,7 +516,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * @param data Data submitted from the Kendo Form.
    */
   private _updateFormFields = async (data) => {
-    debugger;
+
     // These are the fields that can be modified on this form.
     let updateObject = {
       Invoice_x0020_Status: data.Invoice_x0020_Status,
@@ -549,12 +549,12 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
             }
           }
 
-          debugger;
+
 
           // Check to see if we need to send an approval request to the department requester.
           // This means that Finance requires more information.
           if (data.Invoice_x0020_Status === InvoiceStatus["Hold for Department"]) {
-            debugger;
+
             await CreateInvoiceAction(
               this.state.productInEdit.Requested_x0020_By.Id,
               InvoiceActionRequiredRequestType.EditRequired,
@@ -572,7 +572,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         });
     }
     else {
-      debugger;
+
       updateObject['Requires_x0020_Accountant_x0020_ApprovalId'] = data.Requires_x0020_Accountant_x0020_ ? data.Requires_x0020_Accountant_x0020_.Id : null;
       updateObject['RequiresAccountingClerkTwoApprovalId'] = data.RequiresAccountingClerkTwoApproval ? data.RequiresAccountingClerkTwoApproval.Id : null;
 
@@ -677,19 +677,16 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         this._uploadInvoiceDocument(data)
       ])
         .then(response => {
-          debugger;
+
 
           // TODO: Confirm everything has saved correctly.
 
-          // After everything has been confirmed close the edit window.
-          this.setState({
-            productInEdit: null
-          });
+
         })
         .catch(e => {
           console.log(e);
           //TODO: Display an error message to the user.
-          debugger;
+
         });
 
       // TODO: After everything is said and done this is where I can set the productInEdit variable to null, which will close the edit form.
@@ -784,7 +781,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
                 // If the existing accounting clerk has been replaced we will need to delete the record.
                 // TODO: Remove the old accounting clerks actions ONLY if they're still on a waiting status.
               }
-              debugger;
+
               await CreateInvoiceAction(
                 data.RequiresAccountingClerkTwoApprov.Id,
                 InvoiceActionRequiredRequestType.AccountingClerk2ApprovalRequired,
