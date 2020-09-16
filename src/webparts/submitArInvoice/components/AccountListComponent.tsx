@@ -14,7 +14,7 @@ class AccountListItem extends React.Component<any, any> {
     super(props);
     this.state = {
       item: this.props.dataItem
-    }
+    };
   }
 
   public render() {
@@ -59,7 +59,7 @@ class AccountListComponent extends React.Component<IAccountListComponentProps, a
   }
 
   // TODO: Add CRUD methods here.
-  MyAccountItem = props => <AccountListItem {...props} />
+  private MyAccountItem = props => <AccountListItem {...props} />;
 
   public render() {
     return (

@@ -46,7 +46,7 @@ const CustomStep = (props) => {
             </Card>
         </Step>
     );
-}
+};
 
 export class ActionStepsComponent extends React.Component<IActionStepsComponentProps, IActionStepsComponentState> {
 
@@ -64,7 +64,7 @@ export class ActionStepsComponent extends React.Component<IActionStepsComponentP
                 });
             }),
             stepperValue: this.props.actions.map(el => el.Response_x0020_Status).lastIndexOf(InvoiceActionResponseStatus.Approved)
-        }
+        };
     }
 
     private _parseActionType = (action) => {
