@@ -13,6 +13,7 @@ import { MyFinanceGlAccounts } from './MyFinanceGLAccounts';
 import { ActionResponseComponent } from './ActionResponseComponent';
 import { ActionStepsComponent } from './ActionStepsComponent';
 import { IInvoiceItem } from './interface/InvoiceItem';
+import { AccountListComponent } from './AccountListComponent';
 
 export class InvoiceGridDetailComponent extends GridDetailRow {
 
@@ -28,10 +29,14 @@ export class InvoiceGridDetailComponent extends GridDetailRow {
     return (
       <div style={{ marginBottom: '3em;' }}>
         <h3>G/L Accounts</h3>
-        <MyFinanceGlAccounts
+        <AccountListComponent
+          accounts={this.detailItem.AccountDetails}
+          editable={false}
+        />
+        {/* <MyFinanceGlAccounts
           value={this.detailItem.AccountDetails}
           showCommandCell={false}
-          style={{ 'maxWidth': '1200px' }} />
+          style={{ 'maxWidth': '1200px' }} /> */}
         <hr />
 
         {this.detailItem.CancelRequests && <div> {this.detailItem.CancelRequests.length > 0 &&
