@@ -87,10 +87,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
     let currentFiles: IUploadingFile[] = this.state.MyFiles;
 
     try {
-      if (!dataItem.hasOwnProperty('RequestedBy')) {
-        return;
-      }
-
       let web = Web(this._siteUrl);
 
       let currentYear = new Date().getFullYear();
@@ -102,7 +98,9 @@ export class MyForm extends React.Component<IMyFormProps, any> {
         Title: newARTitle,
         Department: dataItem.Department,
         Date: dataItem.Date,
-        Requested_x0020_ById: dataItem.RequestedBy.Id ? dataItem.RequestedBy.Id : dataItem.RequestedBy.id,
+        Requested_x0020_ById: dataItem.RequestedBy
+          ? dataItem.RequestedBy.Id
+          : await (await this._EnsureUser(this.props.ctx.pageContext.user.email)).Id,
         Requires_x0020_Authorization_x0020_ById: {
           'results': dataItem.RequiresAuthorizationBy.map((user) => { return user.Id; })
         },
@@ -113,6 +111,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
         Urgent: dataItem.Urgent
       };
 
+      debugger;
       // Add customer data.
       // dataItem.Customer.ID is undefined when a custom customer is added.
       if (dataItem.Customer.ID === undefined) {
@@ -348,6 +347,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
    * @param userName Users 'id' that comes in a form of a string.
    */
   private _EnsureUser(userName: string): Promise<ISPUser> {
+    debugger;
     var data = { logonName: userName };
 
     return this.props.ctx.spHttpClient
@@ -365,6 +365,19 @@ export class MyForm extends React.Component<IMyFormProps, any> {
       .then((json: ISPUser) => {
         return json;
       });
+  }
+
+  private _EnsureUsers = async (users: Array<any>): Promise<Array<ISPUser>> => {
+    let returnOutput = [];
+    for (let index = 0; index < users.length; index++) {
+      const user = users[index];
+      let output = await this._EnsureUser(user.id)
+
+      returnOutput.push(output);
+    }
+
+
+    return returnOutput;
   }
 
   public render() {
@@ -425,7 +438,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   id="RequestedBy"
                   name="RequestedBy"
                   label="Requested By"
-                  wrapperStyle={{ width: '50%', marginRight: '18px' }}
+                  personSelectionLimit={1}
                   selectedItems={e => {
                     e && e.length > 0 &&
                       this._EnsureUser(e[0].id)
@@ -437,19 +450,26 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   component={MyFormComponents.FormPeoplePicker}
                   defaultSelectedUsers={[this.props.ctx.pageContext.user.email]}
                 />
-                <hr />
+              </div>
 
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
                   id="RequiresAuthorizationBy"
                   name="RequiresAuthorizationBy"
                   label="* Requires Authorization By"
-                  wrapperStyle={{ width: '50%' }}
-                  data={this.props.siteUsers}
                   dataItemKey="Email"
                   textField="Title"
-                  validator={MyValidators.requiresApprovalFrom}
-                  component={MyFormComponents.FormMultiSelect}
-                //onchange={this.onDialogInputChange}
+                  personSelectionLimit={10}
+                  context={this.props.ctx}
+                  selectedItems={e => {
+                    e && e.length > 0 &&
+                      this._EnsureUsers(e)
+                        .then(response => {
+
+                          formRenderProps.onChange('RequiresAuthorizationBy', { value: response });
+                        });
+                  }}
+                  component={MyFormComponents.FormPeoplePicker}
                 />
               </div>
 

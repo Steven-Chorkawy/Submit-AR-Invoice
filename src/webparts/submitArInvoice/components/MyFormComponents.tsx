@@ -829,6 +829,7 @@ export const FormPeoplePicker = (fieldRenderProps) => {
         context={fieldRenderProps.context}
         showtooltip={false}
         isRequired={true}
+        personSelectionLimit={fieldRenderProps.personSelectionLimit}
         // * selectedItems is essentially the onChange event.
         selectedItems={fieldRenderProps.selectedItems}
         showHiddenInUI={false}
