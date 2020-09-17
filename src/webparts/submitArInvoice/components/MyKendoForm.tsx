@@ -442,7 +442,9 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   selectedItems={e => {
                     e && e.length > 0 &&
                       this._EnsureUser(e[0].id)
-                        .then(response => { formRenderProps.onChange('RequestedBy', { value: response }); });
+                        .then(response => {
+                          formRenderProps.onChange('RequestedBy', { value: response });
+                        });
                   }}
                   context={this.props.ctx}
                   dataItemKey="Email"
@@ -465,7 +467,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                     e && e.length > 0 &&
                       this._EnsureUsers(e)
                         .then(response => {
-
                           formRenderProps.onChange('RequiresAuthorizationBy', { value: response });
                         });
                   }}
