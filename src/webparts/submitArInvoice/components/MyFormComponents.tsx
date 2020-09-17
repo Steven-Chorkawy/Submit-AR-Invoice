@@ -838,4 +838,4 @@ export const FormPeoplePicker = (fieldRenderProps) => {
       />
     </FieldWrapper>
   );
-}
+};

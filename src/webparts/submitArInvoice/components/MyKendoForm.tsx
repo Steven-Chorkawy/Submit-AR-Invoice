@@ -335,10 +335,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
     return filterBy(data, filter);
   }
 
-  private _getPeoplePickerItems(items: any[]) {
-    console.log('Items:', items);
-  }
-
 
   /**
    * Convert the user object that we receive from the SPFx PeoplePicker control to a UserId.
@@ -347,9 +343,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
    * @param userName Users 'id' that comes in a form of a string.
    */
   private _EnsureUser(userName: string): Promise<ISPUser> {
-    debugger;
     var data = { logonName: userName };
-
     return this.props.ctx.spHttpClient
       .post(
         `${this.props.ctx.pageContext.site.absoluteUrl}/_api/web/ensureuser`,
@@ -371,12 +365,9 @@ export class MyForm extends React.Component<IMyFormProps, any> {
     let returnOutput = [];
     for (let index = 0; index < users.length; index++) {
       const user = users[index];
-      let output = await this._EnsureUser(user.id)
-
+      let output = await this._EnsureUser(user.id);
       returnOutput.push(output);
     }
-
-
     return returnOutput;
   }
 
@@ -439,13 +430,16 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   name="RequestedBy"
                   label="Requested By"
                   personSelectionLimit={1}
-                  selectedItems={e => {
-                    e && e.length > 0 &&
-                      this._EnsureUser(e[0].id)
-                        .then(response => {
-                          formRenderProps.onChange('RequestedBy', { value: response });
-                        });
-                  }}
+                  selectedItems={
+                    e => {
+                      if (e && e.length > 0) {
+                        this._EnsureUser(e[0].id)
+                          .then(response => {
+                            formRenderProps.onChange('RequestedBy', { value: response });
+                          });
+                      }
+                    }
+                  }
                   context={this.props.ctx}
                   dataItemKey="Email"
                   textField="Title"
@@ -464,11 +458,12 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   personSelectionLimit={10}
                   context={this.props.ctx}
                   selectedItems={e => {
-                    e && e.length > 0 &&
+                    if (e && e.length > 0) {
                       this._EnsureUsers(e)
                         .then(response => {
                           formRenderProps.onChange('RequiresAuthorizationBy', { value: response });
                         });
+                    }
                   }}
                   component={MyFormComponents.FormPeoplePicker}
                 />
@@ -560,10 +555,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   primary={true}
                   type={'submit'}
                   icon="save"
-                  onClick={e => {
-                    this._getPeoplePickerItems;
-                    this.handleSubmit;
-                  }}
+                  onClick={this.handleSubmit}
                 >Submit AR Invoice Request</Button>
                 <Button onClick={formRenderProps.onFormReset}>Clear</Button>
               </div>
