@@ -20,4 +20,7 @@ export enum MyLists {
 
   // New Approval Requests.
   InvoiceActionRequired = 'Invoice Action Required',
+
+  // Freshly submitted AR Requests before they are converted into 'AR Invoice Requests'.
+  ReceiveARInvoiceRequest = 'ReceiveARInvoiceRequest'
 }
