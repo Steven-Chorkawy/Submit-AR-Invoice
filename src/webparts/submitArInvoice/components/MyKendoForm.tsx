@@ -41,8 +41,9 @@ export interface IARFormModel {
 
 
 export interface IARAccountDetails {
-  AR_x0020_InvoiceId?: number;               //ID of Invoice
-  AR_x0020_Invoice_x0020_RequestId: number; // ID of AR Request
+  AR_x0020_InvoiceId?: number;              // ID of Invoice
+  ReceivedARRequestId?: number;             // ID of the incoming AR Request.
+  AR_x0020_Invoice_x0020_RequestId?: number; // ID of AR Request
   Account_x0020_Code: string;               // GL Code
   Amount: number;                           // Amount for account
   HST_x0020_Taxable: boolean;               // Is amount taxable?
@@ -67,31 +68,29 @@ export class MyForm extends React.Component<IMyFormProps, any> {
   }
 
 
+  // TODO: Update this method so it saves in 'ReceiveARInvoiceRequest' instead of AR Invoice Requests.
   /**
    * Form Submit Event
    * @param dataItem Data from form
    */
   public handleSubmit = async (dataItem) => {
+    debugger;
     // We will use this to update states later.
     let currentFiles: IUploadingFile[] = this.state.MyFiles;
 
     try {
-      if (!dataItem.hasOwnProperty('RequestedBy')) {
-        return;
-      }
-
       let web = Web(this._siteUrl);
 
       let currentYear = new Date().getFullYear();
       const newARTitle = currentYear + "-AR-" + BuildGUID();
-      let finalFileName = newARTitle + '.pdf';
+
 
       // Set the data for the invoice
       var myData = {
         Title: newARTitle,
         Department: dataItem.Department,
         Date: dataItem.Date,
-        Requested_x0020_ById: dataItem.RequestedBy.Id,
+        Requested_x0020_ById: dataItem.Requested_x0020_By.Id,
         Requires_x0020_Authorization_x0020_ById: {
           'results': dataItem.RequiresAuthorizationBy.map((user) => { return user.Id; })
         },
@@ -119,51 +118,55 @@ export class MyForm extends React.Component<IMyFormProps, any> {
 
       delete arInvoiceRequestListItemData.Requires_x0020_Authorization_x0020_ById;
 
+      debugger;
+      // * Save the AR Request to the SP List.
       let arInvoiceRequstListItem = await web.lists
-        .getByTitle(MyLists["AR Invoice Requests"])
+        .getByTitle(MyLists.ReceiveARInvoiceRequest)
         .items.add(arInvoiceRequestListItemData);
 
+      debugger;
+
+      // ! This step will no longer be done here.  It will be done in a flow.
+      // TODO: Delete this block of code.
       // Create an approval request.
       // For each requires approval from.
-      for (let index = 0; index < dataItem.RequiresAuthorizationBy.length; index++) {
+      // for (let index = 0; index < dataItem.RequiresAuthorizationBy.length; index++) {
 
-        const element = dataItem.RequiresAuthorizationBy[index];
-        let newAction: IInvoiceActionRequired = {
-          AR_x0020_Invoice_x0020_RequestId: arInvoiceRequstListItem.data.ID,
-          Title: 'Approval Required',
-          AssignedToId: element.Id,
-          Body: 'Approval Required',
-          Request_x0020_Type: InvoiceActionRequiredRequestType.DepartmentApprovalRequired,
-          Response_x0020_Status: InvoiceActionResponseStatus.Waiting
-        };
+      //   const element = dataItem.RequiresAuthorizationBy[index];
+      //   let newAction: IInvoiceActionRequired = {
+      //     ReceivedARRequestId: arInvoiceRequstListItem.data.ID,
+      //     Title: 'Approval Required',
+      //     AssignedToId: element.Id,
+      //     Body: 'Approval Required',
+      //     Request_x0020_Type: InvoiceActionRequiredRequestType.DepartmentApprovalRequired,
+      //     Response_x0020_Status: InvoiceActionResponseStatus.Waiting
+      //   };
 
-        web.lists.getByTitle(MyLists.InvoiceActionRequired)
-          .items
-          .add(newAction);
-      }
+      //   web.lists.getByTitle(MyLists.InvoiceActionRequired)
+      //     .items
+      //     .add(newAction);
+      // }
 
       const accounts: IARAccountDetails = { ...dataItem.GLAccounts };
 
-      // Set the data for the account details.
-      let accountDetails: IARAccountDetails[] = [];
-      dataItem.GLAccounts.map(account => {
-        accountDetails.push({
-          // AR_x0020_InvoiceId: innerFile.ID,
-          AR_x0020_Invoice_x0020_RequestId: arInvoiceRequstListItem.data.ID,
-          Account_x0020_Code: account.GLCode,
-          HST_x0020_Taxable: account.HSTTaxable,
-          Amount: account.Amount
-        });
-      });
-
       // Add Account Codes
-      this.addAccountCodesToListItem(accountDetails, arInvoiceRequstListItem);
+      dataItem.GLAccounts.map(account => {
+        debugger;
+        sp.web.lists.getByTitle(MyLists["AR Invoice Accounts"]).items
+          .add({
+            ReceivedARRequestId: arInvoiceRequstListItem.data.ID,
+            Account_x0020_Code: account.GLCode,
+            HST_x0020_Taxable: account.HSTTaxable,
+            Amount: account.Amount
+          });
+      });
 
       // Add related items
       if (dataItem.RelatedInvoiceAttachments) {
         let relatedInvoiceAttachmentIds = [];
         for (let index = 0; index < dataItem.RelatedInvoiceAttachments.length; index++) {
           const element = dataItem.RelatedInvoiceAttachments[index];
+          // TODO: Remove this hard coded URL and replace it with a config string.
           await web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/')
             .files
             .add(element.name, element.getRawFile(), true)
@@ -176,7 +179,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                     .items
                     .getById(itemProxy.ID)
                     .update({
-                      AR_x0020_Invoice_x0020_RequestId: arInvoiceRequstListItem.data.ID,
+                      ReceivedARRequestId: arInvoiceRequstListItem.data.ID,
                       Title: element.name
                     });
 
@@ -185,17 +188,20 @@ export class MyForm extends React.Component<IMyFormProps, any> {
             });
         }
 
+        // !! No longer required.  This will be done in a flow.
         // Add the attachments ID to the AR Request.
-        sp.web.lists.getByTitle(MyLists["AR Invoice Requests"])
-          .items
-          .getById(arInvoiceRequstListItem.data.Id)
-          .update({
-            RelatedAttachmentsId: {
-              results: relatedInvoiceAttachmentIds
-            }
-          });
+        // sp.web.lists.getByTitle(MyLists["AR Invoice Requests"])
+        //   .items
+        //   .getById(arInvoiceRequstListItem.data.Id)
+        //   .update({
+        //     RelatedAttachmentsId: {
+        //       results: relatedInvoiceAttachmentIds
+        //     }
+        //   });
       }
 
+
+      // TODO: Update this message so it let's the user know they'll be receiving an email once the request has been processed.
       // Provide a success message back to the user.
       currentFiles.push({
         FileName: 'To be set',
@@ -231,16 +237,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
     }
   }
 
-
-  /**
-   * handleSubmit2
-   */
-  public handleSubmit2 = async (event) => {
-    event.preventDefault();
-  }
-
-
-
   public uploadRelatedFiles = async (inputData, mainFile) => {
 
     let web = Web(this._siteUrl);
@@ -261,20 +257,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
           })
         );
     }
-  }
-
-
-  public addAccountCodesToListItem = async (accountDetails: IARAccountDetails[], listItem: IItemAddResult) => {
-    accountDetails.map(account => {
-      sp.web.lists.getByTitle(MyLists["AR Invoice Accounts"]).items.add(account)
-        .then(f => {
-          listItem.item.update({
-            AccountDetailsId: {
-              results: [f.data.ID]
-            }
-          });
-        });
-    });
   }
 
   public UploadStatusCard = () => {
@@ -303,6 +285,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
 
     return React.cloneElement(li, li.props, itemChildren);
   }
+
   public onCustomCustomerChange = (event) => {
 
     let target = event.target;
@@ -332,7 +315,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
     return (
       <div style={{ padding: '5px' }} key={this.state.stateHolder}>
         <Form
-          //onSubmit={this.handleSubmit}
           onSubmit={this.handleSubmit}
 
           initialValues={{
@@ -367,7 +349,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   ]}
                   validator={MyValidators.departmentValidator}
                   component={MyFormComponents.FormDropDownList}
-                //onchange={this.onDialogInputChange}
                 />
 
                 <Field
@@ -377,14 +358,13 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   component={MyFormComponents.FormDatePicker}
                   validator={MyValidators.dateValidator}
                   wrapperStyle={{ width: '50%' }}
-                //onchange={this.onDialogInputChange}
                 />
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
-                  id="RequestedBy"
-                  name="RequestedBy"
+                  id="Requested_x0020_By"
+                  name="Requested_x0020_By"
                   label="* Requested By"
                   wrapperStyle={{ width: '50%', marginRight: '18px' }}
                   data={this.props.siteUsers}
@@ -392,7 +372,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   textField="Title"
                   validator={MyValidators.requestedByValidator}
                   component={MyFormComponents.FormComboBox}
-                //onchange={this.onDialogInputChange}
                 />
 
                 <Field
@@ -405,7 +384,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   textField="Title"
                   validator={MyValidators.requiresApprovalFrom}
                   component={MyFormComponents.FormMultiSelect}
-                //onchange={this.onDialogInputChange}
                 />
               </div>
 
@@ -495,7 +473,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   primary={true}
                   type={'submit'}
                   icon="save"
-                  onClick={this.handleSubmit}
                 >Submit AR Invoice Request</Button>
                 <Button onClick={formRenderProps.onFormReset}>Clear</Button>
               </div>
