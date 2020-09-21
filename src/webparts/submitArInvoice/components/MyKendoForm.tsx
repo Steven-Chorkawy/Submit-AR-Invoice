@@ -226,7 +226,10 @@ export class MyForm extends React.Component<IMyFormProps, any> {
         <Card type={f.UploadSuccessful ? 'success' : 'error'} style={{ margin: '2px' }}>
           <CardBody>
             <CardTitle>
-              <a href={f.LinkToFile} target='_blank'>{f.UploadSuccessful ? 'Success! - View Invoice Here' : 'Error'}</a>
+              <p>{f.UploadSuccessful
+                ? 'Success! You will receive a confirmation Email when your Invoice Request is ready.'
+                : 'Error! Something went wrong.  Please contact helpdesk@clarington.net'
+              }</p>
             </CardTitle>
             <p>{f.ErrorMessage}</p>
           </CardBody>
