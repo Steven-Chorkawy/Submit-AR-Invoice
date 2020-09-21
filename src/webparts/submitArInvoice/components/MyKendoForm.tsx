@@ -74,7 +74,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
    * @param dataItem Data from form
    */
   public handleSubmit = async (dataItem) => {
-    debugger;
     // We will use this to update states later.
     let currentFiles: IUploadingFile[] = this.state.MyFiles;
 
@@ -83,7 +82,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
 
       let currentYear = new Date().getFullYear();
       const newARTitle = currentYear + "-AR-" + BuildGUID();
-
 
       // Set the data for the invoice
       var myData = {
@@ -118,40 +116,13 @@ export class MyForm extends React.Component<IMyFormProps, any> {
 
       delete arInvoiceRequestListItemData.Requires_x0020_Authorization_x0020_ById;
 
-      debugger;
       // * Save the AR Request to the SP List.
       let arInvoiceRequstListItem = await web.lists
         .getByTitle(MyLists.ReceiveARInvoiceRequest)
         .items.add(arInvoiceRequestListItemData);
 
-      debugger;
-
-      // ! This step will no longer be done here.  It will be done in a flow.
-      // TODO: Delete this block of code.
-      // Create an approval request.
-      // For each requires approval from.
-      // for (let index = 0; index < dataItem.RequiresAuthorizationBy.length; index++) {
-
-      //   const element = dataItem.RequiresAuthorizationBy[index];
-      //   let newAction: IInvoiceActionRequired = {
-      //     ReceivedARRequestId: arInvoiceRequstListItem.data.ID,
-      //     Title: 'Approval Required',
-      //     AssignedToId: element.Id,
-      //     Body: 'Approval Required',
-      //     Request_x0020_Type: InvoiceActionRequiredRequestType.DepartmentApprovalRequired,
-      //     Response_x0020_Status: InvoiceActionResponseStatus.Waiting
-      //   };
-
-      //   web.lists.getByTitle(MyLists.InvoiceActionRequired)
-      //     .items
-      //     .add(newAction);
-      // }
-
-      const accounts: IARAccountDetails = { ...dataItem.GLAccounts };
-
       // Add Account Codes
       dataItem.GLAccounts.map(account => {
-        debugger;
         sp.web.lists.getByTitle(MyLists["AR Invoice Accounts"]).items
           .add({
             ReceivedARRequestId: arInvoiceRequstListItem.data.ID,
@@ -187,19 +158,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                 });
             });
         }
-
-        // !! No longer required.  This will be done in a flow.
-        // Add the attachments ID to the AR Request.
-        // sp.web.lists.getByTitle(MyLists["AR Invoice Requests"])
-        //   .items
-        //   .getById(arInvoiceRequstListItem.data.Id)
-        //   .update({
-        //     RelatedAttachmentsId: {
-        //       results: relatedInvoiceAttachmentIds
-        //     }
-        //   });
       }
-
 
       // TODO: Update this message so it let's the user know they'll be receiving an email once the request has been processed.
       // Provide a success message back to the user.
