@@ -404,7 +404,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     // This means taking all the metadata from the request and applying it to this file.
     if (data.InvoiceAttachments) {
       for (let invoiceAttachmentIndex = 0; invoiceAttachmentIndex < data.InvoiceAttachments.length; invoiceAttachmentIndex++) {
-        debugger;
+
         const element = data.InvoiceAttachments[invoiceAttachmentIndex];
         // TODO: Make this string configurable in the web apps settings.
         // ! Do this before we go live.
@@ -791,7 +791,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
       ])
         .then(response => {
 
-          debugger;
+
           // TODO: Confirm everything has saved correctly.
           this.setState({ productInEdit: null });
 

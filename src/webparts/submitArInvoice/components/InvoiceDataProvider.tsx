@@ -207,7 +207,7 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
         .then(async (values) => {
           console.log('Raw Query Res');
           console.log(values);
-          debugger;
+
           /***********************************
            *
            * 0 = G/L Accounts.
