@@ -398,13 +398,11 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
   private _uploadInvoiceDocument2 = async (data) => {
     const invoices = this.state.invoices.data;
-
     // Check to see if there is a file that we can update.
     // If a files is present that means we need to convert the 'Invoice Request' into an 'Invoice'.
     // This means taking all the metadata from the request and applying it to this file.
     if (data.InvoiceAttachments) {
       for (let invoiceAttachmentIndex = 0; invoiceAttachmentIndex < data.InvoiceAttachments.length; invoiceAttachmentIndex++) {
-        debugger;
         const element = data.InvoiceAttachments[invoiceAttachmentIndex];
         // TODO: Make this string configurable in the web apps settings.
         // ! Do this before we go live.
@@ -790,11 +788,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
         this._uploadInvoiceDocument2(data)
       ])
         .then(response => {
-
-          debugger;
           // TODO: Confirm everything has saved correctly.
           this.setState({ productInEdit: null });
-
         })
         .catch(e => {
           console.log(e);

@@ -83,7 +83,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
    * @param dataItem Data from form
    */
   public handleSubmit = async (dataItem) => {
-    debugger;
+
     // We will use this to update states later.
     let currentFiles: IUploadingFile[] = this.state.MyFiles;
 
@@ -111,7 +111,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
         Urgent: dataItem.Urgent
       };
 
-      debugger;
       // Add customer data.
       // dataItem.Customer.ID is undefined when a custom customer is added.
       if (dataItem.Customer.ID === undefined) {
@@ -484,7 +483,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   name="GLAccounts"
                   label="G/L Accounts"
                   component={MyGLAccountComponent}
-                //onchange={this.onDialogInputChange}
                 />
               </div>
 
