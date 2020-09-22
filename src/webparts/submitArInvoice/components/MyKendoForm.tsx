@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Form, Field, FormElement, FieldWrapper, FieldArray } from '@progress/kendo-react-form';
 import { Button } from '@progress/kendo-react-buttons';
-import { Card, CardTitle, CardBody, CardActions } from '@progress/kendo-react-layout';
+import { Card, CardTitle, CardBody, CardActions, CardSubtitle } from '@progress/kendo-react-layout';
 import { filterBy } from '@progress/kendo-data-query';
 
 import { sp } from "@pnp/sp";
@@ -220,17 +220,22 @@ export class MyForm extends React.Component<IMyFormProps, any> {
 
   public UploadStatusCard = () => {
     let output = [];
-
     this.state.MyFiles.map(f => {
       output.push(
-        <Card type={f.UploadSuccessful ? 'success' : 'error'} style={{ margin: '2px' }}>
+        <Card type={f.UploadSuccessful ? 'success' : 'error'} style={{ margin: '2px', marginBottom: '5px' }}>
           <CardBody>
-            <CardTitle>
-              <p>{f.UploadSuccessful
+            <CardTitle style={{ marginBottom: '0' }}>
+              {f.UploadSuccessful
                 ? 'Success! You will receive a confirmation Email when your Invoice Request is ready.'
                 : 'Error! Something went wrong.  Please contact helpdesk@clarington.net'
-              }</p>
+              }
             </CardTitle>
+            {
+              f.UploadSuccessful &&
+              <CardActions orientation='vertical'>
+                <a target={'_blank'} href={'https://claringtonnet.sharepoint.com/sites/FinanceTest/ARTest/SitePages/Department-AR-Search-Page.aspx'} className="k-button k-flat k-primary">Click Here to View Invoices</a>
+              </CardActions>
+            }
             <p>{f.ErrorMessage}</p>
           </CardBody>
         </Card>
@@ -404,9 +409,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                 name="InvoiceDetails"
                 label="Invoice Details"
                 component={MyFormComponents.FormTextArea}
-              //onchange={this.onDialogInputChange}
               />
-
 
               <div style={{ width: '100%' }} className={'k-form-field'}>
                 <FieldArray
@@ -426,7 +429,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                 batch={false}
                 multiple={true}
                 component={MyFormComponents.FormUpload}
-              //onchange={this.onDialogInputChange}
               />
               <hr />
 
