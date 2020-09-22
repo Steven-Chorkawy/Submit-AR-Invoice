@@ -77,6 +77,40 @@ export class MyForm extends React.Component<IMyFormProps, any> {
       ...props
     };
   }
+  private getUserByEmail = async (email: string): Promise<ISPUser> => {
+    let web = Web(this.props.ctx.pageContext.web.absoluteUrl);
+    try {
+      return await web.siteUsers.getByEmail(email).get();
+    } catch (error) {
+      console.error('Error getting Id of user by Email ', error);
+      throw error;
+    }
+  }
+
+  private getUserById = async (userId): Promise<ISPUser> => {
+    let web = Web(this.props.ctx.pageContext.web.absoluteUrl);
+    if (userId > 0 && !isNaN(parseInt(userId))) {
+      try {
+        return await web.siteUsers.getById(userId).get();
+      } catch (error) {
+        console.log(error);
+        throw error;
+      }
+    }
+  }
+
+  private getUserByLoginName = async (loginName: string): Promise<ISPUser> => {
+    return await sp.web.siteUsers.getByLoginName(loginName).get();
+  }
+
+  private getUsersByLoginName = async (users: Array<any>): Promise<Array<ISPUser>> => {
+    let returnOutput: Array<ISPUser> = [];
+    for (let index = 0; index < users.length; index++) {
+      const user = users[index];
+      returnOutput.push(await this.getUserByLoginName(user.loginName));
+    }
+    return returnOutput;
+  }
 
   /**
    * Form Submit Event
@@ -93,6 +127,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
       let currentYear = new Date().getFullYear();
       const newARTitle = currentYear + "-AR-" + BuildGUID();
 
+
       // Set the data for the invoice
       var myData = {
         Title: newARTitle,
@@ -100,7 +135,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
         Date: dataItem.Date,
         Requested_x0020_ById: dataItem.Requested_x0020_By
           ? dataItem.Requested_x0020_By.Id
-          : await (await this._EnsureUser(this.props.ctx.pageContext.user.email)).Id,
+          : await (await this.getUserByEmail(this.props.ctx.pageContext.user.email)).Id,
         Requires_x0020_Authorization_x0020_ById: {
           'results': dataItem.RequiresAuthorizationBy.map((user) => { return user.Id; })
         },
@@ -290,42 +325,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
     return filterBy(data, filter);
   }
 
-
-  /**
-   * Convert the user object that we receive from the SPFx PeoplePicker control to a UserId.
-   * @tutorial https://techcommunity.microsoft.com/t5/sharepoint-developer/how-to-set-a-people-field-in-a-list-e-g-convert-accountname-to/m-p/87641
-   * @returns ISPUser Interface.
-   * @param userName Users 'id' that comes in a form of a string.
-   */
-  private _EnsureUser(userName: string): Promise<ISPUser> {
-    var data = { logonName: userName };
-    return this.props.ctx.spHttpClient
-      .post(
-        `${this.props.ctx.pageContext.site.absoluteUrl}/_api/web/ensureuser`,
-        SPHttpClient.configurations.v1,
-        { body: JSON.stringify(data) }
-      )
-      .then(
-        (value: SPHttpClientResponse) => {
-          return value.json();
-        },
-        (error: any) => console.log("SharePointDataProvider.EnsureUser Rejected: " + error)
-      )
-      .then((json: ISPUser) => {
-        return json;
-      });
-  }
-
-  private _EnsureUsers = async (users: Array<any>): Promise<Array<ISPUser>> => {
-    let returnOutput = [];
-    for (let index = 0; index < users.length; index++) {
-      const user = users[index];
-      let output = await this._EnsureUser(user.id);
-      returnOutput.push(output);
-    }
-    return returnOutput;
-  }
-
   public render() {
     return (
       <div style={{ padding: '5px' }} key={this.state.stateHolder}>
@@ -385,9 +384,9 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   selectedItems={
                     e => {
                       if (e && e.length > 0) {
-                        this._EnsureUser(e[0].id)
-                          .then(response => {
-                            formRenderProps.onChange('Requested_x0020_By', { value: response });
+                        this.getUsersByLoginName(e)
+                          .then(res => {
+                            formRenderProps.onChange('Requested_x0020_By', { value: res });
                           });
                       }
                     }
@@ -411,9 +410,9 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   context={this.props.ctx}
                   selectedItems={e => {
                     if (e && e.length > 0) {
-                      this._EnsureUsers(e)
-                        .then(response => {
-                          formRenderProps.onChange('RequiresAuthorizationBy', { value: response });
+                      this.getUsersByLoginName(e)
+                        .then(res => {
+                          formRenderProps.onChange('RequiresAuthorizationBy', { value: res });
                         });
                     }
                   }}
