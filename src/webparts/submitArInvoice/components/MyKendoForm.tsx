@@ -6,12 +6,19 @@ import { Card, CardTitle, CardBody, CardActions, CardSubtitle } from '@progress/
 import { filterBy } from '@progress/kendo-data-query';
 
 import { sp } from "@pnp/sp";
+import {
+  SPHttpClient, SPHttpClientConfiguration, SPHttpClientResponse,
+  ISPHttpClientConfiguration
+} from '@microsoft/sp-http';
 import { Web } from "@pnp/sp/webs";
 import "@pnp/sp/webs";
 import "@pnp/sp/files";
 import "@pnp/sp/folders";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
+
+import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
+
 
 import * as MyFormComponents from './MyFormComponents';
 import { IMyFormProps } from './IMyFormProps';
@@ -23,8 +30,6 @@ import { MyLists } from './enums/MyLists';
 import { IItemAddResult } from '@pnp/sp/items';
 import { IInvoiceActionRequired, InvoiceActionRequiredRequestType } from '../components/interface/IInvoiceActionRequired';
 import { InvoiceActionResponseStatus } from './enums/MyEnums';
-
-
 
 export interface IARFormModel {
   Title: string;
@@ -39,7 +44,6 @@ export interface IARFormModel {
   Customer_x0020_PO_x0020_Number: any;
 }
 
-
 export interface IARAccountDetails {
   AR_x0020_InvoiceId?: number;              // ID of Invoice
   ReceivedARRequestId?: number;             // ID of the incoming AR Request.
@@ -47,6 +51,13 @@ export interface IARAccountDetails {
   Account_x0020_Code: string;               // GL Code
   Amount: number;                           // Amount for account
   HST_x0020_Taxable: boolean;               // Is amount taxable?
+}
+
+interface ISPUser {
+  Email: string;
+  Id: number;
+  LoginName: string;
+  Title: string;
 }
 
 export class MyForm extends React.Component<IMyFormProps, any> {
@@ -67,13 +78,12 @@ export class MyForm extends React.Component<IMyFormProps, any> {
     };
   }
 
-
-  // TODO: Update this method so it saves in 'ReceiveARInvoiceRequest' instead of AR Invoice Requests.
   /**
    * Form Submit Event
    * @param dataItem Data from form
    */
   public handleSubmit = async (dataItem) => {
+    debugger;
     // We will use this to update states later.
     let currentFiles: IUploadingFile[] = this.state.MyFiles;
 
@@ -99,6 +109,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
         Urgent: dataItem.Urgent
       };
 
+      debugger;
       // Add customer data.
       // dataItem.Customer.ID is undefined when a custom customer is added.
       if (dataItem.Customer.ID === undefined) {
@@ -278,6 +289,42 @@ export class MyForm extends React.Component<IMyFormProps, any> {
     return filterBy(data, filter);
   }
 
+
+  /**
+   * Convert the user object that we receive from the SPFx PeoplePicker control to a UserId.
+   * @tutorial https://techcommunity.microsoft.com/t5/sharepoint-developer/how-to-set-a-people-field-in-a-list-e-g-convert-accountname-to/m-p/87641
+   * @returns ISPUser Interface.
+   * @param userName Users 'id' that comes in a form of a string.
+   */
+  private _EnsureUser(userName: string): Promise<ISPUser> {
+    var data = { logonName: userName };
+    return this.props.ctx.spHttpClient
+      .post(
+        `${this.props.ctx.pageContext.site.absoluteUrl}/_api/web/ensureuser`,
+        SPHttpClient.configurations.v1,
+        { body: JSON.stringify(data) }
+      )
+      .then(
+        (value: SPHttpClientResponse) => {
+          return value.json();
+        },
+        (error: any) => console.log("SharePointDataProvider.EnsureUser Rejected: " + error)
+      )
+      .then((json: ISPUser) => {
+        return json;
+      });
+  }
+
+  private _EnsureUsers = async (users: Array<any>): Promise<Array<ISPUser>> => {
+    let returnOutput = [];
+    for (let index = 0; index < users.length; index++) {
+      const user = users[index];
+      let output = await this._EnsureUser(user.id);
+      returnOutput.push(output);
+    }
+    return returnOutput;
+  }
+
   public render() {
     return (
       <div style={{ padding: '5px' }} key={this.state.stateHolder}>
@@ -333,24 +380,43 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   id="Requested_x0020_By"
                   name="Requested_x0020_By"
                   label="* Requested By"
-                  wrapperStyle={{ width: '50%', marginRight: '18px' }}
-                  data={this.props.siteUsers}
+                  personSelectionLimit={1}
+                  selectedItems={
+                    e => {
+                      if (e && e.length > 0) {
+                        this._EnsureUser(e[0].id)
+                          .then(response => {
+                            formRenderProps.onChange('RequestedBy', { value: response });
+                          });
+                      }
+                    }
+                  }
+                  context={this.props.ctx}
                   dataItemKey="Email"
                   textField="Title"
-                  validator={MyValidators.requestedByValidator}
-                  component={MyFormComponents.FormComboBox}
+                  component={MyFormComponents.FormPeoplePicker}
+                  defaultSelectedUsers={[this.props.ctx.pageContext.user.email]}
                 />
+              </div>
 
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
                   id="RequiresAuthorizationBy"
                   name="RequiresAuthorizationBy"
                   label="* Requires Authorization By"
-                  wrapperStyle={{ width: '50%' }}
-                  data={this.props.siteUsers}
                   dataItemKey="Email"
                   textField="Title"
-                  validator={MyValidators.requiresApprovalFrom}
-                  component={MyFormComponents.FormMultiSelect}
+                  personSelectionLimit={10}
+                  context={this.props.ctx}
+                  selectedItems={e => {
+                    if (e && e.length > 0) {
+                      this._EnsureUsers(e)
+                        .then(response => {
+                          formRenderProps.onChange('RequiresAuthorizationBy', { value: response });
+                        });
+                    }
+                  }}
+                  component={MyFormComponents.FormPeoplePicker}
                 />
               </div>
 

@@ -16,6 +16,9 @@ import { Label, Error, Hint, FloatingLabel } from '@progress/kendo-react-labels'
 import { Upload } from '@progress/kendo-react-upload';
 import { DropDownList, AutoComplete, MultiSelect, ComboBox } from '@progress/kendo-react-dropdowns';
 
+import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
+
+
 import { MyCustomerCardComponent } from './MyCustomerCardComponent';
 
 export const FormInput = (fieldRenderProps) => {
@@ -814,3 +817,25 @@ export const FormFloatingNumericTextBox = (fieldRenderProps) => {
   );
 };
 
+export const FormPeoplePicker = (fieldRenderProps) => {
+  const { label, value, ...others } = fieldRenderProps;
+
+  return (
+    <FieldWrapper>
+      <Label>
+        {label}
+      </Label>
+      <PeoplePicker
+        context={fieldRenderProps.context}
+        showtooltip={false}
+        isRequired={true}
+        personSelectionLimit={fieldRenderProps.personSelectionLimit}
+        // * selectedItems is essentially the onChange event.
+        selectedItems={fieldRenderProps.selectedItems}
+        showHiddenInUI={false}
+        principalTypes={[PrincipalType.User]}
+        defaultSelectedUsers={fieldRenderProps.defaultSelectedUsers}
+      />
+    </FieldWrapper>
+  );
+};
