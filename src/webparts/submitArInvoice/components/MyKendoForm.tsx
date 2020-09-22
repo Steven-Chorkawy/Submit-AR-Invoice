@@ -146,7 +146,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
         Urgent: dataItem.Urgent
       };
 
-
       // Add customer data.
       // dataItem.Customer.ID is undefined when a custom customer is added.
       if (dataItem.Customer.ID === undefined) {
@@ -483,7 +482,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   name="GLAccounts"
                   label="G/L Accounts"
                   component={MyGLAccountComponent}
-                //onchange={this.onDialogInputChange}
                 />
               </div>
 

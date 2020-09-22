@@ -135,6 +135,17 @@ const commandCell = (onRemove) => (props) => {
 export const MyGLAccountComponent = (fieldArrayRenderProps) => {
   const { validationMessage, visited, label } = fieldArrayRenderProps;
 
+  debugger;
+  if (fieldArrayRenderProps.value.length === 0) {
+    fieldArrayRenderProps.onUnshift({
+      value: {
+        GLCode: '',
+        Amount: '',
+        HSTTaxable: false
+      }
+    });
+  }
+
   const onAdd = React.useCallback(
     (e) => {
       e.preventDefault();
@@ -199,7 +210,10 @@ export const MyGLAccountComponent = (fieldArrayRenderProps) => {
           cell={totalInvoiceCell}
         />
 
-        <GridColumn cell={commandCell(onRemove)} width="90px" />
+        {
+          fieldArrayRenderProps.value.length > 1
+          && <GridColumn editable={false} cell={commandCell(onRemove)} width="90px" />
+        }
       </Grid>
     </div>
   );
