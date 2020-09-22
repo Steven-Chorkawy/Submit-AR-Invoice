@@ -98,7 +98,9 @@ export class MyForm extends React.Component<IMyFormProps, any> {
         Title: newARTitle,
         Department: dataItem.Department,
         Date: dataItem.Date,
-        Requested_x0020_ById: dataItem.Requested_x0020_By.Id,
+        Requested_x0020_ById: dataItem.Requested_x0020_By
+          ? dataItem.Requested_x0020_By.Id
+          : await (await this._EnsureUser(this.props.ctx.pageContext.user.email)).Id,
         Requires_x0020_Authorization_x0020_ById: {
           'results': dataItem.RequiresAuthorizationBy.map((user) => { return user.Id; })
         },
@@ -386,7 +388,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                       if (e && e.length > 0) {
                         this._EnsureUser(e[0].id)
                           .then(response => {
-                            formRenderProps.onChange('RequestedBy', { value: response });
+                            formRenderProps.onChange('Requested_x0020_By', { value: response });
                           });
                       }
                     }
