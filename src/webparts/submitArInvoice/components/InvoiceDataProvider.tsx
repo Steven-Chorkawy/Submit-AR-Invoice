@@ -201,12 +201,13 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
           .expand(expandStringARDocumentString)
           .filter(idsForARDocuments.join(' or '))
           .getAll(),
-        sp.web.getFolderByServerRelativePath(MyLists["AR Invoices"]).files()
+        sp.web.getFolderByServerRelativePath(MyLists["AR Invoices"]).files(),
+        sp.web.lists.getByTitle(MyLists.ReceiveARInvoiceRequest).items.getAll()
       ])
         .then(async (values) => {
           console.log('Raw Query Res');
           console.log(values);
-
+          debugger;
           /***********************************
            *
            * 0 = G/L Accounts.
@@ -217,6 +218,7 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
            * 4 = Cancel Requests.
            * 5 = AR Invoice Documents.
            * 6 = Get links to AR Invoice Documents
+           * 7 = Freshly submitted AR Requests before they are converted into 'AR Invoice Requests'.
            ***********************************/
           // Using each of the accounts that we found we will not attach them to the invoice object.
           for (let index = 0; index < processedResponse.data.length; index++) {
