@@ -48,7 +48,6 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
   }
 
   componentWillReceiveProps(nextProps, nextState) {
-    debugger;
     this.setState({
       noAccountPresent: this._checkForAccounts()
     });
@@ -80,7 +79,6 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
   }
 
   private sendApprovalResponse = (response) => {
-    debugger;
     var comment = this.state.approvalNotes;
 
     // * This is where an Approvals Response Summary is sent.
@@ -136,7 +134,6 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
   }
 
   public onApprovalDialogInputChange = (event) => {
-    debugger;
     this.setState({
       approvalNotes: event.value
     });
