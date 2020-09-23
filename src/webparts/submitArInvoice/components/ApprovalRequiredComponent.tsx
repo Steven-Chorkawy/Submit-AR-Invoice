@@ -48,6 +48,7 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
   }
 
   componentWillReceiveProps(nextProps, nextState) {
+    debugger;
     this.setState({
       noAccountPresent: this._checkForAccounts()
     });
@@ -58,7 +59,6 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
   }
 
   public sendApproval = (event) => {
-    debugger;
     // When noAccountPresent === false that means one or more accounts are present.
     if (!this.state.noAccountPresent) {
       this.setState({
@@ -80,11 +80,10 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
   }
 
   private sendApprovalResponse = (response) => {
-
+    debugger;
     var comment = this.state.approvalNotes;
 
-
-    // * This is where an Approvals Response Summar is sent.
+    // * This is where an Approvals Response Summary is sent.
     // TODO: Beef up what details are provided in the Response Summary.
     var updateObj = {
       Response_x0020_Status: response,
@@ -137,12 +136,9 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
   }
 
   public onApprovalDialogInputChange = (event) => {
-    let target = event.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
-    const name = (target.props && target.props.name !== undefined) ? target.props.name : (target.name !== undefined) ? target.name : target.props.id;
-
+    debugger;
     this.setState({
-      approvalNotes: value
+      approvalNotes: event.value
     });
   }
 
@@ -165,6 +161,7 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
                 id={'ApprovalNote'}
                 disabled={this.state.approvalRequestError}
                 style={{ 'width': '100%' }}
+                onChange={this.onApprovalDialogInputChange}
               />
             </div>
             <Hint>Hint text goes here as well.</Hint>
