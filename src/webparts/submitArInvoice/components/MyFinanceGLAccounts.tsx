@@ -208,10 +208,23 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
     if (!props.hasOwnProperty('value'))
       props.value = [];
 
+    let dataObject = props.value.map(a => (
+      {
+        InvoiceID: a.AR_x0020_InvoiceId,
+        RequestId: a.AR_x0020_Invoice_x0020_RequestId,
+        ID: a.ID,
+        GLCode: a.Account_x0020_Code,
+        Amount: a.Amount,
+        HSTTaxable: a.HST_x0020_Taxable,
+        HST: a.HST,
+        TotalInvoice: a.Total_x0020_Invoice
+      }
+    ));
+
     this.state = {
-      data: props.value.map(a => ({ InvoiceID: a.AR_x0020_InvoiceId, ID: a.ID, GLCode: a.Account_x0020_Code, Amount: a.Amount, HSTTaxable: a.HST_x0020_Taxable, HST: a.HST, TotalInvoice: a.Total_x0020_Invoice })),
+      data: dataObject,
       // same as data but we use this to reset state.
-      receivedData: props.value.map(a => ({ InvoiceID: a.AR_x0020_InvoiceId, ID: a.ID, GLCode: a.Account_x0020_Code, Amount: a.Amount, HSTTaxable: a.HST_x0020_Taxable, HST: a.HST, TotalInvoice: a.Total_x0020_Invoice }))
+      receivedData: dataObject
     };
 
     this.CommandCell = MyCommandCell({
@@ -237,8 +250,6 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
 
   public add = (dataItem) => {
     dataItem.inEdit = undefined;
-    debugger;
-
     let isInvoice: boolean = this.props.productInEdit.ContentTypeId === MyContentTypes["AR Invoice Document Item"];
 
     let invoiceId = isInvoice
@@ -257,11 +268,25 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
       HST_x0020_Taxable: dataItem.HSTTaxable
     };
 
-    // TODO: Add the account code. 
+    // TODO: Add the account code.
     sp.web.lists.getByTitle(MyLists["AR Invoice Accounts"])
-      .items.add(newAccount);
-    // TODO: Update the Request or Invoice. 
+      .items.add(newAccount)
+      .then(res => {
+        if (this.props.updateAccountDetails) {
+          this.props.updateAccountDetails([{
+            Amount: res.data.Amount,
+            GLCode: res.data.Account_x0020_Code,
+            HST: res.data.HST,
+            HSTTaxable: res.data.HST_x0020_Taxable,
+            ID: res.data.ID,
+            InvoiceID: res.data.AR_x0020_InvoiceId,
+            RequestId: res.data.AR_x0020_Invoice_x0020_RequestId,
+            TotalInvoice: res.data.Total_x0020_Invoice
+          }]);
+        }
+      });
 
+    // TODO: Update the Request or Invoice.
 
     this.setState({
       data: [...this.state.data]
@@ -281,9 +306,8 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
         this.updateItem(data, updatedItem);
         this.updateItem(this.state.receivedData, updatedItem);
 
-        //TODO: Check what happens when this function is undefined.
-        if (this.props.onUpdateAccount) {
-          this.props.onUpdateAccount(data);
+        if (this.props.updateAccountDetails) {
+          this.props.updateAccountDetails(data);
         }
 
         this.setState({ data: data });
@@ -349,8 +373,6 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
     this.setState({ data: [...this.state.receivedData] });
   }
   //#endregion
-
-
 
   public render() {
     const { data } = this.state;

@@ -1,20 +1,15 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 
-import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
-import { Input, NumericTextBox } from '@progress/kendo-react-inputs';
+import { Dialog } from '@progress/kendo-react-dialogs';
 import { Form, FormElement, Field, FieldArray } from '@progress/kendo-react-form';
 import { Button } from '@progress/kendo-react-buttons';
-import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/kendo-react-layout';
+import { Card, CardTitle, CardBody } from '@progress/kendo-react-layout';
 import { filterBy } from '@progress/kendo-data-query';
-import { Label, Error, Hint, FloatingLabel } from '@progress/kendo-react-labels';
-import { FieldWrapper } from '@progress/kendo-react-form';
-import { DropDownList, AutoComplete, MultiSelect, ComboBox } from '@progress/kendo-react-dropdowns';
-
 
 import * as MyFormComponents from '../MyFormComponents';
 import * as MyValidators from '../validators.jsx';
-import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceGLAccounts';
+import { MyFinanceGlAccountsComponent } from '../MyFinanceGLAccounts';
 import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
 import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
 import { IInvoiceItem } from '../interface/InvoiceItem';
@@ -47,10 +42,8 @@ function GridButtons({ cancel, saveResult }) {
           style={{ width: '50%' }}
           className="k-button k-primary"
           icon="save"
-        // disabled={!formRenderProps.allowSubmit}
         >Save</Button>
         <Button
-          // type={"submit"}
           style={{ width: '50%' }}
           className="k-button"
           onClick={cancel}
@@ -73,8 +66,6 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
     };
   }
 
-
-
   //#region Customer Component Methods
   private customerItemRender = (li, itemProps) => {
     const index = itemProps.index;
@@ -82,7 +73,6 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
 
     return React.cloneElement(li, li.props, itemChildren);
   }
-
 
   public customerFilterChange = (event) => {
     setTimeout(() => {
@@ -99,12 +89,10 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
   }
   //#endregion
 
-
   public onActionResponseSent = (e) => {
     this.props.cancel();
     this.forceUpdate();
   }
-
 
   public render() {
     return (
@@ -123,6 +111,8 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
               );
             })
         }
+
+        {console.log("Dialog Edit")}{console.log(this.state.productInEdit)}
 
         <Form
           onSubmit={this.props.onSubmit}
@@ -195,7 +185,6 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                   component={MyFormComponents.FormSwitch}
                 />
               </div>
-
               <Field
                 id="Customer"
                 name="Customer"
@@ -211,7 +200,6 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                 filterable={true}
                 suggest={true}
               />
-
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
                   id="CustomerPONumber"
@@ -232,7 +220,6 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                   component={MyFormComponents.FormDropDownList}
                 />
               </div>
-
               <Field
                 id="InvoiceDetails"
                 name="InvoiceDetails"
@@ -240,11 +227,11 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                 component={MyFormComponents.FormTextArea}
                 value={this.state.productInEdit.Invoice_x0020_Details}
               />
-
               <div style={{ width: '100%' }}>
                 <FieldArray
                   name="GLAccounts"
                   component={MyFinanceGlAccountsComponent}
+                  updateAccountDetails={this.props.updateAccountDetails}
                   productInEdit={this.state.productInEdit}
                   value={this.state.productInEdit.AccountDetails}
                 />

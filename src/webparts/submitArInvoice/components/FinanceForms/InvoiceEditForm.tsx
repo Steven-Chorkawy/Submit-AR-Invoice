@@ -55,7 +55,7 @@ interface IInvoiceEditFormProps {
   currentUser: any;
   statusData: any;
   siteUsersData: any;
-  onUpdateAccount: any;
+  updateAccountDetails: any;
   onNoteToDepChange?: any;
 }
 
@@ -243,7 +243,7 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                     name="GLAccounts"
                     component={MyFinanceGlAccountsComponent}
                     value={this.state.productInEdit.AccountDetails}
-                    onUpdateAccount={this.props.onUpdateAccount}
+                    updateAccountDetails={this.props.updateAccountDetails}
                   />
                 </div>
                 <div style={{ marginBottom: "2px" }}>

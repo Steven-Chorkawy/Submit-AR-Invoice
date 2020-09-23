@@ -32,7 +32,7 @@ interface IApprovalRequiredComponentState {
   approvalNotes?;
   approvalNotesRequired: boolean;
   approvalRequestError?;
-  noAccountPresent: boolean; // An approval can only be sent if this invoice has 1 or more GL/Account Codes. 
+  noAccountPresent: boolean; // An approval can only be sent if this invoice has 1 or more GL/Account Codes.
 }
 
 class ApprovalRequiredComponent extends React.Component<IApprovalRequiredComponentProps, IApprovalRequiredComponentState> {
@@ -42,15 +42,25 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
       action: props.action,
       approvalNotesRequired: false,
       productInEdit: props.productInEdit,
-      // An approval can only be sent if this invoice has 1 or more GL/Account Codes. 
-      noAccountPresent: !(this.props.productInEdit.AccountDetails && this.props.productInEdit.AccountDetails.length > 0)
+      // An approval can only be sent if this invoice has 1 or more GL/Account Codes.
+      noAccountPresent: this._checkForAccounts()
     };
-    debugger;
+  }
+
+  componentWillReceiveProps(nextProps, nextState) {
+    this.setState({
+      noAccountPresent: this._checkForAccounts()
+    });
+  }
+
+  private _checkForAccounts = (): boolean => {
+    return !(this.props.productInEdit.AccountDetails && this.props.productInEdit.AccountDetails.length > 0);
   }
 
   public sendApproval = (event) => {
-
-    if (this.state.noAccountPresent) {
+    debugger;
+    // When noAccountPresent === false that means one or more accounts are present.
+    if (!this.state.noAccountPresent) {
       this.setState({
         approvalNotesRequired: false
       });
@@ -68,7 +78,6 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
       });
     }
   }
-
 
   private sendApprovalResponse = (response) => {
 
@@ -138,6 +147,9 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
   }
 
   public render() {
+    console.log('Approval Req Component');
+    console.log(this.state);
+
     return (
       <FieldWrapper>
         <Card style={{ width: 600 }} type={this.state.approvalRequestError ? 'error' : ''}>
@@ -150,12 +162,9 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
             <div className={'k-form-field-wrap'}>
               <TextArea
                 valid={this.state.approvalRequestError}
-                //type={type}
                 id={'ApprovalNote'}
                 disabled={this.state.approvalRequestError}
-              //maxlength={200}
-              //ariaDescribedBy={`${hindId} ${errorId}`}
-              // {...others}
+                style={{ 'width': '100%' }}
               />
             </div>
             <Hint>Hint text goes here as well.</Hint>
