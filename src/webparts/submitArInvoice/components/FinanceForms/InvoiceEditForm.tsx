@@ -55,7 +55,7 @@ interface IInvoiceEditFormProps {
   currentUser: any;
   statusData: any;
   siteUsersData: any;
-  onUpdateAccount: any;
+  updateAccountDetails: any;
   onNoteToDepChange?: any;
 }
 
@@ -94,8 +94,6 @@ function GridButtons({ cancel, saveResult }) {
 export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any> {
   constructor(props) {
     super(props);
-    console.log('InvoiceEditForm');
-    console.log(this.props.dataItem);
     this.state = {
       productInEdit: this.props.dataItem || null,
       visible: false,
@@ -243,7 +241,7 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                     name="GLAccounts"
                     component={MyFinanceGlAccountsComponent}
                     value={this.state.productInEdit.AccountDetails}
-                    onUpdateAccount={this.props.onUpdateAccount}
+                    updateAccountDetails={this.props.updateAccountDetails}
                   />
                 </div>
                 <div style={{ marginBottom: "2px" }}>

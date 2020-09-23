@@ -20,7 +20,10 @@ import { Button } from '@progress/kendo-react-buttons';
 import * as MyValidators from './validators.jsx';
 import * as MyFormComponents from './MyFormComponents';
 import { MyCommandCell } from './FinanceForms/MyCommandCell';
-
+import { MyLists } from './enums/MyLists.js';
+import { MyContentTypes } from './enums/MyEnums.js';
+import { IARAccountDetails } from './MyKendoForm.js';
+import { IARInvoiceAccount } from './interface/IARInvoiceAccount';
 
 
 //#region  Cell Functions
@@ -205,10 +208,12 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
     if (!props.hasOwnProperty('value'))
       props.value = [];
 
+    let dataObject = this._mapAccountsForState();
+
     this.state = {
-      data: props.value.map(a => ({ InvoiceID: a.AR_x0020_InvoiceId, ID: a.ID, GLCode: a.Account_x0020_Code, Amount: a.Amount, HSTTaxable: a.HST_x0020_Taxable, HST: a.HST, TotalInvoice: a.Total_x0020_Invoice })),
+      data: dataObject,
       // same as data but we use this to reset state.
-      receivedData: props.value.map(a => ({ InvoiceID: a.AR_x0020_InvoiceId, ID: a.ID, GLCode: a.Account_x0020_Code, Amount: a.Amount, HSTTaxable: a.HST_x0020_Taxable, HST: a.HST, TotalInvoice: a.Total_x0020_Invoice }))
+      receivedData: dataObject
     };
 
     this.CommandCell = MyCommandCell({
@@ -225,6 +230,30 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
     });
   }
 
+  private _mapAccountsForState() {
+    return this.props.value.map(a => (
+      {
+        InvoiceID: a.AR_x0020_InvoiceId,
+        RequestId: a.AR_x0020_Invoice_x0020_RequestId,
+        ID: a.ID,
+        GLCode: a.Account_x0020_Code,
+        Amount: a.Amount,
+        HSTTaxable: a.HST_x0020_Taxable,
+        HST: a.HST,
+        TotalInvoice: a.Total_x0020_Invoice,
+        inEdit: a.inEdit
+      }
+    ));
+  }
+
+  public componentDidMount() {
+    let data = this._mapAccountsForState();
+
+    this.setState({
+      data: data
+    });
+  }
+
   //#region CRUD Methods
   public enterEdit = (dataItem) => {
     this.setState({
@@ -234,9 +263,44 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
 
   public add = (dataItem) => {
     dataItem.inEdit = undefined;
-    //dataItem.ID = this.generateId(sampleProducts);
+    let isInvoice: boolean = this.props.productInEdit.ContentTypeId === MyContentTypes["AR Invoice Document Item"];
 
-    //sampleProducts.unshift(dataItem);
+    let invoiceId = isInvoice
+      ? this.props.productInEdit.ID
+      : null;
+
+    let requestId = !isInvoice
+      ? this.props.productInEdit.ID
+      : this.props.productInEdit.AR_x0020_Invoice_x0020_RequestId;
+
+    let newAccount: IARInvoiceAccount = {
+      AR_x0020_InvoiceId: invoiceId,
+      AR_x0020_Invoice_x0020_RequestId: requestId,
+      Account_x0020_Code: dataItem.GLCode,
+      Amount: dataItem.Amount,
+      HST_x0020_Taxable: dataItem.HSTTaxable
+    };
+
+    // TODO: Add the account code.
+    sp.web.lists.getByTitle(MyLists["AR Invoice Accounts"])
+      .items.add(newAccount)
+      .then(res => {
+        if (this.props.updateAccountDetails) {
+          this.props.updateAccountDetails([{
+            Amount: res.data.Amount,
+            GLCode: res.data.Account_x0020_Code,
+            HST: res.data.HST,
+            HSTTaxable: res.data.HST_x0020_Taxable,
+            ID: res.data.ID,
+            InvoiceID: res.data.AR_x0020_InvoiceId,
+            RequestId: res.data.AR_x0020_Invoice_x0020_RequestId,
+            TotalInvoice: res.data.Total_x0020_Invoice
+          }]);
+        }
+      });
+
+    // TODO: Update the Request or Invoice.
+
     this.setState({
       data: [...this.state.data]
     });
@@ -255,9 +319,8 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
         this.updateItem(data, updatedItem);
         this.updateItem(this.state.receivedData, updatedItem);
 
-        //TODO: Check what happens when this function is undefined.
-        if (this.props.onUpdateAccount) {
-          this.props.onUpdateAccount(data);
+        if (this.props.updateAccountDetails) {
+          this.props.updateAccountDetails(data);
         }
 
         this.setState({ data: data });
@@ -299,26 +362,22 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
   }
 
   public itemChange = (event) => {
-
     const data = this.state.data.map(item => item.ID === event.dataItem.ID ? { ...item, [event.field]: event.value } : item);
     this.setState({ data });
   }
 
-  //TODO: Why isn't this working?
   public addNew = () => {
-
-    const newDataItem = {
-      ID: 0,
-      GLCode: '',
-      Amount: '',
-      HSTTaxable: false,
-      inEdit: true
-    };
-    var data = this.state.data;
-    data.unshift(newDataItem);
-
     this.setState({
-      data: [...data]
+      data: [
+        {
+          ID: 911,
+          GLCode: '',
+          Amount: '',
+          HSTTaxable: false,
+          inEdit: true
+        },
+        ...this.state.data
+      ]
     });
   }
 
@@ -326,8 +385,6 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
     this.setState({ data: [...this.state.receivedData] });
   }
   //#endregion
-
-
 
   public render() {
     const { data } = this.state;
@@ -341,11 +398,11 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
         style={...this.props.style}
       >
         <GridToolbar>
-          {/* <button
+          <button
             title="Add new"
             className="k-button k-primary"
-            onClick={this.addNew}
-          >Add new</button> */}
+            onClick={this.props.onAdd}
+          >Add new</button>
           {hasEditedItem && (
             <button
               title="Cancel current changes"
@@ -389,7 +446,10 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
           cell={totalInvoiceCell}
         />
 
-        {(this.props.showCommandCell || this.props.showCommandCell === undefined) && <GridColumn cell={this.CommandCell} width="90px" />}
+        {
+          (this.props.showCommandCell || this.props.showCommandCell === undefined) &&
+          <GridColumn cell={this.CommandCell} width="90px" />
+        }
       </Grid>
     );
   }
@@ -404,9 +464,18 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
 
 export const MyFinanceGlAccountsComponent = (fieldArrayRenderProps) => {
   const { accounts } = fieldArrayRenderProps;
+  const onAdd = () => {
+    fieldArrayRenderProps.value.unshift({
+      GLCode: '',
+      Amount: '',
+      HSTTaxable: false,
+      inEdit: true
+    });
+  };
+
   return (
     <div key={fieldArrayRenderProps.value}>
-      <MyFinanceGlAccounts {...fieldArrayRenderProps} />
+      <MyFinanceGlAccounts {...fieldArrayRenderProps} onAdd={onAdd} />
     </div>
   );
 };

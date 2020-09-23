@@ -135,16 +135,6 @@ const commandCell = (onRemove) => (props) => {
 export const MyGLAccountComponent = (fieldArrayRenderProps) => {
   const { validationMessage, visited, label } = fieldArrayRenderProps;
 
-  debugger;
-  if (fieldArrayRenderProps.value.length === 0) {
-    fieldArrayRenderProps.onUnshift({
-      value: {
-        GLCode: '',
-        Amount: '',
-        HSTTaxable: false
-      }
-    });
-  }
 
   const onAdd = React.useCallback(
     (e) => {
@@ -175,7 +165,10 @@ export const MyGLAccountComponent = (fieldArrayRenderProps) => {
         resizable={true}
       >
         <GridToolbar>
-          <Button title="Add new" className="k-button k-primary" icon="plus" onClick={onAdd} >Add new Account</Button>
+          <Button title="Add new"
+            className="k-button k-primary"
+            icon="plus"
+            onClick={onAdd} >Add new Account</Button>
         </GridToolbar>
 
         <GridColumn

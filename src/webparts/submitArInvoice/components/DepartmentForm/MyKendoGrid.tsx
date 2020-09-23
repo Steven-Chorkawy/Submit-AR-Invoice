@@ -27,7 +27,7 @@ import { MyEditDialogContainer } from './MyEditDialogContainer';
 import { MyCancelDialogContainer } from './MyCancelDialogContainer';
 import { InvoiceDataProvider } from '../InvoiceDataProvider';
 import { InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
-import { ConvertQueryParamsToKendoFilter } from '../MyHelperMethods';
+import { ConvertQueryParamsToKendoFilter, UpdateAccountDetails } from '../MyHelperMethods';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { MyContentTypes } from '../enums/MyEnums';
@@ -103,8 +103,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
     });
   }
   //#endregion
-
-
 
   //#region Data Operations
   public statusDataReceived = (status) => {
@@ -188,6 +186,25 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   //#endregion
 
   //#region CRUD Methods
+  /**
+   * Update the account details of the invoices stored in the state.
+   * @param data Update this data?
+   */
+  public updateAccountDetails = (data) => {
+    UpdateAccountDetails(
+      this.state.data,
+      data,
+      (e) => {
+        this.setState({
+          data: {
+            data: e,
+            total: e.length
+          },
+          productInEdit: e[e.findIndex(p => p.ID === this.state.productInEdit.ID)]
+        });
+      });
+  }
+
   public onEdit = (dataItem) => {
     this.setState({ productInEdit: Object.assign({}, dataItem) });
   }
@@ -211,6 +228,10 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
     });
   }
 
+  /**
+   * Save the edit dialog box form.
+   * @param event Data Submitted from form.
+   */
   public handleSubmit = (event) => {
     // Used to determine if we're updating an invoice request or an invoice.
     let listName = '';
@@ -579,8 +600,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
           <Column cell={this.CommandCell} width={"110px"} locked={true} resizable={false} filterable={false} sortable={false} />
 
         </Grid>
-
-
         {
           this.state.productInEdit ?
             <MyEditDialogContainer
@@ -590,6 +609,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
               currentUser={this.state.currentUser}
               saveResult={this.state.saveResult}
               onSubmit={this.handleSubmit}
+              updateAccountDetails={this.updateAccountDetails}
               onCustomCustomerChange={this.onCustomCustomerChange}
               cancel={this.cancel}
             />
@@ -601,7 +621,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
               />
               : null
         }
-
         <InvoiceDataProvider
           dataState={this.state.dataState}
           onDataReceived={this.dataReceived}

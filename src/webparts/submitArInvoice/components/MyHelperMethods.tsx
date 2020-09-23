@@ -1,6 +1,6 @@
 import { UrlQueryParameterCollection } from '@microsoft/sp-core-library';
 import { InvoiceActionRequiredRequestType, IInvoiceActionRequired } from './interface/IInvoiceActionRequired';
-import { InvoiceActionResponseStatus } from './enums/MyEnums';
+import { InvoiceActionResponseStatus, MyContentTypes } from './enums/MyEnums';
 import { sp } from "@pnp/sp";
 import "@pnp/sp/webs";
 import "@pnp/sp/files";
@@ -82,3 +82,37 @@ export const CreateInvoiceAction = async (assignedToId: number, requestType: Inv
     });
 };
 
+export const UpdateAccountDetails = (invoices: any, newAccount: Array<any>, setStateCallBack: Function) => {
+  let data = invoices.data;
+
+  for (let index = 0; index < newAccount.length; index++) {
+    const currentAccount = newAccount[index];
+
+    let invoiceIndex = invoices.data
+      .findIndex(p => p.ID === (p.ContentTypeId === MyContentTypes["AR Invoice Document Item"] ? currentAccount.InvoiceID : currentAccount.RequestId));
+
+    if (invoiceIndex >= 0) {
+
+      let accountIndex = data[invoiceIndex].AccountDetails.findIndex(p => p.ID === currentAccount.ID);
+
+      if (accountIndex >= 0) {
+        data[invoiceIndex].AccountDetails[accountIndex] = {
+          ...data[invoiceIndex].AccountDetails[accountIndex],
+          Account_x0020_Code: currentAccount.GLCode,
+          Amount: currentAccount.Amount,
+          HST_x0020_Taxable: currentAccount.HSTTaxable
+        };
+      }
+      else if (data[invoiceIndex].AccountDetails.length === 0) {
+        // If accountIndex is not found that means we are adding the first account.
+        data[invoiceIndex].AccountDetails.push({
+          Account_x0020_Code: currentAccount.GLCode,
+          Amount: currentAccount.Amount,
+          HST_x0020_Taxable: currentAccount.HSTTaxable
+        });
+      }
+    }
+  }
+
+  setStateCallBack(data);
+};

@@ -22,7 +22,7 @@ import { InvoiceDataProvider, QueryInvoiceData } from '../InvoiceDataProvider';
 import { MyCommandCell } from './MyCommandCell';
 import { filterBy } from '@progress/kendo-data-query';
 import { InvoiceStatus, MyGridStrings, MyContentTypes } from '../enums/MyEnums';
-import { ConvertQueryParamsToKendoFilter, BuildGUID, CreateInvoiceAction } from '../MyHelperMethods';
+import { ConvertQueryParamsToKendoFilter, BuildGUID, CreateInvoiceAction, UpdateAccountDetails } from '../MyHelperMethods';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { InvoiceEditForm, IGPAttachmentProps } from './InvoiceEditForm';
@@ -734,8 +734,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * @param dataItem Invoice to edit.
    */
   public edit = (dataItem) => {
-    console.log('editing');
-    console.log(dataItem);
     this.setState({ productInEdit: Object.assign({}, dataItem) });
   }
 
@@ -817,9 +815,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    */
   public onSubmit = async (data) => {
     const invoices = this.state.invoices.data.slice();
-    console.log('onSubmit');
-    console.log(data);
-
     try {
       const index = invoices.findIndex(p => p.ID === data.ID);
       invoices.splice(index, 1, data);
@@ -1112,33 +1107,21 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     });
   }
 
-  public updateAccount = (item) => {
-    let data = this.state.invoices.data;
-
-    for (let index = 0; index < item.length; index++) {
-      const currentAccount = item[index];
-      let invoiceIndex = this.state.invoices.data.findIndex(p => p.ID === currentAccount.InvoiceID);
-
-      if (invoiceIndex >= 0) {
-        let accountIndex = data[invoiceIndex].AccountDetails.findIndex(p => p.ID === currentAccount.ID);
-        if (accountIndex >= 0) {
-          data[invoiceIndex].AccountDetails[accountIndex] = {
-            ...data[invoiceIndex].AccountDetails[accountIndex],
-            Account_x0020_Code: currentAccount.GLCode,
-            Amount: currentAccount.Amount,
-            HST_x0020_Taxable: currentAccount.HSTTaxable
-          };
-        }
+  public updateAccountDetails = (item) => {
+    UpdateAccountDetails(
+      this.state.invoices,
+      item,
+      (e) => {
+        this.setState({
+          invoices: {
+            data: e,
+            total: e.length
+          },
+          productInEdit: e[e.findIndex(p => p.ID === this.state.productInEdit.ID)]
+        });
       }
-    }
+    );
 
-    this.setState({
-      invoices: {
-        data: data,
-        total: data.length
-      }
-    });
-    this.forceUpdate();
     this.expandAllRows();
   }
   //#endregion end CRUD Methods
@@ -1222,7 +1205,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
             onSubmit={this.onSubmit2}
             saveResult={this.state.saveResult}
             cancel={this.cancelEditForm}
-            onUpdateAccount={this.updateAccount}
+            updateAccountDetails={this.updateAccountDetails}
             GPAttachmentWidgetProps={this.state.gpAttachmentProps}
           />
         }

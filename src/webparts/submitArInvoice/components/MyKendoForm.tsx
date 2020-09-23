@@ -19,7 +19,6 @@ import "@pnp/sp/items";
 
 import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
 
-
 import * as MyFormComponents from './MyFormComponents';
 import { IMyFormProps } from './IMyFormProps';
 import { IUploadingFile } from './IMyFormState';
@@ -27,9 +26,6 @@ import * as MyValidators from './validators.jsx';
 import { MyGLAccountComponent } from './MyGLAccountComponent';
 import { BuildGUID, ConvertQueryParamsToKendoFilter } from './MyHelperMethods';
 import { MyLists } from './enums/MyLists';
-import { IItemAddResult } from '@pnp/sp/items';
-import { IInvoiceActionRequired, InvoiceActionRequiredRequestType } from '../components/interface/IInvoiceActionRequired';
-import { InvoiceActionResponseStatus } from './enums/MyEnums';
 
 export interface IARFormModel {
   Title: string;
