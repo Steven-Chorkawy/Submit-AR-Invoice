@@ -175,7 +175,10 @@ export const MyGLAccountComponent = (fieldArrayRenderProps) => {
         resizable={true}
       >
         <GridToolbar>
-          <Button title="Add new" className="k-button k-primary" icon="plus" onClick={onAdd} >Add new Account</Button>
+          <Button title="Add new"
+            className="k-button k-primary"
+            icon="plus"
+            onClick={onAdd} >Add new Account</Button>
         </GridToolbar>
 
         <GridColumn

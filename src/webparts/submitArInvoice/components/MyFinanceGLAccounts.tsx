@@ -20,7 +20,10 @@ import { Button } from '@progress/kendo-react-buttons';
 import * as MyValidators from './validators.jsx';
 import * as MyFormComponents from './MyFormComponents';
 import { MyCommandCell } from './FinanceForms/MyCommandCell';
-
+import { MyLists } from './enums/MyLists.js';
+import { MyContentTypes } from './enums/MyEnums.js';
+import { IARAccountDetails } from './MyKendoForm.js';
+import { IARInvoiceAccount } from './interface/IARInvoiceAccount';
 
 
 //#region  Cell Functions
@@ -234,9 +237,32 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
 
   public add = (dataItem) => {
     dataItem.inEdit = undefined;
-    //dataItem.ID = this.generateId(sampleProducts);
+    debugger;
 
-    //sampleProducts.unshift(dataItem);
+    let isInvoice: boolean = this.props.productInEdit.ContentTypeId === MyContentTypes["AR Invoice Document Item"];
+
+    let invoiceId = isInvoice
+      ? this.props.productInEdit.ID
+      : null;
+
+    let requestId = !isInvoice
+      ? this.props.productInEdit.ID
+      : this.props.productInEdit.AR_x0020_Invoice_x0020_RequestId;
+
+    let newAccount: IARInvoiceAccount = {
+      AR_x0020_InvoiceId: invoiceId,
+      AR_x0020_Invoice_x0020_RequestId: requestId,
+      Account_x0020_Code: dataItem.GLCode,
+      Amount: dataItem.Amount,
+      HST_x0020_Taxable: dataItem.HSTTaxable
+    };
+
+    // TODO: Add the account code. 
+    sp.web.lists.getByTitle(MyLists["AR Invoice Accounts"])
+      .items.add(newAccount);
+    // TODO: Update the Request or Invoice. 
+
+
     this.setState({
       data: [...this.state.data]
     });
@@ -306,16 +332,13 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
 
   //TODO: Why isn't this working?
   public addNew = () => {
-
-    const newDataItem = {
-      ID: 0,
+    var data = this.state.data;
+    data.unshift({
       GLCode: '',
       Amount: '',
       HSTTaxable: false,
       inEdit: true
-    };
-    var data = this.state.data;
-    data.unshift(newDataItem);
+    });
 
     this.setState({
       data: [...data]
@@ -341,11 +364,11 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
         style={...this.props.style}
       >
         <GridToolbar>
-          {/* <button
+          <button
             title="Add new"
             className="k-button k-primary"
             onClick={this.addNew}
-          >Add new</button> */}
+          >Add new</button>
           {hasEditedItem && (
             <button
               title="Cancel current changes"
@@ -389,7 +412,10 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
           cell={totalInvoiceCell}
         />
 
-        {(this.props.showCommandCell || this.props.showCommandCell === undefined) && <GridColumn cell={this.CommandCell} width="90px" />}
+        {
+          (this.props.showCommandCell || this.props.showCommandCell === undefined) &&
+          <GridColumn cell={this.CommandCell} width="90px" />
+        }
       </Grid>
     );
   }

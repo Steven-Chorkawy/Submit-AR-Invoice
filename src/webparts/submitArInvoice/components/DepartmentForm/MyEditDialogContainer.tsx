@@ -245,6 +245,7 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                 <FieldArray
                   name="GLAccounts"
                   component={MyFinanceGlAccountsComponent}
+                  productInEdit={this.state.productInEdit}
                   value={this.state.productInEdit.AccountDetails}
                 />
               </div>
