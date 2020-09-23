@@ -112,7 +112,6 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
             })
         }
 
-        {console.log("Dialog Edit")}{console.log(this.state.productInEdit)}
 
         <Form
           onSubmit={this.props.onSubmit}

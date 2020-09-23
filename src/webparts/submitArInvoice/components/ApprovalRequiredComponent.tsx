@@ -140,9 +140,6 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
   }
 
   public render() {
-    console.log('Approval Req Component');
-    console.log(this.state);
-
     return (
       <FieldWrapper>
         <Card style={{ width: 600 }} type={this.state.approvalRequestError ? 'error' : ''}>

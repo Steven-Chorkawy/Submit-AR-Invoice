@@ -734,8 +734,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    * @param dataItem Invoice to edit.
    */
   public edit = (dataItem) => {
-    console.log('editing');
-    console.log(dataItem);
     this.setState({ productInEdit: Object.assign({}, dataItem) });
   }
 
@@ -817,9 +815,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
    */
   public onSubmit = async (data) => {
     const invoices = this.state.invoices.data.slice();
-    console.log('onSubmit');
-    console.log(data);
-
     try {
       const index = invoices.findIndex(p => p.ID === data.ID);
       invoices.splice(index, 1, data);
