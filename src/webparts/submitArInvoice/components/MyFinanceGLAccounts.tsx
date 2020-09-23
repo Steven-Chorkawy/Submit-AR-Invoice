@@ -248,7 +248,7 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
 
   public componentDidMount() {
     let data = this._mapAccountsForState();
-    debugger;
+
     this.setState({
       data: data
     });
@@ -475,7 +475,6 @@ export const MyFinanceGlAccountsComponent = (fieldArrayRenderProps) => {
 
   return (
     <div key={fieldArrayRenderProps.value}>
-      {console.log(fieldArrayRenderProps.value)}
       <MyFinanceGlAccounts {...fieldArrayRenderProps} onAdd={onAdd} />
     </div>
   );
