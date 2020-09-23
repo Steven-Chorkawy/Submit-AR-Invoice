@@ -246,7 +246,7 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
     ));
   }
 
-  componentDidMount() {
+  public componentDidMount() {
     let data = this._mapAccountsForState();
     debugger;
     this.setState({
@@ -471,7 +471,7 @@ export const MyFinanceGlAccountsComponent = (fieldArrayRenderProps) => {
       HSTTaxable: false,
       inEdit: true
     });
-  }
+  };
 
   return (
     <div key={fieldArrayRenderProps.value}>

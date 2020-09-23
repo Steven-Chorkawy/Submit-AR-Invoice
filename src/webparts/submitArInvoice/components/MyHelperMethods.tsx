@@ -115,4 +115,4 @@ export const UpdateAccountDetails = (invoices: any, newAccount: Array<any>, setS
   }
 
   setStateCallBack(data);
-}
+};

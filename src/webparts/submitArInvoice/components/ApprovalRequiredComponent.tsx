@@ -47,7 +47,7 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
     };
   }
 
-  componentWillReceiveProps(nextProps, nextState) {
+  public componentWillReceiveProps(nextProps, nextState) {
     this.setState({
       noAccountPresent: this._checkForAccounts()
     });
