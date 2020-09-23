@@ -113,12 +113,14 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
           this.state.productInEdit.Actions
             .filter(f => f.AssignedToId === this.props.currentUser.Id && f.Response_x0020_Status === InvoiceActionResponseStatus.Waiting)
             .map(action => {
-              return (<ApprovalRequiredComponent
-                action={action}
-                productInEdit={this.state.productInEdit}
-                currentUser={this.props.currentUser}
-                onActionSentCallBack={this.onActionResponseSent}
-              />);
+              return (
+                <ApprovalRequiredComponent
+                  action={action}
+                  productInEdit={this.state.productInEdit}
+                  currentUser={this.props.currentUser}
+                  onActionSentCallBack={this.onActionResponseSent}
+                />
+              );
             })
         }
 

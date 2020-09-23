@@ -1,11 +1,9 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
-import { ListView, ListViewHeader, ListViewFooter } from '@progress/kendo-react-listview';
+import { TextArea } from '@progress/kendo-react-inputs';
 import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/kendo-react-layout';
 import { Button } from '@progress/kendo-react-buttons';
 import { Label, Error, Hint, FloatingLabel } from '@progress/kendo-react-labels';
-
 
 //PnPjs Imports
 import { sp } from "@pnp/sp";
@@ -18,6 +16,7 @@ import "@pnp/sp/items";
 import { MyLists } from './enums/MyLists';
 import { IInvoiceItem, IInvoiceAction } from './interface/InvoiceItem';
 import { InvoiceActionResponseStatus } from './enums/MyEnums';
+import { FieldWrapper } from '@progress/kendo-react-form';
 
 
 interface IApprovalRequiredComponentProps {
@@ -33,6 +32,7 @@ interface IApprovalRequiredComponentState {
   approvalNotes?;
   approvalNotesRequired: boolean;
   approvalRequestError?;
+  noAccountPresent: boolean; // An approval can only be sent if this invoice has 1 or more GL/Account Codes. 
 }
 
 class ApprovalRequiredComponent extends React.Component<IApprovalRequiredComponentProps, IApprovalRequiredComponentState> {
@@ -41,16 +41,21 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
     this.state = {
       action: props.action,
       approvalNotesRequired: false,
-      productInEdit: props.productInEdit
+      productInEdit: props.productInEdit,
+      // An approval can only be sent if this invoice has 1 or more GL/Account Codes. 
+      noAccountPresent: !(this.props.productInEdit.AccountDetails && this.props.productInEdit.AccountDetails.length > 0)
     };
+    debugger;
   }
 
   public sendApproval = (event) => {
-    this.setState({
-      approvalNotesRequired: false
-    });
 
-    this.sendApprovalResponse(InvoiceActionResponseStatus.Approved);
+    if (this.state.noAccountPresent) {
+      this.setState({
+        approvalNotesRequired: false
+      });
+      this.sendApprovalResponse(InvoiceActionResponseStatus.Approved);
+    }
   }
 
   public sendReject = (event) => {
@@ -69,6 +74,9 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
 
     var comment = this.state.approvalNotes;
 
+
+    // * This is where an Approvals Response Summar is sent.
+    // TODO: Beef up what details are provided in the Response Summary.
     var updateObj = {
       Response_x0020_Status: response,
       Response_x0020_Summary: "Approved from SharePoint Form",
@@ -79,10 +87,7 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
       .getById(this.state.action.Id)
       .update(updateObj)
       .then(res => {
-
         var updated = { ...this.state.action, ...updateObj };
-
-
         const index = this.state.productInEdit.Actions.findIndex(a => a.ID === this.state.action.ID);
         var allRequests = this.state.productInEdit.Actions;
         allRequests[index] = updated;
@@ -116,7 +121,6 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
 
       })
       .catch(error => {
-
         this.setState({
           approvalRequestError: true
         });
@@ -135,25 +139,63 @@ class ApprovalRequiredComponent extends React.Component<IApprovalRequiredCompone
 
   public render() {
     return (
-      <div>
+      <FieldWrapper>
         <Card style={{ width: 600 }} type={this.state.approvalRequestError ? 'error' : ''}>
           <CardBody>
-            <CardTitle><b>Your Response is Required</b></CardTitle>
-            <p>From: {this.state.action.Author.Title} - {this.state.action.Created}</p>
-            <p>"{this.state.action.Body}"</p>
+            {/* <CardTitle><b>Your Response is Required</b></CardTitle> */}
+            {/* <p>{this.state.action.Author.Title} - {this.state.action.Created}</p> */}
+            <p>{this.state.action.Body}</p>
             <hr />
-            <p>Your Response</p>
-            {this.state.approvalRequestError && <h4 className="k-text-error">Something went wrong, cannot send your response at the moment.</h4>}
+            <Label>Send Response:</Label>
+            <div className={'k-form-field-wrap'}>
+              <TextArea
+                valid={this.state.approvalRequestError}
+                //type={type}
+                id={'ApprovalNote'}
+                disabled={this.state.approvalRequestError}
+              //maxlength={200}
+              //ariaDescribedBy={`${hindId} ${errorId}`}
+              // {...others}
+              />
+            </div>
+            <Hint>Hint text goes here as well.</Hint>
 
-            <textarea disabled={this.state.approvalRequestError} style={{ width: '100%' }} id={'ApprovalNote'} onChange={this.onApprovalDialogInputChange}></textarea>
-            {this.state.approvalNotesRequired && <Error>* Please enter a reason to reject this invoice.</Error>}
+            {
+              this.state.noAccountPresent &&
+              <Card type='error'>
+                <CardBody>
+                  <p>Cannot Approve.</p>
+                  <p>Please enter a G/L Account</p>
+                </CardBody>
+              </Card>
+            }
+            {
+              this.state.approvalRequestError &&
+              <Card type='error'>
+                <CardBody>
+                  <p>Something went wrong, cannot send your response at the moment.</p>
+                </CardBody>
+              </Card>
+            }
+            {
+              this.state.approvalNotesRequired &&
+              <Card type='error'>
+                <CardBody>
+                  <p>* Please enter a reason to reject this invoice.</p>
+                </CardBody>
+              </Card>
+            }
           </CardBody>
           <CardActions className="row">
-            <Button className="k-text-success col-sm-6" icon="check" disabled={this.state.approvalRequestError} onClick={this.sendApproval}>Approve</Button>
-            <Button className="k-text-error col-sm-6" icon="close" disabled={this.state.approvalRequestError} onClick={this.sendReject}>Reject</Button>
+            <Button className="k-text-success col-sm-6" icon="check"
+              disabled={this.state.approvalRequestError || this.state.noAccountPresent}
+              onClick={this.sendApproval}>Approve</Button>
+            <Button className="k-text-error col-sm-6" icon="close"
+              disabled={this.state.approvalRequestError}
+              onClick={this.sendReject}>Reject</Button>
           </CardActions>
         </Card>
-      </div>
+      </FieldWrapper>
     );
   }
 }
