@@ -135,15 +135,6 @@ const commandCell = (onRemove) => (props) => {
 export const MyGLAccountComponent = (fieldArrayRenderProps) => {
   const { validationMessage, visited, label } = fieldArrayRenderProps;
 
-  if (fieldArrayRenderProps.value.length === 0) {
-    fieldArrayRenderProps.onUnshift({
-      value: {
-        GLCode: '',
-        Amount: '',
-        HSTTaxable: false
-      }
-    });
-  }
 
   const onAdd = React.useCallback(
     (e) => {
