@@ -208,18 +208,7 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
     if (!props.hasOwnProperty('value'))
       props.value = [];
 
-    let dataObject = props.value.map(a => (
-      {
-        InvoiceID: a.AR_x0020_InvoiceId,
-        RequestId: a.AR_x0020_Invoice_x0020_RequestId,
-        ID: a.ID,
-        GLCode: a.Account_x0020_Code,
-        Amount: a.Amount,
-        HSTTaxable: a.HST_x0020_Taxable,
-        HST: a.HST,
-        TotalInvoice: a.Total_x0020_Invoice
-      }
-    ));
+    let dataObject = this._mapAccountsForState();
 
     this.state = {
       data: dataObject,
@@ -238,6 +227,30 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
       cancel: this.cancel,
 
       editField: this.editField
+    });
+  }
+
+  private _mapAccountsForState() {
+    return this.props.value.map(a => (
+      {
+        InvoiceID: a.AR_x0020_InvoiceId,
+        RequestId: a.AR_x0020_Invoice_x0020_RequestId,
+        ID: a.ID,
+        GLCode: a.Account_x0020_Code,
+        Amount: a.Amount,
+        HSTTaxable: a.HST_x0020_Taxable,
+        HST: a.HST,
+        TotalInvoice: a.Total_x0020_Invoice,
+        inEdit: a.inEdit
+      }
+    ));
+  }
+
+  componentDidMount() {
+    let data = this._mapAccountsForState();
+    debugger;
+    this.setState({
+      data: data
     });
   }
 
@@ -349,23 +362,22 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
   }
 
   public itemChange = (event) => {
-
     const data = this.state.data.map(item => item.ID === event.dataItem.ID ? { ...item, [event.field]: event.value } : item);
     this.setState({ data });
   }
 
-  //TODO: Why isn't this working?
   public addNew = () => {
-    var data = this.state.data;
-    data.unshift({
-      GLCode: '',
-      Amount: '',
-      HSTTaxable: false,
-      inEdit: true
-    });
-
     this.setState({
-      data: [...data]
+      data: [
+        {
+          ID: 911,
+          GLCode: '',
+          Amount: '',
+          HSTTaxable: false,
+          inEdit: true
+        },
+        ...this.state.data
+      ]
     });
   }
 
@@ -389,7 +401,7 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
           <button
             title="Add new"
             className="k-button k-primary"
-            onClick={this.addNew}
+            onClick={this.props.onAdd}
           >Add new</button>
           {hasEditedItem && (
             <button
@@ -452,9 +464,19 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
 
 export const MyFinanceGlAccountsComponent = (fieldArrayRenderProps) => {
   const { accounts } = fieldArrayRenderProps;
+  const onAdd = () => {
+    fieldArrayRenderProps.value.unshift({
+      GLCode: '',
+      Amount: '',
+      HSTTaxable: false,
+      inEdit: true
+    });
+  }
+
   return (
     <div key={fieldArrayRenderProps.value}>
-      <MyFinanceGlAccounts {...fieldArrayRenderProps} />
+      {console.log(fieldArrayRenderProps.value)}
+      <MyFinanceGlAccounts {...fieldArrayRenderProps} onAdd={onAdd} />
     </div>
   );
 };
