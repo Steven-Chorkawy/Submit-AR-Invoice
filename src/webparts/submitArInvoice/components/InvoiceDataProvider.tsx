@@ -88,8 +88,6 @@ class LoadingPanel extends React.Component {
 const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
 
   const includeString = `*,
-    Customer/Customer_x0020_Name,
-    Customer/ID,
     Requested_x0020_By/Id,
     Requested_x0020_By/Title,
     Requested_x0020_By/EMail,
@@ -107,7 +105,6 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
     RelatedAttachments/ID`;
 
   const expandString = `
-    Customer,
     Requested_x0020_By,
     Requires_x0020_Department_x0020_,
     Requires_x0020_Accountant_x0020_,
@@ -149,6 +146,7 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
       var invoiceIds = [];                // filter for accounts
       var idsForARDocuments = [];
 
+
       // Iterate through processedResponse instead of response because if you don't this will generate a URL that over
       // 2000 characters long.
       // That is too big for SharePoint to handle.
@@ -156,6 +154,7 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
         const element = processedResponse.data[index];
         invoiceIds.push(`AR_x0020_Invoice_x0020_Request/ID eq ${element.ID}`);
         idsForARDocuments.push(`AR_x0020_RequestId eq ${element.ID}`);
+
 
         // Format data of processedResponse.
         processedResponse.data[index].Date = new Date(processedResponse.data[index].Date);
@@ -202,7 +201,7 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
           .filter(idsForARDocuments.join(' or '))
           .getAll(),
         sp.web.getFolderByServerRelativePath(MyLists["AR Invoices"]).files(),
-        sp.web.lists.getByTitle(MyLists.ReceiveARInvoiceRequest).items.getAll()
+        sp.web.lists.getByTitle(MyLists.ReceiveARInvoiceRequest).items.getAll(),
       ])
         .then(async (values) => {
           console.log('Raw Query Res');
@@ -267,6 +266,14 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
                 relatedAttachments.ServerRedirectedEmbedUri = url;
               }
             });
+
+            // Add the customer data.
+            // The reason I'm doing this here and not in the extend is because some fields from the customer list weren't working!!!
+            if(processedResponse.data[index].CustomerId)
+            {
+              let customer = await sp.web.lists.getByTitle(MyLists.Customers).items.getById(processedResponse.data[index].CustomerId).get();
+              processedResponse.data[index].Customer = customer;
+            }
 
             // Convert dates from strings to dates.... thanks SharePoint.
             processedResponse.data[index].Date = new Date(processedResponse.data[index].Date);

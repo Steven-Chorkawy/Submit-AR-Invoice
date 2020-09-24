@@ -27,6 +27,7 @@ import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { InvoiceEditForm, IGPAttachmentProps } from './InvoiceEditForm';
 import { FileRefCell } from '../FileRefCell';
+import { IDCell } from '../IDCell';
 import { IMySaveResult } from '../interface/IMySaveResult';
 import { InvoiceActionRequiredRequestType } from '../interface/IInvoiceActionRequired';
 import { QuickFilterButtonGroup } from '../QuickFilterButtonGroup';
@@ -1180,8 +1181,8 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
               >Cancel Current Changes</Button>
             )}
           </GridToolbar>
-          <GridColumn width="75px" field="FileRef" title="" filterable={false} sortable={false} cell={this.MyCustomCell} />
-          <GridColumn field="ID" title="ID" width={this._columnWidth} editable={false} />
+          <GridColumn width="75px" field="" title="" filterable={false} sortable={false} cell={this.MyCustomCell} />
+          <GridColumn field="ID" title="ID" width={this._columnWidth} editable={false} cell={(props) => <IDCell {...props} />} />
           <GridColumn field="Date" title="Date" width={this._columnWidth} filter='date' format={MyGridStrings.DateFilter} />
           <GridColumn field="Department" title="Department" width={this._columnWidth} />
           <GridColumn field="Customer.Customer_x0020_Name" title="Customer" width={this._columnWidth} />

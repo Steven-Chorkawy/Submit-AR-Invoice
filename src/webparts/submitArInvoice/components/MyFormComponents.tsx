@@ -122,7 +122,7 @@ export const FormCheckbox = (fieldRenderProps) => {
 
   const showValidationMessage = touched && validationMessage;
   const showHint = !showValidationMessage && hint;
-  const fullLabel = <span>{label}{optional ? <span className={'k-label-optional'}>(Optional)</span> : ''}</span>;
+  const fullLabel = <span><b>{label}{optional ? <span className={'k-label-optional'}>(Optional)</span> : ''}</b></span>;
   const hindId = showHint ? `${id}_hint` : '';
   const errorId = showValidationMessage ? `${id}_error` : '';
 

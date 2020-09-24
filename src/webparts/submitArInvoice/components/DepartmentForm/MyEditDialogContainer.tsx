@@ -57,6 +57,7 @@ function GridButtons({ cancel, saveResult }) {
 export class MyEditDialogContainer extends React.Component<any, IMyEditDialogContainerState> {
   constructor(props) {
     super(props);
+    debugger;
     this.state = {
       productInEdit: {
         ...this.props.dataItem,
@@ -181,7 +182,8 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                   label="Urgent"
                   onLabel="Yes"
                   offLabel="No"
-                  component={MyFormComponents.FormSwitch}
+                  labelPlacement={'before'}
+                  component={MyFormComponents.FormCheckbox}
                 />
               </div>
               <Field
