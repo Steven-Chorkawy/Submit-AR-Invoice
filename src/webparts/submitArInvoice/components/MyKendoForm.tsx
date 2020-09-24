@@ -402,6 +402,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   label="* Requires Authorization By"
                   dataItemKey="Email"
                   textField="Title"
+                  hint={'Send an approval request to one or more users.'}
                   personSelectionLimit={10}
                   context={this.props.ctx}
                   selectedItems={e => {
