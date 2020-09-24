@@ -32,6 +32,7 @@ import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { MyContentTypes } from '../enums/MyEnums';
 import { FileRefCell } from '../FileRefCell';
+import { IDCell } from '../IDCell';
 import { IInvoiceItem, IPersonField, IInvoiceUpdateItem } from '../interface/InvoiceItem';
 import { IMySaveResult } from '../interface/IMySaveResult';
 import { QuickFilterButtonGroup } from '../QuickFilterButtonGroup';
@@ -590,7 +591,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
           </GridToolbar>
 
           <Column width="75px" field="" title="" filterable={false} sortable={false} cell={this.MyCustomCell} />
-          <Column field="ID" title="ID" width="75px" filterable={false} />
+          <Column field="ID" title="ID" width="75px" filterable={false} cell={(props) => <IDCell {...props} />} />
           <Column field="Created" width="250px" title="Created Date" filter="date" format={MyGridStrings.DateFilter} />
           <Column field="Customer.Customer_x0020_Name" width="250px" title="Customer" />
           <Column field="Invoice_x0020_Status" width="250px" title="Status" />
