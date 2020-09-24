@@ -8,7 +8,8 @@ export class MyCustomerCardComponent extends React.Component<any, any> {
     super(props);
 
     this.state = {
-      selectedCustomer: props.selectedCustomer
+      selectedCustomer: props.selectedCustomer,
+      showMore: false
     };
   }
 
@@ -46,13 +47,33 @@ export class MyCustomerCardComponent extends React.Component<any, any> {
         <Card key={this.state.selectedCustomer.ID} type="info">
           <CardBody>
             <CardTitle>{this.state.selectedCustomer.Customer_x0020_Name}</CardTitle>
-            <p>GP Customer ID: {this.state.selectedCustomer.GPCustomerID}</p>
-            <p>Contact Name: {this.state.selectedCustomer.Company}</p>
-            <p>Email Address: {this.state.selectedCustomer.Email}</p>
-            <p>Telephone Number: {this.state.selectedCustomer.WorkPhone}</p>
             <p>Mailing Address: {this.state.selectedCustomer.WorkAddress}</p>
-            <p>Notes: {this.state.selectedCustomer.Comments}</p>
+            {
+              this.state.showMore &&
+              <div>
+                <p>GP Customer ID: {this.state.selectedCustomer.GPCustomerID}</p>
+                <p>Contact Name: {this.state.selectedCustomer.Company}</p>
+                <p>Email Address: {this.state.selectedCustomer.Email}</p>
+                <p>Telephone Number: {this.state.selectedCustomer.WorkPhone}</p>
+                <p>Notes: {this.state.selectedCustomer.Comments}</p>
+              </div>
+            }
           </CardBody>
+          <CardActions>
+            <span className="k-button k-flat k-primary"
+              onClick={(e) => {
+                this.setState({
+                  showMore: !this.state.showMore
+                })
+              }}
+            >
+              {
+                this.state.showMore
+                  ? 'Hide'
+                  : 'Show More'
+              }
+            </span>
+          </CardActions>
         </Card>
       );
     }
