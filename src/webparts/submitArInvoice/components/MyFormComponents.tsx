@@ -818,10 +818,11 @@ export const FormFloatingNumericTextBox = (fieldRenderProps) => {
 };
 
 export const FormPeoplePicker = (fieldRenderProps) => {
-  const { label, value, ...others } = fieldRenderProps;
+  const { label, value, id, hint, wrapperStyle, ...others } = fieldRenderProps;
+  const hindId = `${id}_hint`;
 
   return (
-    <FieldWrapper>
+    <FieldWrapper style={wrapperStyle}>
       <Label>
         {label}
       </Label>
@@ -836,6 +837,10 @@ export const FormPeoplePicker = (fieldRenderProps) => {
         principalTypes={[PrincipalType.User]}
         defaultSelectedUsers={fieldRenderProps.defaultSelectedUsers}
       />
+      {
+        hint &&
+        <Hint id={hindId}>{hint}</Hint>
+      }
     </FieldWrapper>
   );
 };

@@ -203,10 +203,7 @@ export const MyGLAccountComponent = (fieldArrayRenderProps) => {
           cell={totalInvoiceCell}
         />
 
-        {
-          fieldArrayRenderProps.value.length > 1
-          && <GridColumn editable={false} cell={commandCell(onRemove)} width="90px" />
-        }
+        <GridColumn editable={false} cell={commandCell(onRemove)} width="90px" />
       </Grid>
     </div>
   );

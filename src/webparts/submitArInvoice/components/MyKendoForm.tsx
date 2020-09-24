@@ -340,39 +340,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
 
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
-                  id="Department"
-                  name="Department"
-                  label="* Department"
-                  wrapperStyle={{ width: '50%', marginRight: '18px' }}
-                  data={[
-                    'Administration',
-                    'Clerks Department',
-                    'Community Service',
-                    'Corporate Services Department',
-                    'Emergency Services',
-                    'Engineering Services',
-                    'Finance',
-                    'Legal Services Department',
-                    'Mayor & Council',
-                    'Operations',
-                    'Planning Services'
-                  ]}
-                  validator={MyValidators.departmentValidator}
-                  component={MyFormComponents.FormDropDownList}
-                />
-
-                <Field
-                  id={'Date'}
-                  name={'Date'}
-                  label={'* Date'}
-                  component={MyFormComponents.FormDatePicker}
-                  validator={MyValidators.dateValidator}
-                  wrapperStyle={{ width: '50%' }}
-                />
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Field
                   id="Requested_x0020_By"
                   name="Requested_x0020_By"
                   label="* Requested By"
@@ -393,6 +360,39 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   component={MyFormComponents.FormPeoplePicker}
                   defaultSelectedUsers={[this.props.ctx.pageContext.user.email]}
                 />
+
+                <Field
+                  id={'Date'}
+                  name={'Date'}
+                  label={'* Date'}
+                  component={MyFormComponents.FormDatePicker}
+                  validator={MyValidators.dateValidator}
+                  wrapperStyle={{ width: '50%' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Field
+                  id="Department"
+                  name="Department"
+                  label="* Department"
+                  wrapperStyle={{ width: '50%' }}
+                  data={[
+                    'Administration',
+                    'Clerks Department',
+                    'Community Service',
+                    'Corporate Services Department',
+                    'Emergency Services',
+                    'Engineering Services',
+                    'Finance',
+                    'Legal Services Department',
+                    'Mayor & Council',
+                    'Operations',
+                    'Planning Services'
+                  ]}
+                  validator={MyValidators.departmentValidator}
+                  component={MyFormComponents.FormDropDownList}
+                />
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -400,8 +400,10 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   id="RequiresAuthorizationBy"
                   name="RequiresAuthorizationBy"
                   label="* Requires Authorization By"
+                  wrapperStyle={{ width: '100%' }}
                   dataItemKey="Email"
                   textField="Title"
+                  hint={'Send an approval request to one or more users.'}
                   personSelectionLimit={10}
                   context={this.props.ctx}
                   selectedItems={e => {
