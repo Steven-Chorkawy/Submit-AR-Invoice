@@ -818,11 +818,11 @@ export const FormFloatingNumericTextBox = (fieldRenderProps) => {
 };
 
 export const FormPeoplePicker = (fieldRenderProps) => {
-  const { label, value, id, hint, ...others } = fieldRenderProps;
+  const { label, value, id, hint, wrapperStyle, ...others } = fieldRenderProps;
   const hindId = `${id}_hint`;
 
   return (
-    <FieldWrapper>
+    <FieldWrapper style={wrapperStyle}>
       <Label>
         {label}
       </Label>
