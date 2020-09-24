@@ -423,8 +423,9 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   label="Urgent"
                   onLabel="Yes"
                   offLabel="No"
-                  component={MyFormComponents.FormSwitch}
-                //onchange={this.onDialogInputChange}
+                  labelPlacement={'before'}
+                  component={MyFormComponents.FormCheckbox}
+                  hint={'Flag emails as high priority.'}
                 />
               </div>
               <Field

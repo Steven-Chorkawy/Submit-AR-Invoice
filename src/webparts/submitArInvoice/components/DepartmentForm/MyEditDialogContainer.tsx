@@ -182,6 +182,7 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                   label="Urgent"
                   onLabel="Yes"
                   offLabel="No"
+                  labelPlacement={'before'}
                   component={MyFormComponents.FormCheckbox}
                 />
               </div>
