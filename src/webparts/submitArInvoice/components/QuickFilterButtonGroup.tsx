@@ -43,7 +43,7 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
       filterButtons: [
         { text: "Show All", getData: this._allInvoices },
         { text: "For You", getData: this._invoicesForCurrentUser },
-        { text: "Submitted", getData: this._submittedInvoices },
+        { text: "Urgent", getData: this._urgentInvoices },
         { text: "Approved", getData: this._approvedInvoices },
         { text: "Waiting Approval", getData: this._waitingApproval },
       ]
@@ -62,8 +62,8 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
     return  this.props.invoices ? this.props.invoices : null;
   }
 
-  private _submittedInvoices = () => {
-    return this.props.invoices ? this.props.invoices.filter(f => f.Invoice_x0020_Status === InvoiceStatus.Submitted) : null;
+  private _urgentInvoices = () => {
+    return this.props.invoices ? this.props.invoices.filter(f => f.Urgent === true) : null;
   }
 
   // Get invoices that have actions assigned to this user with a status of Waiting.
