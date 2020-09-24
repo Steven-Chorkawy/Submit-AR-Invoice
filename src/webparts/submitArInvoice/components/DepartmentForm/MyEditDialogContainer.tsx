@@ -1,6 +1,8 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 
+import { sp } from "@pnp/sp";
+
 import { Dialog } from '@progress/kendo-react-dialogs';
 import { Form, FormElement, Field, FieldArray } from '@progress/kendo-react-form';
 import { Button } from '@progress/kendo-react-buttons';
@@ -14,6 +16,7 @@ import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
 import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
 import { IInvoiceItem } from '../interface/InvoiceItem';
 import { InvoiceActionResponseStatus } from '../enums/MyEnums';
+import { MyLists } from '../enums/MyLists';
 
 interface IMyEditDialogContainerState {
   productInEdit: IInvoiceItem;
@@ -21,6 +24,7 @@ interface IMyEditDialogContainerState {
   receivedCustomerList: any;
   MiscCustomerDetails?: any;
   loading?: boolean;
+  standardTerms: Array<any>;
 }
 
 function GridButtons({ cancel, saveResult }) {
@@ -63,8 +67,19 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
         ...this.props.dataItem,
       },
       customerList: this.props.customers,
-      receivedCustomerList: this.props.customers
+      receivedCustomerList: this.props.customers,
+      standardTerms: []
     };
+
+    sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).fields
+      .getByInternalNameOrTitle('Standard_x0020_Terms')
+      .select('Choices')
+      .get()
+      .then(res => {
+        this.setState({
+          standardTerms: res['Choices']
+        });
+      })
   }
 
   //#region Customer Component Methods
@@ -215,9 +230,7 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                   label="Standard Terms"
                   wrapperStyle={{ width: '50%', marginRight: '18px' }}
                   defaultValue='NET 30, 1% INTEREST CHARGED'
-                  data={[
-                    'NET 30, 1% INTEREST CHARGED'
-                  ]}
+                  data={this.state.standardTerms}
                   component={MyFormComponents.FormDropDownList}
                 />
               </div>
