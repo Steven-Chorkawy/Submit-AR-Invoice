@@ -64,7 +64,7 @@ export class MyCustomerCardComponent extends React.Component<any, any> {
               onClick={(e) => {
                 this.setState({
                   showMore: !this.state.showMore
-                })
+                });
               }}
             >
               {
