@@ -79,7 +79,7 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
         this.setState({
           standardTerms: res['Choices']
         });
-      })
+      });
   }
 
   //#region Customer Component Methods
