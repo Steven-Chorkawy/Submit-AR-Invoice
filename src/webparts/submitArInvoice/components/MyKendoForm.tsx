@@ -64,15 +64,29 @@ export class MyForm extends React.Component<IMyFormProps, any> {
 
     this._siteUrl = props.ctx.pageContext.web.absoluteUrl;
 
-    this.state = {
-      MyFiles: [],
-      productInEdit: {},
-      stateHolder: 0,
-      customerList: this.props.customerList,
-      receivedCustomerList: this.props.customerList,
-      ...props
-    };
+    sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).fields
+      .getByInternalNameOrTitle('Standard_x0020_Terms')
+      .select('Choices')
+      .get()
+      .then(res => {
+        this.setState({
+          standardTerms: res['Choices']
+        });
+      });
+
+      this.state = {
+        MyFiles: [],
+        productInEdit: {},
+        stateHolder: 0,
+        customerList: this.props.customerList,
+        receivedCustomerList: this.props.customerList,
+        standardTerms: [],
+        ...props
+      };
   }
+
+
+
   private getUserByEmail = async (email: string): Promise<ISPUser> => {
     let web = Web(this.props.ctx.pageContext.web.absoluteUrl);
     try {
@@ -214,7 +228,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
 
       // Force a re render.
       this.setState({
-        stateHolder: this.state.stateHolder + 1,
+        stateHolder: this.state.stateHolder ? this.state.stateHolder + 1 : 1,
         MyFiles: currentFiles
       });
 
@@ -323,7 +337,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
 
   public render() {
     return (
-      <div style={{ padding: '5px' }} key={this.state.stateHolder}>
+      <div style={{ padding: '5px' }} key={this.state.stateHolder ? this.state.stateHolder : 0}>
         <Form
           onSubmit={this.handleSubmit}
 
@@ -462,9 +476,11 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   label="Standard Terms"
                   wrapperStyle={{ width: '50%', marginRight: '18px' }}
                   defaultValue='NET 30, 1% INTEREST CHARGED'
-                  data={[
-                    'NET 30, 1% INTEREST CHARGED'
-                  ]}
+                  data={
+                    this.state.standardTerms
+                      ? this.state.standardTerms
+                      : []
+                  }
                   component={MyFormComponents.FormDropDownList}
                 />
               </div>
