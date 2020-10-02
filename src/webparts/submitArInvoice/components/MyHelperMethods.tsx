@@ -94,7 +94,7 @@ export const UpdateAccountDetails = (invoices: any, newAccount: Array<any>, setS
     if (invoiceIndex >= 0) {
 
       let accountIndex = data[invoiceIndex].AccountDetails.findIndex(p => p.ID === currentAccount.ID);
-
+      debugger;
       if (accountIndex >= 0) {
         data[invoiceIndex].AccountDetails[accountIndex] = {
           ...data[invoiceIndex].AccountDetails[accountIndex],
@@ -103,12 +103,15 @@ export const UpdateAccountDetails = (invoices: any, newAccount: Array<any>, setS
           HST_x0020_Taxable: currentAccount.HSTTaxable
         };
       }
-      else if (data[invoiceIndex].AccountDetails.length === 0) {
-        // If accountIndex is not found that means we are adding the first account.
+      else {
+        debugger;
+        // If accountIndex is not found that means we are adding the first account or a new account.
         data[invoiceIndex].AccountDetails.push({
           Account_x0020_Code: currentAccount.GLCode,
           Amount: currentAccount.Amount,
-          HST_x0020_Taxable: currentAccount.HSTTaxable
+          HST_x0020_Taxable: currentAccount.HSTTaxable,
+          HST: currentAccount.HST,
+          Total_x0020_Invoice: currentAccount.TotalInvoice
         });
       }
     }

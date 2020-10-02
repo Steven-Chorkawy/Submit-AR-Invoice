@@ -36,14 +36,6 @@ export function MyCommandCell({ edit, remove, add, update, discard, cancel, edit
               icon="edit"
               style={{ "marginBottom": "5px" }}
             >Edit</Button>
-            {/* <Button
-              className="k-button k-grid-remove-command col-sm-12"
-              onClick={() => confirm('Confirm deleting: ' + dataItem.ProductName) &&
-                remove(dataItem)
-              }
-              icon="delete"
-              style={{ "marginBottom": "5px" }}
-            >Delete</Button> */}
           </td>
         );
     }

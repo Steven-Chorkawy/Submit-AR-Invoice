@@ -12,9 +12,6 @@ interface IAccountListComponentProps {
 class AccountListItem extends React.Component<any, any> {
   constructor(props) {
     super(props);
-    this.state = {
-      item: this.props.dataItem
-    };
   }
 
   public render() {
@@ -25,16 +22,16 @@ class AccountListItem extends React.Component<any, any> {
             <div className='k-hbox k-justify-content-between k-flex-wrap'>
               <div style={{ padding: '5 0' }}>
                 <CardTitle style={{ marginBottom: '0px' }}>
-                  <span title='Account Code'>{this.state.item.Account_x0020_Code}</span> | <span title='Total Invoice'>{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(this.state.item.Total_x0020_Invoice)}</span>
+                  <span title='Account Code'>{this.props.dataItem.Account_x0020_Code}</span> | <span title='Total Invoice'>{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(this.props.dataItem.Total_x0020_Invoice)}</span>
                 </CardTitle>
                 <CardBody>
                   <div className='row'>
                     <div className='col-sm-4'>Amount</div>
-                    <div className='col-sm-8'><span>{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(this.state.item.Amount)}</span></div>
+                    <div className='col-sm-8'><span>{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(this.props.dataItem.Amount)}</span></div>
                   </div>
                   <div className='row'>
                     <div className='col-sm-4'>HST</div>
-                    <div className='col-sm-8'><span>{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(this.state.item.HST)}</span></div>
+                    <div className='col-sm-8'><span>{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(this.props.dataItem.HST)}</span></div>
                   </div>
                 </CardBody>
               </div>
