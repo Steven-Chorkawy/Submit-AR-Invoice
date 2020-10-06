@@ -180,6 +180,18 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 
   public statusDataReceived = (status) => {
+    // These status should not be visible in the Finance form as per Al Baker. 
+    // * See issue https://github.com/Steven-Chorkawy/Submit-AR-Invoice/issues/71
+    let hideThese = [
+      'Submitted',
+      'Approved',
+      'Rejected'
+    ];
+
+    for (let index = 0; index < hideThese.length; index++) {
+      status.splice(status.indexOf(hideThese[index]), 1)
+    }
+
     this.setState({
       ...this.state,
       statusData: status
