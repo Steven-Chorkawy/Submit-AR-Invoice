@@ -262,7 +262,6 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
   }
 
   public add = (dataItem) => {
-    debugger;
     dataItem.inEdit = undefined;
     let isInvoice: boolean = this.props.productInEdit.ContentTypeId === MyContentTypes["AR Invoice Document Item"];
 
@@ -287,7 +286,6 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
       .items.add(newAccount)
       .then(res => {
         if (this.props.updateAccountDetails) {
-          debugger;
           this.props.updateAccountDetails([{
             Amount: res.data.Amount,
             GLCode: res.data.Account_x0020_Code,

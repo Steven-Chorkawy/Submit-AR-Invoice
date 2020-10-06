@@ -92,9 +92,7 @@ export const UpdateAccountDetails = (invoices: any, newAccount: Array<any>, setS
       .findIndex(p => p.ID === (p.ContentTypeId === MyContentTypes["AR Invoice Document Item"] ? currentAccount.InvoiceID : currentAccount.RequestId));
 
     if (invoiceIndex >= 0) {
-
       let accountIndex = data[invoiceIndex].AccountDetails.findIndex(p => p.ID === currentAccount.ID);
-      debugger;
       if (accountIndex >= 0) {
         data[invoiceIndex].AccountDetails[accountIndex] = {
           ...data[invoiceIndex].AccountDetails[accountIndex],
@@ -104,7 +102,13 @@ export const UpdateAccountDetails = (invoices: any, newAccount: Array<any>, setS
         };
       }
       else {
-        debugger;
+        // When adding a new account there is a left over empty account.  
+        // This bad object is always in the first index... I can't find where it's getting set in time to release this program. 
+        // Check for it here and remove it if found. 
+        if (data[invoiceIndex].AccountDetails[0].Amount === "" && data[invoiceIndex].AccountDetails[0].GLCode === "") {
+          data[invoiceIndex].AccountDetails.splice(0, 1);
+        }
+
         // If accountIndex is not found that means we are adding the first account or a new account.
         data[invoiceIndex].AccountDetails.push({
           Account_x0020_Code: currentAccount.GLCode,
