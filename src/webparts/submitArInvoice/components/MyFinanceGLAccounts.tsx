@@ -127,10 +127,6 @@ const totalInvoiceCell = (props) => {
   let dataValue = dataItem[field] === null ? '' : dataItem[field];
   let calculatedAmount: Number = CalculateHSTAmount(props) + dataItem.Amount;
 
-  console.log(dataItem);
-  console.log(dataValue);
-  console.log(Number(Number(dataValue).toFixed(2)));
-
   // dataValue is undefined when it is a new invoice.  
   //This is because the TotalInvoice field is populated from SharePoint, and we have yet to receive the response from SharePoint. 
   if (dataValue === undefined && field === 'TotalInvoice') {
