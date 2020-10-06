@@ -59,7 +59,7 @@ const glCodeCell = (props) => {
         <Field
           mask="000-00-000-00000-0000"
           component={MyFormComponents.FormMaskedTextBox}
-          validator={MyValidators.glCodeCell}
+          validator={e => MyValidators.glCodeValidator(dataValue)}
           name={`GLAccounts[${props.dataIndex}].${props.field}`}
           onChange={handleChange}
           value={dataValue}
@@ -72,6 +72,7 @@ const glCodeCell = (props) => {
 };
 
 
+
 /**
  * Amount before HST.
  * @param props Grid properties.
@@ -79,7 +80,6 @@ const glCodeCell = (props) => {
 const amountCell = (props) => {
   const { dataItem, field } = props;
   const dataValue = dataItem[field] === null ? '' : dataItem[field];
-
   const handleChange = React.useCallback(
     (e) => {
       props.onChange({
@@ -98,7 +98,7 @@ const amountCell = (props) => {
         <Field
           format="c2"
           component={MyFormComponents.FormNumericTextBox}
-          //validator={MyValidators.accountAmountValidator}
+          validator={e => MyValidators.accountAmountValidator(dataValue)}
           name={`GLAccounts[${props.dataIndex}].${props.field}`}
           value={dataValue}
           editable={true}
@@ -268,6 +268,16 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
   }
 
   public add = (dataItem) => {
+    if (dataItem.Amount === "" || dataItem.Amount === 0) {
+      alert("Please Enter a valid amount");
+      return;
+    }
+
+    if (dataItem.GLCode == undefined || dataItem.GLCode.includes('_')) {
+      alert('Please Enter a valid G/L Account #');
+      return;
+    }
+
     dataItem.inEdit = undefined;
     let isInvoice: boolean = this.props.productInEdit.ContentTypeId === MyContentTypes["AR Invoice Document Item"];
 
