@@ -241,6 +241,7 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                     name="GLAccounts"
                     component={MyFinanceGlAccountsComponent}
                     value={this.state.productInEdit.AccountDetails}
+                    productInEdit={this.state.productInEdit}
                     updateAccountDetails={this.props.updateAccountDetails}
                   />
                 </div>

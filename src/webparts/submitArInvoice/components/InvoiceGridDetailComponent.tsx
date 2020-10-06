@@ -24,41 +24,38 @@ export class InvoiceGridDetailComponent extends GridDetailRow {
 
   private detailItem: IInvoiceItem;
 
-
-  public render() {
+  public render() {    
     return (
       <div style={{ marginBottom: '3em;' }}>
         <h3>G/L Accounts</h3>
         <AccountListComponent
-          accounts={this.detailItem.AccountDetails}
+          accounts={this.props.dataItem.AccountDetails}
           editable={false}
         />
-        {/* <MyFinanceGlAccounts
-          value={this.detailItem.AccountDetails}
-          showCommandCell={false}
-          style={{ 'maxWidth': '1200px' }} /> */}
         <hr />
-
-        {this.detailItem.CancelRequests && <div> {this.detailItem.CancelRequests.length > 0 &&
+        {
+          this.detailItem.CancelRequests &&
           <div>
-            <h3>Cancel Requests</h3>
-            <Card style={{ width: 600 }} type='error'>
-              {this.detailItem.CancelRequests.map(cancelReq => {
-                return (
-                  <CardBody>
-                    <CardTitle>{cancelReq.Requested_x0020_By.EMail} - {cancelReq.Created}</CardTitle>
-                    <p>"{cancelReq.Requester_x0020_Comments}"</p>
-                    <hr />
-                  </CardBody>
-                );
-              })}
-            </Card>
+            {
+              this.detailItem.CancelRequests.length > 0 &&
+              <div>
+                <h3>Cancel Requests</h3>
+                <Card style={{ width: 600 }} type='error'>
+                  {this.detailItem.CancelRequests.map(cancelReq => {
+                    return (
+                      <CardBody>
+                        <CardTitle>{cancelReq.Requested_x0020_By.EMail} - {cancelReq.Created}</CardTitle>
+                        <p>"{cancelReq.Requester_x0020_Comments}"</p>
+                        <hr />
+                      </CardBody>
+                    );
+                  })}
+                </Card>
+              </div>
+            }
           </div>
-        }</div>}
-
+        }
         <h3>Actions Required</h3>
-        {/* <ActionResponseComponent actions={this.detailItem.Actions} />
-        <hr /> */}
         <ActionStepsComponent actions={this.detailItem.Actions} />
       </div>
     );
