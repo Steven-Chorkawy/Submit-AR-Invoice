@@ -189,7 +189,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     ];
 
     for (let index = 0; index < hideThese.length; index++) {
-      status.splice(status.indexOf(hideThese[index]), 1)
+      status.splice(status.indexOf(hideThese[index]), 1);
     }
 
     this.setState({
