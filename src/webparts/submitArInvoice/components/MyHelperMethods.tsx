@@ -105,8 +105,10 @@ export const UpdateAccountDetails = (invoices: any, newAccount: Array<any>, setS
         // When adding a new account there is a left over empty account.  
         // This bad object is always in the first index... I can't find where it's getting set in time to release this program. 
         // Check for it here and remove it if found. 
-        if (data[invoiceIndex].AccountDetails[0].Amount === "" && data[invoiceIndex].AccountDetails[0].GLCode === "") {
-          data[invoiceIndex].AccountDetails.splice(0, 1);
+        let badIndex = data[invoiceIndex].AccountDetails.findIndex(p => p.Amount === "" && p.GLCode === "");
+        if(badIndex >= 0) {
+          debugger;
+          data[invoiceIndex].AccountDetails.splice(badIndex, 1);
         }
 
         // If accountIndex is not found that means we are adding the first account or a new account.
