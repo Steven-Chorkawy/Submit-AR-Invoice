@@ -107,7 +107,6 @@ export const UpdateAccountDetails = (invoices: any, newAccount: Array<any>, setS
         // Check for it here and remove it if found. 
         let badIndex = data[invoiceIndex].AccountDetails.findIndex(p => p.Amount === "" && p.GLCode === "");
         if(badIndex >= 0) {
-          debugger;
           data[invoiceIndex].AccountDetails.splice(badIndex, 1);
         }
 
