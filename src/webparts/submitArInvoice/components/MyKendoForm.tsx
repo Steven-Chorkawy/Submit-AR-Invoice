@@ -277,7 +277,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
 
   public UploadStatusCard = () => {
     let output = [];
-    const successMessage = 'Invoice request you submitted has been sent out for approval. if you need to review the submitted request you can use the link below.';
+    const successMessage = 'Invoice request you submitted has been sent out for approval. If you need to review the submitted request you can use the link below.';
     const errorMessage = 'Error! Something went wrong.  Please contact helpdesk@clarington.net';
     this.state.MyFiles.map(f => {
       output.push(
