@@ -277,19 +277,24 @@ export class MyForm extends React.Component<IMyFormProps, any> {
 
   public UploadStatusCard = () => {
     let output = [];
+    const successMessage = 'Invoice request you submitted has been sent out for approval. If you need to review the submitted request you can use the link below.';
+    const errorMessage = 'Error! Something went wrong.  Please contact helpdesk@clarington.net';
     this.state.MyFiles.map(f => {
       output.push(
         <Card type={f.UploadSuccessful ? 'success' : 'error'} style={{ margin: '2px', marginBottom: '5px' }}>
           <CardBody>
             <CardTitle style={{ marginBottom: '0' }}>
               {f.UploadSuccessful
-                ? 'Success! You will receive a confirmation Email when your Invoice Request is ready.'
-                : 'Error! Something went wrong.  Please contact helpdesk@clarington.net'
+                ? successMessage
+                : errorMessage
               }
             </CardTitle>
             {
               f.UploadSuccessful &&
               <CardActions orientation='vertical'>
+                {
+                // ! Change this href so it is not hard coded. 
+                }
                 <a target={'_blank'} href={'https://claringtonnet.sharepoint.com/sites/FinanceTest/ARTest/SitePages/Department-AR-Search-Page.aspx'} className="k-button k-flat k-primary">Click Here to View Invoices</a>
               </CardActions>
             }
