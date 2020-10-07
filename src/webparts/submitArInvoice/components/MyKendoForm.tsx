@@ -283,7 +283,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
           <CardBody>
             <CardTitle style={{ marginBottom: '0' }}>
               {f.UploadSuccessful
-                ? 'Success! You will receive a confirmation Email when your Invoice Request is ready.'
+                ? 'Invoice request you submitted has been sent out for approval. if you need to review the submitted request you can use the link below.'
                 : 'Error! Something went wrong.  Please contact helpdesk@clarington.net'
               }
             </CardTitle>
