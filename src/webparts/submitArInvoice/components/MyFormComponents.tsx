@@ -1,6 +1,7 @@
 
 import * as React from 'react';
-import * as ReactDom from 'react-dom';
+
+import { sp } from "@pnp/sp";
 
 import { FieldWrapper } from '@progress/kendo-react-form';
 import {
@@ -355,7 +356,23 @@ export const FormUpload = (fieldRenderProps) => {
   const labelId = label ? `${id}_label` : '';
 
   const onChangeHandler = (event) => {
+    debugger;
     fieldRenderProps.onChange({ value: event.newState });
+
+
+    // for (let index = 0; index < event.affectedFiles.length; index++) {
+    //   const element = event.affectedFiles[index];
+    //   sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/').files
+    //     .add(element.name, element.getRawFile(), true)
+    //     .then(fileRes => {
+    //       fileRes.file.getItem()
+    //         .then(item => {
+    //           debugger;
+    //         });
+    //     });
+    // }
+
+
     if (fieldRenderProps.myOnChange) {
       fieldRenderProps.myOnChange.call(undefined, {
         target: {
@@ -366,6 +383,12 @@ export const FormUpload = (fieldRenderProps) => {
     }
   };
   const onRemoveHandler = (event) => {
+    debugger;
+    // for (let index = 0; index < event.affectedFiles.length; index++) {
+    //   const element = event.affectedFiles[index];
+    //   sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/').files
+    //     .getByName(element.name).delete();
+    // }
     fieldRenderProps.onChange({ value: event.newState });
   };
 
@@ -398,6 +421,54 @@ export const FormUpload = (fieldRenderProps) => {
     </FieldWrapper>
   );
 };
+
+export const FormAutoUpload = (fieldRenderProps) => {
+  const { valid, value, id, optional, label, hint, validationMessage, touched, context, documentLibrary, ...others } = fieldRenderProps;
+
+  const showValidationMessage = touched && validationMessage;
+  const showHint = !showValidationMessage && hint;
+  const hindId = showHint ? `${id}_hint` : '';
+  const errorId = showValidationMessage ? `${id}_error` : '';
+  const labelId = label ? `${id}_label` : '';
+ 
+  return (
+    <FieldWrapper>
+      <Label id={labelId} editorId={id} editorValid={valid} optional={optional}>
+        {label}
+      </Label>
+      <Upload
+        id={id}
+        valid={valid}
+        autoUpload={false}
+        onAdd={e => {
+          debugger;          
+          fieldRenderProps.onChange({ value: e.newState });
+          fieldRenderProps.myOnAdd && fieldRenderProps.MyOnAdd(e);
+        }}
+        onRemove={e => {          
+          debugger;                    
+          fieldRenderProps.onChange({ value: e.newState });
+          fieldRenderProps.MyOnRemove && fieldRenderProps.MyOnRemove(e);
+        }}
+        saveUrl={null}
+        showActionButtons={false}
+        multiple={false}
+        files={value}
+        ariaDescribedBy={`${hindId} ${errorId}`}
+        ariaLabelledBy={labelId}
+        {...others}
+      />
+      {
+        showHint &&
+        <Hint id={hindId}>{hint}</Hint>
+      }
+      {
+        showValidationMessage &&
+        <Error id={errorId}>{validationMessage}</Error>
+      }
+    </FieldWrapper>
+  );
+}
 
 export const FormDropDownList = (fieldRenderProps) => {
   const { validationMessage, touched, label, id, valid, disabled, hint, wrapperStyle, ...others } = fieldRenderProps;

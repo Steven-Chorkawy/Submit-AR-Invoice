@@ -13,6 +13,8 @@ import * as MyFormComponents from '../MyFormComponents';
 import * as MyValidators from '../validators.jsx';
 import { MyFinanceGlAccountsComponent } from '../MyFinanceGLAccounts';
 import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
+import { MyAttachmentComponent } from '../MyAttachmentComponent';
+
 import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
 import { IInvoiceItem } from '../interface/InvoiceItem';
 import { InvoiceActionResponseStatus } from '../enums/MyEnums';
@@ -251,9 +253,18 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
 
               <hr />
 
-              <MyRelatedAttachmentComponent
+              <MyAttachmentComponent
+                id="RelatedAttachments"
+                cardTitle="Upload Related Attachments"
                 productInEdit={this.state.productInEdit}
+                context={this.props.context}
+                documentLibrary={MyLists["Related Invoice Attachments"]}
               />
+              
+              {/* <MyRelatedAttachmentComponent
+                productInEdit={this.state.productInEdit}
+                context={this.props.context}
+              /> */}
 
               {GridButtons({ cancel: this.props.cancel, saveResult: this.props.saveResult })}
             </FormElement>

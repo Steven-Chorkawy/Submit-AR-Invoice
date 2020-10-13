@@ -303,6 +303,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
 
             // If the attachment does not have an ID that means it is a new attachment.
             if (!element.hasOwnProperty('Id')) {
+              // TODO: Update this URL
               sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/').files
                 .add(element.name, element.getRawFile(), true)
                 .then(fileRes => {
@@ -604,6 +605,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
         {
           this.state.productInEdit ?
             <MyEditDialogContainer
+              context={this.props.context}
               dataItem={this.state.productInEdit}
               customers={this.props.customers}
               siteUsers={this.props.siteUsers}
