@@ -440,15 +440,13 @@ export const FormAutoUpload = (fieldRenderProps) => {
         id={id}
         valid={valid}
         autoUpload={false}
-        onAdd={e => {
-          debugger;          
+        onAdd={e => {      
           fieldRenderProps.onChange({ value: e.newState });
-          fieldRenderProps.myOnAdd && fieldRenderProps.MyOnAdd(e);
+          fieldRenderProps.myOnAdd && fieldRenderProps.myOnAdd(e);
         }}
-        onRemove={e => {          
-          debugger;                    
+        onRemove={e => {                  
           fieldRenderProps.onChange({ value: e.newState });
-          fieldRenderProps.MyOnRemove && fieldRenderProps.MyOnRemove(e);
+          fieldRenderProps.myOnRemove && fieldRenderProps.myOnRemove(e);
         }}
         saveUrl={null}
         showActionButtons={false}
