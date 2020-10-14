@@ -1,6 +1,7 @@
 
 import * as React from 'react';
-import * as ReactDom from 'react-dom';
+
+import { sp } from "@pnp/sp";
 
 import { FieldWrapper } from '@progress/kendo-react-form';
 import {
@@ -354,8 +355,9 @@ export const FormUpload = (fieldRenderProps) => {
   const errorId = showValidationMessage ? `${id}_error` : '';
   const labelId = label ? `${id}_label` : '';
 
-  const onChangeHandler = (event) => {
+  const onChangeHandler = (event) => {   
     fieldRenderProps.onChange({ value: event.newState });
+
     if (fieldRenderProps.myOnChange) {
       fieldRenderProps.myOnChange.call(undefined, {
         target: {
@@ -365,6 +367,7 @@ export const FormUpload = (fieldRenderProps) => {
       });
     }
   };
+
   const onRemoveHandler = (event) => {
     fieldRenderProps.onChange({ value: event.newState });
   };
@@ -383,6 +386,52 @@ export const FormUpload = (fieldRenderProps) => {
         files={value}
         onAdd={onChangeHandler}
         onRemove={onRemoveHandler}
+        ariaDescribedBy={`${hindId} ${errorId}`}
+        ariaLabelledBy={labelId}
+        {...others}
+      />
+      {
+        showHint &&
+        <Hint id={hindId}>{hint}</Hint>
+      }
+      {
+        showValidationMessage &&
+        <Error id={errorId}>{validationMessage}</Error>
+      }
+    </FieldWrapper>
+  );
+};
+
+export const FormAutoUpload = (fieldRenderProps) => {
+  const { valid, value, id, optional, label, hint, validationMessage, touched, context, documentLibrary, ...others } = fieldRenderProps;
+
+  const showValidationMessage = touched && validationMessage;
+  const showHint = !showValidationMessage && hint;
+  const hindId = showHint ? `${id}_hint` : '';
+  const errorId = showValidationMessage ? `${id}_error` : '';
+  const labelId = label ? `${id}_label` : '';
+ 
+  return (
+    <FieldWrapper>
+      <Label id={labelId} editorId={id} editorValid={valid} optional={optional}>
+        {label}
+      </Label>
+      <Upload
+        id={id}
+        valid={valid}
+        autoUpload={false}
+        onAdd={e => {      
+          fieldRenderProps.onChange({ value: e.newState });
+          fieldRenderProps.myOnAdd(e);
+        }}
+        onRemove={e => {                  
+          fieldRenderProps.onChange({ value: e.newState });
+          fieldRenderProps.myOnRemove(e);
+        }}
+        saveUrl={null}
+        showActionButtons={false}
+        multiple={false}
+        files={value}
         ariaDescribedBy={`${hindId} ${errorId}`}
         ariaLabelledBy={labelId}
         {...others}

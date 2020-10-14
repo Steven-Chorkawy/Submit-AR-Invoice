@@ -128,7 +128,7 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
           .then(_ => {
             let departmentElement: React.ReactElement<IMyFormProps> = React.createElement(
               MyForm,
-              { ctx: this.context, properties: this.properties, ...this.myFormProps }
+              { context: this.context, properties: this.properties, ...this.myFormProps }
             );
             ReactDom.render(departmentElement, this.domElement);
           });
@@ -139,7 +139,7 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
           .then((values) => {
             let depSearchElement: React.ReactElement = React.createElement(
               MyKendoGrid,
-              { properties: this.properties, data: values[0], siteUsers: values[1], customers: values[2] }
+              { context: this.context, properties: this.properties, data: values[0], siteUsers: values[1], customers: values[2] }
             );
 
             ReactDom.render(depSearchElement, this.domElement);
@@ -151,7 +151,7 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
           .then((values) => {
             let depSearchElement: React.ReactElement = React.createElement(
               DepartmentListView,
-              { properties: this.properties, data: values[0], siteUsers: values[1], customers: values[2] }
+              { context: this.context, sproperties: this.properties, data: values[0], siteUsers: values[1], customers: values[2] }
             );
 
             ReactDom.render(depSearchElement, this.domElement);
@@ -161,7 +161,7 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
       case ActiveDisplay.FinanceForm:
         let financeForm: React.ReactElement = React.createElement(
           MyFinanceForm,
-          {}
+          { context: this.context }
         );
 
         ReactDom.render(financeForm, this.domElement);

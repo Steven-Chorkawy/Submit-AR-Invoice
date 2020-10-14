@@ -62,7 +62,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
   constructor(props) {
     super(props);
 
-    this._siteUrl = props.ctx.pageContext.web.absoluteUrl;
+    this._siteUrl = props.context.pageContext.web.absoluteUrl;
 
     sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).fields
       .getByInternalNameOrTitle('Standard_x0020_Terms')
@@ -88,7 +88,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
 
 
   private getUserByEmail = async (email: string): Promise<ISPUser> => {
-    let web = Web(this.props.ctx.pageContext.web.absoluteUrl);
+    let web = Web(this.props.context.pageContext.web.absoluteUrl);
     try {
       return await web.siteUsers.getByEmail(email).get();
     } catch (error) {
@@ -98,7 +98,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
   }
 
   private getUserById = async (userId): Promise<ISPUser> => {
-    let web = Web(this.props.ctx.pageContext.web.absoluteUrl);
+    let web = Web(this.props.context.pageContext.web.absoluteUrl);
     if (userId > 0 && !isNaN(parseInt(userId))) {
       try {
         return await web.siteUsers.getById(userId).get();
@@ -145,7 +145,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
         Date: dataItem.Date,
         Requested_x0020_ById: dataItem.Requested_x0020_By
           ? dataItem.Requested_x0020_By.Id
-          : await (await this.getUserByEmail(this.props.ctx.pageContext.user.email)).Id,
+          : await (await this.getUserByEmail(this.props.context.pageContext.user.email)).Id,
         Requires_x0020_Authorization_x0020_ById: {
           'results': dataItem.RequiresAuthorizationBy.map((user) => { return user.Id; })
         },
@@ -373,11 +373,11 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                       }
                     }
                   }
-                  context={this.props.ctx}
+                  context={this.props.context}
                   dataItemKey="Email"
                   textField="Title"
                   component={MyFormComponents.FormPeoplePicker}
-                  defaultSelectedUsers={[this.props.ctx.pageContext.user.email]}
+                  defaultSelectedUsers={[this.props.context.pageContext.user.email]}
                 />
 
                 <Field
@@ -424,7 +424,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   textField="Title"
                   hint={'Send an approval request to one or more users.'}
                   personSelectionLimit={10}
-                  context={this.props.ctx}
+                  context={this.props.context}
                   selectedItems={e => {
                     if (e && e.length > 0) {
                       this.getUsersByLoginName(e)

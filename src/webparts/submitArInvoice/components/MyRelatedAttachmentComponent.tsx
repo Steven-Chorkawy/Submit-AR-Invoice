@@ -9,6 +9,7 @@ import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/
 
 import * as MyValidators from './validators.jsx';
 import * as MyFormComponents from './MyFormComponents';
+import { MyLists } from './enums/MyLists.js';
 
 
 export class MyRelatedAttachmentComponent extends React.Component<any, any> {
@@ -21,8 +22,12 @@ export class MyRelatedAttachmentComponent extends React.Component<any, any> {
     return (
       <Card style={{ width: 400 }}>
         <CardBody>
-          <CardTitle><b>Upload Related Attachments</b></CardTitle>
-          {this.props.productInEdit.RelatedAttachments && this.props.productInEdit.RelatedAttachments.map(f => {
+          <CardTitle>
+            <b>Upload Related Attachments</b>
+          </CardTitle>
+          {
+            this.props.productInEdit.RelatedAttachments
+            && this.props.productInEdit.RelatedAttachments.map(f => {
               return (
                 <a target='_blank' data-interception="off" href={f.ServerRedirectedEmbedUrl} style={{ margin: '2px' }}>
                   <div className='k-chip k-chip-filled k-chip-info'>
@@ -40,6 +45,9 @@ export class MyRelatedAttachmentComponent extends React.Component<any, any> {
             name="RelatedAttachments"
             batch={false}
             multiple={true}
+            context={this.props.context}
+            documentLibrary={MyLists["Related Invoice Attachments"]}
+            //component={MyFormComponents.FormAutoUpload}
             component={MyFormComponents.FormUpload}
           />
         </CardBody>

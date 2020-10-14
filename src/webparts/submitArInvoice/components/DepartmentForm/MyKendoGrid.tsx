@@ -206,6 +206,40 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       });
   }
 
+  public removeRelatedAttachments = (element, invoiceId) => {
+    let invoiceIndex = this.state.data.data.findIndex(f => f.Id === invoiceId);
+    let dataState = this.state.data.data;
+    dataState[invoiceIndex].RelatedAttachments = dataState[invoiceIndex].RelatedAttachments.filter(f => { return f.Id !== element.id; });
+  }
+
+  public updateRelatedAttachments = (element, invoiceId) => {
+    sp.web.lists.getByTitle('RelatedInvoiceAttachments')
+      .items
+      .filter(`AR_x0020_Invoice_x0020_Request/ID eq ${invoiceId}`)
+      .getAll()
+      .then(newestMetadata => {
+        sp.web.getFolderByServerRelativePath(MyLists["Related Invoice Attachments"])
+          .files()
+          .then(docFromSP => {
+            let thisNewFile = docFromSP.find(f => f.Title === element.name);
+            let thisNewFileMetadata = newestMetadata.find(f => f.Title === element.name);
+
+            thisNewFileMetadata.ServerRedirectedEmbedUrl = thisNewFile.ServerRelativeUrl;
+
+            let invoiceIndex = this.state.data.data.findIndex(f => f.Id === invoiceId);
+            let dataState = this.state.data.data;
+            dataState[invoiceIndex].RelatedAttachments.push(thisNewFileMetadata);
+
+            this.setState({
+              data: {
+                data: dataState,
+                total: dataState.length
+              }
+            });
+          });
+      });
+  }
+
   public onEdit = (dataItem) => {
     this.setState({ productInEdit: Object.assign({}, dataItem) });
   }
@@ -303,8 +337,9 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
 
             // If the attachment does not have an ID that means it is a new attachment.
             if (!element.hasOwnProperty('Id')) {
-              sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/').files
-                .add(element.name, element.getRawFile(), true)
+              sp.web
+                .getFolderByServerRelativeUrl(`${this.props.context.pageContext.web.serverRelativeUrl}/${MyLists["Related Invoice Attachments"]}`)
+                .files.add(element.name, element.getRawFile(), true)
                 .then(fileRes => {
                   fileRes.file.getItem()
                     .then(item => {
@@ -604,12 +639,15 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
         {
           this.state.productInEdit ?
             <MyEditDialogContainer
+              context={this.props.context}
               dataItem={this.state.productInEdit}
               customers={this.props.customers}
               siteUsers={this.props.siteUsers}
               currentUser={this.state.currentUser}
               saveResult={this.state.saveResult}
               onSubmit={this.handleSubmit}
+              onRelatedAttachmentAdd={this.updateRelatedAttachments}
+              onRelatedAttachmentRemove={this.removeRelatedAttachments}
               updateAccountDetails={this.updateAccountDetails}
               onCustomCustomerChange={this.onCustomCustomerChange}
               cancel={this.cancel}

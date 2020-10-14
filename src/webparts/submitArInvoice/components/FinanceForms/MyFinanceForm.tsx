@@ -251,6 +251,40 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   //#endregion End Methods
 
   //#region Update Methods
+  public removeRelatedAttachments = (element, invoiceId) => {
+    let invoiceIndex = this.state.invoices.data.findIndex(f => f.Id === invoiceId);
+    let dataState = this.state.invoices.data;
+    dataState[invoiceIndex].RelatedAttachments = dataState[invoiceIndex].RelatedAttachments.filter(f => { return f.Id !== element.id; });
+  }
+
+  public updateRelatedAttachments = (element, invoiceId) => {
+    sp.web.lists.getByTitle('RelatedInvoiceAttachments')
+      .items
+      .filter(`AR_x0020_Invoice_x0020_Request/ID eq ${invoiceId}`)
+      .getAll()
+      .then(newestMetadata => {
+        sp.web.getFolderByServerRelativePath(MyLists["Related Invoice Attachments"])
+          .files()
+          .then(docFromSP => {
+            let thisNewFile = docFromSP.find(f => f.Title === element.name);
+            let thisNewFileMetadata = newestMetadata.find(f => f.Title === element.name);
+
+            thisNewFileMetadata.ServerRedirectedEmbedUrl = thisNewFile.ServerRelativeUrl;
+
+            let invoiceIndex = this.state.invoices.data.findIndex(f => f.Id === invoiceId);
+            let dataState = this.state.invoices.data;
+            dataState[invoiceIndex].RelatedAttachments.push(thisNewFileMetadata);
+
+            this.setState({
+              invoices: {
+                data: dataState,
+                total: dataState.length
+              }
+            });
+          });
+      });
+  }
+
   /**
    * Remove a Field/ Property of a given object.
    * @param input Object that contains unwanted fields.
@@ -1219,7 +1253,10 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
             saveResult={this.state.saveResult}
             cancel={this.cancelEditForm}
             updateAccountDetails={this.updateAccountDetails}
+            onRelatedAttachmentAdd={this.updateRelatedAttachments}
+            onRelatedAttachmentRemove={this.removeRelatedAttachments}
             GPAttachmentWidgetProps={this.state.gpAttachmentProps}
+            context={this.props.context}
           />
         }
 

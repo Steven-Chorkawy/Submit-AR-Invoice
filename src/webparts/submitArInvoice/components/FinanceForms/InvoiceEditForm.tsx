@@ -32,13 +32,13 @@ import { filterGroupByField } from '@progress/kendo-react-grid/dist/npm/columnMe
 import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceGLAccounts';
 import { ActionResponseComponent } from '../ActionResponseComponent';
 import { InvoiceStatus, MyGridStrings, MyContentTypes } from '../enums/MyEnums';
-import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
 import { ConvertQueryParamsToKendoFilter, BuildGUID } from '../MyHelperMethods';
 import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { InvoiceActionResponseStatus } from '../enums/MyEnums';
 import { IInvoiceItem } from '../interface/InvoiceItem';
+import { MyAttachmentComponent } from '../MyAttachmentComponent';
 
 
 export interface IGPAttachmentProps {
@@ -57,6 +57,9 @@ interface IInvoiceEditFormProps {
   siteUsersData: any;
   updateAccountDetails: any;
   onNoteToDepChange?: any;
+  context: any;
+  onRelatedAttachmentAdd: Function;
+  onRelatedAttachmentRemove: Function;
 }
 
 function GridButtons({ cancel, saveResult }) {
@@ -118,6 +121,8 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
       productInEdit: null
     });
   }
+
+
 
   private _statusValue = null;
 
@@ -246,46 +251,14 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                   />
                 </div>
                 <div style={{ marginBottom: "2px" }}>
-                  <Card style={{ width: 400 }} type={this.props.GPAttachmentWidgetProps.type}>
-                    <CardBody>
-                      <CardTitle><b>Upload GP Attachment</b></CardTitle>
-                      <p>{this.props.GPAttachmentWidgetProps.errorMessage}</p>
-                      {
-                        this.state.productInEdit.ContentTypeId === MyContentTypes["AR Invoice Document Item"] &&
-                        this.state.productInEdit.ServerRedirectedEmbedUrl &&
-                        <a target='_blank' href={this.state.productInEdit.ServerRedirectedEmbedUrl} style={{ margin: '2px' }}>
-                          <div className='k-chip k-chip-filled k-chip-info'>
-                            <div className='k-chip-content'>
-                              {this.state.productInEdit.Title}
-                            </div>
-                          </div>
-                        </a>
-                      }
-
-                      {
-                        /**
-                         * Only show this upload box if we're working with a request. If it not a request that means the file has already been uploaded.
-                         *
-                         * If Finance ever needs to re upload a file they should delete this one and restart the upload process.
-                         * This is because the meta data will be applied to the NEW file.
-                         * */
-                        this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"] &&
-                        <Field
-                          id="InvoiceAttachments"
-                          name="InvoiceAttachments"
-                          batch={false}
-                          multiple={false}
-                          myOnChange={this.onDialogInputChange}
-                          component={MyFormComponents.FormUpload}
-                        />
-                      }
-                    </CardBody>
-                  </Card>
-                </div>
-                <div style={{ marginBottom: "2px" }}>
-                  <MyRelatedAttachmentComponent
+                  <MyAttachmentComponent
+                    id="RelatedAttachments"
+                    cardTitle="Upload Related Attachments"
                     productInEdit={this.state.productInEdit}
-                    onChange={this.onDialogInputChange}
+                    context={this.props.context}
+                    documentLibrary={MyLists["Related Invoice Attachments"]}
+                    onAdd={this.props.onRelatedAttachmentAdd}
+                    onRemove={this.props.onRelatedAttachmentRemove}
                   />
                 </div>
               </fieldset>
