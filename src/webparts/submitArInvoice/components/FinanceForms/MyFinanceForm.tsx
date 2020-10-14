@@ -251,6 +251,12 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   //#endregion End Methods
 
   //#region Update Methods
+  public removeRelatedAttachments = (element, invoiceId) => {
+    let invoiceIndex = this.state.invoices.data.findIndex(f => f.Id === invoiceId);
+    let dataState = this.state.invoices.data;
+    dataState[invoiceIndex].RelatedAttachments = dataState[invoiceIndex].RelatedAttachments.filter(f => {return f.Id !== element.id});
+  }
+
   public updateRelatedAttachments = (element, invoiceId) => {
     sp.web.lists.getByTitle('RelatedInvoiceAttachments')
       .items
@@ -1248,6 +1254,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
             cancel={this.cancelEditForm}
             updateAccountDetails={this.updateAccountDetails}
             onRelatedAttachmentAdd={this.updateRelatedAttachments}
+            onRelatedAttachmentRemove={this.removeRelatedAttachments}
             GPAttachmentWidgetProps={this.state.gpAttachmentProps}
             context={this.props.context}
           />

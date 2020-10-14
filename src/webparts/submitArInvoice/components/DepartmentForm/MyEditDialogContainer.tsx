@@ -260,6 +260,7 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                 context={this.props.context}
                 documentLibrary={MyLists["Related Invoice Attachments"]}
                 onAdd={this.props.onRelatedAttachmentAdd}
+                onRemove={this.props.onRelatedAttachmentRemove}
               />
 
               {GridButtons({ cancel: this.props.cancel, saveResult: this.props.saveResult })}

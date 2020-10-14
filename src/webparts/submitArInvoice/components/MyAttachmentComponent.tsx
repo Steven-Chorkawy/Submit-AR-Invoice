@@ -1,16 +1,13 @@
 import * as React from 'react';
 import { sp } from '@pnp/sp';
 
-
 import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/kendo-react-layout';
 import { Field } from '@progress/kendo-react-form';
 import { Button } from '@progress/kendo-react-buttons';
 import { UploadFileStatus } from '@progress/kendo-react-upload';
 
-
 import * as MyFormComponents from './MyFormComponents';
 import { MyLists } from './enums/MyLists.js';
-import { FieldUserSelectionMode } from '@pnp/sp/fields';
 
 
 interface IMyAttachmentComponentProps {
@@ -21,6 +18,7 @@ interface IMyAttachmentComponentProps {
     name?: string;
     documentLibrary: string;
     onAdd: Function;
+    onRemove: Function;
 }
 
 interface IUploadFileInfo {
@@ -37,9 +35,10 @@ interface IMyAttachmentComponentState {
 }
 
 
-
+/**
+ * Render each individual file. 
+ */
 class CustomListItemUI extends React.Component<any> {
-
     constructor(props) {
         super(props);
     }
@@ -48,19 +47,20 @@ class CustomListItemUI extends React.Component<any> {
         const { files } = this.props;
         return (
             files.map(file =>
+                // This element is a copy of Kendo's default element.  
                 <div key={file.name} className='k-file-single'>
-                    <span className='k-progress' style={{ width: `${file.progress}%`, transition: 'opacity 0.5s ease-in-out 0s;' }}></span>
+                    <span className='k-progress' style={{ width: `${file.progress ? file.progress : 0}%`, transition: 'opacity 0.5s ease-in-out 0s;' }}></span>
                     <span className='k-file-extension-wrapper'>
                         <span className='k-file-extension'></span>
                         <span className='k-file-state'></span>
                     </span>
                     <span className='k-file-name-size-wrapper'>
                         {
-                            file.ServerRedirectedEmbedUrl
-                                ? <a href={file.ServerRedirectedEmbedUrl} target='_blank' data-interception='off'>
+                            file.ServerRedirectedEmbedUrl ?
+                                <a href={file.ServerRedirectedEmbedUrl} target='_blank' data-interception='off'>
                                     <span className='k-file-name' title={file.name}>{file.name}</span>
-                                </a>
-                                : <span className='k-file-name' title={file.name}>{file.name}</span>
+                                </a> :
+                                <span className='k-file-name' title={file.name}>{file.name}</span>
                         }
                         <span className='k-file-size'></span>
                     </span>
@@ -200,7 +200,42 @@ export class MyAttachmentComponent extends React.Component<IMyAttachmentComponen
     }
 
     private _onRemove = (e) => {
-        debugger;
+        for (let index = 0; index < e.affectedFiles.length; index++) {
+            const file = e.affectedFiles[index];
+
+            let oldFileState = this.state.defaultFiles;
+            let oldFileStateIndex = oldFileState.findIndex(f => f.name === file.name);
+
+            oldFileState[oldFileStateIndex] = {
+                ...oldFileState[oldFileStateIndex],
+                status: UploadFileStatus.Removing
+            };
+
+            this.setState({
+                defaultFiles: [...oldFileState]
+            });
+
+            sp.web.getFolderByServerRelativePath(MyLists["Related Invoice Attachments"])
+                .files
+                .getByName(file.name)
+                .delete()
+                .then(f => {
+                    this.setState({
+                        defaultFiles: e.newState
+                    });
+                    this.props.onRemove(oldFileState[oldFileStateIndex], this.props.productInEdit.Id);
+                })
+                .catch(f => {
+                    oldFileState[oldFileStateIndex] = {
+                        ...oldFileState[oldFileStateIndex],
+                        status: UploadFileStatus.RemoveFailed
+                    };
+
+                    this.setState({
+                        defaultFiles: oldFileState
+                    });
+                });
+        }
     }
 
     private MyItemRender = (props) => <CustomListItemUI {...props} />

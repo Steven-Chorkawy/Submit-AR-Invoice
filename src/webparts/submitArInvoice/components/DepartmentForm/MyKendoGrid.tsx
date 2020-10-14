@@ -206,6 +206,12 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       });
   }
 
+  public removeRelatedAttachments = (element, invoiceId) => {
+    let invoiceIndex = this.state.data.data.findIndex(f => f.Id === invoiceId);
+    let dataState = this.state.data.data;
+    dataState[invoiceIndex].RelatedAttachments = dataState[invoiceIndex].RelatedAttachments.filter(f => {return f.Id !== element.id});
+  }
+
   public updateRelatedAttachments = (element, invoiceId) => {
     sp.web.lists.getByTitle('RelatedInvoiceAttachments')
       .items
@@ -641,6 +647,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
               saveResult={this.state.saveResult}
               onSubmit={this.handleSubmit}
               onRelatedAttachmentAdd={this.updateRelatedAttachments}
+              onRelatedAttachmentRemove={this.removeRelatedAttachments}
               updateAccountDetails={this.updateAccountDetails}
               onCustomCustomerChange={this.onCustomCustomerChange}
               cancel={this.cancel}

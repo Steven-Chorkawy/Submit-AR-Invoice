@@ -59,6 +59,7 @@ interface IInvoiceEditFormProps {
   onNoteToDepChange?: any;
   context: any;
   onRelatedAttachmentAdd: Function;
+  onRelatedAttachmentRemove: Function;
 }
 
 function GridButtons({ cancel, saveResult }) {
@@ -294,6 +295,7 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                     context={this.props.context}
                     documentLibrary={MyLists["Related Invoice Attachments"]}
                     onAdd={this.props.onRelatedAttachmentAdd}
+                    onRemove={this.props.onRelatedAttachmentRemove}
                   />
                 </div>
               </fieldset>
