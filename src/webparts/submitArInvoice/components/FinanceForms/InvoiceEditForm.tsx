@@ -251,43 +251,6 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                   />
                 </div>
                 <div style={{ marginBottom: "2px" }}>
-                  <Card style={{ width: 400 }} type={this.props.GPAttachmentWidgetProps.type}>
-                    <CardBody>
-                      <CardTitle><b>Upload GP Attachment</b></CardTitle>
-                      <p>{this.props.GPAttachmentWidgetProps.errorMessage}</p>
-                      {
-                        this.state.productInEdit.ContentTypeId === MyContentTypes["AR Invoice Document Item"] &&
-                        this.state.productInEdit.ServerRedirectedEmbedUrl &&
-                        <a target='_blank' href={this.state.productInEdit.ServerRedirectedEmbedUrl} style={{ margin: '2px' }}>
-                          <div className='k-chip k-chip-filled k-chip-info'>
-                            <div className='k-chip-content'>
-                              {this.state.productInEdit.Title}
-                            </div>
-                          </div>
-                        </a>
-                      }
-
-                      {
-                        /**
-                         * Only show this upload box if we're working with a request. If it not a request that means the file has already been uploaded.
-                         *
-                         * If Finance ever needs to re upload a file they should delete this one and restart the upload process.
-                         * This is because the meta data will be applied to the NEW file.
-                         * */
-                        this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"] &&
-                        <Field
-                          id="InvoiceAttachments"
-                          name="InvoiceAttachments"
-                          batch={false}
-                          multiple={false}
-                          myOnChange={this.onDialogInputChange}
-                          component={MyFormComponents.FormUpload}
-                        />
-                      }
-                    </CardBody>
-                  </Card>
-                </div>
-                <div style={{ marginBottom: "2px" }}>
                   <MyAttachmentComponent
                     id="RelatedAttachments"
                     cardTitle="Upload Related Attachments"
