@@ -207,17 +207,14 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   }
 
   public updateRelatedAttachments = (element, invoiceId) => {
-    debugger;
     sp.web.lists.getByTitle('RelatedInvoiceAttachments')
       .items
       .filter(`AR_x0020_Invoice_x0020_Request/ID eq ${invoiceId}`)
       .getAll()
       .then(newestMetadata => {
-        debugger;
         sp.web.getFolderByServerRelativePath(MyLists["Related Invoice Attachments"])
           .files()
           .then(docFromSP => {
-            debugger;
             let thisNewFile = docFromSP.find(f => f.Title === element.name);
             let thisNewFileMetadata = newestMetadata.find(f => f.Title === element.name);
 
@@ -227,7 +224,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
             let dataState = this.state.data.data;
             dataState[invoiceIndex].RelatedAttachments.push(thisNewFileMetadata);
 
-            debugger;
             this.setState({
               data: {
                 data: dataState,

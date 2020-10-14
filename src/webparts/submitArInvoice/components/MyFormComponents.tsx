@@ -355,23 +355,8 @@ export const FormUpload = (fieldRenderProps) => {
   const errorId = showValidationMessage ? `${id}_error` : '';
   const labelId = label ? `${id}_label` : '';
 
-  const onChangeHandler = (event) => {
-    debugger;
+  const onChangeHandler = (event) => {   
     fieldRenderProps.onChange({ value: event.newState });
-
-
-    // for (let index = 0; index < event.affectedFiles.length; index++) {
-    //   const element = event.affectedFiles[index];
-    //   sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/').files
-    //     .add(element.name, element.getRawFile(), true)
-    //     .then(fileRes => {
-    //       fileRes.file.getItem()
-    //         .then(item => {
-    //           debugger;
-    //         });
-    //     });
-    // }
-
 
     if (fieldRenderProps.myOnChange) {
       fieldRenderProps.myOnChange.call(undefined, {
@@ -382,13 +367,8 @@ export const FormUpload = (fieldRenderProps) => {
       });
     }
   };
+
   const onRemoveHandler = (event) => {
-    debugger;
-    // for (let index = 0; index < event.affectedFiles.length; index++) {
-    //   const element = event.affectedFiles[index];
-    //   sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/').files
-    //     .getByName(element.name).delete();
-    // }
     fieldRenderProps.onChange({ value: event.newState });
   };
 
