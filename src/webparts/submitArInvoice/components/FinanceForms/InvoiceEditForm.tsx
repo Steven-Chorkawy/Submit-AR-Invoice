@@ -283,10 +283,7 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                   </Card>
                 </div>
                 <div style={{ marginBottom: "2px" }}>
-                  <MyRelatedAttachmentComponent
-                    productInEdit={this.state.productInEdit}
-                    onChange={this.onDialogInputChange}
-                  />
+                 
                 </div>
               </fieldset>
               {GridButtons({ cancel: this.props.cancel, saveResult: this.props.saveResult })}
