@@ -422,11 +422,11 @@ export const FormAutoUpload = (fieldRenderProps) => {
         autoUpload={false}
         onAdd={e => {      
           fieldRenderProps.onChange({ value: e.newState });
-          fieldRenderProps.myOnAdd && fieldRenderProps.myOnAdd(e);
+          fieldRenderProps.myOnAdd(e);
         }}
         onRemove={e => {                  
           fieldRenderProps.onChange({ value: e.newState });
-          fieldRenderProps.myOnRemove && fieldRenderProps.myOnRemove(e);
+          fieldRenderProps.myOnRemove(e);
         }}
         saveUrl={null}
         showActionButtons={false}
@@ -446,7 +446,7 @@ export const FormAutoUpload = (fieldRenderProps) => {
       }
     </FieldWrapper>
   );
-}
+};
 
 export const FormDropDownList = (fieldRenderProps) => {
   const { validationMessage, touched, label, id, valid, disabled, hint, wrapperStyle, ...others } = fieldRenderProps;

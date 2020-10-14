@@ -22,12 +22,12 @@ interface IMyAttachmentComponentProps {
 }
 
 interface IUploadFileInfo {
-    name: string,
-    progress: number,
-    status: UploadFileStatus,
-    uid: string,
-    id?: number,
-    ServerRedirectedEmbedUrl?: string
+    name: string;
+    progress: number;
+    status: UploadFileStatus;
+    uid: string;
+    id?: number;
+    ServerRedirectedEmbedUrl?: string;
 }
 
 interface IMyAttachmentComponentState {
@@ -43,7 +43,7 @@ class CustomListItemUI extends React.Component<any> {
         super(props);
     }
 
-    render() {
+    public render() {
         const { files } = this.props;
         return (
             files.map(file =>
@@ -100,7 +100,7 @@ export class MyAttachmentComponent extends React.Component<IMyAttachmentComponen
                     id: attachment.ID,
                     ServerRedirectedEmbedUrl: attachment.ServerRedirectedEmbedUrl
                 }))
-        }
+        };
     }
 
     private _updateFileProgress = (uid, progress) => {
@@ -194,7 +194,7 @@ export class MyAttachmentComponent extends React.Component<IMyAttachmentComponen
                                             });
                                     });
                             });
-                    })
+                    });
                 });
         }
     }
@@ -238,7 +238,7 @@ export class MyAttachmentComponent extends React.Component<IMyAttachmentComponen
         }
     }
 
-    private MyItemRender = (props) => <CustomListItemUI {...props} />
+    private MyItemRender = (props) => <CustomListItemUI {...props} />;
 
     public render() {
         return (

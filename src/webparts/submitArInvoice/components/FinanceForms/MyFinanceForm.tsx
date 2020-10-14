@@ -254,7 +254,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   public removeRelatedAttachments = (element, invoiceId) => {
     let invoiceIndex = this.state.invoices.data.findIndex(f => f.Id === invoiceId);
     let dataState = this.state.invoices.data;
-    dataState[invoiceIndex].RelatedAttachments = dataState[invoiceIndex].RelatedAttachments.filter(f => {return f.Id !== element.id});
+    dataState[invoiceIndex].RelatedAttachments = dataState[invoiceIndex].RelatedAttachments.filter(f => { return f.Id !== element.id; });
   }
 
   public updateRelatedAttachments = (element, invoiceId) => {
