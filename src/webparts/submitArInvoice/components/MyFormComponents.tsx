@@ -356,7 +356,7 @@ export const FormUpload = (fieldRenderProps) => {
   const labelId = label ? `${id}_label` : '';
 
   const onChangeHandler = (event) => {
-    debugger;
+    
     fieldRenderProps.onChange({ value: event.newState });
 
 
@@ -383,7 +383,7 @@ export const FormUpload = (fieldRenderProps) => {
     }
   };
   const onRemoveHandler = (event) => {
-    debugger;
+    
     // for (let index = 0; index < event.affectedFiles.length; index++) {
     //   const element = event.affectedFiles[index];
     //   sp.web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/').files
