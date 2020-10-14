@@ -32,13 +32,13 @@ import { filterGroupByField } from '@progress/kendo-react-grid/dist/npm/columnMe
 import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceGLAccounts';
 import { ActionResponseComponent } from '../ActionResponseComponent';
 import { InvoiceStatus, MyGridStrings, MyContentTypes } from '../enums/MyEnums';
-import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
 import { ConvertQueryParamsToKendoFilter, BuildGUID } from '../MyHelperMethods';
 import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { InvoiceActionResponseStatus } from '../enums/MyEnums';
 import { IInvoiceItem } from '../interface/InvoiceItem';
+import { MyAttachmentComponent } from '../MyAttachmentComponent';
 
 
 export interface IGPAttachmentProps {
@@ -57,6 +57,8 @@ interface IInvoiceEditFormProps {
   siteUsersData: any;
   updateAccountDetails: any;
   onNoteToDepChange?: any;
+  context: any;
+  onRelatedAttachmentAdd: Function;
 }
 
 function GridButtons({ cancel, saveResult }) {
@@ -118,6 +120,8 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
       productInEdit: null
     });
   }
+
+
 
   private _statusValue = null;
 
@@ -283,7 +287,14 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                   </Card>
                 </div>
                 <div style={{ marginBottom: "2px" }}>
-                 
+                  <MyAttachmentComponent
+                    id="RelatedAttachments"
+                    cardTitle="Upload Related Attachments"
+                    productInEdit={this.state.productInEdit}
+                    context={this.props.context}
+                    documentLibrary={MyLists["Related Invoice Attachments"]}
+                    onAdd={this.props.onRelatedAttachmentAdd}
+                  />
                 </div>
               </fieldset>
               {GridButtons({ cancel: this.props.cancel, saveResult: this.props.saveResult })}
