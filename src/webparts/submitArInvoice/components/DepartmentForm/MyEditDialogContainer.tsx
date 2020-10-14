@@ -259,6 +259,7 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                 productInEdit={this.state.productInEdit}
                 context={this.props.context}
                 documentLibrary={MyLists["Related Invoice Attachments"]}
+                onAdd={this.props.onRelatedAttachmentAdd}
               />
               
               {/* <MyRelatedAttachmentComponent

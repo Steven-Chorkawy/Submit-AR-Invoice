@@ -20,6 +20,7 @@ interface IMyAttachmentComponentProps {
     id: string;
     name?: string;
     documentLibrary: string;
+    onAdd: Function;
 }
 
 interface IUploadFileInfo {
@@ -165,21 +166,26 @@ export class MyAttachmentComponent extends React.Component<IMyAttachmentComponen
                                         sp.web.lists.getByTitle('RelatedInvoiceAttachments')
                                             .items
                                             .filter(`AR_x0020_Invoice_x0020_Request/ID eq ${this.props.productInEdit.Id}`)
-                                            .getAll().then(newestMetadata => {
-                                                
+                                            .getAll()
+                                            .then(newestMetadata => {
                                                 sp.web.getFolderByServerRelativePath(MyLists["Related Invoice Attachments"])
                                                     .files().then(docFromSP => {
                                                         let thisNewFile = docFromSP.find(f => f.Title === element.name);
                                                         let thisNewFileMetadata = newestMetadata.find(f => f.Title === element.name);
 
                                                         let oldFileState = this.state.defaultFiles;
-                                                        oldFileState[oldFileState.findIndex(f => f.name === element.name)] = {
+                                                        let oldFileStateIndex = oldFileState.findIndex(f => f.name === element.name);
+                                                        let oldFileStateMetadata = oldFileState[oldFileStateIndex];
+                                                        oldFileStateMetadata = {
                                                             ...oldFileState[oldFileState.findIndex(f => f.name === element.name)],
                                                             ServerRedirectedEmbedUrl: thisNewFile.ServerRelativeUrl,
                                                             id: thisNewFileMetadata.ID,
                                                             status: UploadFileStatus.Uploaded,
                                                             progress: 100
                                                         };
+                                                        oldFileState[oldFileStateIndex] = oldFileStateMetadata;
+
+                                                        this.props.onAdd(oldFileStateMetadata, this.props.productInEdit.Id);
 
                                                         this.setState({
                                                             defaultFiles: [...oldFileState]

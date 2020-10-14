@@ -206,6 +206,38 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       });
   }
 
+  public updateRelatedAttachments = (element, invoiceId) => {
+    debugger;
+    sp.web.lists.getByTitle('RelatedInvoiceAttachments')
+      .items
+      .filter(`AR_x0020_Invoice_x0020_Request/ID eq ${invoiceId}`)
+      .getAll()
+      .then(newestMetadata => {
+        debugger;
+        sp.web.getFolderByServerRelativePath(MyLists["Related Invoice Attachments"])
+          .files()
+          .then(docFromSP => {
+            debugger;
+            let thisNewFile = docFromSP.find(f => f.Title === element.name);
+            let thisNewFileMetadata = newestMetadata.find(f => f.Title === element.name);
+
+            thisNewFileMetadata.ServerRedirectedEmbedUrl = thisNewFile.ServerRelativeUrl;
+
+            let invoiceIndex = this.state.data.data.findIndex(f => f.Id === invoiceId);
+            let dataState = this.state.data.data;
+            dataState[invoiceIndex].RelatedAttachments.push(thisNewFileMetadata);
+
+            debugger;
+            this.setState({
+              data: {
+                data: dataState,
+                total: dataState.length
+              }
+            });
+          });
+      });
+  }
+
   public onEdit = (dataItem) => {
     this.setState({ productInEdit: Object.assign({}, dataItem) });
   }
@@ -612,6 +644,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
               currentUser={this.state.currentUser}
               saveResult={this.state.saveResult}
               onSubmit={this.handleSubmit}
+              onRelatedAttachmentAdd={this.updateRelatedAttachments}
               updateAccountDetails={this.updateAccountDetails}
               onCustomCustomerChange={this.onCustomCustomerChange}
               cancel={this.cancel}
