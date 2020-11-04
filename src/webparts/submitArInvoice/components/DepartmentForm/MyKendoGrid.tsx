@@ -295,8 +295,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       // This means we need to take out the customer name.
       currentEditItem.MiscCustomerName = event.Customer.Customer_x0020_Name;
       currentEditItem.DirtyField = new Date();
-      currentEditItem.MiscCustomerDetails = this.state.productInEdit.Customer.MiscCustomerDetails;
-
+      
       // If a customer was previously selected it's ID will still be present.
       currentEditItem.CustomerId = null;
     }
