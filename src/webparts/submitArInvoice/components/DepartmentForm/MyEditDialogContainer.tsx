@@ -235,8 +235,8 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                 />
               </div>
               <Field
-                id="InvoiceDetails"
-                name="InvoiceDetails"
+                id="Invoice_x0020_Details"
+                name="Invoice_x0020_Details"
                 label="Invoice Details"
                 component={MyFormComponents.FormTextArea}
                 value={this.state.productInEdit.Invoice_x0020_Details}
