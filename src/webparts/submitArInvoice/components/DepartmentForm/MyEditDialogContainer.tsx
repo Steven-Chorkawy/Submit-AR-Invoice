@@ -218,8 +218,8 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
               />
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
-                  id="CustomerPONumber"
-                  name="CustomerPONumber"
+                  id="Customer_x0020_PO_x0020_Number"
+                  name="Customer_x0020_PO_x0020_Number"
                   label="Customer PO Number"
                   component={MyFormComponents.FormInput}
                 />
