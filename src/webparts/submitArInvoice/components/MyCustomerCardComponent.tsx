@@ -1,6 +1,8 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Card, CardTitle, CardBody, CardActions } from '@progress/kendo-react-layout';
+import { Form, Field, FormElement, FieldArray } from '@progress/kendo-react-form';
+import * as MyFormComponents from './MyFormComponents';
 
 
 export class MyCustomerCardComponent extends React.Component<any, any> {
@@ -22,26 +24,8 @@ export class MyCustomerCardComponent extends React.Component<any, any> {
     if (this.state.selectedCustomer == undefined) {
       return (<div key="0">Select a Customer</div>);
     }
-    // Custom value is entered.
-    // If id isn't present that means the user has given us a custom value.
-    else if (!this.state.selectedCustomer.hasOwnProperty('ID')) {
-      return (
-        <div>
-          <div>
-            <b>Enter Additional Customer Details.</b>
-          </div>
-          <textarea
-            className={'k-textarea k-autofill'}
-            id={'MiscCustomerDetails'}
-            name={'MiscCustomerDetails'}
-            onChange={this.props.onCustomCustomerChange}
-            value={this.state.selectedCustomer.CustomerDetails}
-          />
-        </div>
-      );
-    }
     // existing value is selected.
-    else {
+    else if (this.state.selectedCustomer.hasOwnProperty('ID')) {
       return (
         // TODO: Design this better! This is just for the first round of review.
         <Card key={this.state.selectedCustomer.ID} type="info">
@@ -76,6 +60,9 @@ export class MyCustomerCardComponent extends React.Component<any, any> {
           </CardActions>
         </Card>
       );
+    }
+    else {
+      return (<div></div>);
     }
   }
 }

@@ -216,10 +216,22 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                 filterable={true}
                 suggest={true}
               />
+              <div>
+                {
+                  formRenderProps.valueGetter('Customer') !== null &&
+                  'ID' in formRenderProps.valueGetter('Customer') === false &&
+                  <Field
+                    id={'MiscCustomerDetails'}
+                    name={'MiscCustomerDetails'}
+                    label={'Enter Additional Customer Details'}
+                    component={MyFormComponents.FormTextArea}
+                  />
+                }
+              </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
-                  id="CustomerPONumber"
-                  name="CustomerPONumber"
+                  id="Customer_x0020_PO_x0020_Number"
+                  name="Customer_x0020_PO_x0020_Number"
                   label="Customer PO Number"
                   component={MyFormComponents.FormInput}
                 />
@@ -235,11 +247,10 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                 />
               </div>
               <Field
-                id="InvoiceDetails"
-                name="InvoiceDetails"
+                id="Invoice_x0020_Details"
+                name="Invoice_x0020_Details"
                 label="Invoice Details"
                 component={MyFormComponents.FormTextArea}
-                value={this.state.productInEdit.Invoice_x0020_Details}
               />
               <div style={{ width: '100%' }}>
                 <FieldArray
