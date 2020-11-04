@@ -1,6 +1,8 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Card, CardTitle, CardBody, CardActions } from '@progress/kendo-react-layout';
+import { Form, Field, FormElement, FieldArray } from '@progress/kendo-react-form';
+import * as MyFormComponents from './MyFormComponents';
 
 
 export class MyCustomerCardComponent extends React.Component<any, any> {
@@ -27,16 +29,19 @@ export class MyCustomerCardComponent extends React.Component<any, any> {
     else if (!this.state.selectedCustomer.hasOwnProperty('ID')) {
       return (
         <div>
-          <div>
-            <b>Enter Additional Customer Details.</b>
-          </div>
-          <textarea
+          <Field
+            id={'MiscCustomerDetails'}
+            name={'MiscCustomerDetails'}
+            label={'Enter Additional Customer Details'}
+            component={MyFormComponents.FormInput}
+          />
+          {/* <textarea
             className={'k-textarea k-autofill'}
             id={'MiscCustomerDetails'}
             name={'MiscCustomerDetails'}
             onChange={this.props.onCustomCustomerChange}
             value={this.state.selectedCustomer.CustomerDetails}
-          />
+          /> */}
         </div>
       );
     }
