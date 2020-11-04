@@ -3,7 +3,7 @@
   "solution": {
     "name": "submit-ar-invoice-client-side-solution",
     "id": "f46b7f60-4d1d-423a-a124-8d8b51af3a9d",
-    "version": "1.0.0.43",
+    "version": "1.0.0.44",
     "includeClientSideAssets": true,
     "isDomainIsolated": false
   },
