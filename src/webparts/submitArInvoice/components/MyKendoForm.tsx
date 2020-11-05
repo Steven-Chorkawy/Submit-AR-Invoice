@@ -74,15 +74,15 @@ export class MyForm extends React.Component<IMyFormProps, any> {
         });
       });
 
-      this.state = {
-        MyFiles: [],
-        productInEdit: {},
-        stateHolder: 0,
-        customerList: this.props.customerList,
-        receivedCustomerList: this.props.customerList,
-        standardTerms: [],
-        ...props
-      };
+    this.state = {
+      MyFiles: [],
+      productInEdit: {},
+      stateHolder: 0,
+      customerList: this.props.customerList,
+      receivedCustomerList: this.props.customerList,
+      standardTerms: [],
+      ...props
+    };
   }
 
 
@@ -293,7 +293,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
               f.UploadSuccessful &&
               <CardActions orientation='vertical'>
                 {
-                // ! Change this href so it is not hard coded. 
+                  // ! Change this href so it is not hard coded. 
                 }
                 <a target={'_blank'} href={'https://claringtonnet.sharepoint.com/sites/FinanceTest/ARTest/SitePages/Department-AR-Search-Page.aspx'} className="k-button k-flat k-primary">Click Here to View Invoices</a>
               </CardActions>
@@ -466,6 +466,17 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                 onFilterChange={this.customerFilterChange}
                 onCustomCusteromChange={this.onCustomCustomerChange}
               />
+              {
+                formRenderProps.valueGetter('Customer') !== undefined &&
+                formRenderProps.valueGetter('Customer') !== null &&
+                formRenderProps.valueGetter('Customer').hasOwnProperty('ID') !== undefined &&
+                <Field
+                  id={'MiscCustomerDetails'}
+                  name={'MiscCustomerDetails'}
+                  label={'Enter Additional Customer Details'}
+                  component={MyFormComponents.FormTextArea}
+                />
+              }
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Field
                   id="CustomerPONumber"
