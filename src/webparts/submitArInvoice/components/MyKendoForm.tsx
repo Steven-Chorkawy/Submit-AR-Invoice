@@ -127,6 +127,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
    * @param dataItem Data from form
    */
   public handleSubmit = async (dataItem) => {
+    debugger;
 
     // We will use this to update states later.
     let currentFiles: IUploadingFile[] = this.state.MyFiles;
@@ -473,6 +474,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
                   id={'MiscCustomerDetails'}
                   name={'MiscCustomerDetails'}
                   label={'Enter Additional Customer Details'}
+                  placeholder={'Address, Postal Code, Contact, etc....'}
                   component={MyFormComponents.FormTextArea}
                 />
               }

@@ -224,6 +224,7 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                     id={'MiscCustomerDetails'}
                     name={'MiscCustomerDetails'}
                     label={'Enter Additional Customer Details'}
+                    placeholder={'Address, Postal Code, Contact, etc....'}
                     component={MyFormComponents.FormTextArea}
                   />
                 }
