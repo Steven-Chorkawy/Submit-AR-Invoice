@@ -26,6 +26,7 @@ import * as MyValidators from './validators.jsx';
 import { MyGLAccountComponent } from './MyGLAccountComponent';
 import { BuildGUID, ConvertQueryParamsToKendoFilter } from './MyHelperMethods';
 import { MyLists } from './enums/MyLists';
+import { RenderListDataOptions } from '@pnp/sp/lists';
 
 export interface IARFormModel {
   Title: string;
@@ -127,8 +128,6 @@ export class MyForm extends React.Component<IMyFormProps, any> {
    * @param dataItem Data from form
    */
   public handleSubmit = async (dataItem) => {
-    debugger;
-
     // We will use this to update states later.
     let currentFiles: IUploadingFile[] = this.state.MyFiles;
 
@@ -161,6 +160,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
       // dataItem.Customer.ID is undefined when a custom customer is added.
       if (dataItem.Customer.ID === undefined) {
         myData['MiscCustomerName'] = dataItem.Customer.Customer_x0020_Name;
+        myData['MiscCustomerDetails'] = dataItem.MiscCustomerDetails;
       }
       else {
         myData['CustomerId'] = dataItem.Customer.Id;
