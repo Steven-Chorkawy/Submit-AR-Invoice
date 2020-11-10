@@ -8,7 +8,7 @@ import {
   GridCell,
   GridToolbar,
 } from '@progress/kendo-react-grid';
-import { Button } from '@progress/kendo-react-buttons';
+import { Button, SplitButton, DropDownButton } from '@progress/kendo-react-buttons';
 
 
 //PnPjs Imports
@@ -295,7 +295,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       // This means we need to take out the customer name.
       currentEditItem.MiscCustomerName = event.Customer.Customer_x0020_Name;
       currentEditItem.DirtyField = new Date();
-      
+
       // If a customer was previously selected it's ID will still be present.
       currentEditItem.CustomerId = null;
     }
@@ -632,7 +632,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
           <Column field="Date" title="Date" width="250px" filter="date" format={MyGridStrings.DateFilter} />
           {/* <Column field="Type_x0020_of_x0020_Request" width="250px" title="Type" /> */}
 
-          <Column cell={this.CommandCell} width={"110px"} locked={true} resizable={false} filterable={false} sortable={false} />
+          <Column cell={this.CommandCell} width={"120px"} locked={true} resizable={false} filterable={false} sortable={false} />
 
         </Grid>
         {
@@ -685,32 +685,49 @@ export function MyCommandCell({ edit, cancel }) {
       super(props);
     }
 
+
     public render() {
       const { dataItem } = this.props;
 
       const isNewItem = dataItem.ID === undefined;
 
-      return (this.props.dataItem.Invoice_x0020_Status === InvoiceStatus["Hold for Department"] || this.props.dataItem.Invoice_x0020_Status === InvoiceStatus.Submitted || this.props.dataItem.Invoice_x0020_Status === InvoiceStatus.Rejected)
-        ? (
-          <td className={this.props.className + " k-command-cell"} style={this.props.style}>
-            <Button
-              className="k-primary k-button k-grid-edit-command col-sm-12"
-              onClick={() => edit(dataItem)}
-              icon="edit"
-              style={{ "marginBottom": "5px" }}
-            >Edit</Button>
-          </td>
-        )
-        : (
-          <td className={this.props.className + " k-command-cell"} style={this.props.style}>
-            <Button
-              className="k-button k-grid-edit-command col-sm-12 k-text-error"
-              onClick={() => { cancel(dataItem); }}
-              icon="cancel"
-              style={{ "marginBottom": "5px" }}
-            >Cancel</Button>
-          </td>
-        );
+      const onItemClick = (e) => {
+        console.log("onItemClick");
+        console.log(e);
+        switch (e.item.text.toLowerCase()) {
+          case "edit":
+            edit(dataItem);
+            break;
+          case "cancel":
+            cancel(dataItem);
+            break;
+          case "approve":
+
+            break;
+          case "deny":
+
+            break;
+          default:
+            break;
+        }
+      };
+
+      const iconItems = [
+        { text: "Edit", icon: "edit" },
+        { text: "Cancel", icon: "cancel" },
+      ];
+
+      const approveDenyItems = [
+        { text: "Approve", icon: "check-outline" },
+        { text: "Deny", icon: "close-outline" }
+      ];
+
+      return (
+        <td className={this.props.className + " k-command-cell"} style={this.props.style}>
+          <DropDownButton items={iconItems} text={'Edit'} icon={'more-vertical'} look="flat" onItemClick={(e) => { onItemClick(e); }} />
+          <Button look="flat" onClick={(e) => { console.log(e); }}>Approve/Deny</Button>
+        </td>
+      );
     }
   };
 }
