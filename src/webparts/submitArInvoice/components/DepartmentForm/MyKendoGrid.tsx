@@ -24,6 +24,7 @@ import "@pnp/sp/items";
 import IARInvoice from '../IARInvoice';
 import { filterBy, orderBy, groupBy } from '@progress/kendo-data-query';
 import { MyEditDialogContainer } from './MyEditDialogContainer';
+import { ApprovalDialogContainer } from '../ApprovalDialogContainer';
 import { MyCancelDialogContainer } from './MyCancelDialogContainer';
 import { InvoiceDataProvider } from '../InvoiceDataProvider';
 import { InvoiceActionResponseStatus, InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
@@ -46,6 +47,7 @@ type MyKendoGridState = {
   dataState?: any;
   productInEdit: any;
   productInCancel: any;
+  productInApproval: any;
   statusData: any;
   siteUsersData: any;
   currentUser?: any;
@@ -69,6 +71,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       },
       productInEdit: undefined,
       productInCancel: undefined,
+      productInApproval: undefined,
       dataState: {
         take: 20,
         skip: 0,
@@ -80,9 +83,14 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
 
     sp.web.currentUser.get()
       .then(user => {
+        this.setState({
+          currentUser: user
+        });
+
         this.CommandCell = MyCommandCell({
           edit: this.onEdit,
           cancel: this.onInvoiceCancel,
+          approvalResponse: this.onApprovalResponse,
           currentUser: user
         });
       });
@@ -251,6 +259,12 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   public onInvoiceCancel = (dataItem) => {
     this.setState({
       productInCancel: Object.assign({}, dataItem)
+    });
+  }
+
+  public onApprovalResponse = (dataItem) => {
+    this.setState({
+      productInApproval: Object.assign({}, dataItem)
     });
   }
 
@@ -663,6 +677,18 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
               />
               : null
         }
+        {
+          this.state.productInApproval &&
+          <ApprovalDialogContainer
+            context={this.props.context}
+            dataItem={this.state.productInApproval}
+            currentUser={this.state.currentUser}
+            updateAccountDetails={this.updateAccountDetails}
+            onRelatedAttachmentAdd={this.updateRelatedAttachments}
+            onRelatedAttachmentRemove={this.removeRelatedAttachments}
+            cancel={() => { this.setState({ productInApproval: undefined }); }}
+          />
+        }
         <InvoiceDataProvider
           dataState={this.state.dataState}
           onDataReceived={this.dataReceived}
@@ -683,7 +709,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
 }
 
 
-export function MyCommandCell({ edit, cancel, currentUser }) {
+export function MyCommandCell({ edit, cancel, approvalResponse, currentUser }) {
   return class extends GridCell {
     constructor(props) {
       super(props);
@@ -692,8 +718,7 @@ export function MyCommandCell({ edit, cancel, currentUser }) {
 
     public render() {
       const { dataItem } = this.props;
-      const needsApproval: Boolean = dataItem.Actions.some(y => y.Response_x0020_Status === InvoiceActionResponseStatus.Waiting
-        && y.AssignedToId === currentUser.Id);
+      const needsApproval: Boolean = dataItem.Actions.some(y => y.Response_x0020_Status === InvoiceActionResponseStatus.Waiting && y.AssignedToId === currentUser.Id);
 
       const isNewItem = dataItem.ID === undefined;
 
@@ -730,11 +755,10 @@ export function MyCommandCell({ edit, cancel, currentUser }) {
 
       return (
         <td className={this.props.className + " k-command-cell"} style={this.props.style}>
-          {console.log(dataItem)}
           <DropDownButton items={iconItems} text={'Edit'} icon={'more-vertical'} look="flat" onItemClick={(e) => { onItemClick(e); }} />
           {
             needsApproval &&
-            <Button primary={true} onClick={(e) => { console.log(e); }}>Approve/Deny</Button>
+            <Button primary={true} onClick={(e) => { approvalResponse(dataItem); }}>Approve/Deny</Button>
           }
         </td>
       );
