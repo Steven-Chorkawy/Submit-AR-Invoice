@@ -26,7 +26,7 @@ import { filterBy, orderBy, groupBy } from '@progress/kendo-data-query';
 import { MyEditDialogContainer } from './MyEditDialogContainer';
 import { MyCancelDialogContainer } from './MyCancelDialogContainer';
 import { InvoiceDataProvider } from '../InvoiceDataProvider';
-import { InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
+import { InvoiceActionResponseStatus, InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
 import { ConvertQueryParamsToKendoFilter, UpdateAccountDetails } from '../MyHelperMethods';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
@@ -78,10 +78,14 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       }
     };
 
-    this.CommandCell = MyCommandCell({
-      edit: this.onEdit,
-      cancel: this.onInvoiceCancel
-    });
+    sp.web.currentUser.get()
+      .then(user => {
+        this.CommandCell = MyCommandCell({
+          edit: this.onEdit,
+          cancel: this.onInvoiceCancel,
+          currentUser: user
+        });
+      });
   }
 
   private CommandCell;
@@ -679,7 +683,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
 }
 
 
-export function MyCommandCell({ edit, cancel }) {
+export function MyCommandCell({ edit, cancel, currentUser }) {
   return class extends GridCell {
     constructor(props) {
       super(props);
@@ -688,6 +692,8 @@ export function MyCommandCell({ edit, cancel }) {
 
     public render() {
       const { dataItem } = this.props;
+      const needsApproval: Boolean = dataItem.Actions.some(y => y.Response_x0020_Status === InvoiceActionResponseStatus.Waiting
+        && y.AssignedToId === currentUser.Id);
 
       const isNewItem = dataItem.ID === undefined;
 
@@ -724,8 +730,12 @@ export function MyCommandCell({ edit, cancel }) {
 
       return (
         <td className={this.props.className + " k-command-cell"} style={this.props.style}>
+          {console.log(dataItem)}
           <DropDownButton items={iconItems} text={'Edit'} icon={'more-vertical'} look="flat" onItemClick={(e) => { onItemClick(e); }} />
-          <Button look="flat" onClick={(e) => { console.log(e); }}>Approve/Deny</Button>
+          {
+            needsApproval &&
+            <Button primary={true} onClick={(e) => { console.log(e); }}>Approve/Deny</Button>
+          }
         </td>
       );
     }
