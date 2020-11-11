@@ -783,11 +783,7 @@ export function MyCommandCell({ edit, cancel, approvalResponse, currentUser }) {
           case "cancel":
             cancel(dataItem);
             break;
-          case "approve":
-
-            break;
-          case "deny":
-
+          case "request approval":
             break;
           default:
             break;
@@ -797,6 +793,7 @@ export function MyCommandCell({ edit, cancel, approvalResponse, currentUser }) {
       const iconItems = [
         { text: "Edit", icon: "edit" },
         { text: "Cancel", icon: "cancel" },
+        //{ text: "Request Approval", icon: "check" }
       ];
 
       const approveDenyItems = [
