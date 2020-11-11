@@ -218,6 +218,21 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       });
   }
 
+  public updateAccountDetailsForApproval = (data) => {
+    UpdateAccountDetails(
+      this.state.data,
+      data,
+      (e) => {
+        this.setState({
+          data: {
+            data: e,
+            total: e.length
+          },
+          productInApproval: e[e.findIndex(p => p.ID === this.state.productInApproval.ID)]
+        });
+      });
+  }
+
   public removeRelatedAttachments = (element, invoiceId) => {
     let invoiceIndex = this.state.data.data.findIndex(f => f.Id === invoiceId);
     let dataState = this.state.data.data;
@@ -683,7 +698,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
             context={this.props.context}
             dataItem={this.state.productInApproval}
             currentUser={this.state.currentUser}
-            updateAccountDetails={this.updateAccountDetails}
+            updateAccountDetails={this.updateAccountDetailsForApproval}
             onRelatedAttachmentAdd={this.updateRelatedAttachments}
             onRelatedAttachmentRemove={this.removeRelatedAttachments}
             cancel={() => { this.setState({ productInApproval: undefined }); }}
