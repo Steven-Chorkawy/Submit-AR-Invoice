@@ -86,11 +86,15 @@ export class ApprovalDialogContainer extends React.Component<any, IApprovalDialo
             console.log('Submit Valid!');
             SendApprovalResponse(this.state.response, this.state.comment, this.state.approvalRequest)
                 .then(response => {
-                    response.item.get().then(item => {
-                        this.props.onResponseSent(item);
-                    });
+                    response.item
+                        .select('*, AssignedTo/EMail, AssignedTo/Title, Author/EMail, Author/Title')
+                        .expand('AssignedTo, Author')
+                        .get()
+                        .then(item => {
+                            this.props.onResponseSent(item);
+                        });
                 })
-                .catch(response => {                    
+                .catch(response => {
                     this.setState({
                         submitFailed: true
                     });

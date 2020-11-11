@@ -292,10 +292,30 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
    * @param dataItem Approval Modified.
    */
   public approvalResponseSent = (approvalItem) => {
-    console.log('approvalResponseSent');
-    console.log(approvalItem);
+    // This is the invoice that we will need to update in state.data.data
+    let allInvoices = this.state.data.data;
+    const invoiceIndex = allInvoices.findIndex(a => a.ID === this.state.productInApproval.ID);
+    let invoice = allInvoices[invoiceIndex];
 
-    
+    // Update the approval action item in the productInApproval state. 
+    const approvalActionIndex = invoice.Actions.findIndex(a => a.ID === approvalItem.ID);
+
+    // Store all the approval actions here so we can edit them. 
+    let allApprovalActions = invoice.Actions;
+
+    // Update the approval using the index that we previously found. 
+    allApprovalActions[approvalActionIndex] = approvalItem;
+
+    invoice.Actions = allApprovalActions;
+
+    allInvoices[invoiceIndex] = { ...invoice };
+
+    this.setState({
+      data: {
+        data: allInvoices
+      },
+      productInApproval: undefined
+    });
   }
 
   // Handle custom customer change event.
