@@ -48,6 +48,7 @@ type MyKendoGridState = {
   productInEdit: any;
   productInCancel: any;
   productInApproval: any;
+  requestingApprovalFor: any;
   statusData: any;
   siteUsersData: any;
   currentUser?: any;
@@ -72,6 +73,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       productInEdit: undefined,
       productInCancel: undefined,
       productInApproval: undefined,
+      requestingApprovalFor: undefined,
       dataState: {
         take: 20,
         skip: 0,
@@ -91,6 +93,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
           edit: this.onEdit,
           cancel: this.onInvoiceCancel,
           approvalResponse: this.onApprovalResponse,
+          requestApproval: undefined, // TODO: add method here.
           currentUser: user
         });
       });
@@ -274,6 +277,16 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   public onInvoiceCancel = (dataItem) => {
     this.setState({
       productInCancel: Object.assign({}, dataItem)
+    });
+  }
+
+  /**
+   * When a user requests an approval for an invoice this will open the dialog. 
+   * @param dataItem Invoice that needs an approval.
+   */
+  public onRequestApproval = (dataItem) => {
+    this.setState({
+      requestingApprovalFor: Object.assign({}, dataItem)
     });
   }
 
@@ -760,7 +773,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
 }
 
 
-export function MyCommandCell({ edit, cancel, approvalResponse, currentUser }) {
+export function MyCommandCell({ edit, cancel, approvalResponse, requestApproval, currentUser }) {
   return class extends GridCell {
     constructor(props) {
       super(props);
@@ -793,7 +806,7 @@ export function MyCommandCell({ edit, cancel, approvalResponse, currentUser }) {
       const iconItems = [
         { text: "Edit", icon: "edit" },
         { text: "Cancel", icon: "cancel" },
-        //{ text: "Request Approval", icon: "check" }
+        { text: "Request Approval", icon: "check" }
       ];
 
       const approveDenyItems = [
