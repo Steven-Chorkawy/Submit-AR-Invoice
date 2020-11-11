@@ -33,7 +33,7 @@ import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceG
 import { ActionResponseComponent } from '../ActionResponseComponent';
 import { InvoiceStatus, MyGridStrings, MyContentTypes } from '../enums/MyEnums';
 import { ConvertQueryParamsToKendoFilter, BuildGUID } from '../MyHelperMethods';
-import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
+
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { InvoiceActionResponseStatus } from '../enums/MyEnums';
@@ -130,18 +130,6 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
     return (
       this.state.productInEdit && <Dialog onClose={this.props.cancel} title={"Edit AR Invoice"} minWidth="200px" width="80%" height="80%" >
         {this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"] ? "Content Type: Invoice Request" : "Invoice Document"}
-        {this.state.productInEdit.Actions &&
-          this.state.productInEdit.Actions
-            .filter(f => f.AssignedToId === this.props.currentUser.Id && f.Response_x0020_Status === InvoiceActionResponseStatus.Waiting)
-            .map(action => {
-              return (<ApprovalRequiredComponent
-                action={action}
-                productInEdit={this.state.productInEdit}
-                currentUser={this.props.currentUser}
-                onActionSentCallBack={this.onActionResponseSent}
-              />);
-            })
-        }
         <Form
           onSubmit={this.props.onSubmit}
           initialValues={{ ...this.state.productInEdit }}

@@ -25,6 +25,7 @@ import IARInvoice from '../IARInvoice';
 import { filterBy, orderBy, groupBy } from '@progress/kendo-data-query';
 import { MyEditDialogContainer } from './MyEditDialogContainer';
 import { ApprovalDialogContainer } from '../ApprovalDialogContainer';
+import { RequestApprovalDialogComponent } from '../RequestApprovalDialogComponent';
 import { MyCancelDialogContainer } from './MyCancelDialogContainer';
 import { InvoiceDataProvider } from '../InvoiceDataProvider';
 import { InvoiceActionResponseStatus, InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
@@ -48,6 +49,7 @@ type MyKendoGridState = {
   productInEdit: any;
   productInCancel: any;
   productInApproval: any;
+  requestingApprovalFor: any;
   statusData: any;
   siteUsersData: any;
   currentUser?: any;
@@ -72,6 +74,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
       productInEdit: undefined,
       productInCancel: undefined,
       productInApproval: undefined,
+      requestingApprovalFor: undefined,
       dataState: {
         take: 20,
         skip: 0,
@@ -91,6 +94,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
           edit: this.onEdit,
           cancel: this.onInvoiceCancel,
           approvalResponse: this.onApprovalResponse,
+          requestApproval: this.onRequestApproval,
           currentUser: user
         });
       });
@@ -275,6 +279,69 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
     this.setState({
       productInCancel: Object.assign({}, dataItem)
     });
+  }
+
+  /**
+   * When a user requests an approval for an invoice this will open the dialog. 
+   * @param dataItem Invoice that needs an approval.
+   */
+  public onRequestApproval = (dataItem) => {
+    this.setState({
+      requestingApprovalFor: Object.assign({}, dataItem)
+    });
+  }
+
+  /**
+   * Save the approval request data from the Panel.
+   * @param e Data from form
+   */
+  public onApprovalRequestSave = (e) => {
+    let reqForInvoice = this.state.requestingApprovalFor;
+    // Close the dialog. 
+    this.setState({
+      requestingApprovalFor: undefined
+    });
+
+    for (let index = 0; index < e.Users.length; index++) {
+      const user = e.Users[index];
+
+      let obj = {
+        Title: 'Approval Required',
+        AssignedToId: user.Id,
+        AR_x0020_Invoice_x0020_RequestId: reqForInvoice.ID,
+        Body: e.Description,
+        Response_x0020_Status: InvoiceActionResponseStatus.Waiting,
+        Request_x0020_Type: e.Request_x0020_Type
+      };
+
+      sp.web.lists.getByTitle(MyLists.InvoiceActionRequired).items.add(obj)
+        .then(response => {
+          response.item
+            .select('*, AssignedTo/EMail, AssignedTo/Title, Author/EMail, Author/Title')
+            .expand('AssignedTo, Author')
+            .get()
+            .then(item => {
+              // Update the invoice found in state.data.data 
+              let allInvoices = this.state.data.data;
+              const indexOfCurrentInvoice = allInvoices.findIndex(f => f.ID === reqForInvoice.Id);
+              allInvoices[indexOfCurrentInvoice].Actions = [...allInvoices[indexOfCurrentInvoice].Actions, item];
+              this.setState({
+                data: {
+                  data: allInvoices
+                }
+              });
+
+              // Update the invoice found in productsInEdit if it is set.
+              if (this.state.productInEdit) {
+                let prodInEdit = this.state.productInEdit;
+                prodInEdit.Actions = [...prodInEdit.Actions, item];
+                this.setState({
+                  productInEdit: prodInEdit
+                });
+              }
+            });
+        });
+    }
   }
 
   /**
@@ -717,6 +784,11 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
               onRelatedAttachmentRemove={this.removeRelatedAttachments}
               updateAccountDetails={this.updateAccountDetails}
               onCustomCustomerChange={this.onCustomCustomerChange}
+              onAddNewApproval={(e) => {
+                this.setState({
+                  requestingApprovalFor: this.state.productInEdit
+                });
+              }}
               cancel={this.cancel}
             />
             : this.state.productInCancel ?
@@ -740,6 +812,20 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
             cancel={() => { this.setState({ productInApproval: undefined }); }}
           />
         }
+        {
+          this.state.requestingApprovalFor &&
+          <RequestApprovalDialogComponent
+            context={this.props.context}
+            dataItem={this.state.requestingApprovalFor}
+            currentUser={this.state.currentUser}
+            onSave={this.onApprovalRequestSave}
+            onDismiss={(e) => {
+              this.setState({
+                requestingApprovalFor: undefined
+              });
+            }}
+          />
+        }
         <InvoiceDataProvider
           dataState={this.state.dataState}
           onDataReceived={this.dataReceived}
@@ -760,7 +846,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
 }
 
 
-export function MyCommandCell({ edit, cancel, approvalResponse, currentUser }) {
+export function MyCommandCell({ edit, cancel, approvalResponse, requestApproval, currentUser }) {
   return class extends GridCell {
     constructor(props) {
       super(props);
@@ -784,6 +870,7 @@ export function MyCommandCell({ edit, cancel, approvalResponse, currentUser }) {
             cancel(dataItem);
             break;
           case "request approval":
+            requestApproval(dataItem);
             break;
           default:
             break;
@@ -793,7 +880,7 @@ export function MyCommandCell({ edit, cancel, approvalResponse, currentUser }) {
       const iconItems = [
         { text: "Edit", icon: "edit" },
         { text: "Cancel", icon: "cancel" },
-        //{ text: "Request Approval", icon: "check" }
+        { text: "Request Approval", icon: "check" }
       ];
 
       const approveDenyItems = [

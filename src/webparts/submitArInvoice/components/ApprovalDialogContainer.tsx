@@ -35,7 +35,7 @@ interface IApprovalDialogContainerState {
     submitFailed: boolean;
 }
 
-const formRowStyle = { width: '100%', marginBottom: '3px' }
+const formRowStyle = { width: '100%', marginBottom: '3px' };
 
 export class ApprovalDialogContainer extends React.Component<any, IApprovalDialogContainerState> {
     constructor(props) {
@@ -145,6 +145,7 @@ export class ApprovalDialogContainer extends React.Component<any, IApprovalDialo
                                             commentRequired: false
                                         });
                                     }}
+                                    value={this.state.comment && this.state.comment}
                                     required={this.state.commentRequired}
                                     placeholder={'Add a comment...'}
                                 />

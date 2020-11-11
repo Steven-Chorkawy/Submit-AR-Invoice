@@ -3,6 +3,7 @@ import * as ReactDom from 'react-dom';
 
 import { Stepper, Step, CardSubtitle } from '@progress/kendo-react-layout';
 import { Card, CardTitle, CardBody, CardActions } from '@progress/kendo-react-layout';
+import { Button } from '@progress/kendo-react-buttons';
 
 import { IInvoiceAction } from './interface/InvoiceItem';
 import { InvoiceActionResponseStatus } from './enums/MyEnums';
@@ -11,11 +12,7 @@ import { IInvoiceActionRequired, InvoiceActionRequiredRequestType } from './inte
 
 interface IActionStepsComponentProps {
     actions: Array<IInvoiceAction>;
-}
-
-interface IActionStepsComponentState {
-    actions: any;
-    stepperValue: number;
+    onAddNewApproval?: any;
 }
 
 const CustomStep = (props) => {
@@ -48,23 +45,10 @@ const CustomStep = (props) => {
     );
 };
 
-export class ActionStepsComponent extends React.Component<IActionStepsComponentProps, IActionStepsComponentState> {
+export class ActionStepsComponent extends React.Component<IActionStepsComponentProps, any> {
 
     constructor(props) {
         super(props);
-        this.state = {
-            actions: this.props.actions.map(action => {
-                return ({
-                    icon: this._parseActionType(action),
-                    label: action.Request_x0020_Type,
-                    isValid: action.Response_x0020_Status === InvoiceActionResponseStatus.Denied ? false : true,
-                    AssignedTo: action.AssignedTo,
-                    Response_x0020_Status: action.Response_x0020_Status,
-                    Response_x0020_Message: action.Response_x0020_Message
-                });
-            }),
-            stepperValue: this.props.actions.map(el => el.Response_x0020_Status).lastIndexOf(InvoiceActionResponseStatus.Approved)
-        };
     }
 
     private _parseActionType = (action) => {
@@ -91,12 +75,31 @@ export class ActionStepsComponent extends React.Component<IActionStepsComponentP
 
     public render() {
         return (
-            <Stepper
-                items={this.state.actions}
-                item={CustomStep}
-                value={this.state.stepperValue}
-                orientation={'vertical'}
-            />
+            <div>
+                <Stepper
+                    items={
+                        this.props.actions.map(action => {
+                            return ({
+                                icon: this._parseActionType(action),
+                                label: action.Request_x0020_Type,
+                                isValid: action.Response_x0020_Status === InvoiceActionResponseStatus.Denied ? false : true,
+                                AssignedTo: action.AssignedTo,
+                                Response_x0020_Status: action.Response_x0020_Status,
+                                Response_x0020_Message: action.Response_x0020_Message
+                            });
+                        })
+                    }
+                    item={CustomStep}
+                    value={
+                        this.props.actions.map(el => el.Response_x0020_Status).lastIndexOf(InvoiceActionResponseStatus.Approved)
+                    }
+                    orientation={'vertical'}
+                />
+                {
+                    this.props.onAddNewApproval &&
+                    <Button onClick={this.props.onAddNewApproval} icon={'check'}>Request Approval</Button>
+                }
+            </div>
         );
     }
 }
