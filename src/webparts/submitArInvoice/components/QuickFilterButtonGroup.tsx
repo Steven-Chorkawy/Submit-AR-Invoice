@@ -41,7 +41,7 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
       currentUser: null,
       selected: 0,  // Select the first button by default.
       filterButtons: [
-        { text: "Show All", getData: this._allInvoices },
+        { text: "Show Active", getData: this._allInvoices },
         { text: "For You", getData: this._invoicesForCurrentUser },
         { text: "Urgent", getData: this._urgentInvoices },
         { text: "Approved", getData: this._approvedInvoices },

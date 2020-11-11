@@ -692,7 +692,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
             />
           </GridToolbar>
 
-          <Column width="75px" field="" title="" filterable={false} sortable={false} cell={this.MyCustomCell} />
+          {/* <Column width="75px" field="" title="" filterable={false} sortable={false} cell={this.MyCustomCell} /> */}
           <Column field="ID" title="ID" width="75px" filterable={false} cell={(props) => <IDCell {...props} />} />
           <Column field="Created" width="250px" title="Created Date" filter="date" format={MyGridStrings.DateFilter} />
           <Column field="Customer.Customer_x0020_Name" width="250px" title="Customer" />
@@ -809,7 +809,7 @@ export function MyCommandCell({ edit, cancel, approvalResponse, currentUser }) {
           <DropDownButton items={iconItems} text={'Edit'} icon={'more-vertical'} look="flat" onItemClick={(e) => { onItemClick(e); }} />
           {
             needsApproval &&
-            <Button primary={true} onClick={(e) => { approvalResponse(dataItem); }}>Approve/Deny</Button>
+            <Button style={{ marginTop: '2px', marginBottom: '2px' }} primary={true} onClick={(e) => { approvalResponse(dataItem); }}>Approve/Deny</Button>
           }
         </td>
       );
