@@ -303,7 +303,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
     });
 
     for (let index = 0; index < e.Users.length; index++) {
-      debugger;
       const user = e.Users[index];
 
       let obj = {
@@ -322,12 +321,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
             .expand('AssignedTo, Author')
             .get()
             .then(item => {
-              // Update the state objects.
-              console.log('After save!');
-              console.log(response);
-
-              debugger;
-
               // Update the invoice found in state.data.data 
               let allInvoices = this.state.data.data;
               const indexOfCurrentInvoice = allInvoices.findIndex(f => f.ID === reqForInvoice.Id);
@@ -791,6 +784,11 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
               onRelatedAttachmentRemove={this.removeRelatedAttachments}
               updateAccountDetails={this.updateAccountDetails}
               onCustomCustomerChange={this.onCustomCustomerChange}
+              onAddNewApproval={(e) => {
+                this.setState({
+                  requestingApprovalFor: this.state.productInEdit
+                });
+              }}
               cancel={this.cancel}
             />
             : this.state.productInCancel ?
