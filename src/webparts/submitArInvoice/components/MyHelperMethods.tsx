@@ -131,8 +131,17 @@ export const UpdateAccountDetails = (invoices: any, newAccount: Array<any>, setS
  * @param response Approve or Deny.
  * @param invoiceAction IInvoiceAction object.  Must contain ID property. 
  */
-export const SendApprovalResponse = async (response: string, invoiceAction: IInvoiceAction) => {
+export const SendApprovalResponse = async (response: string, comment: string, invoiceAction: IInvoiceAction) => {
   console.log('Sending Approval');
   console.log(response);
   console.log(invoiceAction);
+
+  // TODO: Check if Id is present.
+  if (invoiceAction) {
+    return await sp.web.lists.getByTitle(MyLists.InvoiceActionRequired).items.getById(invoiceAction.Id)
+      .update({
+        Response_x0020_Status: response,
+        Response_x0020_Message: comment
+      });
+  }
 };

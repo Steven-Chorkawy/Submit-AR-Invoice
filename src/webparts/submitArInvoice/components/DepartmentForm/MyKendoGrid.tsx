@@ -277,10 +277,25 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
     });
   }
 
+  /**
+   * When a user clicks Approve/Deny.
+   * @param dataItem Item user wants to approve.
+   */
   public onApprovalResponse = (dataItem) => {
     this.setState({
       productInApproval: Object.assign({}, dataItem)
     });
+  }
+
+  /**
+   * When a user submits an approval response. 
+   * @param dataItem Approval Modified.
+   */
+  public approvalResponseSent = (approvalItem) => {
+    console.log('approvalResponseSent');
+    console.log(approvalItem);
+
+    
   }
 
   // Handle custom customer change event.
@@ -699,6 +714,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
             dataItem={this.state.productInApproval}
             currentUser={this.state.currentUser}
             updateAccountDetails={this.updateAccountDetailsForApproval}
+            onResponseSent={this.approvalResponseSent}
             onRelatedAttachmentAdd={this.updateRelatedAttachments}
             onRelatedAttachmentRemove={this.removeRelatedAttachments}
             cancel={() => { this.setState({ productInApproval: undefined }); }}

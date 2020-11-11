@@ -84,11 +84,13 @@ export class ApprovalDialogContainer extends React.Component<any, IApprovalDialo
         // _validateSubmit will apply any warning messages required. 
         if (this._validateSubmit()) {
             console.log('Submit Valid!');
-            SendApprovalResponse(this.state.response, this.state.approvalRequest)
+            SendApprovalResponse(this.state.response, this.state.comment, this.state.approvalRequest)
                 .then(response => {
-                    console.log('approval has been submitted');
+                    response.item.get().then(item => {
+                        this.props.onResponseSent(item);
+                    });
                 })
-                .catch(response => {
+                .catch(response => {                    
                     this.setState({
                         submitFailed: true
                     });
