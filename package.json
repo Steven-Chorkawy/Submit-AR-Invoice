@@ -12,6 +12,7 @@
     "test": "gulp test"
   },
   "dependencies": {
+    "@fluentui/react": "^7.150.0",
     "@microsoft/sp-core-library": "1.10.0",
     "@microsoft/sp-lodash-subset": "1.10.0",
     "@microsoft/sp-office-ui-fabric-core": "1.10.0",
@@ -25,12 +26,14 @@
     "@pnp/spfx-controls-react": "1.19.0",
     "@progress/kendo-data-query": "^1.5.4",
     "@progress/kendo-drawing": "^1.9.1",
+    "@progress/kendo-licensing": "^1.0.2",
     "@progress/kendo-react-data-tools": "^3.16.0",
     "@progress/kendo-react-dateinputs": "^3.16.0",
     "@progress/kendo-react-dialogs": "^3.16.0",
     "@progress/kendo-react-dropdowns": "^3.16.0",
     "@progress/kendo-react-form": "^3.16.0",
     "@progress/kendo-react-grid": "^3.16.0",
+    "@progress/kendo-react-indicators": "^4.0.0",
     "@progress/kendo-react-inputs": "^3.16.0",
     "@progress/kendo-react-intl": "^3.16.0",
     "@progress/kendo-react-labels": "^3.16.0",

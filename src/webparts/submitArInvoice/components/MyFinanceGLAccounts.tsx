@@ -409,6 +409,7 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
     return (
       <Grid
         data={data}
+        resizable={true}
         onItemChange={this.itemChange}
         editField={this.editField}
         style={...this.props.style}

@@ -8,10 +8,12 @@ import { UploadFileStatus } from '@progress/kendo-react-upload';
 
 import * as MyFormComponents from './MyFormComponents';
 import { MyLists } from './enums/MyLists.js';
+import { BooleanFilter } from '@progress/kendo-react-data-tools';
 
 
 interface IMyAttachmentComponentProps {
     cardTitle: string;
+    boldCardTitle?: boolean;
     productInEdit: any;
     context: any;
     id: string;
@@ -245,9 +247,10 @@ export class MyAttachmentComponent extends React.Component<IMyAttachmentComponen
             <Card style={{ width: 400 }}>
                 <CardBody>
                     <CardTitle>
-                        <b>{this.props.cardTitle}</b>
+                        {
+                            this.props.boldCardTitle ? <b>{this.props.cardTitle}</b> : this.props.cardTitle
+                        }
                     </CardTitle>
-                    <hr />
                     <Field
                         id={this.props.id}
                         name={this.props.name ? this.props.name : this.props.id}

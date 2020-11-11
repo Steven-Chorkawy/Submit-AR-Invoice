@@ -8,6 +8,7 @@ import "@pnp/sp/folders";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
 import { MyLists } from './enums/MyLists';
+import { IInvoiceAction } from './interface/InvoiceItem';
 
 
 interface IMyKendoFilter {
@@ -106,7 +107,7 @@ export const UpdateAccountDetails = (invoices: any, newAccount: Array<any>, setS
         // This bad object is always in the first index... I can't find where it's getting set in time to release this program. 
         // Check for it here and remove it if found. 
         let badIndex = data[invoiceIndex].AccountDetails.findIndex(p => p.Amount === "" && p.GLCode === "");
-        if(badIndex >= 0) {
+        if (badIndex >= 0) {
           data[invoiceIndex].AccountDetails.splice(badIndex, 1);
         }
 
@@ -123,4 +124,24 @@ export const UpdateAccountDetails = (invoices: any, newAccount: Array<any>, setS
   }
 
   setStateCallBack(data);
+};
+
+/**
+ * 
+ * @param response Approve or Deny.
+ * @param invoiceAction IInvoiceAction object.  Must contain ID property. 
+ */
+export const SendApprovalResponse = async (response: string, comment: string, invoiceAction: IInvoiceAction) => {
+  console.log('Sending Approval');
+  console.log(response);
+  console.log(invoiceAction);
+
+  // TODO: Check if Id is present.
+  if (invoiceAction) {
+    return await sp.web.lists.getByTitle(MyLists.InvoiceActionRequired).items.getById(invoiceAction.Id)
+      .update({
+        Response_x0020_Status: response,
+        Response_x0020_Message: comment
+      });
+  }
 };

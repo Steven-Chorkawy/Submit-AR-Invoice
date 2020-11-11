@@ -8,14 +8,17 @@ import { Form, FormElement, Field, FieldArray } from '@progress/kendo-react-form
 import { Button } from '@progress/kendo-react-buttons';
 import { Card, CardTitle, CardBody } from '@progress/kendo-react-layout';
 import { filterBy } from '@progress/kendo-data-query';
+import { Label, Error, Hint, FloatingLabel } from '@progress/kendo-react-labels';
+
+import { Facepile, Panel, PanelType, PrimaryButton, DefaultButton, Dropdown, TextField } from '@fluentui/react';
 
 import * as MyFormComponents from '../MyFormComponents';
 import * as MyValidators from '../validators.jsx';
 import { MyFinanceGlAccountsComponent } from '../MyFinanceGLAccounts';
 import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
 import { MyAttachmentComponent } from '../MyAttachmentComponent';
+import { ActionStepsComponent } from '../ActionStepsComponent';
 
-import { ApprovalRequiredComponent } from '../ApprovalRequiredComponent';
 import { IInvoiceItem } from '../interface/InvoiceItem';
 import { InvoiceActionResponseStatus } from '../enums/MyEnums';
 import { MyLists } from '../enums/MyLists';
@@ -114,92 +117,71 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
   public render() {
     return (
       <Dialog onClose={this.props.cancel} title={"Edit AR Invoice Request"} minWidth="200px" width="80%" height="80%">
-        {
-          this.state.productInEdit.Actions
-            .filter(f => f.AssignedToId === this.props.currentUser.Id && f.Response_x0020_Status === InvoiceActionResponseStatus.Waiting)
-            .map(action => {
-              return (
-                <ApprovalRequiredComponent
-                  action={action}
-                  productInEdit={this.state.productInEdit}
-                  currentUser={this.props.currentUser}
-                  onActionSentCallBack={this.onActionResponseSent}
-                />
-              );
-            })
-        }
-
+        {console.log('MyEditDialog')}
+        {console.log(this.state.productInEdit)}
         <Form
           onSubmit={this.props.onSubmit}
           initialValues={{ ...this.state.productInEdit }}
           render={(formRenderProps) => (
             <FormElement>
               {GridButtons({ cancel: this.props.cancel, saveResult: this.props.saveResult })}
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Field
-                  id="Department"
-                  name="Department"
-                  label="* Department"
-                  wrapperStyle={{ width: '50%', marginRight: '18px' }}
-                  data={[
-                    'Administration',
-                    'Clerks Department',
-                    'Community Service',
-                    'Corporate Services Department',
-                    'Emergency Services',
-                    'Engineering Services',
-                    'Finance',
-                    'Legal Services Department',
-                    'Mayor & Council',
-                    'Operations',
-                    'Planning Services'
-                  ]}
-                  component={MyFormComponents.FormDropDownList}
-                />
-                <Field
-                  id={'Date'}
-                  name={'Date'}
-                  label={'* Date'}
-                  component={MyFormComponents.FormDatePicker}
-                  validator={MyValidators.dateValidator}
-                  wrapperStyle={{ width: '50%' }}
-                />
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Field
-                  id="Requested_x0020_By"
-                  name="Requested_x0020_By"
-                  label="* Requested By"
-                  wrapperStyle={{ width: '50%', marginRight: '18px' }}
-                  data={this.props.siteUsers}
-                  dataItemKey="Email"
-                  textField="Title"
-                  validator={MyValidators.requestedByValidator}
-                  component={MyFormComponents.FormComboBox}
-                />
-
-                <Field
-                  id="Requires_x0020_Department_x0020_"
-                  name="Requires_x0020_Department_x0020_"
-                  label="* Requires Authorization By"
-                  wrapperStyle={{ width: '50%' }}
-                  data={this.props.siteUsers}
-                  dataItemKey="Email"
-                  textField="Title"
-                  component={MyFormComponents.FormMultiSelect}
-                  validator={MyValidators.requiresApprovalFrom}
-                />
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Field
-                  id="Urgent"
-                  name="Urgent"
-                  label="Urgent"
-                  onLabel="Yes"
-                  offLabel="No"
-                  labelPlacement={'before'}
-                  component={MyFormComponents.FormCheckbox}
-                />
+              <div className={'row'}>
+                <div className={'col-sm-6'}>
+                  <div style={{ display: 'block', justifyContent: 'space-between' }}>
+                    <Field
+                      id="Department"
+                      name="Department"
+                      label="* Department"
+                      wrapperStyle={{ width: '100%' }}
+                      data={[
+                        'Administration',
+                        'Clerks Department',
+                        'Community Service',
+                        'Corporate Services Department',
+                        'Emergency Services',
+                        'Engineering Services',
+                        'Finance',
+                        'Legal Services Department',
+                        'Mayor & Council',
+                        'Operations',
+                        'Planning Services'
+                      ]}
+                      component={MyFormComponents.FormDropDownList}
+                    />
+                    <Field
+                      id={'Date'}
+                      name={'Date'}
+                      label={'* Date'}
+                      component={MyFormComponents.FormDatePicker}
+                      validator={MyValidators.dateValidator}
+                      wrapperStyle={{ width: '100%' }}
+                    />
+                    <Field
+                      id="Requested_x0020_By"
+                      name="Requested_x0020_By"
+                      label="* Requested By"
+                      wrapperStyle={{ width: '100%' }}
+                      data={this.props.siteUsers}
+                      dataItemKey="Email"
+                      textField="Title"
+                      validator={MyValidators.requestedByValidator}
+                      component={MyFormComponents.FormComboBox}
+                    />
+                    <Field
+                      id="Urgent"
+                      name="Urgent"
+                      label="Urgent"
+                      onLabel="Yes"
+                      offLabel="No"
+                      labelPlacement={'before'}
+                      component={MyFormComponents.FormCheckbox}
+                    />
+                  </div>
+                </div>
+                <div className={'col-sm-6'}>
+                  <Label>Approval Requests</Label>
+                  <ActionStepsComponent actions={this.props.dataItem.Actions} onAddNewApproval={this.props.onAddNewApproval} />
+                </div>
               </div>
               <Field
                 id="Customer"
@@ -268,6 +250,7 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
               <MyAttachmentComponent
                 id="RelatedAttachments"
                 cardTitle="Upload Related Attachments"
+                boldCardTitle={true}
                 productInEdit={this.state.productInEdit}
                 context={this.props.context}
                 documentLibrary={MyLists["Related Invoice Attachments"]}
