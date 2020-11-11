@@ -292,6 +292,66 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   }
 
   /**
+   * Save the approval request data from the Panel.
+   * @param e Data from form
+   */
+  public onApprovalRequestSave = (e) => {
+    let reqForInvoice = this.state.requestingApprovalFor;
+    // Close the dialog. 
+    this.setState({
+      requestingApprovalFor: undefined
+    });
+
+    for (let index = 0; index < e.Users.length; index++) {
+      debugger;
+      const user = e.Users[index];
+
+      let obj = {
+        Title: 'Approval Required',
+        AssignedToId: user.Id,
+        AR_x0020_Invoice_x0020_RequestId: reqForInvoice.ID,
+        Body: e.Description,
+        Response_x0020_Status: InvoiceActionResponseStatus.Waiting,
+        Request_x0020_Type: e.Request_x0020_Type
+      };
+
+      sp.web.lists.getByTitle(MyLists.InvoiceActionRequired).items.add(obj)
+        .then(response => {
+          response.item
+            .select('*, AssignedTo/EMail, AssignedTo/Title, Author/EMail, Author/Title')
+            .expand('AssignedTo, Author')
+            .get()
+            .then(item => {
+              // Update the state objects.
+              console.log('After save!');
+              console.log(response);
+
+              debugger;
+
+              // Update the invoice found in state.data.data 
+              let allInvoices = this.state.data.data;
+              const indexOfCurrentInvoice = allInvoices.findIndex(f => f.ID === reqForInvoice.Id);
+              allInvoices[indexOfCurrentInvoice].Actions = [...allInvoices[indexOfCurrentInvoice].Actions, item];
+              this.setState({
+                data: {
+                  data: allInvoices
+                }
+              });
+
+              // Update the invoice found in productsInEdit if it is set.
+              if (this.state.productInEdit) {
+                let prodInEdit = this.state.productInEdit;
+                prodInEdit.Actions = [...prodInEdit.Actions, item];
+                this.setState({
+                  productInEdit: prodInEdit
+                });
+              }
+            });
+        })
+    }
+  }
+
+  /**
    * When a user clicks Approve/Deny.
    * @param dataItem Item user wants to approve.
    */
@@ -760,6 +820,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
             context={this.props.context}
             dataItem={this.state.requestingApprovalFor}
             currentUser={this.state.currentUser}
+            onSave={this.onApprovalRequestSave}
             onDismiss={(e) => {
               this.setState({
                 requestingApprovalFor: undefined

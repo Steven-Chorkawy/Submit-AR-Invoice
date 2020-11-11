@@ -16,15 +16,51 @@ const buttonStyles = { root: { marginRight: 8 } };
 export class RequestApprovalDialogComponent extends React.Component<any, any> {
     constructor(props) {
         super(props);
-        console.log(props);
+        this.state = {
+            Request_x0020_Type: InvoiceActionRequestTypes.DepartmentApprovalRequired,
+            Users: []
+        };
     }
 
-    private onRenderFooterContent = () => (
+    private _PeoplePickerChange = (e) => {
+        this.setState({
+            Users: []
+        });
+        for (let index = 0; index < e.length; index++) {
+            const element = e[index];
+            sp.web.siteUsers.getByLoginName(element.loginName).get()
+                .then(response => {
+                    this.setState({
+                        Users: [...this.state.Users, response]
+                    });
+                });
+        }
+    }
+
+    private _RequestTypeChange = (option, index) => {
+        this.setState({
+            Request_x0020_Type: index.key
+        });
+    }
+
+    private _DescriptionChange = (event, newValue) => {
+        this.setState({
+            Description: newValue
+        });
+    }
+
+    //#region Render Methods
+    private onRenderFooterContent = (props) => (
         <div>
-            <PrimaryButton onClick={this.props.onDismiss} styles={buttonStyles}>Save</PrimaryButton>
+            <PrimaryButton onClick={(e) => {
+                this.props.onSave(this.state);
+            }} styles={buttonStyles}>Save</PrimaryButton>
             <DefaultButton onClick={this.props.onDismiss}>Cancel</DefaultButton>
         </div>
-    );
+    )
+    //#endregion
+
+
 
     public render() {
         return (
@@ -48,7 +84,8 @@ export class RequestApprovalDialogComponent extends React.Component<any, any> {
                                     { key: InvoiceActionRequestTypes.AccountantApprovalRequired, text: InvoiceActionRequestTypes.AccountantApprovalRequired },
                                     { key: InvoiceActionRequestTypes.AccountingClerkApprovalRequired, text: InvoiceActionRequestTypes.AccountingClerkApprovalRequired }
                                 ]}
-                                selectedKey={InvoiceActionRequestTypes.DepartmentApprovalRequired}
+                                selectedKey={this.state.Request_x0020_Type}
+                                onChange={this._RequestTypeChange}
                             />
                         </div>
                         <div style={{ marginBottom: '15px' }}>
@@ -56,14 +93,19 @@ export class RequestApprovalDialogComponent extends React.Component<any, any> {
                             <PeoplePicker
                                 context={this.props.context}
                                 showtooltip={false}
-                                isRequired={true}
                                 personSelectionLimit={10}
                                 showHiddenInUI={false}
                                 principalTypes={[PrincipalType.User]}
+                                selectedItems={this._PeoplePickerChange}
+                                isRequired={true}
                             />
+                            {
+                                this.state.Users && (this.state.Users.length < 1) &&
+                                <Error>Please Select one or more users.</Error>
+                            }
                         </div>
                         <div style={{ marginBottom: '15px' }}>
-                            <TextField label="Notes" multiline rows={5} />
+                            <TextField label="Description" multiline rows={5} onChange={this._DescriptionChange} />
                         </div>
                     </CardBody>
                 </Card>
