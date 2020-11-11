@@ -131,7 +131,7 @@ export const UpdateAccountDetails = (invoices: any, newAccount: Array<any>, setS
  * @param response Approve or Deny.
  * @param invoiceAction IInvoiceAction object.  Must contain ID property. 
  */
-export const SendApprovalResponse = async (response: InvoiceActionResponseStatus, invoiceAction: IInvoiceAction) => {
+export const SendApprovalResponse = async (response: string, invoiceAction: IInvoiceAction) => {
   console.log('Sending Approval');
   console.log(response);
   console.log(invoiceAction);

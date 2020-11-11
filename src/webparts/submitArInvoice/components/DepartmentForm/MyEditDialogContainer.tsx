@@ -268,6 +268,7 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
               <MyAttachmentComponent
                 id="RelatedAttachments"
                 cardTitle="Upload Related Attachments"
+                boldCardTitle={true}
                 productInEdit={this.state.productInEdit}
                 context={this.props.context}
                 documentLibrary={MyLists["Related Invoice Attachments"]}
