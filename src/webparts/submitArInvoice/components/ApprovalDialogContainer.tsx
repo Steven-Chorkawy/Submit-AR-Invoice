@@ -145,6 +145,7 @@ export class ApprovalDialogContainer extends React.Component<any, IApprovalDialo
                                             commentRequired: false
                                         });
                                     }}
+                                    value={this.state.comment && this.state.comment}
                                     required={this.state.commentRequired}
                                     placeholder={'Add a comment...'}
                                 />
