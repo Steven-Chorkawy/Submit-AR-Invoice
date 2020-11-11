@@ -35,7 +35,7 @@ interface IApprovalDialogContainerState {
     submitFailed: boolean;
 }
 
-const formRowStyle = { width: '100%', marginBottom: '3px' }
+const formRowStyle = { width: '100%', marginBottom: '3px' };
 
 export class ApprovalDialogContainer extends React.Component<any, IApprovalDialogContainerState> {
     constructor(props) {

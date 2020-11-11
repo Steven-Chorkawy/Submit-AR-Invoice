@@ -340,7 +340,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
                 });
               }
             });
-        })
+        });
     }
   }
 
