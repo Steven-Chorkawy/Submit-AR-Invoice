@@ -25,6 +25,13 @@ export enum InvoiceActionResponseStatus {
   Waiting = 'Waiting'
 }
 
+export enum InvoiceActionRequestTypes {
+  DepartmentApprovalRequired = 'Department Approval Required',
+  AccountantApprovalRequired = 'Accountant Approval Required',
+  AccountingClerkApprovalRequired = 'Accounting Clerk2 Approval Required',
+  EditRequired = 'Edit Required'
+}
+
 export enum MyGridStrings {
   DateFilter = '{0: MM/dd/yyyy}',
 }

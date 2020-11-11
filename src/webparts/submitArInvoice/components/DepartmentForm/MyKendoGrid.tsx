@@ -25,6 +25,7 @@ import IARInvoice from '../IARInvoice';
 import { filterBy, orderBy, groupBy } from '@progress/kendo-data-query';
 import { MyEditDialogContainer } from './MyEditDialogContainer';
 import { ApprovalDialogContainer } from '../ApprovalDialogContainer';
+import { RequestApprovalDialogComponent } from '../RequestApprovalDialogComponent';
 import { MyCancelDialogContainer } from './MyCancelDialogContainer';
 import { InvoiceDataProvider } from '../InvoiceDataProvider';
 import { InvoiceActionResponseStatus, InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
@@ -93,7 +94,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
           edit: this.onEdit,
           cancel: this.onInvoiceCancel,
           approvalResponse: this.onApprovalResponse,
-          requestApproval: undefined, // TODO: add method here.
+          requestApproval: this.onRequestApproval,
           currentUser: user
         });
       });
@@ -753,6 +754,19 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
             cancel={() => { this.setState({ productInApproval: undefined }); }}
           />
         }
+        {
+          this.state.requestingApprovalFor &&
+          <RequestApprovalDialogComponent
+            context={this.props.context}
+            dataItem={this.state.requestingApprovalFor}
+            currentUser={this.state.currentUser}
+            onDismiss={(e) => {
+              this.setState({
+                requestingApprovalFor: undefined
+              });
+            }}
+          />
+        }
         <InvoiceDataProvider
           dataState={this.state.dataState}
           onDataReceived={this.dataReceived}
@@ -797,6 +811,7 @@ export function MyCommandCell({ edit, cancel, approvalResponse, requestApproval,
             cancel(dataItem);
             break;
           case "request approval":
+            requestApproval(dataItem);
             break;
           default:
             break;
