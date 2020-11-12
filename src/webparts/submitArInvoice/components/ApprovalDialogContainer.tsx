@@ -40,7 +40,6 @@ const formRowStyle = { width: '100%', marginBottom: '3px' };
 export class ApprovalDialogContainer extends React.Component<any, IApprovalDialogContainerState> {
     constructor(props) {
         super(props);
-        console.log(props);
 
         this.state = {
             // ! TODO: Check to see if there are any values!!!
@@ -58,9 +57,6 @@ export class ApprovalDialogContainer extends React.Component<any, IApprovalDialo
 
     private _validateSubmit = (): boolean => {
         let output = true;
-
-        console.log('_validateSubmit');
-        console.log(this.state);
 
         if (!this.state.response) {
             output = false;
@@ -83,7 +79,6 @@ export class ApprovalDialogContainer extends React.Component<any, IApprovalDialo
     private _onConfirmClick = (e) => {
         // _validateSubmit will apply any warning messages required. 
         if (this._validateSubmit()) {
-            console.log('Submit Valid!');
             SendApprovalResponse(this.state.response, this.state.comment, this.state.approvalRequest)
                 .then(response => {
                     response.item

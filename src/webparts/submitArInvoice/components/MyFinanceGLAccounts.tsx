@@ -27,6 +27,7 @@ import { MyLists } from './enums/MyLists.js';
 import { MyContentTypes } from './enums/MyEnums.js';
 import { IARAccountDetails } from './MyKendoForm.js';
 import { IARInvoiceAccount } from './interface/IARInvoiceAccount';
+import { BuildGUID } from './MyHelperMethods';
 
 
 //#region  Cell Functions
@@ -210,7 +211,7 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
 
   constructor(props) {
     super(props);
-    debugger;
+    
 
     if (!props.hasOwnProperty('value'))
       props.value = [];
@@ -485,7 +486,7 @@ class GLAccountsListViewItemRender extends React.Component<any, any> {
     item: this.props.dataItem
   };
   public componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevProps.dataItem.ProductID !== this.props.dataItem.ProductID) {
+    if (prevProps.dataItem.ID !== this.props.dataItem.ID) {
       this.setState({
         item: this.props.dataItem
       });
@@ -569,7 +570,14 @@ class GLAccountsListViewItemRender extends React.Component<any, any> {
                   </div>
                   <div className={'col-md-2'}>
                     <Button primary={true} look={'flat'} disabled={this._disableSaveButton()} title={'Save'} icon={'save'} style={{ marginRight: 5 }} onClick={this.handleSave}></Button>
-                    <Button icon={'cancel'} look={'flat'} title={'Cancel'} onClick={this.cancelEdit}></Button>
+                    {
+                      this.state.item.ID
+                        ?
+                        <Button icon={'cancel'} look={'flat'} title={'Cancel'} onClick={this.cancelEdit}></Button>
+                        :
+                        <Button icon={'delete'} look={'flat'} title={'Delete'} onClick={this.handleDelete}></Button>
+                    }
+
                   </div>
                 </div>
               </CardBody>
@@ -614,7 +622,7 @@ export class GLAccountsListView extends React.Component<any, any> {
   public MyCustomItem = props => <GLAccountsListViewItemRender
     {...props}
     saveItem={this.saveAccount}
-    deleteItem={(e) => { console.log('deleteItem'); console.log(e); }}
+    deleteItem={this.deleteAccount}
   />;
 
   public MyHeader = () => {
@@ -622,7 +630,7 @@ export class GLAccountsListView extends React.Component<any, any> {
       <ListViewHeader style={{ color: 'rgb(160, 160, 160)', fontSize: 14 }} className='pl-3 pb-2 pt-2'>
         <Button primary={true} icon={'plus'} onClick={(e) => {
           this.setState({
-            value: [...this.state.value, { edit: true }]
+            value: [...this.state.value, { edit: true, newAccountGuid: BuildGUID() }]
           });
         }}>Add New Account</Button>
       </ListViewHeader>
@@ -630,19 +638,13 @@ export class GLAccountsListView extends React.Component<any, any> {
   }
 
   public saveAccount = (e, callBack) => {
-    console.log('saveAccount');
-    console.log(e);
-    console.log(this.state.value);
-
     // Check if GL Code is present. 
     if (!e.Account_x0020_Code) {
       return;
     }
-
     if (e.Account_x0020_Code.length !== 21) {
       return;
     }
-
     // Save account to invoice. 
     if (e.ID) {
       this._updateAccount(e, callBack);
@@ -650,8 +652,29 @@ export class GLAccountsListView extends React.Component<any, any> {
     else {
       this._createNewAccount(e, callBack);
     }
+  }
 
-    // Update parent grid state.
+  public deleteAccount = (e, callBack) => {
+    let values = this.state.value;    
+
+    if (e.ID) {
+      values = values.filter(f => f.ID !== e.ID);
+      sp.web.lists.getByTitle(MyLists["AR Invoice Accounts"])
+        .items.getById(e.ID).delete()
+        .then(response => {
+          this.setState({
+            value: [...values]
+          });          
+          this.props.updateAccountDetails(this.state.value);
+        });
+    }
+    else {
+      // Records that have not been saved yet.
+      values = values.filter(f => f.newAccountGuid !== e.newAccountGuid);
+      this.setState({
+        value: [...values]
+      });
+    }
   }
 
   private _updateAccount = (e, callBack) => {
@@ -660,6 +683,7 @@ export class GLAccountsListView extends React.Component<any, any> {
 
   private _createNewAccount = (e, callBack) => {
     delete e.edit;
+    delete e.newAccountGuid;
     e['AR_x0020_Invoice_x0020_RequestId'] = this.props.productInEdit.ID;
     sp.web.lists.getByTitle(MyLists["AR Invoice Accounts"])
       .items.add(e).then(response => {
@@ -688,9 +712,7 @@ export class GLAccountsListView extends React.Component<any, any> {
     });
 
     // If this is a new account there won't be an index found. 
-    debugger;
     let indexOfAccount = allAccounts.indexOf(f => f.Id === updatedAccount.Id);
-    debugger;
 
     if (indexOfAccount === -1) {
       // Add a new account.
@@ -704,12 +726,10 @@ export class GLAccountsListView extends React.Component<any, any> {
     this.props.updateAccountDetails(allAccounts);
   }
 
-  /**
-   * render
-   */
   public render() {
     return (
       <ListView
+        // data={this.state.value}
         data={this.state.value}
         item={this.MyCustomItem}
         style={{ width: "100%" }}

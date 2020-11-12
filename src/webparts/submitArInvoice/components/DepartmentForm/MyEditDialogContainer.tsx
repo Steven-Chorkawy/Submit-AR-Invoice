@@ -117,8 +117,6 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
   public render() {
     return (
       <Dialog onClose={this.props.cancel} title={"Edit AR Invoice Request"} minWidth="200px" width="80%" height="80%">
-        {console.log('MyEditDialog')}
-        {console.log(this.state.productInEdit)}
         <Form
           onSubmit={this.props.onSubmit}
           initialValues={{ ...this.state.productInEdit }}
