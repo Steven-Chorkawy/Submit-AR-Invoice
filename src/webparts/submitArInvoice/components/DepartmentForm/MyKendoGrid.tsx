@@ -203,24 +203,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
   //#endregion
 
   //#region CRUD Methods
-  /**
-   * Update the account details of the invoices stored in the state.
-   * @param data Update this data?
-   */
-  public updateAccountDetails = (data) => {
-    UpdateAccountDetails(
-      this.state.data,
-      data,
-      (e) => {
-        this.setState({
-          data: {
-            data: e,
-            total: e.length
-          },
-          productInEdit: e[e.findIndex(p => p.ID === this.state.productInEdit.ID)]
-        });
-      });
-  }
 
   public updateAccountDetailsForApproval = (data) => {
     UpdateAccountDetails(
@@ -782,7 +764,19 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
               onSubmit={this.handleSubmit}
               onRelatedAttachmentAdd={this.updateRelatedAttachments}
               onRelatedAttachmentRemove={this.removeRelatedAttachments}
-              updateAccountDetails={this.updateAccountDetails}
+              updateAccountDetails={(e) => {
+                debugger;
+                // e will be a list of all the accounts.              
+                let invoiceIndex = this.state.data.data.findIndex(f => f.Id === this.state.productInEdit.ID);
+                let dataState = this.state.data.data;
+                dataState[invoiceIndex].AccountDetails = [...e];
+                this.setState({
+                  data: {
+                    data: dataState
+                  },
+                  productInEdit: { ...this.state.productInEdit, AccountDetails: [...e] }
+                });
+              }}
               onCustomCustomerChange={this.onCustomCustomerChange}
               onAddNewApproval={(e) => {
                 this.setState({
@@ -816,7 +810,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
                 },
                 productInApproval: { ...this.state.productInApproval, AccountDetails: [...e] }
               });
-
             }}
             onResponseSent={this.approvalResponseSent}
             onRelatedAttachmentAdd={this.updateRelatedAttachments}
