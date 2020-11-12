@@ -503,16 +503,30 @@ class GLAccountsListViewItemRender extends React.Component<any, any> {
     this.setState({ item: updatedItem });
   }
   public handleSave = () => {
-    this.props.saveItem(this.state.item);
-    this.setState({ item: { ...this.state.item, edit: false } });
+    this.props.saveItem(this.state.item, (e) => {
+      this.setState({ item: { ...e, edit: false } });
+    });
   }
   public handleDelete = () => {
     this.props.deleteItem(this.state.item);
   }
+
+  private _disableSaveButton = () => {
+    let output = true;
+    if (this.state.item.Account_x0020_Code) {
+      // 111-11-111-11111-1111 is a valid account code. 
+      // That's 21 characters.
+      if (this.state.item.Account_x0020_Code.length === 21 && this.state.item.Amount) {
+        output = false;
+      }
+    }
+    return output;
+  }
+
   public render() {
-    const item = this.props.dataItem;
+    const item = this.state.item;
     return (
-      <div key={this.props.dataItem.ProductID}>
+      <div key={this.state.item.ID}>
         <Card orientation='horizontal' style={{ borderWidth: '0px 0px 1px' }}>
           {
             this.state.item.edit ?
@@ -526,22 +540,23 @@ class GLAccountsListViewItemRender extends React.Component<any, any> {
                           id={'Account_x0020_Code'}
                           name={'Account_x0020_Code'}
                           mask="000-00-000-00000-0000"
+                          required={true}
                           value={this.state.item.Account_x0020_Code}
                           onChange={(e) => this.handleChange(e, 'Account_x0020_Code')}
                         />
                       </div>
                       <div className={'col-md-6'}>
                         <label style={{ display: 'block' }}>Amount:</label>
-                        <NumericTextBox value={this.state.item.Amount} format="c2" min={0} onChange={(e) => this.handleChange(e, 'Amount')} />
+                        <NumericTextBox value={this.state.item.Amount} required={true} format="c2" min={0} onChange={(e) => this.handleChange(e, 'Amount')} />
                       </div>
                     </div>
-                    <div className={'row'}>
+                    <div className={'row'} style={{ paddingTop: '5px' }}>
                       <div className={'col-md-6'}>
-                        <div className={'col-md-6'}>
+                        <div className={'col-md-4'}>
                           <label style={{ display: 'block' }}>HST:</label>
-                          <Checkbox label={'HST'} value={this.state.item.HST_x0020_Taxable} onChange={(e) => this.handleChange(e, 'HST_x0020_Taxable')} />
+                          <Checkbox value={this.state.item.HST_x0020_Taxable} onChange={(e) => this.handleChange(e, 'HST_x0020_Taxable')} />
                         </div>
-                        <div className={'col-md-6'}>
+                        <div className={'col-md-8'}>
                           <label style={{ display: 'block' }}>HST Amount:</label>
                           <NumericTextBox value={this.state.item.HST_x0020_Taxable ? this.state.item.Amount * 0.13 : 0} format="c2" disabled={true} min={0} />
                         </div>
@@ -553,7 +568,7 @@ class GLAccountsListViewItemRender extends React.Component<any, any> {
                     </div>
                   </div>
                   <div className={'col-md-2'}>
-                    <Button primary={true} look={'flat'} title={'Save'} icon={'save'} style={{ marginRight: 5 }} onClick={this.handleSave}></Button>
+                    <Button primary={true} look={'flat'} disabled={this._disableSaveButton()} title={'Save'} icon={'save'} style={{ marginRight: 5 }} onClick={this.handleSave}></Button>
                     <Button icon={'cancel'} look={'flat'} title={'Cancel'} onClick={this.cancelEdit}></Button>
                   </div>
                 </div>
@@ -590,7 +605,6 @@ export class GLAccountsListView extends React.Component<any, any> {
 
   constructor(props) {
     super(props);
-    debugger;
   }
 
   public state = {
@@ -599,7 +613,7 @@ export class GLAccountsListView extends React.Component<any, any> {
 
   public MyCustomItem = props => <GLAccountsListViewItemRender
     {...props}
-    saveItem={(e) => { console.log('saveItem'); console.log(e); }}
+    saveItem={this.saveAccount}
     deleteItem={(e) => { console.log('deleteItem'); console.log(e); }}
   />;
 
@@ -613,6 +627,46 @@ export class GLAccountsListView extends React.Component<any, any> {
         }}>Add New Account</Button>
       </ListViewHeader>
     );
+  }
+
+  public saveAccount = (e, callBack) => {
+    console.log('saveAccount');
+    console.log(e);
+    console.log(this.state.value);
+
+    // Check if GL Code is present. 
+    if (!e.Account_x0020_Code) {
+      return;
+    }
+
+    if (e.Account_x0020_Code.length !== 21) {
+      return;
+    }
+
+    // Save account to invoice. 
+    if (e.ID) {
+      this._updateAccount(e, callBack);
+    }
+    else {
+      this._createNewAccount(e, callBack);
+    }
+
+    // Update parent grid state.
+  }
+
+  private _updateAccount = (e, callBack) => {
+
+  }
+
+  private _createNewAccount = (e, callBack) => {
+    delete e.edit;
+    e['AR_x0020_Invoice_x0020_RequestId'] = this.props.productInEdit.ID;
+    sp.web.lists.getByTitle(MyLists["AR Invoice Accounts"])
+      .items.add(e).then(response => {
+        response.item.get().then(item => {
+          callBack(item);
+        });
+      });
   }
 
   /**
