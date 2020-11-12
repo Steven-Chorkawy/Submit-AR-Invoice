@@ -805,7 +805,20 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
             context={this.props.context}
             dataItem={this.state.productInApproval}
             currentUser={this.state.currentUser}
-            updateAccountDetails={this.updateAccountDetailsForApproval}
+            updateAccountDetails={(e) => {
+              // e will be a list of all the accounts. 
+              debugger;
+              let invoiceIndex = this.state.data.data.findIndex(f => f.Id === this.state.productInApproval.ID);
+              let dataState = this.state.data.data;
+              dataState[invoiceIndex].AccountDetails = [...e];
+
+              this.setState({
+                data: {
+                  data: dataState
+                }
+              });
+              debugger;
+            }}
             onResponseSent={this.approvalResponseSent}
             onRelatedAttachmentAdd={this.updateRelatedAttachments}
             onRelatedAttachmentRemove={this.removeRelatedAttachments}

@@ -665,8 +665,43 @@ export class GLAccountsListView extends React.Component<any, any> {
       .items.add(e).then(response => {
         response.item.get().then(item => {
           callBack(item);
+          this._sentUpdatedAccountsToParent(item);
         });
       });
+  }
+
+  /**
+   * Add or splice the updated Account into this.state.value
+   * this is where all the accounts are stored for the ListView. 
+   * 
+   * Once we have a complete list of all the accounts, send that 
+   * list to the parent of this component. 
+   * 
+   * The parent will update it's account list.
+   */
+  private _sentUpdatedAccountsToParent = (updatedAccount) => {
+    let allAccounts = this.state.value;
+
+    // Remove place holders
+    allAccounts = allAccounts.filter(f => {
+      return f.Id !== undefined;
+    });
+
+    // If this is a new account there won't be an index found. 
+    debugger;
+    let indexOfAccount = allAccounts.indexOf(f => f.Id === updatedAccount.Id);
+    debugger;
+
+    if (indexOfAccount === -1) {
+      // Add a new account.
+      allAccounts.push(updatedAccount);
+    }
+    else {
+      // Insert into an existing account. 
+      allAccounts[indexOfAccount] = { ...updatedAccount };
+    }
+
+    this.props.updateAccountDetails(allAccounts);
   }
 
   /**
