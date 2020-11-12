@@ -591,9 +591,18 @@ class GLAccountsListViewItemRender extends React.Component<any, any> {
                         </p>
                       </div>
                       <div className={'col-md-6'}>
-                        <div>Amount: {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(item.Amount)}</div>
-                        <div>HST: {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(item.HST)}</div>
-                        <div>Total: {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(item.Total_x0020_Invoice)}</div>
+                        <div style={{ display: "flex" }}>
+                          <div style={{ width: '50%' }}>Amount:</div>
+                          <div style={{ width: '50%' }}>{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(item.Amount)}</div>
+                        </div>
+                        <div style={{ display: "flex" }}>
+                          <div style={{ width: '50%' }}>HST:</div>
+                          <div style={{ width: '50%' }}>{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(item.HST)}</div>
+                        </div>
+                        <div style={{ display: "flex" }}>
+                          <div style={{ width: '50%' }}>Total:</div>
+                          <div style={{ width: '50%' }}>{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(item.Total_x0020_Invoice)}</div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -619,6 +628,7 @@ export class GLAccountsListView extends React.Component<any, any> {
   public state = {
     value: this.props.value
   };
+
 
   public MyCustomItem = props => <GLAccountsListViewItemRender
     {...props}
@@ -655,7 +665,7 @@ export class GLAccountsListView extends React.Component<any, any> {
     }
   }
 
-  public deleteAccount = (e, callBack) => {
+  public deleteAccount = (e) => {
     let values = this.state.value;
 
     if (e.ID) {
@@ -679,7 +689,21 @@ export class GLAccountsListView extends React.Component<any, any> {
   }
 
   private _updateAccount = (e, callBack) => {
+    console.log('_updateAccount');
+    console.log(e);
+    delete e.edit;
+    delete e.newAccountGuid; // if any
 
+    sp.web.lists.getByTitle(MyLists["AR Invoice Accounts"])
+      .items.getById(e.ID)
+      .update(e)
+      .then(response => {
+        response.item.get()
+          .then(item => {
+            callBack(item);
+            this._sentUpdatedAccountsToParent(item);
+          });
+      });
   }
 
   private _createNewAccount = (e, callBack) => {
@@ -713,8 +737,8 @@ export class GLAccountsListView extends React.Component<any, any> {
     });
 
     // If this is a new account there won't be an index found. 
-    let indexOfAccount = allAccounts.indexOf(f => f.Id === updatedAccount.Id);
-
+    let indexOfAccount = allAccounts.findIndex(f => f.Id === updatedAccount.Id);
+    debugger;
     if (indexOfAccount === -1) {
       // Add a new account.
       allAccounts.push(updatedAccount);
