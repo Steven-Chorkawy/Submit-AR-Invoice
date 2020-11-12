@@ -203,9 +203,6 @@ const hstCell = (props) => {
 };
 //#endregion
 
-export enum MyFinanceGlAccountsViewsEnum {
-  // TODO: put class names here. 
-}
 
 export class MyFinanceGlAccounts extends React.Component<any, any> {
   public editField = "inEdit";
@@ -487,13 +484,22 @@ export class GLAccountsListView extends React.Component<any, any> {
 
   constructor(props) {
     super(props);
+    debugger;
   }
 
   /**
    * render
    */
   public render() {
-    return (<p>hello</p>);
+    return (
+      <div>hello</div>
+      // <ListView
+      //           data={this.props.productInEdit.}
+      //           item={this.MyCustomItem}
+      //           style={{ width: "100%", height: 500 }}
+      //           header={MyHeader}
+      //       />
+    );
   }
 }
 
@@ -510,10 +516,15 @@ export const MyFinanceGlAccountsComponent = (fieldArrayRenderProps) => {
 
   return (
     <div key={fieldArrayRenderProps.value}>
-      {
-        // TODO: Use MyFinanceGlAccountsViewsEnum here to know which component to use.
-      }
       <MyFinanceGlAccounts {...fieldArrayRenderProps} onAdd={onAdd} />
     </div>
   );
 };
+
+export const GLAccountsListViewComponent = (fieldArrayRenderProps) => {
+  return(
+    <div key={fieldArrayRenderProps.value}>
+      <GLAccountsListView {...fieldArrayRenderProps} />
+    </div>
+  );
+}

@@ -16,7 +16,7 @@ import { Loader } from '@progress/kendo-react-indicators';
 
 
 import { InvoiceActionResponseStatus } from './enums/MyEnums';
-import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from './MyFinanceGLAccounts';
+import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts, GLAccountsListViewComponent } from './MyFinanceGLAccounts';
 import { MyAttachmentComponent } from './MyAttachmentComponent';
 import { MyLists } from './enums/MyLists';
 import { IInvoiceAction } from './interface/InvoiceItem';
@@ -194,7 +194,7 @@ export class ApprovalDialogContainer extends React.Component<any, IApprovalDialo
                                             <Label>Accounts</Label>
                                             <FieldArray
                                                 name="GLAccounts"
-                                                component={MyFinanceGlAccountsComponent}
+                                                component={GLAccountsListViewComponent}
                                                 updateAccountDetails={this.props.updateAccountDetails}
                                                 productInEdit={this.props.dataItem}
                                                 value={this.props.dataItem.AccountDetails}
