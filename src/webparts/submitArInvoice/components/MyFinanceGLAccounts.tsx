@@ -754,7 +754,6 @@ export class GLAccountsListView extends React.Component<any, any> {
   public render() {
     return (
       <ListView
-        // data={this.state.value}
         data={this.state.value}
         item={this.MyCustomItem}
         style={{ width: "100%", maxWidth: '800px', minHeight: '150px' }}
