@@ -211,7 +211,7 @@ export class MyFinanceGlAccounts extends React.Component<any, any> {
 
   constructor(props) {
     super(props);
-    
+
 
     if (!props.hasOwnProperty('value'))
       props.value = [];
@@ -592,6 +592,7 @@ class GLAccountsListViewItemRender extends React.Component<any, any> {
                       </div>
                       <div className={'col-md-6'}>
                         <div>Amount: {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(item.Amount)}</div>
+                        <div>HST: {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(item.HST)}</div>
                         <div>Total: {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(item.Total_x0020_Invoice)}</div>
                       </div>
                     </div>
@@ -655,7 +656,7 @@ export class GLAccountsListView extends React.Component<any, any> {
   }
 
   public deleteAccount = (e, callBack) => {
-    let values = this.state.value;    
+    let values = this.state.value;
 
     if (e.ID) {
       values = values.filter(f => f.ID !== e.ID);
@@ -664,7 +665,7 @@ export class GLAccountsListView extends React.Component<any, any> {
         .then(response => {
           this.setState({
             value: [...values]
-          });          
+          });
           this.props.updateAccountDetails(this.state.value);
         });
     }
