@@ -22,7 +22,7 @@ import { InvoiceDataProvider, QueryInvoiceData } from '../InvoiceDataProvider';
 import { MyCommandCell } from './MyCommandCell';
 import { filterBy } from '@progress/kendo-data-query';
 import { InvoiceStatus, MyGridStrings, MyContentTypes } from '../enums/MyEnums';
-import { ConvertQueryParamsToKendoFilter, BuildGUID, CreateInvoiceAction, UpdateAccountDetails } from '../MyHelperMethods';
+import { ConvertQueryParamsToKendoFilter, BuildGUID, CreateInvoiceAction } from '../MyHelperMethods';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { InvoiceEditForm, IGPAttachmentProps } from './InvoiceEditForm';
@@ -1154,23 +1154,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
     });
   }
 
-  public updateAccountDetails = (item) => {
-    UpdateAccountDetails(
-      this.state.invoices,
-      item,
-      (e) => {
-        this.setState({
-          invoices: {
-            data: e,
-            total: e.length
-          },
-          productInEdit: e[e.findIndex(p => p.ID === this.state.productInEdit.ID)]
-        });
-      }
-    );
 
-    this.expandAllRows();
-  }
   //#endregion end CRUD Methods
 
   public render() {
@@ -1252,7 +1236,20 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
             onSubmit={this.onSubmit2}
             saveResult={this.state.saveResult}
             cancel={this.cancelEditForm}
-            updateAccountDetails={this.updateAccountDetails}
+            updateAccountDetails={(e) => {
+              debugger;
+              // e will be a list of all the accounts.              
+              let invoiceIndex = this.state.invoices.data.findIndex(f => f.Id === this.state.productInEdit.ID);
+              let dataState = this.state.invoices.data;
+              dataState[invoiceIndex].AccountDetails = [...e];
+              this.setState({
+                invoices: {
+                  data: dataState,
+                  total: dataState.length
+                },
+                productInEdit: { ...this.state.productInEdit, AccountDetails: [...e] }
+              });
+            }}
             onRelatedAttachmentAdd={this.updateRelatedAttachments}
             onRelatedAttachmentRemove={this.removeRelatedAttachments}
             GPAttachmentWidgetProps={this.state.gpAttachmentProps}

@@ -29,7 +29,7 @@ import { MyCommandCell } from './MyCommandCell';
 import * as MyFormComponents from '../MyFormComponents';
 import { filterBy } from '@progress/kendo-data-query';
 import { filterGroupByField } from '@progress/kendo-react-grid/dist/npm/columnMenu/GridColumnMenuFilter';
-import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts } from '../MyFinanceGLAccounts';
+import { GLAccountsListViewComponent } from '../MyFinanceGLAccounts';
 import { ActionResponseComponent } from '../ActionResponseComponent';
 import { InvoiceStatus, MyGridStrings, MyContentTypes } from '../enums/MyEnums';
 import { ConvertQueryParamsToKendoFilter, BuildGUID } from '../MyHelperMethods';
@@ -232,7 +232,7 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
                 <div style={{ marginBottom: "2px" }}>
                   <FieldArray
                     name="GLAccounts"
-                    component={MyFinanceGlAccountsComponent}
+                    component={GLAccountsListViewComponent}
                     value={this.state.productInEdit.AccountDetails}
                     productInEdit={this.state.productInEdit}
                     updateAccountDetails={this.props.updateAccountDetails}
