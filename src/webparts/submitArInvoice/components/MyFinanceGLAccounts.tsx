@@ -30,10 +30,11 @@ import { IARInvoiceAccount } from './interface/IARInvoiceAccount';
 import { BuildGUID } from './MyHelperMethods';
 
 
-//#region  Cell Functions
 
-
-
+export enum GLAccountsListViewDisplayMode {
+  horizontal = 'horizontal',
+  vertical = 'vertical',
+}
 
 class GLAccountsListViewItemRender extends React.Component<any, any> {
   public state = {
@@ -143,12 +144,12 @@ class GLAccountsListViewItemRender extends React.Component<any, any> {
                 <div className={'row'}>
                   <div className={'col-md-10'}>
                     <div className={'row'}>
-                      <div className={'col-md-6'}>
+                      <div className={this.props.displayMode === GLAccountsListViewDisplayMode.horizontal ? 'col-md-6' : 'col-md-12'}>
                         <p>
                           {item.Account_x0020_Code}
                         </p>
                       </div>
-                      <div className={'col-md-6'}>
+                      <div className={this.props.displayMode === GLAccountsListViewDisplayMode.horizontal ? 'col-md-6' : 'col-md-12'}>
                         <div style={{ display: "flex" }}>
                           <div style={{ width: '50%' }}>Amount:</div>
                           <div style={{ width: '50%' }}>{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(item.Amount)}</div>
@@ -164,10 +165,13 @@ class GLAccountsListViewItemRender extends React.Component<any, any> {
                       </div>
                     </div>
                   </div>
-                  <div className={'col-md-2'}>
-                    <Button primary={true} look={'flat'} title={'Edit'} icon={'edit'} style={{ marginRight: 5 }} onClick={this.enterEdit}></Button>
-                    <Button icon={'trash'} look={'flat'} title={'Delete'} onClick={this.handleDelete}></Button>
-                  </div>
+                  {
+                    this.props.editable &&
+                    <div className={'col-md-2'}>
+                      <Button primary={true} look={'flat'} title={'Edit'} icon={'edit'} style={{ marginRight: 5 }} onClick={this.enterEdit}></Button>
+                      <Button icon={'trash'} look={'flat'} title={'Delete'} onClick={this.handleDelete}></Button>
+                    </div>
+                  }
                 </div>
               </CardBody>
           }
@@ -184,11 +188,18 @@ export class GLAccountsListView extends React.Component<any, any> {
   }
 
   public state = {
-    value: this.props.value
+    value: this.props.value,
+    // IF props is null or undefined  : true
+    // IF props is true               : true
+    // IF props is false              : false
+    editable: this.props.editable ? true : this.props.editable === false ? false : true,
+    displayMode: this.props.displayMode ? this.props.displayMode : GLAccountsListViewDisplayMode.horizontal
   };
 
   public MyCustomItem = props => <GLAccountsListViewItemRender
     {...props}
+    editable={this.state.editable}
+    displayMode={this.state.displayMode}
     saveItem={this.saveAccount}
     deleteItem={this.deleteAccount}
   />
@@ -196,11 +207,14 @@ export class GLAccountsListView extends React.Component<any, any> {
   public MyHeader = () => {
     return (
       <ListViewHeader style={{ color: 'rgb(160, 160, 160)', fontSize: 14 }} className='pl-3 pb-2 pt-2'>
-        <Button primary={true} icon={'plus'} onClick={(e) =>
-          this.setState({
-            value: [...this.state.value, { edit: true, newAccountGuid: BuildGUID() }]
-          })
-        }>Add New Account</Button>
+        {
+          this.state.editable &&
+          <Button primary={true} icon={'plus'} onClick={(e) =>
+            this.setState({
+              value: [...this.state.value, { edit: true, newAccountGuid: BuildGUID() }]
+            })
+          }>Add New Account</Button>
+        }
       </ListViewHeader>
     );
   }
@@ -293,7 +307,7 @@ export class GLAccountsListView extends React.Component<any, any> {
 
     // If this is a new account there won't be an index found. 
     let indexOfAccount = allAccounts.findIndex(f => f.Id === updatedAccount.Id);
-    
+
     if (indexOfAccount === -1) {
       // Add a new account.
       allAccounts.push(updatedAccount);
