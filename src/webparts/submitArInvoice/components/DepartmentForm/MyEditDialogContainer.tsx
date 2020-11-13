@@ -14,7 +14,7 @@ import { Facepile, Panel, PanelType, PrimaryButton, DefaultButton, Dropdown, Tex
 
 import * as MyFormComponents from '../MyFormComponents';
 import * as MyValidators from '../validators.jsx';
-import { MyFinanceGlAccountsComponent } from '../MyFinanceGLAccounts';
+import { GLAccountsListViewComponent } from '../MyFinanceGLAccounts';
 import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
 import { MyAttachmentComponent } from '../MyAttachmentComponent';
 import { ActionStepsComponent } from '../ActionStepsComponent';
@@ -117,8 +117,6 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
   public render() {
     return (
       <Dialog onClose={this.props.cancel} title={"Edit AR Invoice Request"} minWidth="200px" width="80%" height="80%">
-        {console.log('MyEditDialog')}
-        {console.log(this.state.productInEdit)}
         <Form
           onSubmit={this.props.onSubmit}
           initialValues={{ ...this.state.productInEdit }}
@@ -238,7 +236,7 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
               <div style={{ width: '100%' }}>
                 <FieldArray
                   name="GLAccounts"
-                  component={MyFinanceGlAccountsComponent}
+                  component={GLAccountsListViewComponent}
                   updateAccountDetails={this.props.updateAccountDetails}
                   productInEdit={this.state.productInEdit}
                   value={this.state.productInEdit.AccountDetails}
