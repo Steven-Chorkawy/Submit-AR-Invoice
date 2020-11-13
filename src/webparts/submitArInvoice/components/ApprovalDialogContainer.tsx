@@ -16,7 +16,7 @@ import { Loader } from '@progress/kendo-react-indicators';
 
 
 import { InvoiceActionResponseStatus } from './enums/MyEnums';
-import { MyFinanceGlAccountsComponent, MyFinanceGlAccounts, GLAccountsListViewComponent } from './MyFinanceGLAccounts';
+import { GLAccountsListViewComponent } from './MyFinanceGLAccounts';
 import { MyAttachmentComponent } from './MyAttachmentComponent';
 import { MyLists } from './enums/MyLists';
 import { IInvoiceAction } from './interface/InvoiceItem';
@@ -116,13 +116,13 @@ export class ApprovalDialogContainer extends React.Component<any, IApprovalDialo
                                 <DropDownList
                                     data={[InvoiceActionResponseStatus.Approved, InvoiceActionResponseStatus.Denied]}
                                     label="Select Approve or Deny"
-                                    onChange={(e) => {
+                                    onChange={(e) =>
                                         this.setState({
                                             response: e.target.value,
                                             responseRequired: false,
                                             commentRequired: e.target.value === InvoiceActionResponseStatus.Denied
-                                        });
-                                    }}
+                                        })
+                                    }
                                     required={this.state.responseRequired}
                                 />
                                 {
