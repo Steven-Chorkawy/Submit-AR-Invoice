@@ -765,7 +765,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
               onRelatedAttachmentAdd={this.updateRelatedAttachments}
               onRelatedAttachmentRemove={this.removeRelatedAttachments}
               updateAccountDetails={(e) => {
-                debugger;
                 // e will be a list of all the accounts.              
                 let invoiceIndex = this.state.data.data.findIndex(f => f.Id === this.state.productInEdit.ID);
                 let dataState = this.state.data.data;
@@ -865,8 +864,6 @@ export function MyCommandCell({ edit, cancel, approvalResponse, requestApproval,
       const isNewItem = dataItem.ID === undefined;
 
       const onItemClick = (e) => {
-        console.log("onItemClick");
-        console.log(e);
         switch (e.item.text.toLowerCase()) {
           case "edit":
             edit(dataItem);

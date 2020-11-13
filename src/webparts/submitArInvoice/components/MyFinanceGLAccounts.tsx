@@ -79,7 +79,6 @@ class GLAccountsListViewItemRender extends React.Component<any, any> {
   }
 
   private _calculateHSTAmount = (e) => {
-    debugger;
     return (e.item.HST_x0020_Taxable === true) ? e.item.Amount * 0.13 : 0;
   }
 
@@ -247,8 +246,6 @@ export class GLAccountsListView extends React.Component<any, any> {
   }
 
   private _updateAccount = (e, callBack) => {
-    console.log('_updateAccount');
-    console.log(e);
     delete e.edit;
     delete e.newAccountGuid; // if any
 
@@ -296,7 +293,7 @@ export class GLAccountsListView extends React.Component<any, any> {
 
     // If this is a new account there won't be an index found. 
     let indexOfAccount = allAccounts.findIndex(f => f.Id === updatedAccount.Id);
-    debugger;
+    
     if (indexOfAccount === -1) {
       // Add a new account.
       allAccounts.push(updatedAccount);
