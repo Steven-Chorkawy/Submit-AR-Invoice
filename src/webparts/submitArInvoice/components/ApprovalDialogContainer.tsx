@@ -152,66 +152,70 @@ export class ApprovalDialogContainer extends React.Component<any, IApprovalDialo
                         </CardBody>
                     </Card>
                 </div>
-                <div className={'k-card-deck'}>
-                    <Card style={{ width: '28%' }}>
-                        <CardBody>
-                            <CardTitle><b>Request Details</b></CardTitle>
-                            <Label>Requested By:</Label>
-                            <p>{this.state.approvalRequest && this.state.approvalRequest.Author.EMail}</p>
-                            <Label>Date:</Label>
-                            <p>{this.state.approvalRequest && this.state.approvalRequest.Created}</p>
-                            <Label>Note:</Label>
-                            <p>{this.state.approvalRequest.Body}</p>
-                        </CardBody>
-                    </Card>
-                    <Card style={{ width: '70%' }}>
-                        <CardBody>
-                            <CardTitle><b>Invoice Details</b></CardTitle>
-                            <Form
-                                onSubmit={(e) => e.preventDefault()}
-                                initialValues={{ ...this.props.dataItem }}
-                                render={(formRenderProps) => (
-                                    <FormElement>
-                                        <div style={formRowStyle}>
-                                            <Label>Customer</Label>
-                                            <div className='row'>
-                                                <div className='col-md-6'>
-                                                    <Label>Name:</Label>
-                                                    <p>{this.props.dataItem.Customer.Customer_x0020_Name}</p>
-                                                </div>
-                                                <div className='col-md-6'>
-                                                    <Label>Details:</Label>
-                                                    <p>{this.props.dataItem.Customer.ID ? this.props.dataItem.Customer.WorkAddress : this.props.dataItem.Customer.CustomerDetails}</p>
+                <div className={'row'}>
+                    <div className={'col-lg-4 col-md-12'}>
+                        <Card style={{ width: '100%' }}>
+                            <CardBody>
+                                <CardTitle><b>Request Details</b></CardTitle>
+                                <Label>Requested By:</Label>
+                                <p>{this.state.approvalRequest && this.state.approvalRequest.Author.EMail}</p>
+                                <Label>Date:</Label>
+                                <p>{this.state.approvalRequest && this.state.approvalRequest.Created}</p>
+                                <Label>Note:</Label>
+                                <p>{this.state.approvalRequest.Body}</p>
+                            </CardBody>
+                        </Card>
+                    </div>
+                    <div className={'col-lg-8 col-md-12'}>
+                        <Card style={{ width: '100%' }}>
+                            <CardBody>
+                                <CardTitle><b>Invoice Details</b></CardTitle>
+                                <Form
+                                    onSubmit={(e) => e.preventDefault()}
+                                    initialValues={{ ...this.props.dataItem }}
+                                    render={(formRenderProps) => (
+                                        <FormElement>
+                                            <div style={formRowStyle}>
+                                                <Label>Customer</Label>
+                                                <div className='row'>
+                                                    <div className='col-md-6'>
+                                                        <Label>Name:</Label>
+                                                        <p>{this.props.dataItem.Customer.Customer_x0020_Name}</p>
+                                                    </div>
+                                                    <div className='col-md-6'>
+                                                        <Label>Details:</Label>
+                                                        <p>{this.props.dataItem.Customer.ID ? this.props.dataItem.Customer.WorkAddress : this.props.dataItem.Customer.CustomerDetails}</p>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div style={formRowStyle}>
-                                            <Label>Accounts</Label>
-                                            <FieldArray
-                                                name="GLAccounts"
-                                                component={GLAccountsListViewComponent}
-                                                updateAccountDetails={this.props.updateAccountDetails}
-                                                productInEdit={this.props.dataItem}
-                                                value={this.props.dataItem.AccountDetails}
-                                            />
-                                        </div>
-                                        <div style={formRowStyle}>
-                                            <MyAttachmentComponent
-                                                id="RelatedAttachments"
-                                                cardTitle="Attachments"
-                                                productInEdit={this.props.dataItem}
-                                                context={this.props.context}
-                                                documentLibrary={MyLists["Related Invoice Attachments"]}
-                                                onAdd={this.props.onRelatedAttachmentAdd}
-                                                onRemove={this.props.onRelatedAttachmentRemove}
-                                            />
-                                        </div>
-                                    </FormElement>
-                                )}
-                            >
-                            </Form>
-                        </CardBody>
-                    </Card>
+                                            <div style={formRowStyle}>
+                                                <Label>Accounts</Label>
+                                                <FieldArray
+                                                    name="GLAccounts"
+                                                    component={GLAccountsListViewComponent}
+                                                    updateAccountDetails={this.props.updateAccountDetails}
+                                                    productInEdit={this.props.dataItem}
+                                                    value={this.props.dataItem.AccountDetails}
+                                                />
+                                            </div>
+                                            <div style={formRowStyle}>
+                                                <MyAttachmentComponent
+                                                    id="RelatedAttachments"
+                                                    cardTitle="Attachments"
+                                                    productInEdit={this.props.dataItem}
+                                                    context={this.props.context}
+                                                    documentLibrary={MyLists["Related Invoice Attachments"]}
+                                                    onAdd={this.props.onRelatedAttachmentAdd}
+                                                    onRemove={this.props.onRelatedAttachmentRemove}
+                                                />
+                                            </div>
+                                        </FormElement>
+                                    )}
+                                >
+                                </Form>
+                            </CardBody>
+                        </Card>
+                    </div>
                 </div>
                 <DialogActionsBar>
                     <Button primary={!this.state.submitFailed} icon={!this.state.submitFailed ? 'save' : 'close-outline'}

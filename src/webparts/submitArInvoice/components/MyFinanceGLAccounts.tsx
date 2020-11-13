@@ -111,17 +111,17 @@ class GLAccountsListViewItemRender extends React.Component<any, any> {
                       </div>
                     </div>
                     <div className={'row'} style={{ paddingTop: '5px' }}>
-                      <div className={'col-md-6'}>
-                        <div className={'col-md-4'}>
+                      <div className={'col-md-6 col-sm-6'}>
+                        <div className={'col-md-4 col-sm-3'}>
                           <label style={{ display: 'block' }}>HST:</label>
                           <Checkbox value={this.state.item.HST_x0020_Taxable} onChange={(e) => this.handleChange(e, 'HST_x0020_Taxable')} />
                         </div>
-                        <div className={'col-md-8'}>
+                        <div className={'col-md-8 col-sm-3'}>
                           <label style={{ display: 'block' }}>HST Amount:</label>
                           {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(this.state.item.Amount ? this._calculateHSTAmount(this.state) : 0)}
                         </div>
                       </div>
-                      <div className={'col-md-6'}>
+                      <div className={'col-md-6 col-sm-6'}>
                         <label style={{ display: 'block' }}>Total:</label>
                         {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(this.state.item.Amount ? this._calculateHSTAmount(this.state) + this.state.item.Amount : 0)}
                       </div>
