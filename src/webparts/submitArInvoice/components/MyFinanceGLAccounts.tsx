@@ -197,11 +197,11 @@ export class GLAccountsListView extends React.Component<any, any> {
   public MyHeader = () => {
     return (
       <ListViewHeader style={{ color: 'rgb(160, 160, 160)', fontSize: 14 }} className='pl-3 pb-2 pt-2'>
-        <Button primary={true} icon={'plus'} onClick={(e) => {
+        <Button primary={true} icon={'plus'} onClick={(e) =>
           this.setState({
             value: [...this.state.value, { edit: true, newAccountGuid: BuildGUID() }]
-          });
-        }}>Add New Account</Button>
+          })
+        }>Add New Account</Button>
       </ListViewHeader>
     );
   }

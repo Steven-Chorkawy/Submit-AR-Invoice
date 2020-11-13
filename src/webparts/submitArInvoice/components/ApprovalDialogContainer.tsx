@@ -134,12 +134,12 @@ export class ApprovalDialogContainer extends React.Component<any, IApprovalDialo
                                 <TextArea
                                     id={'ApprovalNote'}
                                     style={{ 'width': '100%' }}
-                                    onChange={(e) => {
+                                    onChange={(e) =>
                                         this.setState({
                                             comment: e.value.toString(),
                                             commentRequired: false
-                                        });
-                                    }}
+                                        })
+                                    }
                                     value={this.state.comment && this.state.comment}
                                     required={this.state.commentRequired}
                                     placeholder={'Add a comment...'}
@@ -168,7 +168,7 @@ export class ApprovalDialogContainer extends React.Component<any, IApprovalDialo
                         <CardBody>
                             <CardTitle><b>Invoice Details</b></CardTitle>
                             <Form
-                                onSubmit={(e) => { e.preventDefault(); }}
+                                onSubmit={(e) => e.preventDefault()}
                                 initialValues={{ ...this.props.dataItem }}
                                 render={(formRenderProps) => (
                                     <FormElement>
