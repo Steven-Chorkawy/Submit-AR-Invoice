@@ -47,7 +47,7 @@ const parseActionType = (action) => {
     }
 
     return output;
-}
+};
 
 const CustomStep = (props) => {
     return (
