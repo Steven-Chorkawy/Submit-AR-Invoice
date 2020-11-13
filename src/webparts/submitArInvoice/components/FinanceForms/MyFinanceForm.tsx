@@ -1237,7 +1237,6 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
             saveResult={this.state.saveResult}
             cancel={this.cancelEditForm}
             updateAccountDetails={(e) => {
-              debugger;
               // e will be a list of all the accounts.              
               let invoiceIndex = this.state.invoices.data.findIndex(f => f.Id === this.state.productInEdit.ID);
               let dataState = this.state.invoices.data;

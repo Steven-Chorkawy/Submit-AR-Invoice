@@ -765,7 +765,6 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
               onRelatedAttachmentAdd={this.updateRelatedAttachments}
               onRelatedAttachmentRemove={this.removeRelatedAttachments}
               updateAccountDetails={(e) => {
-                debugger;
                 // e will be a list of all the accounts.              
                 let invoiceIndex = this.state.data.data.findIndex(f => f.Id === this.state.productInEdit.ID);
                 let dataState = this.state.data.data;
@@ -778,11 +777,11 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
                 });
               }}
               onCustomCustomerChange={this.onCustomCustomerChange}
-              onAddNewApproval={(e) => {
+              onAddNewApproval={(e) =>
                 this.setState({
                   requestingApprovalFor: this.state.productInEdit
-                });
-              }}
+                })
+              }
               cancel={this.cancel}
             />
             : this.state.productInCancel ?
@@ -824,11 +823,11 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
             dataItem={this.state.requestingApprovalFor}
             currentUser={this.state.currentUser}
             onSave={this.onApprovalRequestSave}
-            onDismiss={(e) => {
+            onDismiss={(e) =>
               this.setState({
                 requestingApprovalFor: undefined
-              });
-            }}
+              })
+            }
           />
         }
         <InvoiceDataProvider
@@ -865,8 +864,6 @@ export function MyCommandCell({ edit, cancel, approvalResponse, requestApproval,
       const isNewItem = dataItem.ID === undefined;
 
       const onItemClick = (e) => {
-        console.log("onItemClick");
-        console.log(e);
         switch (e.item.text.toLowerCase()) {
           case "edit":
             edit(dataItem);
@@ -895,10 +892,10 @@ export function MyCommandCell({ edit, cancel, approvalResponse, requestApproval,
 
       return (
         <td className={this.props.className + " k-command-cell"} style={this.props.style}>
-          <DropDownButton items={iconItems} text={'Edit'} icon={'more-vertical'} look="flat" onItemClick={(e) => { onItemClick(e); }} />
+          <DropDownButton items={iconItems} text={'Edit'} icon={'more-vertical'} look="flat" onItemClick={(e) => onItemClick(e)} />
           {
             needsApproval &&
-            <Button style={{ marginTop: '2px', marginBottom: '2px' }} primary={true} onClick={(e) => { approvalResponse(dataItem); }}>Approve/Deny</Button>
+            <Button style={{ marginTop: '2px', marginBottom: '2px' }} primary={true} onClick={(e) => approvalResponse(dataItem)}>Approve/Deny</Button>
           }
         </td>
       );

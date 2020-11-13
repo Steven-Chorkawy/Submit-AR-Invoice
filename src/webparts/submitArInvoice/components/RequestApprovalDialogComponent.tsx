@@ -52,9 +52,7 @@ export class RequestApprovalDialogComponent extends React.Component<any, any> {
     //#region Render Methods
     private onRenderFooterContent = (props) => (
         <div>
-            <PrimaryButton onClick={(e) => {
-                this.props.onSave(this.state);
-            }} styles={buttonStyles}>Save</PrimaryButton>
+            <PrimaryButton onClick={(e) => this.props.onSave(this.state)} styles={buttonStyles}>Save</PrimaryButton>
             <DefaultButton onClick={this.props.onDismiss}>Cancel</DefaultButton>
         </div>
     )

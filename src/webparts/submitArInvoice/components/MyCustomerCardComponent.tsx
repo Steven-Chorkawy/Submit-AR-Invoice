@@ -45,11 +45,11 @@ export class MyCustomerCardComponent extends React.Component<any, any> {
           </CardBody>
           <CardActions>
             <span className="k-button k-flat k-primary"
-              onClick={(e) => {
+              onClick={(e) =>
                 this.setState({
                   showMore: !this.state.showMore
-                });
-              }}
+                })
+              }
             >
               {
                 this.state.showMore
