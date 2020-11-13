@@ -99,7 +99,7 @@ export class ApprovalDialogContainer extends React.Component<any, IApprovalDialo
 
     public render() {
         return (
-            <Dialog onClose={this.props.cancel} title={this.state.approvalRequest.Request_x0020_Type} minWidth="200px" width="60%" height="80%">
+            <Dialog onClose={this.props.cancel} title={this.state.approvalRequest.Request_x0020_Type} minWidth="500px" width="60%" height="80%">
                 <div className={'k-card-deck'} style={{ marginBottom: "16px" }}>
                     <Card style={formRowStyle}>
                         <CardBody>
