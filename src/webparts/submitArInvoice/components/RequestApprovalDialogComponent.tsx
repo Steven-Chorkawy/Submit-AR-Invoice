@@ -8,6 +8,7 @@ import { Card, CardTitle, CardBody, CardSubtitle } from '@progress/kendo-react-l
 import { Label, Error, Hint, FloatingLabel } from '@progress/kendo-react-labels';
 import { Panel, PanelType, PrimaryButton, DefaultButton, Dropdown, TextField } from '@fluentui/react';
 import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
+import { ActionStepsComponent } from './ActionStepsComponent';
 
 import { InvoiceActionRequestTypes } from './enums/MyEnums';
 
@@ -105,6 +106,11 @@ export class RequestApprovalDialogComponent extends React.Component<any, any> {
                         <div style={{ marginBottom: '15px' }}>
                             <TextField label="Description" multiline rows={5} onChange={this._DescriptionChange} />
                         </div>
+                    </CardBody>
+                </Card>
+                <Card>
+                    <CardBody>
+                        <ActionStepsComponent actions={this.props.dataItem.Actions} />
                     </CardBody>
                 </Card>
             </Panel>
