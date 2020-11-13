@@ -49,7 +49,7 @@ export class MyCancelDialogContainer extends React.Component<IMyEditDialogContai
           <button
             className="k-button"
             onClick={this.props.cancel}
-          >Cancel</button>
+          >Close</button>
         </DialogActionsBar>
       </Dialog>
     );

@@ -5,6 +5,9 @@ import { Stepper, Step, CardSubtitle } from '@progress/kendo-react-layout';
 import { Card, CardTitle, CardBody, CardActions } from '@progress/kendo-react-layout';
 import { Button } from '@progress/kendo-react-buttons';
 
+import { ActivityItem, IActivityItemProps, Link, mergeStyleSets } from 'office-ui-fabric-react';
+import Moment from 'react-moment';
+
 import { IInvoiceAction } from './interface/InvoiceItem';
 import { InvoiceActionResponseStatus } from './enums/MyEnums';
 import { IInvoiceActionRequired, InvoiceActionRequiredRequestType } from './interface/IInvoiceActionRequired';
@@ -15,31 +18,66 @@ interface IActionStepsComponentProps {
     onAddNewApproval?: any;
 }
 
+const classNames = mergeStyleSets({
+    exampleRoot: {
+        marginTop: '20px',
+    },
+    nameText: {
+        fontWeight: 'bold',
+    },
+});
+
+const parseActionType = (action) => {
+    let output = 'k-i-info';
+    switch (action.Request_x0020_Type) {
+        case InvoiceActionRequiredRequestType.DepartmentApprovalRequired:
+        case InvoiceActionRequiredRequestType.AccountantApprovalRequired:
+        case InvoiceActionRequiredRequestType.AccountingClerk2ApprovalRequired:
+            output = 'k-i-check';
+            break;
+        case InvoiceActionRequiredRequestType.EditRequired:
+            output = 'k-i-edit';
+            break;
+        default:
+            break;
+    }
+
+    if (action.Response_x0020_Status === InvoiceActionResponseStatus.Rejected || action.Response_x0020_Status === InvoiceActionResponseStatus.Denied) {
+        output = 'k-i-close';
+    }
+
+    return output;
+}
+
 const CustomStep = (props) => {
     return (
         <Step {...props}>
-            <span className="k-step-indicator">
-                <span className={`k-step-indicator-icon k-icon ${props.icon}`}></span>
+            <span className="k-step-indicator" title={props.Request_x0020_Type}>
+                <span className={`k-step-indicator-icon k-icon ${parseActionType(props)}`}></span>
             </span>
             <Card
-                // style={{ width: '500px' }}
+                style={{ marginBottom: '5px' }}
                 type={
                     props.Response_x0020_Status === InvoiceActionResponseStatus.Waiting ? 'info' :
                         props.Response_x0020_Status === InvoiceActionResponseStatus.Approved ? 'success' :
                             props.Response_x0020_Status === InvoiceActionResponseStatus.Denied || props.Response_x0020_Status === InvoiceActionResponseStatus.Rejected ? 'error' :
                                 ''
                 }>
-                <CardBody>
-                    <CardTitle>{props.label}</CardTitle>
-                    <CardSubtitle>
-                        {
-                            props.Response_x0020_Status === InvoiceActionResponseStatus.Waiting ?
-                                `Waiting for ${props.AssignedTo.Title}` :
-                                `${props.Response_x0020_Status} by ${props.AssignedTo.Title}`
-                        }
-                    </CardSubtitle>
-                    {props.Response_x0020_Message && <p>"{props.Response_x0020_Message}"</p>}
-                </CardBody>
+                <ActivityItem
+                    {
+                    ...{
+                        label: props.Request_x0020_Type,
+                        isValid: props.Response_x0020_Status === InvoiceActionResponseStatus.Denied ? false : true,
+                        activityDescription: [
+                            <span>{props.Response_x0020_Status === InvoiceActionResponseStatus.Waiting ? `Waiting for ` : `${props.Response_x0020_Status} by `}</span>,
+                            <b>{props.AssignedTo.Title}</b>
+                        ],
+                        comments: props.Response_x0020_Message ? props.Response_x0020_Message : '',
+                        timeStamp: <div style={{ paddingTop: '5px' }}><span title='Created'><Moment format="MM/DD/YYYY">{props.Created}</Moment></span> | <span title='Modified'><Moment format="MM/DD/YYYY">{props.Modified}</Moment></span></div>
+                    }
+                    }
+                    key={props.ID}
+                />
             </Card>
         </Step>
     );
@@ -51,44 +89,11 @@ export class ActionStepsComponent extends React.Component<IActionStepsComponentP
         super(props);
     }
 
-    private _parseActionType = (action) => {
-        let output = 'k-i-info';
-        switch (action.Request_x0020_Type) {
-            case InvoiceActionRequiredRequestType.DepartmentApprovalRequired:
-            case InvoiceActionRequiredRequestType.AccountantApprovalRequired:
-            case InvoiceActionRequiredRequestType.AccountingClerk2ApprovalRequired:
-                output = 'k-i-check';
-                break;
-            case InvoiceActionRequiredRequestType.EditRequired:
-                output = 'k-i-edit';
-                break;
-            default:
-                break;
-        }
-
-        if (action.Response_x0020_Status === InvoiceActionResponseStatus.Rejected || action.Response_x0020_Status === InvoiceActionResponseStatus.Denied) {
-            output = 'k-i-close';
-        }
-
-        return output;
-    }
-
     public render() {
         return (
             <div>
                 <Stepper
-                    items={
-                        this.props.actions.map(action => {
-                            return ({
-                                icon: this._parseActionType(action),
-                                label: action.Request_x0020_Type,
-                                isValid: action.Response_x0020_Status === InvoiceActionResponseStatus.Denied ? false : true,
-                                AssignedTo: action.AssignedTo,
-                                Response_x0020_Status: action.Response_x0020_Status,
-                                Response_x0020_Message: action.Response_x0020_Message
-                            });
-                        })
-                    }
+                    items={this.props.actions}
                     item={CustomStep}
                     value={
                         this.props.actions.map(el => el.Response_x0020_Status).lastIndexOf(InvoiceActionResponseStatus.Approved)

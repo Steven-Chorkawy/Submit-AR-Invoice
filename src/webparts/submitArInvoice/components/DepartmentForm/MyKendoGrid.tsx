@@ -856,7 +856,6 @@ export function MyCommandCell({ edit, cancel, approvalResponse, requestApproval,
       super(props);
     }
 
-
     public render() {
       const { dataItem } = this.props;
       const needsApproval: Boolean = dataItem.Actions.some(y => y.Response_x0020_Status === InvoiceActionResponseStatus.Waiting && y.AssignedToId === currentUser.Id);
@@ -892,10 +891,10 @@ export function MyCommandCell({ edit, cancel, approvalResponse, requestApproval,
 
       return (
         <td className={this.props.className + " k-command-cell"} style={this.props.style}>
-          <DropDownButton items={iconItems} text={'Edit'} icon={'more-vertical'} look="flat" onItemClick={(e) => onItemClick(e)} />
+          <SplitButton items={iconItems} text={'Edit'} icon={'edit'} look="flat" onButtonClick={e => edit(dataItem)} onItemClick={(e) => onItemClick(e)} />
           {
             needsApproval &&
-            <Button style={{ marginTop: '2px', marginBottom: '2px' }} primary={true} onClick={(e) => approvalResponse(dataItem)}>Approve/Deny</Button>
+            <Button style={{ marginTop: '4px', marginBottom: '4px' }} primary={true} onClick={(e) => approvalResponse(dataItem)}>Approve/Deny</Button>
           }
         </td>
       );
