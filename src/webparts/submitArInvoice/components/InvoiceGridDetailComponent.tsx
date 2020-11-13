@@ -2,9 +2,7 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 
 // Kendo Imports
-import {
-  GridDetailRow
-} from '@progress/kendo-react-grid';
+import { GridDetailRow } from '@progress/kendo-react-grid';
 
 import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/kendo-react-layout';
 
@@ -22,39 +20,30 @@ export class InvoiceGridDetailComponent extends GridDetailRow {
 
   private detailItem: IInvoiceItem;
 
-  public render() {    
+  private _bsColClassNames = 'col-lg-4 col-sm-12';
+  private _maxWidth = '1000px';
+
+  public render() {
     return (
-      <div style={{ marginBottom: '3em;' }}>
-        <h3>G/L Accounts</h3>
-        <AccountListComponent
-          accounts={this.props.dataItem.AccountDetails}
-          editable={false}
-        />
-        <hr />
-        {
-          this.detailItem.CancelRequests &&
-          <div>
-            {
-              this.detailItem.CancelRequests.length > 0 &&
-              <div>
-                <h3>Cancel Requests</h3>
-                <Card style={{ width: 600 }} type='error'>
-                  {this.detailItem.CancelRequests.map(cancelReq => {
-                    return (
-                      <CardBody>
-                        <CardTitle>{cancelReq.Requested_x0020_By.EMail} - {cancelReq.Created}</CardTitle>
-                        <p>"{cancelReq.Requester_x0020_Comments}"</p>
-                        <hr />
-                      </CardBody>
-                    );
-                  })}
-                </Card>
-              </div>
-            }
-          </div>
-        }
-        <h3>Actions Required</h3>
-        <ActionStepsComponent actions={this.detailItem.Actions} />
+      <div style={{ maxWidth: this._maxWidth }}>
+        {console.log('Grid Detail Row.')}
+        {console.log(this.props.dataItem)}
+        <div className={'row'}>
+          {
+            this.props.dataItem.Actions && this.props.dataItem.Actions.length > 0 &&
+            <div className={this._bsColClassNames}>
+              <Card>
+                <CardBody>
+                  <CardTitle>Approval Requests</CardTitle>
+                  <ActionStepsComponent actions={this.props.dataItem.Actions} />
+                </CardBody>
+              </Card>
+            </div>
+          }
+
+          <div className={this._bsColClassNames}>2</div>
+          <div className={this._bsColClassNames}>3</div>
+        </div>
       </div>
     );
   }
