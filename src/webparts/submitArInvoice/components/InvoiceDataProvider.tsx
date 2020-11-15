@@ -293,9 +293,58 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
  * @param callBack 
  */
 const QueryOrdersDate = (e: any, callBack: Function) => {
+  const OrderStatus = ['Pending', 'Approved', 'Deny', 'Void'];
+
+  // * .getAll() alone is the only method that works on large lists. 
+  // * https://pnp.github.io/pnpjs/v1/sp/docs/items/#get-all-items
+  // * .top() and .filter() will result in no items returned. 
   sp.web.lists.getByTitle(MyLists.Orders).items.getAll().then(response => {
-    callBack(response);
-  })
+    for (let index = 0; index < OrderStatus.length; index++) {
+      const status = OrderStatus[index];
+      console.log(status);
+      console.log(response.filter(f => { return f.Status === status }));
+    }
+
+    if (e.filterEq) {
+      callBack(response.filter(f => { return f[e.filterEq.field] === e.filterEq.value }));
+    } else {
+      callBack(response);
+    }
+  }).catch(reason => {
+    console.log('Oh No!');
+    console.log(reason);
+  });
+}
+
+// From here https://pnp.github.io/pnpjs/v1/sp/docs/items/#update-multiple-items
+const _UpdateOrders = (orders) => {
+  let list = sp.web.lists.getByTitle(MyLists.Orders);
+
+  const OrderStatus = ['Pending', 'Approved', 'Deny', 'Void'];
+
+  list.getListItemEntityTypeFullName().then(entityTypeFullName => {
+    let batch = sp.web.createBatch();
+
+    orders = orders.filter(f => f.Status === null);
+
+    console.log(`Orders: ${orders.length}`)
+    console.log(orders);
+
+    for (let index = 0; index < orders.length; index++) {
+      const order = orders[index];
+      const randomStatus = OrderStatus[Math.floor(Math.random() * OrderStatus.length)];
+      list.items.getById(order.ID).inBatch(batch).update({ Status: randomStatus }, "*", entityTypeFullName);
+    }
+
+    batch.execute().then(d => {
+      console.log("Done");
+      console.log(d);
+    }).catch(reason => {
+      console.log(`Batch Failed!`);
+      console.log(reason);
+    });
+
+  });
 }
 
 
@@ -317,7 +366,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
 
     this.pending = toODataString(this.props.dataState);
 
-    QueryOrdersDate({}, (response) => {
+    QueryOrdersDate({ filterEq: { field: 'Status', value: 'Approved' } }, (response) => {
       console.log('QueryOrdersDate');
       console.log(response);
     });
