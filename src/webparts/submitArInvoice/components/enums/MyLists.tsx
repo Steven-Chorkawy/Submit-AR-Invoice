@@ -24,5 +24,9 @@ export enum MyLists {
   // Freshly submitted AR Requests before they are converted into 'AR Invoice Requests'.
   ReceiveARInvoiceRequest = 'ReceiveARInvoiceRequest',
 
-  Customers = 'Customers'
+  Customers = 'Customers',
+
+
+  // ! This is a test list.
+  Orders = 'Orders'
 }

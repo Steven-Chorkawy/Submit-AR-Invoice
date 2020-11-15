@@ -269,8 +269,7 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
 
             // Add the customer data.
             // The reason I'm doing this here and not in the extend is because some fields from the customer list weren't working!!!
-            if(processedResponse.data[index].CustomerId)
-            {
+            if (processedResponse.data[index].CustomerId) {
               let customer = await sp.web.lists.getByTitle(MyLists.Customers).items.getById(processedResponse.data[index].CustomerId).get();
               processedResponse.data[index].Customer = customer;
             }
@@ -287,6 +286,18 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
         });
     });
 };
+
+/**
+ * 
+ * @param e 
+ * @param callBack 
+ */
+const QueryOrdersDate = (e: any, callBack: Function) => {
+  sp.web.lists.getByTitle(MyLists.Orders).items.getAll().then(response => {
+    callBack(response);
+  })
+}
+
 
 class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IInvoiceDataProviderState> {
   constructor(props) {
@@ -306,6 +317,7 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
 
     this.pending = toODataString(this.props.dataState);
 
+    //TODO: Make another one of these...
     QueryInvoiceData(
       {
         filterState: this.props.filterState,
@@ -368,6 +380,9 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
   }
 
   public render() {
+
+    QueryOrdersDate({}, (response) => { console.log('QueryOrdersDate'); console.log(response); });
+
     this.requestARRequestsIfNeeded();
     this.requestStatusData();
     this.requestSiteUsers();
