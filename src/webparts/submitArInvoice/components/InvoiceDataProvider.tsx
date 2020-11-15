@@ -317,7 +317,11 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
 
     this.pending = toODataString(this.props.dataState);
 
-    //TODO: Make another one of these...
+    QueryOrdersDate({}, (response) => {
+      console.log('QueryOrdersDate');
+      console.log(response);
+    });
+
     QueryInvoiceData(
       {
         filterState: this.props.filterState,
@@ -380,9 +384,6 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
   }
 
   public render() {
-
-    QueryOrdersDate({}, (response) => { console.log('QueryOrdersDate'); console.log(response); });
-
     this.requestARRequestsIfNeeded();
     this.requestStatusData();
     this.requestSiteUsers();
