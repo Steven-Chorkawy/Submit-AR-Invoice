@@ -302,11 +302,11 @@ const QueryOrdersDate = (e: any, callBack: Function) => {
     for (let index = 0; index < OrderStatus.length; index++) {
       const status = OrderStatus[index];
       console.log(status);
-      console.log(response.filter(f => { return f.Status === status }));
+      console.log(response.filter(f => { return f.Status === status; }));
     }
 
     if (e.filterEq) {
-      callBack(response.filter(f => { return f[e.filterEq.field] === e.filterEq.value }));
+      callBack(response.filter(f => { return f[e.filterEq.field] === e.filterEq.value; }));
     } else {
       callBack(response);
     }
@@ -314,7 +314,7 @@ const QueryOrdersDate = (e: any, callBack: Function) => {
     console.log('Oh No!');
     console.log(reason);
   });
-}
+};
 
 // From here https://pnp.github.io/pnpjs/v1/sp/docs/items/#update-multiple-items
 const _UpdateOrders = (orders) => {
@@ -327,7 +327,7 @@ const _UpdateOrders = (orders) => {
 
     orders = orders.filter(f => f.Status === null);
 
-    console.log(`Orders: ${orders.length}`)
+    console.log(`Orders: ${orders.length}`);
     console.log(orders);
 
     for (let index = 0; index < orders.length; index++) {
@@ -345,7 +345,7 @@ const _UpdateOrders = (orders) => {
     });
 
   });
-}
+};
 
 
 class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IInvoiceDataProviderState> {
