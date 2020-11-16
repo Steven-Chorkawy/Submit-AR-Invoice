@@ -28,7 +28,7 @@ const MyItemRender = props => {
     );
 };
 
-export class OrdersListView extends React.Component<any,any> {
+export class OrdersListView extends React.Component<any, any> {
     constructor(props) {
         super(props);
         debugger;
@@ -40,7 +40,8 @@ export class OrdersListView extends React.Component<any,any> {
             };
         });
     }
-    scrollHandler = (event) => {
+
+    private scrollHandler = (event) => {
         const e = event.nativeEvent;
         if (e.target.scrollTop + 10 >= e.target.scrollHeight - e.target.clientHeight) {
             const moreData = this.state.availableData.splice(0, 6);
@@ -50,15 +51,17 @@ export class OrdersListView extends React.Component<any,any> {
         }
     }
 
-    render() {
+    public render() {
         return (
-            <ListView
-                onScroll={this.scrollHandler}
-                data={this.state.data}
-                item={MyItemRender}
-                style={{ width: "100%", height: 530 }}
-                header={MyHeader}
-            />
+            this.state.data ?
+                <ListView
+                    onScroll={this.scrollHandler}
+                    data={this.state.data}
+                    item={MyItemRender}
+                    style={{ width: "100%", height: 530 }}
+                    header={MyHeader}
+                /> :
+                <h1>Loading...</h1>
         );
     }
 }
