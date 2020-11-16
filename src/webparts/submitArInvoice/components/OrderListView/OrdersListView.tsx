@@ -33,8 +33,8 @@ export class OrdersListView extends React.Component<any, any> {
         super(props);
         debugger;
         this.state = {
-            availableData: [],
-            data: []
+            availableData: undefined,
+            data: undefined
         };
 
         QueryOrdersDate({}, (orders) => {
