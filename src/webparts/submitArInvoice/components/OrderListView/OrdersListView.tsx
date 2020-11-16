@@ -8,7 +8,7 @@ import { QueryInvoiceData, QueryOrdersDate } from '../InvoiceDataProvider';
 const MyHeader = () => {
     return (
         <ListViewHeader style={{ color: 'rgb(160, 160, 160)', fontSize: 14 }} className='pl-4 pb-2 pt-2'>
-            Top European destinations
+            List View Header
         </ListViewHeader>
     );
 }
@@ -16,13 +16,12 @@ const MyHeader = () => {
 const MyItemRender = props => {
     return (
         <Card style={{ width: 180, boxShadow: 'none', flex: '0 0 25.33%', margin: 25, border: 'none' }} >
-            <CardImage src={`https://gist.github.com/simonssspirit/0db46d4292ea8e335eb18544718e2624/raw/54748432143492082bf60eee16c1c681f4d6270f/${props.dataItem.Image}`} style={{ height: 150, width: 180 }} />
             <div style={{ padding: 0 }}>
                 <CardTitle style={{ fontSize: 14 }}>
-                    {props.dataItem.Destination}
+                    {props.dataItem.Title}
                 </CardTitle>
                 <CardSubtitle style={{ fontSize: 12, marginTop: 0 }}>
-                    {props.dataItem.Text}
+                    {props.dataItem.Status}
                 </CardSubtitle>
             </div>
         </Card>
