@@ -59,7 +59,7 @@ export class OrdersListView extends React.Component<any, any> {
     MyHeader = () => {
         return (
             <ListViewHeader style={{ color: 'rgb(160, 160, 160)', fontSize: 14 }} className='pl-4 pb-2 pt-2'>
-                List View Header 
+                List View Header {this.state.data.length}/{this.state.availableData.length}
             </ListViewHeader>
         );
     };
