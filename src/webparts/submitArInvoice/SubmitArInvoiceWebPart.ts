@@ -174,6 +174,8 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
           OrdersListView,
           { context: this.context }
         );
+
+        ReactDom.render(ordersListView, this.domElement);
         break;
 
       default:
