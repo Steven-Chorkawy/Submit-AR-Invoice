@@ -57,12 +57,11 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
         };
 
         QueryOrdersDate({}, (orders) => {
-            debugger;
-            const o = orders;
-            //let visibleData = orders.splice(0, 12);
+            // Create a new variable by reference. Changes made to 'a' will be reflected in 'b'.
+            // let a = b
+            // Create a new variable by value instead of reference. Changes made in 'visibleData' will not be reflected in 'orders'.
             let visibleData = orders.slice(0);
 
-            debugger;
             this.setState({
                 availableData: visibleData,
                 orders: orders,
@@ -71,14 +70,13 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
             });
         });
     }
-    
+
     private scrollHandler = (event) => {
         const e = event.nativeEvent;
         if (e.target.scrollTop + 10 >= e.target.scrollHeight - e.target.clientHeight) {
             const moreData = this.state.availableData.splice(0, 6);
             if (moreData.length > 0) {
-                debugger;
-                this.setState({ data: this.state.data.concat(moreData), orders: this.state.orders });
+                this.setState({ data: this.state.data.concat(moreData) });
             }
         }
     }
