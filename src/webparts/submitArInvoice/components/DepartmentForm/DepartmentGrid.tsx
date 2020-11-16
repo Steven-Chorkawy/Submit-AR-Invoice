@@ -23,7 +23,7 @@ import "@pnp/sp/items";
 // Import my stuff.
 import IARInvoice from '../IARInvoice';
 import { filterBy, orderBy, groupBy } from '@progress/kendo-data-query';
-import { MyEditDialogContainer } from './MyEditDialogContainer';
+import { DepartmentGridEditDialogContainer } from './DepartmentGridEditDialogContainer';
 import { ApprovalDialogContainer } from '../ApprovalDialogContainer';
 import { RequestApprovalDialogComponent } from '../RequestApprovalDialogComponent';
 import { MyCancelDialogContainer } from './MyCancelDialogContainer';
@@ -754,7 +754,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
         </Grid>
         {
           this.state.productInEdit ?
-            <MyEditDialogContainer
+            <DepartmentGridEditDialogContainer
               context={this.props.context}
               dataItem={this.state.productInEdit}
               customers={this.props.customers}

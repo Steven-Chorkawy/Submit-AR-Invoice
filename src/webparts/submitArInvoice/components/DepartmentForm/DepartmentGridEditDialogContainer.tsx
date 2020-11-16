@@ -23,7 +23,7 @@ import { IInvoiceItem } from '../interface/InvoiceItem';
 import { InvoiceActionResponseStatus } from '../enums/MyEnums';
 import { MyLists } from '../enums/MyLists';
 
-interface IMyEditDialogContainerState {
+interface IDepartmentGridEditDialogContainerState {
   productInEdit: IInvoiceItem;
   customerList: any;
   receivedCustomerList: any;
@@ -63,7 +63,7 @@ function GridButtons({ cancel, saveResult }) {
   );
 }
 
-export class MyEditDialogContainer extends React.Component<any, IMyEditDialogContainerState> {
+export class DepartmentGridEditDialogContainer extends React.Component<any, IDepartmentGridEditDialogContainerState> {
   constructor(props) {
     super(props);
     this.state = {
