@@ -357,7 +357,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
   }
 
   public render() {
-    this.state.currentUser ? null : this.setCurrentUserState();
+    !this.state.currentUser && this.setCurrentUserState();
     return (
       this.state.currentUser ?
         <div style={{ padding: '5px' }} key={this.state.stateHolder ? this.state.stateHolder : 0}>
