@@ -5,42 +5,33 @@ import { Card, CardTitle, CardImage, CardSubtitle } from '@progress/kendo-react-
 
 import { QueryInvoiceData, QueryOrdersDate } from '../InvoiceDataProvider';
 
-// const MyHeader = () => {
-//     return (
-//         <ListViewHeader style={{ color: 'rgb(160, 160, 160)', fontSize: 14 }} className='pl-4 pb-2 pt-2'>
-//             List View Header 
-//         </ListViewHeader>
-//     );
-// };
 
-const MyItemRender = props => {
-    return (
-        <Card style={{ width: 180, boxShadow: 'none', flex: '0 0 25.33%', margin: 25, border: 'none' }} >
-            <div style={{ padding: 0 }}>
-                <CardTitle style={{ fontSize: 14 }}>
-                    {props.dataItem.Title}
-                </CardTitle>
-                <CardSubtitle style={{ fontSize: 12, marginTop: 0 }}>
-                    {props.dataItem.Status}
-                </CardSubtitle>
-            </div>
-        </Card>
-    );
-};
 
-export class OrdersListView extends React.Component<any, any> {
+interface IOrdersListViewState {
+    // Data that we have but do not want visible yet.
+    availableData?: any[];
+
+    // Data tht we want visible.
+    data?: any[];
+
+    // All Orders
+    orders?: any[];
+}
+
+export class OrdersListView extends React.Component<any, IOrdersListViewState> {
     constructor(props) {
         super(props);
-        debugger;
+        
         this.state = {
             availableData: undefined,
-            data: undefined
+            data: undefined,
+            orders: undefined
         };
 
         QueryOrdersDate({}, (orders) => {
-            debugger;
             this.setState({
                 availableData: orders,
+                orders: orders,
                 data: orders.splice(0, 12)
             });
         });
@@ -56,11 +47,26 @@ export class OrdersListView extends React.Component<any, any> {
         }
     }
 
-    MyHeader = () => {
+    private MyHeader = () => {
         return (
             <ListViewHeader style={{ color: 'rgb(160, 160, 160)', fontSize: 14 }} className='pl-4 pb-2 pt-2'>
-                List View Header {this.state.data.length}/{this.state.availableData.length}
+                List View Header {this.state.data.length}/{this.state.orders.length}
             </ListViewHeader>
+        );
+    };
+
+    private MyItemRender = props => {
+        return (
+            <Card style={{ width: 180, boxShadow: 'none', flex: '0 0 25.33%', margin: 25, border: 'none' }} >
+                <div style={{ padding: 0 }}>
+                    <CardTitle style={{ fontSize: 14 }}>
+                        {props.dataItem.Title}
+                    </CardTitle>
+                    <CardSubtitle style={{ fontSize: 12, marginTop: 0 }}>
+                        {props.dataItem.Status}
+                    </CardSubtitle>
+                </div>
+            </Card>
         );
     };
 
@@ -70,7 +76,7 @@ export class OrdersListView extends React.Component<any, any> {
                 <ListView
                     onScroll={this.scrollHandler}
                     data={this.state.data}
-                    item={MyItemRender}
+                    item={this.MyItemRender}
                     style={{ width: "100%", height: 530 }}
                     header={this.MyHeader}
                 /> :
