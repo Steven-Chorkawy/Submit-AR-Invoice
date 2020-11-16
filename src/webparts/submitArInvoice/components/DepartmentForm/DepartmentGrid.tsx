@@ -40,7 +40,7 @@ import { IMySaveResult } from '../interface/IMySaveResult';
 import { QuickFilterButtonGroup } from '../QuickFilterButtonGroup';
 
 
-type MyKendoGridState = {
+type DepartmentGridState = {
   data: any;
   receivedData: Array<IInvoiceItem>;
   filter: any;
@@ -56,7 +56,7 @@ type MyKendoGridState = {
   saveResult?: IMySaveResult;
 };
 
-export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
+export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
   constructor(props) {
     super(props);
 
