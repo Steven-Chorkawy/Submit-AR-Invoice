@@ -447,4 +447,4 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
 
 
 
-export { InvoiceDataProvider, QueryInvoiceData };
+export { InvoiceDataProvider, QueryInvoiceData, QueryOrdersDate };
