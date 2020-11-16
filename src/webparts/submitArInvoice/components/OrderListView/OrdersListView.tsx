@@ -186,7 +186,7 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
                 availableData: visibleData,
                 orders: orders,
                 ordersCount: orders.length,
-                data: visibleData.splice(0, 12)
+                data: visibleData.splice(0, 50)
             });
         });
     }
@@ -194,7 +194,8 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
     private scrollHandler = (event) => {
         const e = event.nativeEvent;
         if (e.target.scrollTop + 10 >= e.target.scrollHeight - e.target.clientHeight) {
-            const moreData = this.state.availableData.splice(0, 6);
+            const nMoreRecords = 50;
+            const moreData = this.state.availableData.splice(0, nMoreRecords);
             if (moreData.length > 0) {
                 this.setState({ data: this.state.data.concat(moreData) });
             }
