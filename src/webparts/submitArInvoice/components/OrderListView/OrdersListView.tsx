@@ -5,12 +5,12 @@ import { ListView, ListViewHeader } from '@progress/kendo-react-listview';
 import { Card, CardTitle, CardImage, CardSubtitle } from '@progress/kendo-react-layout';
 import { Input } from '@progress/kendo-react-inputs';
 import { FloatingLabel } from '@progress/kendo-react-labels';
+import { filterBy } from '@progress/kendo-data-query';
 
 import { Shimmer, ShimmerElementType, IShimmerElement } from 'office-ui-fabric-react/lib/Shimmer';
 
 
 import { QueryInvoiceData, QueryOrdersDate } from '../InvoiceDataProvider';
-
 
 
 interface IOrdersListViewState {
@@ -26,6 +26,23 @@ interface IOrdersListViewState {
     ordersCount: number;
 
     searchValue?: any;
+
+
+    // filter: {
+    //     logic: 'and', 
+    //     filters: [
+    //         { field: 'UnitPrice', operator: 'gt', value: 20 },
+    //         { field: 'UnitPrice', operator: 'lt', value: 50 },
+    //         { field: 'Discontinued', operator: 'eq', value: false },
+    //         {
+    //             logic: 'or', filters: [
+    //                 { field: 'ProductName', operator: 'contains', value: 'organic' },
+    //                 { field: 'ProductName', operator: 'contains', value: 'cranberry' },
+    //             ]
+    //         }
+    //     ]
+    // }
+    filter?: any;
 }
 
 export class OrdersListView extends React.Component<any, IOrdersListViewState> {
@@ -36,28 +53,47 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
             availableData: undefined,
             data: undefined,
             orders: undefined,
-            ordersCount: 0
+            ordersCount: 0,
         };
 
         QueryOrdersDate({}, (orders) => {
+            debugger;
+            const o = orders;
+            //let visibleData = orders.splice(0, 12);
+            let visibleData = orders.slice(0);
+
+            debugger;
             this.setState({
-                availableData: orders,
+                availableData: visibleData,
                 orders: orders,
                 ordersCount: orders.length,
-                data: orders.splice(0, 12)
+                data: visibleData.splice(0, 12)
             });
         });
     }
-
+    
     private scrollHandler = (event) => {
         const e = event.nativeEvent;
         if (e.target.scrollTop + 10 >= e.target.scrollHeight - e.target.clientHeight) {
             const moreData = this.state.availableData.splice(0, 6);
             if (moreData.length > 0) {
-                this.setState({ data: this.state.data.concat(moreData) });
+                debugger;
+                this.setState({ data: this.state.data.concat(moreData), orders: this.state.orders });
             }
         }
     }
+
+    private onFilterChange = (event) => {
+        console.log(this.state.orders);
+        console.log(this.state.ordersCount);
+        let filterRes = filterBy(this.state.orders, event.filter);
+        this.setState({
+            filter: event.filter,
+            availableData: filterRes,
+            data: filterRes.splice(0, 12)
+        });
+    }
+
 
     private MyHeader = () => {
         return (
@@ -71,11 +107,28 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
                     id={'search'}
                     style={{ width: '100%' }}
                     value={this.state.searchValue}
-                    onChange={(e) => { this.setState({ searchValue: e['value'] }); }}
+                    onChange={(e) => {
+                        // ? Why does VS Code say that e can't have value??????
+                        // TODO: Try using this line of code at work. 
+                        //let value = e.value;
+                        let value = e['value'];
+                        this.setState({ searchValue: value });
+                        this.onFilterChange({
+                            filter: {
+                                logic: 'or',
+                                filters: [
+                                    { field: 'Title', operator: 'contains', value: value },
+                                    { field: 'Status', operator: 'contains', value: value },
+                                ]
+                            }
+                        });
+                    }}
                 />
             </FloatingLabel>
         );
     };
+
+
 
     private MyItemRender = props => {
         let cardTypes = {
@@ -83,7 +136,8 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
             Approved: 'success',
             Deny: 'error',
             void: 'warning'
-        }
+        };
+
         return (
             <Card type={cardTypes[props.dataItem.Status]} style={{ margin: '5px' }} >
                 <div style={{ padding: 0 }}>
@@ -95,8 +149,8 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
                     </CardSubtitle>
                 </div>
             </Card>
-        );
-    };
+        )
+    }
 
 
 
