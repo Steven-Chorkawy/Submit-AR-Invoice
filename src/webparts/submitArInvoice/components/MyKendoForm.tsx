@@ -143,9 +143,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
         Title: newARTitle,
         Department: dataItem.Department,
         Date: dataItem.Date,
-        Requested_x0020_ById: dataItem.Requested_x0020_By
-          ? dataItem.Requested_x0020_By.Id
-          : await (await this.getUserByEmail(this.props.context.pageContext.user.email)).Id,
+        Requested_x0020_ById: await (await this.getUserByEmail(this.props.context.pageContext.user.email)).Id,
         Requires_x0020_Authorization_x0020_ById: {
           'results': dataItem.RequiresAuthorizationBy.map((user) => { return user.Id; })
         },
