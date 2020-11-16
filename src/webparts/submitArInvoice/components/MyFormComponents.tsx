@@ -1,8 +1,12 @@
-
 import * as React from 'react';
 
+// PNP Imports
 import { sp } from "@pnp/sp";
+import { Web } from "@pnp/sp/webs";
+import "@pnp/sp/profiles";
+import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
 
+// Kendo Imports
 import { FieldWrapper } from '@progress/kendo-react-form';
 import {
   Input, MaskedTextBox, NumericTextBox,
@@ -17,9 +21,11 @@ import { Label, Error, Hint, FloatingLabel } from '@progress/kendo-react-labels'
 import { Upload } from '@progress/kendo-react-upload';
 import { DropDownList, AutoComplete, MultiSelect, ComboBox } from '@progress/kendo-react-dropdowns';
 
-import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
+// Office UI Imports
+import { Persona, PersonaSize } from 'office-ui-fabric-react/lib/Persona';
+import { Shimmer, ShimmerElementsGroup, ShimmerElementType } from 'office-ui-fabric-react/lib/Shimmer';
 
-
+// My Imports
 import { MyCustomerCardComponent } from './MyCustomerCardComponent';
 
 export const FormInput = (fieldRenderProps) => {
@@ -355,7 +361,7 @@ export const FormUpload = (fieldRenderProps) => {
   const errorId = showValidationMessage ? `${id}_error` : '';
   const labelId = label ? `${id}_label` : '';
 
-  const onChangeHandler = (event) => {   
+  const onChangeHandler = (event) => {
     fieldRenderProps.onChange({ value: event.newState });
 
     if (fieldRenderProps.myOnChange) {
@@ -410,7 +416,7 @@ export const FormAutoUpload = (fieldRenderProps) => {
   const hindId = showHint ? `${id}_hint` : '';
   const errorId = showValidationMessage ? `${id}_error` : '';
   const labelId = label ? `${id}_label` : '';
- 
+
   return (
     <FieldWrapper>
       <Label id={labelId} editorId={id} editorValid={valid} optional={optional}>
@@ -420,11 +426,11 @@ export const FormAutoUpload = (fieldRenderProps) => {
         id={id}
         valid={valid}
         autoUpload={false}
-        onAdd={e => {      
+        onAdd={e => {
           fieldRenderProps.onChange({ value: e.newState });
           fieldRenderProps.myOnAdd(e);
         }}
-        onRemove={e => {                  
+        onRemove={e => {
           fieldRenderProps.onChange({ value: e.newState });
           fieldRenderProps.myOnRemove(e);
         }}
@@ -891,5 +897,83 @@ export const FormPeoplePicker = (fieldRenderProps) => {
         <Hint id={hindId}>{hint}</Hint>
       }
     </FieldWrapper>
+  );
+};
+
+export const FormPersonaDisplay = (fieldRenderProps) => {
+  const { label, value, id, hint, wrapperStyle, context, ...others } = fieldRenderProps;
+  const hindId = `${id}_hint`;
+
+  const [user, setUser] = React.useState(fieldRenderProps.user === undefined ? undefined : fieldRenderProps.user);
+  
+  // siteUser is only requried to set the user state. 
+  // if user state is set we *should be able to find everything we need in there. 
+  const [siteUser, setSiteUser] = React.useState(undefined);
+
+  let web = Web(context.pageContext.web.absoluteUrl);
+
+  // Get siteUser object.
+  // * What we are really after here is the users LoginName. 
+  if (user === undefined && siteUser === undefined) {
+    if (fieldRenderProps.userId) {
+      web.siteUsers.getById(fieldRenderProps.userId).get().then(res => {
+        setSiteUser(res);
+      });
+    }
+    else if (fieldRenderProps.userEmail) {
+      web.siteUsers.getByEmail(fieldRenderProps.userEmail).get().then(res => {
+        setSiteUser(res);
+      });
+    }
+  }
+
+  // Get all user properties. 
+  if (user === undefined && siteUser !== undefined) {
+    sp.profiles.getPropertiesFor(siteUser.LoginName).then(userProperties => {
+      // This converts UserProfileProperties from an array of key value pairs [{Key:'', Value: ''},{Key:'', Value: ''}]
+      // Into an array of objects [{'Key': 'Value'}, {'Key: 'Value'}]
+      let props = {};
+      userProperties.UserProfileProperties.map(p => {
+        props[p.Key] = p.Value;
+      });
+      userProperties['Props'] = { ...props };
+      setUser(userProperties);
+    });
+  }
+
+  return (
+    <FieldWrapper style={wrapperStyle}>
+      <Label>
+        {label}
+      </Label>
+      {
+        user ?
+          <Persona
+            imageUrl={user.PictureUrl}
+            imageInitials={`${user.Props['FirstName'].charAt(0)} ${user.Props['LastName'].charAt(0)}`}
+            text={`${user.Props['FirstName']} ${user.Props['LastName']}`}
+            size={PersonaSize.size40}
+            secondaryText={user.Title}
+          /> :
+          <div style={{ display: 'flex' }}>
+            <ShimmerElementsGroup
+              shimmerElements={[
+                { type: ShimmerElementType.circle, height: 40 },
+                { type: ShimmerElementType.gap, width: 16, height: 40 },
+              ]}
+            />
+            <ShimmerElementsGroup
+              flexWrap
+              width="100%"
+              shimmerElements={[
+                { type: ShimmerElementType.line, width: '100%', height: 10, verticalAlign: 'bottom' },
+                { type: ShimmerElementType.line, width: '90%', height: 8 },
+                { type: ShimmerElementType.gap, width: '10%', height: 20 },
+              ]}
+            />
+          </div>
+      }
+
+    </FieldWrapper >
   );
 };

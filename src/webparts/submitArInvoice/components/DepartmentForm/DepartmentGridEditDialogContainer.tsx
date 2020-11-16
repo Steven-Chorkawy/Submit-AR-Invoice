@@ -127,6 +127,15 @@ export class DepartmentGridEditDialogContainer extends React.Component<any, IDep
                 <div className={'col-sm-6'}>
                   <div style={{ display: 'block', justifyContent: 'space-between' }}>
                     <Field
+                      id="Requested_x0020_By"
+                      name="Requested_x0020_By"
+                      label="Requested By"
+                      wrapperStyle={{ width: '100%' }}
+                      context={this.props.context}
+                      userId={this.state.productInEdit.Requested_x0020_ById}
+                      component={MyFormComponents.FormPersonaDisplay}
+                    />
+                    <Field
                       id="Department"
                       name="Department"
                       label="* Department"
@@ -153,17 +162,6 @@ export class DepartmentGridEditDialogContainer extends React.Component<any, IDep
                       component={MyFormComponents.FormDatePicker}
                       validator={MyValidators.dateValidator}
                       wrapperStyle={{ width: '100%' }}
-                    />
-                    <Field
-                      id="Requested_x0020_By"
-                      name="Requested_x0020_By"
-                      label="* Requested By"
-                      wrapperStyle={{ width: '100%' }}
-                      data={this.props.siteUsers}
-                      dataItemKey="Email"
-                      textField="Title"
-                      validator={MyValidators.requestedByValidator}
-                      component={MyFormComponents.FormComboBox}
                     />
                     <Field
                       id="Urgent"

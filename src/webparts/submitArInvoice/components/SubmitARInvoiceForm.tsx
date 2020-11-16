@@ -98,7 +98,7 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
 
   private setCurrentUserState = async () => {
     // If state is already set we do not need to run this function again. 
-    if(this.state.currentUser !== undefined) {
+    if (this.state.currentUser !== undefined) {
       return;
     }
 
@@ -388,21 +388,15 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
                 <legend className={'k-form-legend'}>ACCOUNTS RECEIVABLE - INVOICE REQUISITION </legend>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <FieldWrapper>
-                    <Label>
-                      Requested By
-                  </Label>
-                    {
-                      this.state.currentUser &&
-                      <Persona
-                        imageUrl={this.state.currentUser.PictureUrl}
-                        imageInitials={`${this.state.currentUser.Props['FirstName'].charAt(0)} ${this.state.currentUser.Props['LastName'].charAt(0)}`}
-                        text={`${this.state.currentUser.Props['FirstName']} ${this.state.currentUser.Props['LastName']}`}
-                        size={PersonaSize.size40}
-                        secondaryText={this.state.currentUser.Title}
-                      />
-                    }
-                  </FieldWrapper>
+                  <Field
+                    id="Requested_x0020_By"
+                    name="Requested_x0020_By"
+                    label="Requested By"
+                    wrapperStyle={{ width: '100%' }}
+                    context={this.props.context}
+                    user={this.state.currentUser}
+                    component={MyFormComponents.FormPersonaDisplay}
+                  />
 
                   <Field
                     id={'Date'}
