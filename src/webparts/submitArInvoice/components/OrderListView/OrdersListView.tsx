@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import { ListView, ListViewHeader } from '@progress/kendo-react-listview';
+import { ListView } from '@progress/kendo-react-listview';
 import { Card, CardTitle, CardImage, CardBody, CardSubtitle } from '@progress/kendo-react-layout';
 import { Input } from '@progress/kendo-react-inputs';
 import { FloatingLabel } from '@progress/kendo-react-labels';
@@ -9,11 +9,19 @@ import { filterBy } from '@progress/kendo-data-query';
 import { ChipList, Chip } from '@progress/kendo-react-buttons';
 import { DropDownList } from '@progress/kendo-react-dropdowns';
 
-import { Shimmer, ShimmerElementType, IShimmerElement } from 'office-ui-fabric-react/lib/Shimmer';
+import { Shimmer } from 'office-ui-fabric-react/lib/Shimmer';
 
+import { QueryOrdersDate } from '../InvoiceDataProvider';
 
-import { QueryInvoiceData, QueryOrdersDate } from '../InvoiceDataProvider';
-
+//PnPjs Imports
+import { sp } from "@pnp/sp";
+import { Web } from "@pnp/sp/webs";
+import "@pnp/sp/webs";
+import "@pnp/sp/files";
+import "@pnp/sp/folders";
+import "@pnp/sp/lists";
+import "@pnp/sp/items";
+import { MyLists } from '../enums/MyLists';
 
 const STATUS_OPTIONS = [
     {
@@ -106,7 +114,7 @@ class OrdersListViewItemRender extends React.Component<any, any> {
                             <div className='k-hbox k-justify-content-between k-flex-wrap'>
                                 <div style={{ width: '40%', padding: '5 0' }}>
                                     <CardTitle style={{ fontSize: 16 }}>
-                                        {item.Title}
+                                        {item.ID} | {item.Title}
                                     </CardTitle>
                                     <CardSubtitle>
                                         {item.Status}
@@ -129,7 +137,7 @@ interface IOrdersListViewState {
     // Data that we have but do not want visible yet.
     availableData?: any[];
 
-    // Data tht we want visible.
+    // Data that we want visible.
     data?: any[];
 
     // All Orders
@@ -204,6 +212,19 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
         });
     }
 
+    private onOrderSave = (e) => {
+        sp.web.lists.getByTitle(MyLists.Orders).items.getById(e.ID).update({ Title: e.Title, Status: e.Status }).then(value => {
+            value.item.get().then(item => {
+                let d = this.state.data;
+                let indexOf = this.state.data.findIndex(f => f.ID === item.ID);
+                d[indexOf] = { ...item };
+                this.setState({
+                    data: d
+                });
+            });
+        });
+    }
+
     private MyHeader = () => {
         return (
             <div>
@@ -215,7 +236,6 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
                 >
                     <Input
                         id={'search'}
-                        disabled={true}
                         style={{ width: '100%' }}
                         value={this.state.searchValue}
                         onChange={(e) => {
@@ -258,9 +278,9 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
                 />
             </div>
         );
-    };
+    };    
 
-    private MyItemRender = props => <OrdersListViewItemRender {...props} saveItem={e => console.log(e)} deleteItem={e => console.log(e)} />
+    private MyItemRender = props => <OrdersListViewItemRender {...props} saveItem={this.onOrderSave} deleteItem={e => console.log(e)} />
 
     public render() {
         return (
