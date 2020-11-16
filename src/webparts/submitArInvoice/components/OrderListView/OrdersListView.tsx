@@ -32,12 +32,17 @@ export class OrdersListView extends React.Component<any, any> {
     constructor(props) {
         super(props);
         debugger;
+        this.state = {
+            availableData: [],
+            data: []
+        };
+
         QueryOrdersDate({}, (orders) => {
             debugger;
-            this.state = {
+            this.setState({
                 availableData: orders,
                 data: orders.splice(0, 12)
-            };
+            });
         });
     }
 
