@@ -29,6 +29,7 @@ import * as strings from 'SubmitArInvoiceWebPartStrings';
 import { MyForm } from './components/MyKendoForm';
 import { MyFinanceForm } from './components/FinanceForms/MyFinanceForm';
 import { MyKendoGrid } from './components/DepartmentForm/MyKendoGrid';
+import { OrdersListView } from './components/OrderListView/OrdersListView';
 import { DepartmentListView } from './components/DepartmentForm/DepartmentListView';
 import { IMyFormProps } from './components/IMyFormProps';
 
@@ -42,7 +43,8 @@ export enum ActiveDisplay {
   CreateARForm = 1,
   DepartmentForm = 2,
   FinanceForm = 3,
-  DepartmentListView = 4
+  DepartmentListView = 4,
+  OrdersListView = 5
 }
 
 
@@ -167,6 +169,13 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
         ReactDom.render(financeForm, this.domElement);
         break;
 
+      case ActiveDisplay.OrdersListView:
+        let ordersListView: React.ReactElement = React.createElement(
+          OrdersListView,
+          { context: this.context }
+        );
+        break;
+
       default:
         break;
     }
@@ -194,7 +203,7 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
                     { key: ActiveDisplay.CreateARForm, text: 'Create AR Form' },
                     { key: ActiveDisplay.DepartmentForm, text: 'Departments Form' },
                     { key: ActiveDisplay.FinanceForm, text: 'Finance Form' },
-                    { key: ActiveDisplay.DepartmentListView, text: 'Department List View' },
+                    { key: ActiveDisplay.OrdersListView, text: 'Orders List View' },
                   ]
                 }),
               ]
