@@ -26,11 +26,10 @@ import './custom.css';
 // ? What is this for ?
 import * as strings from 'SubmitArInvoiceWebPartStrings';
 
-import { MyForm } from './components/MyKendoForm';
+import { SubmitARInvoiceForm, IMyFormProps } from './components/SubmitARInvoiceForm';
 import { MyFinanceForm } from './components/FinanceForms/MyFinanceForm';
 import { MyKendoGrid } from './components/DepartmentForm/MyKendoGrid';
 import { DepartmentListView } from './components/DepartmentForm/DepartmentListView';
-import { IMyFormProps } from './components/IMyFormProps';
 
 export interface ISubmitArInvoiceWebPartProps {
   description: string;
@@ -127,7 +126,7 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
           })
           .then(_ => {
             let departmentElement: React.ReactElement<IMyFormProps> = React.createElement(
-              MyForm,
+              SubmitARInvoiceForm,
               { context: this.context, properties: this.properties, ...this.myFormProps }
             );
             ReactDom.render(departmentElement, this.domElement);

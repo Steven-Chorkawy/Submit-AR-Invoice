@@ -24,7 +24,6 @@ import { Shimmer } from 'office-ui-fabric-react/lib/Shimmer';
 
 // My custom imports
 import * as MyFormComponents from './MyFormComponents';
-import { IMyFormProps } from './IMyFormProps';
 import { IUploadingFile } from './IMyFormState';
 import * as MyValidators from './validators.jsx';
 import { MyGLAccountComponent } from './MyGLAccountComponent';
@@ -61,7 +60,13 @@ interface ISPUser {
   Title: string;
 }
 
-export class MyForm extends React.Component<IMyFormProps, any> {
+export interface IMyFormProps {
+  siteUsers: any;
+  customerList: any;
+  context: any;
+}
+
+export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
   private _siteUrl: string;
 
   constructor(props) {
@@ -86,11 +91,17 @@ export class MyForm extends React.Component<IMyFormProps, any> {
       customerList: this.props.customerList,
       receivedCustomerList: this.props.customerList,
       standardTerms: [],
+      currentUser: undefined,
       ...props
     };
   }
 
   private setCurrentUserState = async () => {
+    // If state is already set we do not need to run this function again. 
+    if(this.state.currentUser !== undefined) {
+      return;
+    }
+
     let user = await this.getUserByEmail(this.props.context.pageContext.user.email);
     let userProperties = await sp.profiles.getPropertiesFor(user.LoginName);
 
@@ -357,7 +368,7 @@ export class MyForm extends React.Component<IMyFormProps, any> {
   }
 
   public render() {
-    !this.state.currentUser && this.setCurrentUserState();
+    this.setCurrentUserState();
     return (
       this.state.currentUser ?
         <div style={{ padding: '5px' }} key={this.state.stateHolder ? this.state.stateHolder : 0}>
