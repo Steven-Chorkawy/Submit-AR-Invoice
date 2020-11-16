@@ -6,6 +6,7 @@ import { Card, CardTitle, CardImage, CardSubtitle } from '@progress/kendo-react-
 import { Input } from '@progress/kendo-react-inputs';
 import { FloatingLabel } from '@progress/kendo-react-labels';
 import { filterBy } from '@progress/kendo-data-query';
+import { ChipList, Chip } from '@progress/kendo-react-buttons';
 
 import { Shimmer, ShimmerElementType, IShimmerElement } from 'office-ui-fabric-react/lib/Shimmer';
 
@@ -26,7 +27,7 @@ interface IOrdersListViewState {
     ordersCount: number;
 
     searchValue?: any;
-
+    selectedChips?: any[];
 
     // filter: {
     //     logic: 'and', 
@@ -84,7 +85,7 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
     private onFilterChange = (event) => {
         console.log(this.state.orders);
         console.log(this.state.ordersCount);
-        let filterRes = filterBy(this.state.orders, event.filter);
+        let filterRes = filterBy(this.state.orders, event.filter).slice(0);
         this.setState({
             filter: event.filter,
             availableData: filterRes,
@@ -95,34 +96,78 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
 
     private MyHeader = () => {
         return (
-            <FloatingLabel
-                label={`List View Header ${this.state.data.length}/${this.state.ordersCount} | ${this.state.orders.length}`}
-                editorId={'search'}
-                editorValue={this.state.searchValue}
-                style={{ width: '100%' }}
-            >
-                <Input
-                    id={'search'}
+            <div>
+                <FloatingLabel
+                    label={`List View Header ${this.state.data.length}/${this.state.ordersCount} | ${this.state.orders.length}`}
+                    editorId={'search'}
+                    editorValue={this.state.searchValue}
                     style={{ width: '100%' }}
-                    value={this.state.searchValue}
+                >
+                    <Input
+                        id={'search'}
+                        disabled={true}
+                        style={{ width: '100%' }}
+                        value={this.state.searchValue}
+                        onChange={(e) => {
+                            // ? Why does VS Code say that e can't have value??????
+                            // TODO: Try using this line of code at work. 
+                            //let value = e.value;
+                            let value = e['value'];
+                            this.setState({ searchValue: value });
+                            this.onFilterChange({
+                                filter: {
+                                    logic: 'or',
+                                    filters: [
+                                        { field: 'Title', operator: 'contains', value: value },
+                                        { field: 'Status', operator: 'contains', value: value },
+                                    ]
+                                }
+                            });
+                        }}
+                    />
+                </FloatingLabel>
+                <ChipList
+                    style={{ marginTop: '5px', marginBottom: '5px' }}
+                    defaultData={[
+                        {
+                            text: 'Pending',
+                            value: 'Pending',
+                            type: 'info'
+                        },
+                        {
+                            text: 'Approved',
+                            value: 'Approved',
+                            type: 'success'
+                        },
+                        {
+                            text: 'Deny',
+                            value: 'Deny',
+                            type: 'error'
+                        },
+                        {
+                            text: 'Void',
+                            value: 'Void',
+                            type: 'none'
+                        },
+                    ]}
+                    selection={'multiple'}
                     onChange={(e) => {
-                        // ? Why does VS Code say that e can't have value??????
-                        // TODO: Try using this line of code at work. 
-                        //let value = e.value;
-                        let value = e['value'];
-                        this.setState({ searchValue: value });
+                        // e.value is an array of values from defaultData.
+                        this.setState({ selectedChips: e.value });
                         this.onFilterChange({
                             filter: {
                                 logic: 'or',
-                                filters: [
-                                    { field: 'Title', operator: 'contains', value: value },
-                                    { field: 'Status', operator: 'contains', value: value },
-                                ]
+                                filters: e.value.map(f => {
+                                    return { field: 'Status', operator: 'contains', value: f }
+                                })
                             }
                         });
                     }}
+                    chip={(props) =>
+                        <Chip {...props} type={props.dataItem.type} />
+                    }
                 />
-            </FloatingLabel>
+            </div>
         );
     };
 
@@ -133,7 +178,7 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
             Pending: 'info',
             Approved: 'success',
             Deny: 'error',
-            void: 'warning'
+            void: null
         };
 
         return (
