@@ -3,6 +3,9 @@ import * as ReactDOM from 'react-dom';
 import { ListView, ListViewHeader } from '@progress/kendo-react-listview';
 import { Card, CardTitle, CardImage, CardSubtitle } from '@progress/kendo-react-layout';
 
+import { Shimmer, ShimmerElementType, IShimmerElement } from 'office-ui-fabric-react/lib/Shimmer';
+
+
 import { QueryInvoiceData, QueryOrdersDate } from '../InvoiceDataProvider';
 
 
@@ -67,7 +70,7 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
             void: 'warning'
         }
         return (
-            <Card type={cardTypes[props.dataItem.Status]} style={{ width: 180, boxShadow: 'none', flex: '0 0 25.33%', margin: 25, border: 'none' }} >
+            <Card type={cardTypes[props.dataItem.Status]} >
                 <div style={{ padding: 0 }}>
                     <CardTitle style={{ fontSize: 14 }}>
                         {props.dataItem.Title}
@@ -90,7 +93,11 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
                     style={{ width: "100%", height: 530 }}
                     header={this.MyHeader}
                 /> :
-                <h1>Loading...</h1>
+                <div>
+                    <Shimmer />
+                    <Shimmer width="75%" />
+                    <Shimmer width="50%" />
+                </div>
         );
     }
 }
