@@ -11,7 +11,7 @@ const MyHeader = () => {
             List View Header
         </ListViewHeader>
     );
-}
+};
 
 const MyItemRender = props => {
     return (
@@ -26,11 +26,14 @@ const MyItemRender = props => {
             </div>
         </Card>
     );
-}
+};
+
 export class OrdersListView extends React.Component<any,any> {
     constructor(props) {
         super(props);
+        debugger;
         QueryOrdersDate({}, (orders) => {
+            debugger;
             this.state = {
                 availableData: orders,
                 data: orders.splice(0, 12)
