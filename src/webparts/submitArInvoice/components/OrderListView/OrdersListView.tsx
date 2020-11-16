@@ -1,7 +1,10 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+
 import { ListView, ListViewHeader } from '@progress/kendo-react-listview';
 import { Card, CardTitle, CardImage, CardSubtitle } from '@progress/kendo-react-layout';
+import { Input } from '@progress/kendo-react-inputs';
+import { FloatingLabel } from '@progress/kendo-react-labels';
 
 import { Shimmer, ShimmerElementType, IShimmerElement } from 'office-ui-fabric-react/lib/Shimmer';
 
@@ -21,6 +24,8 @@ interface IOrdersListViewState {
     orders?: any[];
 
     ordersCount: number;
+
+    searchValue?: any;
 }
 
 export class OrdersListView extends React.Component<any, IOrdersListViewState> {
@@ -56,9 +61,19 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
 
     private MyHeader = () => {
         return (
-            <ListViewHeader style={{ color: 'rgb(160, 160, 160)', fontSize: 14 }} className='pl-4 pb-2 pt-2'>
-                List View Header {this.state.data.length}/{this.state.ordersCount} | {this.state.orders.length}
-            </ListViewHeader>
+            <FloatingLabel
+                label={`List View Header ${this.state.data.length}/${this.state.ordersCount} | ${this.state.orders.length}`}
+                editorId={'search'}
+                editorValue={this.state.searchValue}
+                style={{ width: '100%' }}
+            >
+                <Input
+                    id={'search'}
+                    style={{ width: '100%' }}
+                    value={this.state.searchValue}
+                    onChange={(e) => { this.setState({ searchValue: e['value'] }); }}
+                />
+            </FloatingLabel>
         );
     };
 
@@ -70,7 +85,7 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
             void: 'warning'
         }
         return (
-            <Card type={cardTypes[props.dataItem.Status]} >
+            <Card type={cardTypes[props.dataItem.Status]} style={{ margin: '5px' }} >
                 <div style={{ padding: 0 }}>
                     <CardTitle style={{ fontSize: 14 }}>
                         {props.dataItem.Title}
@@ -83,6 +98,8 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
         );
     };
 
+
+
     public render() {
         return (
             this.state.data ?
@@ -94,9 +111,15 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
                     header={this.MyHeader}
                 /> :
                 <div>
-                    <Shimmer />
-                    <Shimmer width="75%" />
-                    <Shimmer width="50%" />
+                    <div style={{ padding: 2 }}>
+                        <Shimmer />
+                    </div>
+                    <div style={{ padding: 2 }}>
+                        <Shimmer width="75%" />
+                    </div>
+                    <div style={{ padding: 2 }}>
+                        <Shimmer width="50%" />
+                    </div>
                 </div>
         );
     }
