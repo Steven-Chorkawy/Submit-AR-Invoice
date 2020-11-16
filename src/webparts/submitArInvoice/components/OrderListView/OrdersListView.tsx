@@ -5,13 +5,13 @@ import { Card, CardTitle, CardImage, CardSubtitle } from '@progress/kendo-react-
 
 import { QueryInvoiceData, QueryOrdersDate } from '../InvoiceDataProvider';
 
-const MyHeader = () => {
-    return (
-        <ListViewHeader style={{ color: 'rgb(160, 160, 160)', fontSize: 14 }} className='pl-4 pb-2 pt-2'>
-            List View Header
-        </ListViewHeader>
-    );
-};
+// const MyHeader = () => {
+//     return (
+//         <ListViewHeader style={{ color: 'rgb(160, 160, 160)', fontSize: 14 }} className='pl-4 pb-2 pt-2'>
+//             List View Header 
+//         </ListViewHeader>
+//     );
+// };
 
 const MyItemRender = props => {
     return (
@@ -56,6 +56,14 @@ export class OrdersListView extends React.Component<any, any> {
         }
     }
 
+    MyHeader = () => {
+        return (
+            <ListViewHeader style={{ color: 'rgb(160, 160, 160)', fontSize: 14 }} className='pl-4 pb-2 pt-2'>
+                List View Header 
+            </ListViewHeader>
+        );
+    };
+
     public render() {
         return (
             this.state.data ?
@@ -64,7 +72,7 @@ export class OrdersListView extends React.Component<any, any> {
                     data={this.state.data}
                     item={MyItemRender}
                     style={{ width: "100%", height: 530 }}
-                    header={MyHeader}
+                    header={this.MyHeader}
                 /> :
                 <h1>Loading...</h1>
         );
