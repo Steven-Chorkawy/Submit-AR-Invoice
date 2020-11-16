@@ -16,22 +16,26 @@ interface IOrdersListViewState {
 
     // All Orders
     orders?: any[];
+
+    ordersCount: number;
 }
 
 export class OrdersListView extends React.Component<any, IOrdersListViewState> {
     constructor(props) {
         super(props);
-        
+
         this.state = {
             availableData: undefined,
             data: undefined,
-            orders: undefined
+            orders: undefined,
+            ordersCount: 0
         };
 
         QueryOrdersDate({}, (orders) => {
             this.setState({
                 availableData: orders,
                 orders: orders,
+                ordersCount: orders.length,
                 data: orders.splice(0, 12)
             });
         });
@@ -50,14 +54,20 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
     private MyHeader = () => {
         return (
             <ListViewHeader style={{ color: 'rgb(160, 160, 160)', fontSize: 14 }} className='pl-4 pb-2 pt-2'>
-                List View Header {this.state.data.length}/{this.state.orders.length}
+                List View Header {this.state.data.length}/{this.state.ordersCount} | {this.state.orders.length}
             </ListViewHeader>
         );
     };
 
     private MyItemRender = props => {
+        let cardTypes = {
+            Pending: 'info',
+            Approved: 'success',
+            Deny: 'error',
+            void: 'warning'
+        }
         return (
-            <Card style={{ width: 180, boxShadow: 'none', flex: '0 0 25.33%', margin: 25, border: 'none' }} >
+            <Card type={cardTypes[props.dataItem.Status]} style={{ width: 180, boxShadow: 'none', flex: '0 0 25.33%', margin: 25, border: 'none' }} >
                 <div style={{ padding: 0 }}>
                     <CardTitle style={{ fontSize: 14 }}>
                         {props.dataItem.Title}
