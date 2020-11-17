@@ -37,6 +37,7 @@ export interface IPersonaComponentProps {
     userEmail?: string;
     user?: ISiteUserInfo;
     userProfile?: any;
+    personaSize?: PersonaSize;
 }
 
 interface IPersonaComponentState {
@@ -52,7 +53,7 @@ export class PersonaComponent extends React.Component<IPersonaComponentProps, IP
             userProfile: undefined
         };
 
-        if(this.props.userProfile) {
+        if (this.props.userProfile) {
             this.state = {
                 userProfile: this.props.userProfile
             };
@@ -100,7 +101,7 @@ export class PersonaComponent extends React.Component<IPersonaComponentProps, IP
                     imageUrl={user.PictureUrl}
                     imageInitials={`${user.Props['FirstName'].charAt(0)} ${user.Props['LastName'].charAt(0)}`}
                     text={`${user.Props['FirstName']} ${user.Props['LastName']}`}
-                    size={PersonaSize.size40}
+                    size={this.props.personaSize ? this.props.personaSize : PersonaSize.size40}
                     secondaryText={user.Title}
                 /> :
                 <div style={{ display: 'flex' }}>
