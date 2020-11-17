@@ -78,17 +78,17 @@ export class PersonaComponent extends React.Component<IPersonaComponentProps, IP
      * @param user ISiteUserInfo 
      */
     private setUserProfileStateFromSiteUser = (user: ISiteUserInfo) => {
-        sp.profiles.getPropertiesFor(user.LoginName).then(user => {
+        sp.profiles.getPropertiesFor(user.LoginName).then(userProfileRes => {
             // This converts UserProfileProperties from an array of key value pairs [{Key:'', Value: ''},{Key:'', Value: ''}]
             // Into an array of objects [{'Key': 'Value'}, {'Key: 'Value'}]
             let props = {};
-            user.UserProfileProperties.map(p => {
+            userProfileRes.UserProfileProperties.map(p => {
                 props[p.Key] = p.Value;
             });
-            user['Props'] = { ...props };
+            userProfileRes['Props'] = { ...props };
 
             this.setState({
-                userProfile: user
+                userProfile: userProfileRes
             });
         });
     }
