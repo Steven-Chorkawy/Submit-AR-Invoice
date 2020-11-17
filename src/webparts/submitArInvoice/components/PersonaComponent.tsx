@@ -36,6 +36,7 @@ export interface IPersonaComponentProps {
     userId?: number;
     userEmail?: string;
     user?: ISiteUserInfo;
+    userProfile?: any;
 }
 
 interface IPersonaComponentState {
@@ -51,7 +52,12 @@ export class PersonaComponent extends React.Component<IPersonaComponentProps, IP
             userProfile: undefined
         };
 
-        if (this.props.user) {
+        if(this.props.userProfile) {
+            this.state = {
+                userProfile: this.props.userProfile
+            };
+        }
+        else if (this.props.user) {
             this.setUserProfileStateFromSiteUser(this.props.user);
         }
         else if (this.props.userId) {
