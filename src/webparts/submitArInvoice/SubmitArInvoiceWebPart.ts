@@ -27,7 +27,7 @@ import './custom.css';
 import * as strings from 'SubmitArInvoiceWebPartStrings';
 
 import { SubmitARInvoiceForm, IMyFormProps } from './components/SubmitARInvoiceForm';
-import { MyFinanceForm } from './components/FinanceForms/MyFinanceForm';
+import { FinanceGrid } from './components/FinanceForms/FinanceGrid';
 import { DepartmentGrid } from './components/DepartmentForm/DepartmentGrid';
 import { DepartmentListView } from './components/DepartmentForm/DepartmentListView';
 
@@ -159,7 +159,7 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
 
       case ActiveDisplay.FinanceForm:
         let financeForm: React.ReactElement = React.createElement(
-          MyFinanceForm,
+          FinanceGrid,
           { context: this.context }
         );
 

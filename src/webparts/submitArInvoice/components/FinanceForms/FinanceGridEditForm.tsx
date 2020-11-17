@@ -38,7 +38,7 @@ export interface IGPAttachmentProps {
   errorMessage: string;
 }
 
-interface IInvoiceEditFormProps {
+interface IFinanceGridEditFormProps {
   GPAttachmentWidgetProps: IGPAttachmentProps;
   dataItem: IInvoiceItem;
   onSubmit: any;
@@ -86,7 +86,7 @@ function GridButtons({ cancel, saveResult }) {
   );
 }
 
-export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any> {
+export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormProps, any> {
   constructor(props) {
     super(props);
     this.state = {

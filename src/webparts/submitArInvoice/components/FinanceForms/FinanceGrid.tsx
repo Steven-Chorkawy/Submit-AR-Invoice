@@ -25,7 +25,7 @@ import { InvoiceStatus, MyGridStrings, MyContentTypes } from '../enums/MyEnums';
 import { ConvertQueryParamsToKendoFilter, BuildGUID, CreateInvoiceAction } from '../MyHelperMethods';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
-import { InvoiceEditForm, IGPAttachmentProps } from './InvoiceEditForm';
+import { FinanceGridEditForm, IGPAttachmentProps } from './FinanceGridEditForm';
 import { FileRefCell } from '../FileRefCell';
 import { IDCell } from '../IDCell';
 import { IMySaveResult } from '../interface/IMySaveResult';
@@ -33,7 +33,7 @@ import { InvoiceActionRequiredRequestType } from '../interface/IInvoiceActionReq
 import { QuickFilterButtonGroup } from '../QuickFilterButtonGroup';
 
 
-interface IMyFinanceFormState {
+interface IFinanceGridState {
   invoices: IInvoicesDataState;
   receivedData: IInvoicesDataState;
   dataState: any;
@@ -68,7 +68,7 @@ class CustomUrgentCell extends React.Component<any, any> {
   }
 }
 
-class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
+class FinanceGrid extends React.Component<any, IFinanceGridState> {
   constructor(props) {
     super(props);
 
@@ -1226,7 +1226,7 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
 
         {
           this.state.productInEdit &&
-          <InvoiceEditForm
+          <FinanceGridEditForm
             currentUser={this.state.currentUser}
             dataItem={this.state.productInEdit}
             statusData={this.state.statusData}
@@ -1276,4 +1276,4 @@ class MyFinanceForm extends React.Component<any, IMyFinanceFormState> {
   }
 }
 
-export { MyFinanceForm };
+export { FinanceGrid };
