@@ -12,6 +12,8 @@ import { IInvoiceAction } from './interface/InvoiceItem';
 import { InvoiceActionResponseStatus } from './enums/MyEnums';
 import { IInvoiceActionRequired, InvoiceActionRequiredRequestType } from './interface/IInvoiceActionRequired';
 
+import { PersonaComponent } from './PersonaComponent';
+import { PersonaSize } from '@fluentui/react';
 
 interface IActionStepsComponentProps {
     actions: Array<IInvoiceAction>;
@@ -70,7 +72,7 @@ const CustomStep = (props) => {
                         isValid: props.Response_x0020_Status === InvoiceActionResponseStatus.Denied ? false : true,
                         activityDescription: [
                             <span>{props.Response_x0020_Status === InvoiceActionResponseStatus.Waiting ? `Waiting for ` : `${props.Response_x0020_Status} by `}</span>,
-                            <b>{props.AssignedTo.Title}</b>
+                            <PersonaComponent userEmail={props.AssignedTo.EMail} personaSize={PersonaSize.size24} />
                         ],
                         comments: props.Response_x0020_Message ? props.Response_x0020_Message : '',
                         timeStamp: <div style={{ paddingTop: '5px' }}><span title='Created'><Moment format="MM/DD/YYYY">{props.Created}</Moment></span> | <span title='Modified'><Moment format="MM/DD/YYYY">{props.Modified}</Moment></span></div>

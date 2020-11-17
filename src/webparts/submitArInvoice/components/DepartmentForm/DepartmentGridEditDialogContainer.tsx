@@ -23,7 +23,7 @@ import { IInvoiceItem } from '../interface/InvoiceItem';
 import { InvoiceActionResponseStatus } from '../enums/MyEnums';
 import { MyLists } from '../enums/MyLists';
 
-interface IMyEditDialogContainerState {
+interface IDepartmentGridEditDialogContainerState {
   productInEdit: IInvoiceItem;
   customerList: any;
   receivedCustomerList: any;
@@ -63,7 +63,7 @@ function GridButtons({ cancel, saveResult }) {
   );
 }
 
-export class MyEditDialogContainer extends React.Component<any, IMyEditDialogContainerState> {
+export class DepartmentGridEditDialogContainer extends React.Component<any, IDepartmentGridEditDialogContainerState> {
   constructor(props) {
     super(props);
     this.state = {
@@ -127,6 +127,15 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                 <div className={'col-sm-6'}>
                   <div style={{ display: 'block', justifyContent: 'space-between' }}>
                     <Field
+                      id="Requested_x0020_By"
+                      name="Requested_x0020_By"
+                      label="Requested By"
+                      wrapperStyle={{ width: '100%' }}
+                      context={this.props.context}
+                      userId={this.state.productInEdit.Requested_x0020_ById}
+                      component={MyFormComponents.FormPersonaDisplay}
+                    />
+                    <Field
                       id="Department"
                       name="Department"
                       label="* Department"
@@ -153,17 +162,6 @@ export class MyEditDialogContainer extends React.Component<any, IMyEditDialogCon
                       component={MyFormComponents.FormDatePicker}
                       validator={MyValidators.dateValidator}
                       wrapperStyle={{ width: '100%' }}
-                    />
-                    <Field
-                      id="Requested_x0020_By"
-                      name="Requested_x0020_By"
-                      label="* Requested By"
-                      wrapperStyle={{ width: '100%' }}
-                      data={this.props.siteUsers}
-                      dataItemKey="Email"
-                      textField="Title"
-                      validator={MyValidators.requestedByValidator}
-                      component={MyFormComponents.FormComboBox}
                     />
                     <Field
                       id="Urgent"

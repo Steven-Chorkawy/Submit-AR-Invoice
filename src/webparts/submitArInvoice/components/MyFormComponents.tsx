@@ -1,8 +1,12 @@
-
 import * as React from 'react';
 
+// PNP Imports
 import { sp } from "@pnp/sp";
+import { Web } from "@pnp/sp/webs";
+import "@pnp/sp/profiles";
+import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
 
+// Kendo Imports
 import { FieldWrapper } from '@progress/kendo-react-form';
 import {
   Input, MaskedTextBox, NumericTextBox,
@@ -17,10 +21,13 @@ import { Label, Error, Hint, FloatingLabel } from '@progress/kendo-react-labels'
 import { Upload } from '@progress/kendo-react-upload';
 import { DropDownList, AutoComplete, MultiSelect, ComboBox } from '@progress/kendo-react-dropdowns';
 
-import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
+// Office UI Imports
+import { Persona, PersonaSize } from 'office-ui-fabric-react/lib/Persona';
+import { Shimmer, ShimmerElementsGroup, ShimmerElementType } from 'office-ui-fabric-react/lib/Shimmer';
 
-
+// My Imports
 import { MyCustomerCardComponent } from './MyCustomerCardComponent';
+import { PersonaComponent } from './PersonaComponent';
 
 export const FormInput = (fieldRenderProps) => {
   const { validationMessage, touched, label, id, valid, disabled, hint, type, optional, ...others } = fieldRenderProps;
@@ -355,7 +362,7 @@ export const FormUpload = (fieldRenderProps) => {
   const errorId = showValidationMessage ? `${id}_error` : '';
   const labelId = label ? `${id}_label` : '';
 
-  const onChangeHandler = (event) => {   
+  const onChangeHandler = (event) => {
     fieldRenderProps.onChange({ value: event.newState });
 
     if (fieldRenderProps.myOnChange) {
@@ -410,7 +417,7 @@ export const FormAutoUpload = (fieldRenderProps) => {
   const hindId = showHint ? `${id}_hint` : '';
   const errorId = showValidationMessage ? `${id}_error` : '';
   const labelId = label ? `${id}_label` : '';
- 
+
   return (
     <FieldWrapper>
       <Label id={labelId} editorId={id} editorValid={valid} optional={optional}>
@@ -420,11 +427,11 @@ export const FormAutoUpload = (fieldRenderProps) => {
         id={id}
         valid={valid}
         autoUpload={false}
-        onAdd={e => {      
+        onAdd={e => {
           fieldRenderProps.onChange({ value: e.newState });
           fieldRenderProps.myOnAdd(e);
         }}
-        onRemove={e => {                  
+        onRemove={e => {
           fieldRenderProps.onChange({ value: e.newState });
           fieldRenderProps.myOnRemove(e);
         }}
@@ -890,6 +897,21 @@ export const FormPeoplePicker = (fieldRenderProps) => {
         hint &&
         <Hint id={hindId}>{hint}</Hint>
       }
+    </FieldWrapper>
+  );
+};
+
+export const FormPersonaDisplay = (fieldRenderProps) => {
+  const { label, value, id, hint, wrapperStyle, context, ...others } = fieldRenderProps;
+  const hindId = `${id}_hint`;
+
+
+  return (
+    <FieldWrapper style={wrapperStyle}>
+      <Label>
+        {label}
+      </Label>
+      <PersonaComponent {...fieldRenderProps} />
     </FieldWrapper>
   );
 };

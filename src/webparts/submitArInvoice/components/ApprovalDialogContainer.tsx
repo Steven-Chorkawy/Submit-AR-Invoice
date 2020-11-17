@@ -22,6 +22,8 @@ import { MyLists } from './enums/MyLists';
 import { IInvoiceAction } from './interface/InvoiceItem';
 import { SendApprovalResponse } from './MyHelperMethods';
 import { ActionResponseComponent } from './ActionResponseComponent';
+import { PersonaComponent } from './PersonaComponent';
+import Moment from 'react-moment';
 
 
 
@@ -158,9 +160,9 @@ export class ApprovalDialogContainer extends React.Component<any, IApprovalDialo
                             <CardBody>
                                 <CardTitle><b>Request Details</b></CardTitle>
                                 <Label>Requested By:</Label>
-                                <p>{this.state.approvalRequest && this.state.approvalRequest.Author.EMail}</p>
+                                {this.state.approvalRequest && <PersonaComponent userEmail={this.state.approvalRequest.Author.EMail} />}
                                 <Label>Date:</Label>
-                                <p>{this.state.approvalRequest && this.state.approvalRequest.Created}</p>
+                                <p>{this.state.approvalRequest && <Moment format="D MMM YYYY">{this.state.approvalRequest.Created}</Moment>}</p>
                                 <Label>Note:</Label>
                                 <p>{this.state.approvalRequest.Body}</p>
                             </CardBody>

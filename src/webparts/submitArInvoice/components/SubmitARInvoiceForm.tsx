@@ -29,7 +29,7 @@ import * as MyValidators from './validators.jsx';
 import { MyGLAccountComponent } from './MyGLAccountComponent';
 import { BuildGUID } from './MyHelperMethods';
 import { MyLists } from './enums/MyLists';
-
+import './PersonaComponent';
 
 export interface IARFormModel {
   Title: string;
@@ -91,31 +91,11 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
       customerList: this.props.customerList,
       receivedCustomerList: this.props.customerList,
       standardTerms: [],
-      currentUser: undefined,
       ...props
     };
   }
 
-  private setCurrentUserState = async () => {
-    // If state is already set we do not need to run this function again. 
-    if(this.state.currentUser !== undefined) {
-      return;
-    }
 
-    let user = await this.getUserByEmail(this.props.context.pageContext.user.email);
-    let userProperties = await sp.profiles.getPropertiesFor(user.LoginName);
-
-    // This converts UserProfileProperties from an array of key value pairs [{Key:'', Value: ''},{Key:'', Value: ''}]
-    // Into an array of objects [{'Key': 'Value'}, {'Key: 'Value'}]
-    let props = {};
-    userProperties.UserProfileProperties.map(p => {
-      props[p.Key] = p.Value;
-    });
-
-    this.setState({
-      currentUser: { ...userProperties, Props: { ...props } }
-    });
-  }
 
   private getUserByEmail = async (email: string): Promise<ISPUser> => {
     let web = Web(this.props.context.pageContext.web.absoluteUrl);
@@ -368,9 +348,7 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
   }
 
   public render() {
-    this.setCurrentUserState();
     return (
-      this.state.currentUser ?
         <div style={{ padding: '5px' }} key={this.state.stateHolder ? this.state.stateHolder : 0}>
           <Form
             onSubmit={this.handleSubmit}
@@ -388,21 +366,15 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
                 <legend className={'k-form-legend'}>ACCOUNTS RECEIVABLE - INVOICE REQUISITION </legend>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <FieldWrapper>
-                    <Label>
-                      Requested By
-                  </Label>
-                    {
-                      this.state.currentUser &&
-                      <Persona
-                        imageUrl={this.state.currentUser.PictureUrl}
-                        imageInitials={`${this.state.currentUser.Props['FirstName'].charAt(0)} ${this.state.currentUser.Props['LastName'].charAt(0)}`}
-                        text={`${this.state.currentUser.Props['FirstName']} ${this.state.currentUser.Props['LastName']}`}
-                        size={PersonaSize.size40}
-                        secondaryText={this.state.currentUser.Title}
-                      />
-                    }
-                  </FieldWrapper>
+                  <Field
+                    id="Requested_x0020_By"
+                    name="Requested_x0020_By"
+                    label="Requested By"
+                    wrapperStyle={{ width: '100%' }}
+                    context={this.props.context}
+                    userEmail={this.props.context.pageContext.user.email}
+                    component={MyFormComponents.FormPersonaDisplay}
+                  />
 
                   <Field
                     id={'Date'}
@@ -565,17 +537,6 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
                 {(this.state.MyFiles.length > 0) && this.UploadStatusCard()}
               </FormElement>
             )} />
-        </div> :
-        <div>
-          <div style={{ marginTop: '5px', marginBottom: '5px' }}>
-            <Shimmer />
-          </div>
-          <div style={{ marginTop: '5px', marginBottom: '5px' }}>
-            <Shimmer width="75%" />
-          </div>
-          <div style={{ marginTop: '5px', marginBottom: '5px' }}>
-            <Shimmer width="50%" />
-          </div>
         </div>
     );
   }

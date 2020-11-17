@@ -28,7 +28,7 @@ import * as strings from 'SubmitArInvoiceWebPartStrings';
 
 import { SubmitARInvoiceForm, IMyFormProps } from './components/SubmitARInvoiceForm';
 import { MyFinanceForm } from './components/FinanceForms/MyFinanceForm';
-import { MyKendoGrid } from './components/DepartmentForm/MyKendoGrid';
+import { DepartmentGrid } from './components/DepartmentForm/DepartmentGrid';
 import { DepartmentListView } from './components/DepartmentForm/DepartmentListView';
 
 export interface ISubmitArInvoiceWebPartProps {
@@ -137,7 +137,7 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
         Promise.all([this.getARInvoices(), this.getSiteUsers(), this.getCustomers()])
           .then((values) => {
             let depSearchElement: React.ReactElement = React.createElement(
-              MyKendoGrid,
+              DepartmentGrid,
               { context: this.context, properties: this.properties, data: values[0], siteUsers: values[1], customers: values[2] }
             );
 

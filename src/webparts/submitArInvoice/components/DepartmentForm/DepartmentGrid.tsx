@@ -23,7 +23,7 @@ import "@pnp/sp/items";
 // Import my stuff.
 import IARInvoice from '../IARInvoice';
 import { filterBy, orderBy, groupBy } from '@progress/kendo-data-query';
-import { MyEditDialogContainer } from './MyEditDialogContainer';
+import { DepartmentGridEditDialogContainer } from './DepartmentGridEditDialogContainer';
 import { ApprovalDialogContainer } from '../ApprovalDialogContainer';
 import { RequestApprovalDialogComponent } from '../RequestApprovalDialogComponent';
 import { MyCancelDialogContainer } from './MyCancelDialogContainer';
@@ -40,7 +40,7 @@ import { IMySaveResult } from '../interface/IMySaveResult';
 import { QuickFilterButtonGroup } from '../QuickFilterButtonGroup';
 
 
-type MyKendoGridState = {
+type DepartmentGridState = {
   data: any;
   receivedData: Array<IInvoiceItem>;
   filter: any;
@@ -56,7 +56,7 @@ type MyKendoGridState = {
   saveResult?: IMySaveResult;
 };
 
-export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
+export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
   constructor(props) {
     super(props);
 
@@ -754,7 +754,7 @@ export class MyKendoGrid extends React.Component<any, MyKendoGridState> {
         </Grid>
         {
           this.state.productInEdit ?
-            <MyEditDialogContainer
+            <DepartmentGridEditDialogContainer
               context={this.props.context}
               dataItem={this.state.productInEdit}
               customers={this.props.customers}
