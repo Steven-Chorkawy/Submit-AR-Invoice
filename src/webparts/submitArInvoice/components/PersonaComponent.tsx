@@ -48,7 +48,7 @@ interface IPersonaComponentState {
 export class PersonaComponent extends React.Component<IPersonaComponentProps, IPersonaComponentState> {
     constructor(props) {
         super(props);
-
+    
         this.state = {
             userProfile: undefined
         };
