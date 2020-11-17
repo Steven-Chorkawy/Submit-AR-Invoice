@@ -74,7 +74,7 @@ export class RequestApprovalCardComponent extends React.Component<IRequestApprov
                                 />
                                 : this.props.defaultUsers
                                     ? this.props.defaultUsers.map(userEMail => {
-                                        return <PersonaComponent userEmail={userEMail} />
+                                        return <PersonaComponent userEmail={userEMail} />;
                                     })
                                     // onPeoplePickerChange and defaultUsers are missing! 
                                     : <Error>... Something went wrong ...</Error>

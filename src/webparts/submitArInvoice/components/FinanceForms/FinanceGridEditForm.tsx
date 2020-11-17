@@ -32,6 +32,8 @@ import { MyLists } from '../enums/MyLists';
 import { IInvoiceItem } from '../interface/InvoiceItem';
 import { MyAttachmentComponent } from '../MyAttachmentComponent';
 import { RequestApprovalCardComponent } from '../RequestApprovalDialogComponent';
+import { ActionStepsComponent } from '../ActionStepsComponent';
+import { Label } from '@progress/kendo-react-labels';
 
 export interface IGPAttachmentProps {
   type: string;
@@ -124,120 +126,124 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
           render={(formRenderProps) => (
             <FormElement style={{ width: '100%' }}>
               {GridButtons({ cancel: this.props.cancel, saveResult: this.props.saveResult })}
-              <fieldset className={'k-form-fieldset'}>
-                <div style={{ marginBottom: "2px" }}>
-                  <Field
-                    id={'Invoice_x0020_Status'}
-                    name={'Invoice_x0020_Status'}
-                    label={'Status'}
-                    data={this.props.statusData}
-                    component={MyFormComponents.FormDropDownList}
-                  />
-                  {
-                    formRenderProps.valueGetter('Invoice_x0020_Status') === InvoiceStatus["Hold for Department"] &&
-                    this.state.productInEdit.Requested_x0020_By &&
-                    this.props.dataItem.Invoice_x0020_Status !== InvoiceStatus["Hold for Department"] &&
-                    < div >
-                      <hr />
-                      <RequestApprovalCardComponent
-                        context={this.props.context}
-                        defaultUsers={[this.state.productInEdit.Requested_x0020_By.EMail]}
-                        // Do nothing because there will only be one option. 
-                        onRequestTypeChange={e => { /**Do Nothing */ }}
-                        requestOptions={[{ key: InvoiceActionRequestTypes.EditRequired, text: InvoiceActionRequestTypes.EditRequired }]}
-                        requestType={InvoiceActionRequestTypes.EditRequired}
-                        onDescriptionChange={this.props.onNoteToDepChange}
-                      />
-                      <hr />
-                    </div>
-                  }
-                </div>
-                <div style={{ marginBottom: "2px" }}>
-                  <Field
-                    id={
-                      this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"]
-                        ? 'Requires_x0020_Accountant_x0020_'
-                        : 'Requires_x0020_Accountant_x0020_Approval'
+              <div className='row'>
+                <div className='col-sm-8'>
+                  <div style={{ marginBottom: "2px" }}>
+                    <Field
+                      id={'Invoice_x0020_Status'}
+                      name={'Invoice_x0020_Status'}
+                      label={'Status'}
+                      data={this.props.statusData}
+                      component={MyFormComponents.FormDropDownList}
+                    />
+                    {
+                      formRenderProps.valueGetter('Invoice_x0020_Status') === InvoiceStatus["Hold for Department"] &&
+                      this.state.productInEdit.Requested_x0020_By &&
+                      this.props.dataItem.Invoice_x0020_Status !== InvoiceStatus["Hold for Department"] &&
+                      <div>
+                        <RequestApprovalCardComponent
+                          context={this.props.context}
+                          defaultUsers={[this.state.productInEdit.Requested_x0020_By.EMail]}
+                          // Do nothing because there will only be one option. 
+                          onRequestTypeChange={e => { /**Do Nothing */ }}
+                          requestOptions={[{ key: InvoiceActionRequestTypes.EditRequired, text: InvoiceActionRequestTypes.EditRequired }]}
+                          requestType={InvoiceActionRequestTypes.EditRequired}
+                          onDescriptionChange={this.props.onNoteToDepChange}
+                        />
+                      </div>
                     }
-                    name={
-                      this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"]
-                        ? 'Requires_x0020_Accountant_x0020_'
-                        : 'Requires_x0020_Accountant_x0020_Approval'
+                  </div>
+                  <div style={{ marginBottom: "2px" }}>
+                    <Field
+                      id={
+                        this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"]
+                          ? 'Requires_x0020_Accountant_x0020_'
+                          : 'Requires_x0020_Accountant_x0020_Approval'
+                      }
+                      name={
+                        this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"]
+                          ? 'Requires_x0020_Accountant_x0020_'
+                          : 'Requires_x0020_Accountant_x0020_Approval'
+                      }
+                      label="Requires Approval From Accountant"
+                      data={this.props.siteUsersData}
+                      dataItemKey="Id"
+                      textField="Title"
+                      // * valueGetter is a very nice method! No need to set the state anymore.
+                      disabled={formRenderProps.valueGetter('Invoice_x0020_Status') !== InvoiceStatus["Accountant Approval Required"]}
+                      component={MyFormComponents.FormComboBox}
+                      hint={`To enable set status to 'Accountant Approval Required'`}
+                    />
+                  </div>
+                  <div style={{ marginBottom: '2px' }}
+                    hidden={
+                      formRenderProps.valueGetter('Invoice_x0020_Status') !== InvoiceStatus["Entered into GP"]
+                      && this.state.productInEdit.RequiresAccountingClerkTwoApprovId === null
                     }
-                    label="Requires Approval From Accountant"
-                    data={this.props.siteUsersData}
-                    dataItemKey="Id"
-                    textField="Title"
-                    // * valueGetter is a very nice method! No need to set the state anymore.
-                    disabled={formRenderProps.valueGetter('Invoice_x0020_Status') !== InvoiceStatus["Accountant Approval Required"]}
-                    component={MyFormComponents.FormComboBox}
-                    hint={`To enable set status to 'Accountant Approval Required'`}
-                  />
+                  >
+                    <Field
+                      id={
+                        this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"]
+                          ? 'RequiresAccountingClerkTwoApprov'
+                          : 'RequiresAccountingClerkTwoApproval'
+                      }
+                      name={
+                        this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"]
+                          ? 'RequiresAccountingClerkTwoApprov'
+                          : 'RequiresAccountingClerkTwoApproval'
+                      }
+                      label="Requires Approval From Accounting Clerk 2"
+                      data={this.props.siteUsersData}
+                      dataItemKey="Id"
+                      textField="Title"
+                      disabled={formRenderProps.valueGetter('Invoice_x0020_Status') !== InvoiceStatus["Entered into GP"]}
+                      component={MyFormComponents.FormComboBox}
+                      hint={`To enable set status to 'Entered into GP'`}
+                    />
+                  </div>
+                  <div style={{ marginBottom: "2px" }}>
+                    <Field
+                      id={'Invoice_x0020_Number'}
+                      name={'Invoice_x0020_Number'}
+                      label={'Invoice Number'}
+                      component={MyFormComponents.FormInput}
+                    />
+                  </div>
+                  <div style={{ marginBottom: "2px" }}>
+                    <Field
+                      id={'Batch_x0020_Number'}
+                      name={'Batch_x0020_Number'}
+                      label={'Batch Number'}
+                      component={MyFormComponents.FormInput}
+                    />
+                  </div>
+                  <div style={{ marginBottom: "2px" }}>
+                    <FieldArray
+                      name="GLAccounts"
+                      component={GLAccountsListViewComponent}
+                      value={this.state.productInEdit.AccountDetails}
+                      productInEdit={this.state.productInEdit}
+                      updateAccountDetails={this.props.updateAccountDetails}
+                    />
+                  </div>
+                  <div style={{ marginBottom: "2px" }}>
+                    <MyAttachmentComponent
+                      id="RelatedAttachments"
+                      cardTitle="Upload Related Attachments"
+                      productInEdit={this.state.productInEdit}
+                      context={this.props.context}
+                      documentLibrary={MyLists["Related Invoice Attachments"]}
+                      onAdd={this.props.onRelatedAttachmentAdd}
+                      onRemove={this.props.onRelatedAttachmentRemove}
+                    />
+                  </div>
+
                 </div>
-                <div
-                  style={{ marginBottom: '2px' }}
-                  hidden={
-                    formRenderProps.valueGetter('Invoice_x0020_Status') !== InvoiceStatus["Entered into GP"]
-                    && this.state.productInEdit.RequiresAccountingClerkTwoApprovId === null
-                  }
-                >
-                  <Field
-                    id={
-                      this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"]
-                        ? 'RequiresAccountingClerkTwoApprov'
-                        : 'RequiresAccountingClerkTwoApproval'
-                    }
-                    name={
-                      this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"]
-                        ? 'RequiresAccountingClerkTwoApprov'
-                        : 'RequiresAccountingClerkTwoApproval'
-                    }
-                    label="Requires Approval From Accounting Clerk 2"
-                    data={this.props.siteUsersData}
-                    dataItemKey="Id"
-                    textField="Title"
-                    disabled={formRenderProps.valueGetter('Invoice_x0020_Status') !== InvoiceStatus["Entered into GP"]}
-                    component={MyFormComponents.FormComboBox}
-                    hint={`To enable set status to 'Entered into GP'`}
-                  />
+                <div className='col-sm-4'>
+                  <Label>Approval Requests</Label>
+                  <ActionStepsComponent actions={this.props.dataItem.Actions} />
                 </div>
-                <div style={{ marginBottom: "2px" }}>
-                  <Field
-                    id={'Invoice_x0020_Number'}
-                    name={'Invoice_x0020_Number'}
-                    label={'Invoice Number'}
-                    component={MyFormComponents.FormInput}
-                  />
-                </div>
-                <div style={{ marginBottom: "2px" }}>
-                  <Field
-                    id={'Batch_x0020_Number'}
-                    name={'Batch_x0020_Number'}
-                    label={'Batch Number'}
-                    component={MyFormComponents.FormInput}
-                  />
-                </div>
-                <div style={{ marginBottom: "2px" }}>
-                  <FieldArray
-                    name="GLAccounts"
-                    component={GLAccountsListViewComponent}
-                    value={this.state.productInEdit.AccountDetails}
-                    productInEdit={this.state.productInEdit}
-                    updateAccountDetails={this.props.updateAccountDetails}
-                  />
-                </div>
-                <div style={{ marginBottom: "2px" }}>
-                  <MyAttachmentComponent
-                    id="RelatedAttachments"
-                    cardTitle="Upload Related Attachments"
-                    productInEdit={this.state.productInEdit}
-                    context={this.props.context}
-                    documentLibrary={MyLists["Related Invoice Attachments"]}
-                    onAdd={this.props.onRelatedAttachmentAdd}
-                    onRemove={this.props.onRelatedAttachmentRemove}
-                  />
-                </div>
-              </fieldset>
+              </div>
               {GridButtons({ cancel: this.props.cancel, saveResult: this.props.saveResult })}
             </FormElement>
           )}
