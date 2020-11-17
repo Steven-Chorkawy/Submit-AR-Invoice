@@ -47,6 +47,10 @@ export class PersonaComponent extends React.Component<IPersonaComponentProps, IP
     constructor(props) {
         super(props);
 
+        this.state = {
+            userProfile: undefined
+        };
+
         if (this.props.user) {
             this.setUserProfileStateFromSiteUser(this.props.user);
         }
@@ -59,12 +63,6 @@ export class PersonaComponent extends React.Component<IPersonaComponentProps, IP
             sp.web.siteUsers.getByEmail(this.props.userEmail).get().then(res => {
                 this.setUserProfileStateFromSiteUser(res);
             });
-        }
-        // If there is no user, userId, or userEmail provided there is nothing we can do. 
-        else {
-            this.state = {
-                userProfile: undefined
-            };
         }
     }
 

@@ -27,6 +27,7 @@ import { Shimmer, ShimmerElementsGroup, ShimmerElementType } from 'office-ui-fab
 
 // My Imports
 import { MyCustomerCardComponent } from './MyCustomerCardComponent';
+import { PersonaComponent } from './PersonaComponent';
 
 export const FormInput = (fieldRenderProps) => {
   const { validationMessage, touched, label, id, valid, disabled, hint, type, optional, ...others } = fieldRenderProps;
@@ -904,76 +905,13 @@ export const FormPersonaDisplay = (fieldRenderProps) => {
   const { label, value, id, hint, wrapperStyle, context, ...others } = fieldRenderProps;
   const hindId = `${id}_hint`;
 
-  const [user, setUser] = React.useState(fieldRenderProps.user === undefined ? undefined : fieldRenderProps.user);
-  
-  // siteUser is only requried to set the user state. 
-  // if user state is set we *should be able to find everything we need in there. 
-  const [siteUser, setSiteUser] = React.useState(undefined);
-
-  let web = Web(context.pageContext.web.absoluteUrl);
-
-  // Get siteUser object.
-  // * What we are really after here is the users LoginName. 
-  if (user === undefined && siteUser === undefined) {
-    if (fieldRenderProps.userId) {
-      web.siteUsers.getById(fieldRenderProps.userId).get().then(res => {
-        setSiteUser(res);
-      });
-    }
-    else if (fieldRenderProps.userEmail) {
-      web.siteUsers.getByEmail(fieldRenderProps.userEmail).get().then(res => {
-        setSiteUser(res);
-      });
-    }
-  }
-
-  // Get all user properties. 
-  if (user === undefined && siteUser !== undefined) {
-    sp.profiles.getPropertiesFor(siteUser.LoginName).then(userProperties => {
-      // This converts UserProfileProperties from an array of key value pairs [{Key:'', Value: ''},{Key:'', Value: ''}]
-      // Into an array of objects [{'Key': 'Value'}, {'Key: 'Value'}]
-      let props = {};
-      userProperties.UserProfileProperties.map(p => {
-        props[p.Key] = p.Value;
-      });
-      userProperties['Props'] = { ...props };
-      setUser(userProperties);
-    });
-  }
 
   return (
     <FieldWrapper style={wrapperStyle}>
       <Label>
         {label}
       </Label>
-      {
-        user ?
-          <Persona
-            imageUrl={user.PictureUrl}
-            imageInitials={`${user.Props['FirstName'].charAt(0)} ${user.Props['LastName'].charAt(0)}`}
-            text={`${user.Props['FirstName']} ${user.Props['LastName']}`}
-            size={PersonaSize.size40}
-            secondaryText={user.Title}
-          /> :
-          <div style={{ display: 'flex' }}>
-            <ShimmerElementsGroup
-              shimmerElements={[
-                { type: ShimmerElementType.circle, height: 40 },
-                { type: ShimmerElementType.gap, width: 16, height: 40 },
-              ]}
-            />
-            <ShimmerElementsGroup
-              flexWrap
-              width="100%"
-              shimmerElements={[
-                { type: ShimmerElementType.line, width: '100%', height: 10, verticalAlign: 'bottom' },
-                { type: ShimmerElementType.line, width: '90%', height: 8 },
-                { type: ShimmerElementType.gap, width: '10%', height: 20 },
-              ]}
-            />
-          </div>
-      }
-
-    </FieldWrapper >
+      <PersonaComponent {...fieldRenderProps} />
+    </FieldWrapper>
   );
 };
