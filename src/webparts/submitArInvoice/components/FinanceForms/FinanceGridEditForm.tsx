@@ -96,7 +96,6 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
     };
   }
 
-
   public onDialogInputChange = (event) => {
     let target = event.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
@@ -113,8 +112,6 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
       productInEdit: null
     });
   }
-
-
 
   private _statusValue = null;
 
