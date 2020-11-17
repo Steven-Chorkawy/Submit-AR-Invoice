@@ -25,11 +25,11 @@ import { InvoiceStatus, MyGridStrings, MyContentTypes } from '../enums/MyEnums';
 import { ConvertQueryParamsToKendoFilter, BuildGUID, CreateInvoiceAction } from '../MyHelperMethods';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
+import { InvoiceActionRequestTypes } from '../enums/MyEnums';
 import { FinanceGridEditForm, IGPAttachmentProps } from './FinanceGridEditForm';
 import { FileRefCell } from '../FileRefCell';
 import { IDCell } from '../IDCell';
 import { IMySaveResult } from '../interface/IMySaveResult';
-import { InvoiceActionRequiredRequestType } from '../interface/IInvoiceActionRequired';
 import { QuickFilterButtonGroup } from '../QuickFilterButtonGroup';
 
 
@@ -701,7 +701,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
               || this.state.productInEdit.Requires_x0020_Accountant_x0020_.Id !== data.Requires_x0020_Accountant_x0020_.Id) {
               await CreateInvoiceAction(
                 data.Requires_x0020_Accountant_x0020_.Id,
-                InvoiceActionRequiredRequestType.AccountantApprovalRequired,
+                InvoiceActionRequestTypes.AccountantApprovalRequired,
                 data.Id
               );
             }
@@ -715,7 +715,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
 
             await CreateInvoiceAction(
               this.state.productInEdit.Requested_x0020_By.Id,
-              InvoiceActionRequiredRequestType.EditRequired,
+              InvoiceActionRequestTypes.EditRequired,
               data.Id,
               null,
               this.state.noteForDepartment
@@ -745,7 +745,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
         || this.state.productInEdit.RequiresAccountingClerkTwoApproval.Id !== data.RequiresAccountingClerkTwoApproval.Id) {
         await CreateInvoiceAction(
           data.RequiresAccountingClerkTwoApproval.Id,
-          InvoiceActionRequiredRequestType.AccountingClerk2ApprovalRequired,
+          InvoiceActionRequestTypes.AccountingClerkApprovalRequired,
           data.AR_x0020_RequestId,
           data.Id
         );
@@ -898,7 +898,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
               }
               await CreateInvoiceAction(
                 data.RequiresAccountingClerkTwoApprov.Id,
-                InvoiceActionRequiredRequestType.AccountingClerk2ApprovalRequired,
+                InvoiceActionRequestTypes.AccountingClerkApprovalRequired,
                 data.Id
               );
             }
@@ -912,7 +912,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
                 || this.state.productInEdit.Requires_x0020_Accountant_x0020_.Id !== data.Requires_x0020_Accountant_x0020_.Id) {
                 await CreateInvoiceAction(
                   data.Requires_x0020_Accountant_x0020_.Id,
-                  InvoiceActionRequiredRequestType.AccountantApprovalRequired,
+                  InvoiceActionRequestTypes.AccountantApprovalRequired,
                   data.Id
                 );
               }
@@ -934,7 +934,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
 
               await CreateInvoiceAction(
                 data.RequiresAccountingClerkTwoApprov.Id,
-                InvoiceActionRequiredRequestType.AccountingClerk2ApprovalRequired,
+                InvoiceActionRequestTypes.AccountingClerkApprovalRequired,
                 data.AR_x0020_RequestId,
                 data.Id
               );

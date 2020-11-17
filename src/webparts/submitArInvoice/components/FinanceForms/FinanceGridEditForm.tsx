@@ -26,12 +26,12 @@ import "@pnp/sp/items";
 // Custom Imports
 import * as MyFormComponents from '../MyFormComponents';
 import { GLAccountsListViewComponent } from '../MyFinanceGLAccounts';
-import { InvoiceStatus, MyContentTypes } from '../enums/MyEnums';
+import { InvoiceActionRequestTypes, InvoiceStatus, MyContentTypes } from '../enums/MyEnums';
 
 import { MyLists } from '../enums/MyLists';
 import { IInvoiceItem } from '../interface/InvoiceItem';
 import { MyAttachmentComponent } from '../MyAttachmentComponent';
-
+import { RequestApprovalCardComponent } from '../RequestApprovalDialogComponent';
 
 export interface IGPAttachmentProps {
   type: string;
@@ -139,15 +139,15 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                     this.props.dataItem.Invoice_x0020_Status !== InvoiceStatus["Hold for Department"] &&
                     < div >
                       <hr />
-                      <Card style={{ paddingTop: '10px' }}>
-                        <CardTitle style={{ marginBottom: '0px' }}>Send note to {this.state.productInEdit.Requested_x0020_By.Title}</CardTitle>
-                        <CardBody>
-                          <textarea style={{ width: '100%' }} onChange={this.props.onNoteToDepChange}></textarea>
-                        </CardBody>
-                        <CardActions orientation='vertical'>
-                          <Button>{'Send & Save'}</Button>
-                        </CardActions>
-                      </Card>
+                      <RequestApprovalCardComponent
+                        context={this.props.context}
+                        defaultUsers={[this.state.productInEdit.Requested_x0020_By.EMail]}
+                        // Do nothing because there will only be one option. 
+                        onRequestTypeChange={e => { /**Do Nothing */ }}
+                        requestOptions={[{ key: InvoiceActionRequestTypes.EditRequired, text: InvoiceActionRequestTypes.EditRequired }]}
+                        requestType={InvoiceActionRequestTypes.EditRequired}
+                        onDescriptionChange={this.props.onNoteToDepChange}
+                      />
                       <hr />
                     </div>
                   }

@@ -1,6 +1,6 @@
 import { UrlQueryParameterCollection } from '@microsoft/sp-core-library';
-import { InvoiceActionRequiredRequestType, IInvoiceActionRequired } from './interface/IInvoiceActionRequired';
-import { InvoiceActionResponseStatus, MyContentTypes } from './enums/MyEnums';
+import { IInvoiceActionRequired } from './interface/IInvoiceActionRequired';
+import { InvoiceActionRequestTypes, InvoiceActionResponseStatus, MyContentTypes } from './enums/MyEnums';
 import { sp } from "@pnp/sp";
 import "@pnp/sp/webs";
 import "@pnp/sp/files";
@@ -64,7 +64,7 @@ export const BuildGUID = () => {
  * @param arRequestId AR Request ID
  * @param arInvoiceId AR Invoice ID (optional)
  */
-export const CreateInvoiceAction = async (assignedToId: number, requestType: InvoiceActionRequiredRequestType, arRequestId: number, arInvoiceId?: number, message?: string) => {
+export const CreateInvoiceAction = async (assignedToId: number, requestType: InvoiceActionRequestTypes, arRequestId: number, arInvoiceId?: number, message?: string) => {
   let newAction: IInvoiceActionRequired = {
     AR_x0020_Invoice_x0020_RequestId: arRequestId,
     AR_x0020_InvoiceId: arInvoiceId,

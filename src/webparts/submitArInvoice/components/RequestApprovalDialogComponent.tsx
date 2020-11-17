@@ -6,13 +6,92 @@ import { sp } from "@pnp/sp";
 
 import { Card, CardTitle, CardBody, CardSubtitle } from '@progress/kendo-react-layout';
 import { Label, Error, Hint, FloatingLabel } from '@progress/kendo-react-labels';
-import { Panel, PanelType, PrimaryButton, DefaultButton, Dropdown, TextField } from '@fluentui/react';
+import { Panel, PanelType, PrimaryButton, DefaultButton, Dropdown, TextField, IDropdownOption } from '@fluentui/react';
 import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
 import { ActionStepsComponent } from './ActionStepsComponent';
 
 import { InvoiceActionRequestTypes } from './enums/MyEnums';
+import { PersonaComponent } from './PersonaComponent';
 
 const buttonStyles = { root: { marginRight: 8 } };
+
+export interface IRequestApprovalCardComponentProps {
+    // Start Request Type Dropdown
+    requestType?: InvoiceActionRequestTypes;
+    onRequestTypeChange: any;
+    requestOptions?: IDropdownOption[]; // key value pair.
+    // End Request Type Dropdown
+
+    context: any;
+
+    // Start People Picker
+    // Default selected user emails or login names as per https://pnp.github.io/sp-dev-fx-controls-react/controls/PeoplePicker/
+    defaultUsers?: string[];
+    onPeoplePickerChange?: any;
+    // End People Picker
+
+    // Start Textbox 
+    onDescriptionChange: any;
+    // End Textbox
+}
+export class RequestApprovalCardComponent extends React.Component<IRequestApprovalCardComponentProps, any> {
+    constructor(props) {
+        super(props);
+    }
+
+    public render() {
+        let defaultSelectOptions = [
+            { key: InvoiceActionRequestTypes.DepartmentApprovalRequired, text: InvoiceActionRequestTypes.DepartmentApprovalRequired },
+            { key: InvoiceActionRequestTypes.EditRequired, text: InvoiceActionRequestTypes.EditRequired },
+            { key: InvoiceActionRequestTypes.AccountantApprovalRequired, text: InvoiceActionRequestTypes.AccountantApprovalRequired },
+            { key: InvoiceActionRequestTypes.AccountingClerkApprovalRequired, text: InvoiceActionRequestTypes.AccountingClerkApprovalRequired }
+        ];
+
+        return (
+            <Card>
+                <CardBody>
+                    <div style={{ marginBottom: '15px' }}>
+                        <Dropdown
+                            label="Select Request Type"
+                            options={this.props.requestOptions ? this.props.requestOptions : defaultSelectOptions}
+                            selectedKey={this.props.requestType ? this.props.requestType : InvoiceActionRequestTypes.DepartmentApprovalRequired}
+                            onChange={this.props.onRequestTypeChange}
+                        />
+                    </div>
+                    <div style={{ marginBottom: '15px' }}>
+                        <Label>* Requires Approval From</Label>
+                        {
+                            this.props.onPeoplePickerChange
+                                ? <PeoplePicker
+                                    context={this.props.context}
+                                    showtooltip={false}
+                                    personSelectionLimit={10}
+                                    showHiddenInUI={false}
+                                    principalTypes={[PrincipalType.User]}
+                                    selectedItems={this.props.onPeoplePickerChange}
+                                    defaultSelectedUsers={this.props.defaultUsers ? this.props.defaultUsers : []}
+                                    isRequired={true}
+                                />
+                                : this.props.defaultUsers
+                                    ? this.props.defaultUsers.map(userEMail => {
+                                        return <PersonaComponent userEmail={userEMail} />
+                                    })
+                                    // onPeoplePickerChange and defaultUsers are missing! 
+                                    : <Error>... Something went wrong ...</Error>
+                        }
+                        {/* {
+                            this.state.Users && (this.state.Users.length < 1) &&
+                            <Error>Please Select one or more users.</Error>
+                        } */}
+                    </div>
+                    <div style={{ marginBottom: '15px' }}>
+                        <TextField label="Description" multiline rows={5} onChange={this.props.onDescriptionChange} />
+                    </div>
+                </CardBody>
+            </Card>
+        );
+    }
+}
 
 export class RequestApprovalDialogComponent extends React.Component<any, any> {
     constructor(props) {
@@ -59,8 +138,6 @@ export class RequestApprovalDialogComponent extends React.Component<any, any> {
     )
     //#endregion
 
-
-
     public render() {
         return (
             <Panel
@@ -72,42 +149,12 @@ export class RequestApprovalDialogComponent extends React.Component<any, any> {
                 onRenderFooterContent={this.onRenderFooterContent}
                 isFooterAtBottom={true}
             >
-                <Card>
-                    <CardBody>
-                        <div style={{ marginBottom: '15px' }}>
-                            <Dropdown
-                                label="Select Request Type"
-                                options={[
-                                    { key: InvoiceActionRequestTypes.DepartmentApprovalRequired, text: InvoiceActionRequestTypes.DepartmentApprovalRequired },
-                                    { key: InvoiceActionRequestTypes.EditRequired, text: InvoiceActionRequestTypes.EditRequired },
-                                    { key: InvoiceActionRequestTypes.AccountantApprovalRequired, text: InvoiceActionRequestTypes.AccountantApprovalRequired },
-                                    { key: InvoiceActionRequestTypes.AccountingClerkApprovalRequired, text: InvoiceActionRequestTypes.AccountingClerkApprovalRequired }
-                                ]}
-                                selectedKey={this.state.Request_x0020_Type}
-                                onChange={this._RequestTypeChange}
-                            />
-                        </div>
-                        <div style={{ marginBottom: '15px' }}>
-                            <Label>* Requires Approval From</Label>
-                            <PeoplePicker
-                                context={this.props.context}
-                                showtooltip={false}
-                                personSelectionLimit={10}
-                                showHiddenInUI={false}
-                                principalTypes={[PrincipalType.User]}
-                                selectedItems={this._PeoplePickerChange}
-                                isRequired={true}
-                            />
-                            {
-                                this.state.Users && (this.state.Users.length < 1) &&
-                                <Error>Please Select one or more users.</Error>
-                            }
-                        </div>
-                        <div style={{ marginBottom: '15px' }}>
-                            <TextField label="Description" multiline rows={5} onChange={this._DescriptionChange} />
-                        </div>
-                    </CardBody>
-                </Card>
+                <RequestApprovalCardComponent
+                    context={this.props.context}
+                    onRequestTypeChange={this._RequestTypeChange}
+                    onPeoplePickerChange={this._PeoplePickerChange}
+                    onDescriptionChange={this._DescriptionChange}
+                />
                 <Card>
                     <CardBody>
                         <ActionStepsComponent actions={this.props.dataItem.Actions} />
