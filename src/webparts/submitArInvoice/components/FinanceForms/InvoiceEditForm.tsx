@@ -121,7 +121,6 @@ export class InvoiceEditForm extends React.Component<IInvoiceEditFormProps, any>
   public render() {
     return (
       this.state.productInEdit && <Dialog onClose={this.props.cancel} title={"Edit AR Invoice"} minWidth="200px" width="80%" height="80%" >
-        {this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"] ? "Content Type: Invoice Request" : "Invoice Document"}
         <Form
           onSubmit={this.props.onSubmit}
           initialValues={{ ...this.state.productInEdit }}
