@@ -385,9 +385,6 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
    * @param event Data Submitted from form.
    */
   public handleSubmit = (event) => {
-    // Used to determine if we're updating an invoice request or an invoice.
-    let listName = '';
-
     let currentEditItem: IInvoiceUpdateItem = {
       Id: event.Id,
       ID: event.ID,
