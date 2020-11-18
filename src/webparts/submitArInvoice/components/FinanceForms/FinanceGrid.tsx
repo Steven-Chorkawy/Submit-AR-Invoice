@@ -1211,7 +1211,6 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
               >Cancel Current Changes</Button>
             )}
           </GridToolbar>
-          <GridColumn width="75px" field="" title="" filterable={false} sortable={false} cell={this.MyCustomCell} />
           <GridColumn field="ID" title="ID" width={this._columnWidth} editable={false} cell={(props) => <IDCell {...props} />} />
           <GridColumn field="Date" title="Date" width={this._columnWidth} filter='date' format={MyGridStrings.DateFilter} />
           <GridColumn field="Department" title="Department" width={this._columnWidth} />
