@@ -168,7 +168,7 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                         wrapperStyle={{ width: '100%' }}
                         dataItemKey="Email"
                         textField="Title"
-                        hint={'Send an approval request to one or more users.'}
+                        hint={'Send an accountant approval request.'}
                         personSelectionLimit={1}
                         context={this.props.context}
                         selectedItems={e => {
@@ -187,23 +187,22 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                     <div style={{ marginBottom: '2px' }}
                     >
                       <Field
-                        id={
-                          this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"]
-                            ? 'RequiresAccountingClerkTwoApprov'
-                            : 'RequiresAccountingClerkTwoApproval'
-                        }
-                        name={
-                          this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"]
-                            ? 'RequiresAccountingClerkTwoApprov'
-                            : 'RequiresAccountingClerkTwoApproval'
-                        }
-                        label="Requires Approval From Accounting Clerk 2"
-                        data={this.props.siteUsersData}
-                        dataItemKey="Id"
+                        id="RequiresAccountingClerkTwoApprov"
+                        name="RequiresAccountingClerkTwoApprov"
+                        label="* Requires Approval From Accounting Clerk 2"
+                        wrapperStyle={{ width: '100%' }}
+                        dataItemKey="Email"
                         textField="Title"
-                        disabled={formRenderProps.valueGetter('Invoice_x0020_Status') !== InvoiceStatus["Entered into GP"]}
-                        component={MyFormComponents.FormComboBox}
-                        hint={`To enable set status to 'Entered into GP'`}
+                        personSelectionLimit={1}
+                        context={this.props.context}
+                        selectedItems={e => {
+                          if (e && e.length > 0) {
+                            GetUsersByLoginName(e).then(res => {
+                              formRenderProps.onChange('RequiresAccountingClerkTwoApprov', { value: res });
+                            });
+                          }
+                        }}
+                        component={MyFormComponents.FormPeoplePicker}
                       />
                     </div>
                   }
