@@ -160,16 +160,8 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                   </div>
                   <div style={{ marginBottom: "2px" }}>
                     <Field
-                      id={
-                        this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"]
-                          ? 'Requires_x0020_Accountant_x0020_'
-                          : 'Requires_x0020_Accountant_x0020_Approval'
-                      }
-                      name={
-                        this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"]
-                          ? 'Requires_x0020_Accountant_x0020_'
-                          : 'Requires_x0020_Accountant_x0020_Approval'
-                      }
+                      id={'Requires_x0020_Accountant_x0020_'}
+                      name={'Requires_x0020_Accountant_x0020_'}
                       label="Requires Approval From Accountant"
                       data={this.props.siteUsersData}
                       dataItemKey="Id"
