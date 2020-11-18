@@ -159,7 +159,7 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                     }
                   </div>
                   {
-                    formRenderProps.valueGetter('Invoice_x0020_Status') !== InvoiceStatus["Accountant Approval Required"] &&
+                    formRenderProps.valueGetter('Invoice_x0020_Status') === InvoiceStatus["Accountant Approval Required"] &&
                     <div style={{ marginBottom: "2px" }}>
                       <Field
                         id="Requires_x0020_Accountant_x0020_"
@@ -183,7 +183,7 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                     </div>
                   }
                   {
-                    formRenderProps.valueGetter('Invoice_x0020_Status') !== InvoiceStatus["Entered into GP"] &&
+                    formRenderProps.valueGetter('Invoice_x0020_Status') === InvoiceStatus["Entered into GP"] &&
                     <div style={{ marginBottom: '2px' }}
                     >
                       <Field
