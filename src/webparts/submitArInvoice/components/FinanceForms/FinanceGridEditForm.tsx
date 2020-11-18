@@ -158,46 +158,47 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                       </div>
                     }
                   </div>
-                  <div style={{ marginBottom: "2px" }}>
-                    <Field
-                      id={'Requires_x0020_Accountant_x0020_'}
-                      name={'Requires_x0020_Accountant_x0020_'}
-                      label="Requires Approval From Accountant"
-                      data={this.props.siteUsersData}
-                      dataItemKey="Id"
-                      textField="Title"
-                      // * valueGetter is a very nice method! No need to set the state anymore.
-                      disabled={formRenderProps.valueGetter('Invoice_x0020_Status') !== InvoiceStatus["Accountant Approval Required"]}
-                      component={MyFormComponents.FormComboBox}
-                      hint={`To enable set status to 'Accountant Approval Required'`}
-                    />
-                  </div>
-                  <div style={{ marginBottom: '2px' }}
-                    hidden={
-                      formRenderProps.valueGetter('Invoice_x0020_Status') !== InvoiceStatus["Entered into GP"]
-                      && this.state.productInEdit.RequiresAccountingClerkTwoApprovId === null
-                    }
-                  >
-                    <Field
-                      id={
-                        this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"]
-                          ? 'RequiresAccountingClerkTwoApprov'
-                          : 'RequiresAccountingClerkTwoApproval'
-                      }
-                      name={
-                        this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"]
-                          ? 'RequiresAccountingClerkTwoApprov'
-                          : 'RequiresAccountingClerkTwoApproval'
-                      }
-                      label="Requires Approval From Accounting Clerk 2"
-                      data={this.props.siteUsersData}
-                      dataItemKey="Id"
-                      textField="Title"
-                      disabled={formRenderProps.valueGetter('Invoice_x0020_Status') !== InvoiceStatus["Entered into GP"]}
-                      component={MyFormComponents.FormComboBox}
-                      hint={`To enable set status to 'Entered into GP'`}
-                    />
-                  </div>
+                  {
+                    <div style={{ marginBottom: "2px" }}>
+                      formRenderProps.valueGetter('Invoice_x0020_Status') !== InvoiceStatus["Accountant Approval Required"] &&
+                      <Field
+                        id={'Requires_x0020_Accountant_x0020_'}
+                        name={'Requires_x0020_Accountant_x0020_'}
+                        label="Requires Approval From Accountant"
+                        data={this.props.siteUsersData}
+                        dataItemKey="Id"
+                        textField="Title"
+                        component={MyFormComponents.FormComboBox}
+                        hint={`To enable set status to 'Accountant Approval Required'`}
+                      />
+                    </div>
+                  }
+                  {
+                    formRenderProps.valueGetter('Invoice_x0020_Status') !== InvoiceStatus["Entered into GP"] &&
+                    <div style={{ marginBottom: '2px' }}
+                    >
+                      <Field
+                        id={
+                          this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"]
+                            ? 'RequiresAccountingClerkTwoApprov'
+                            : 'RequiresAccountingClerkTwoApproval'
+                        }
+                        name={
+                          this.state.productInEdit.ContentTypeId === MyContentTypes["AR Request List Item"]
+                            ? 'RequiresAccountingClerkTwoApprov'
+                            : 'RequiresAccountingClerkTwoApproval'
+                        }
+                        label="Requires Approval From Accounting Clerk 2"
+                        data={this.props.siteUsersData}
+                        dataItemKey="Id"
+                        textField="Title"
+                        disabled={formRenderProps.valueGetter('Invoice_x0020_Status') !== InvoiceStatus["Entered into GP"]}
+                        component={MyFormComponents.FormComboBox}
+                        hint={`To enable set status to 'Entered into GP'`}
+                      />
+                    </div>
+                  }
+
                   <div style={{ marginBottom: "2px" }}>
                     <Field
                       id={'Invoice_x0020_Number'}
