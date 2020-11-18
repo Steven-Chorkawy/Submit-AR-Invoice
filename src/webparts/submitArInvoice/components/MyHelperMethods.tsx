@@ -1,5 +1,4 @@
 import { UrlQueryParameterCollection } from '@microsoft/sp-core-library';
-import { IInvoiceActionRequired } from './interface/IInvoiceActionRequired';
 import { InvoiceActionRequestTypes, InvoiceActionResponseStatus, MyContentTypes } from './enums/MyEnums';
 import { sp } from "@pnp/sp";
 import "@pnp/sp/webs";
@@ -8,7 +7,7 @@ import "@pnp/sp/folders";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
 import { MyLists } from './enums/MyLists';
-import { IInvoiceAction } from './interface/InvoiceItem';
+import { IInvoiceAction, IInvoiceActionRequired } from './interface/MyInterfaces';
 import { ISPUser } from './interface/MyInterfaces';
 
 

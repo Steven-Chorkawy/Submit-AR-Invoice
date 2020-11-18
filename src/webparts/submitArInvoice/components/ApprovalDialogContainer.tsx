@@ -19,7 +19,7 @@ import { InvoiceActionResponseStatus } from './enums/MyEnums';
 import { GLAccountsListViewComponent } from './MyFinanceGLAccounts';
 import { MyAttachmentComponent } from './MyAttachmentComponent';
 import { MyLists } from './enums/MyLists';
-import { IInvoiceAction } from './interface/InvoiceItem';
+import { IInvoiceAction } from './interface/MyInterfaces';
 import { SendApprovalResponse } from './MyHelperMethods';
 import { ActionResponseComponent } from './ActionResponseComponent';
 import { PersonaComponent } from './PersonaComponent';

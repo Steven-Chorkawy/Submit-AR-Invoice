@@ -8,7 +8,7 @@ import { Button } from '@progress/kendo-react-buttons';
 import { ActivityItem, IActivityItemProps, Link, mergeStyleSets } from 'office-ui-fabric-react';
 import Moment from 'react-moment';
 
-import { IInvoiceAction } from './interface/InvoiceItem';
+import { IInvoiceAction } from './interface/MyInterfaces';
 import { InvoiceActionResponseStatus, InvoiceActionRequestTypes } from './enums/MyEnums';
 
 import { PersonaComponent } from './PersonaComponent';

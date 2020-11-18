@@ -8,7 +8,7 @@ import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/
 
 // Custom Imports
 import { ActionStepsComponent } from './ActionStepsComponent';
-import { IInvoiceItem } from './interface/InvoiceItem';
+import { IInvoiceItem } from './interface/MyInterfaces';
 import { GLAccountsListView, GLAccountsListViewDisplayMode } from './MyFinanceGLAccounts';
 
 

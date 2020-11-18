@@ -35,8 +35,7 @@ import { MyLists } from '../enums/MyLists';
 import { MyContentTypes } from '../enums/MyEnums';
 import { FileRefCell } from '../FileRefCell';
 import { IDCell } from '../IDCell';
-import { IInvoiceItem, IPersonField, IInvoiceUpdateItem } from '../interface/InvoiceItem';
-import { IMySaveResult } from '../interface/IMySaveResult';
+import { IInvoiceItem, IInvoiceUpdateItem, IMySaveResult } from '../interface/MyInterfaces';
 import { QuickFilterButtonGroup } from '../QuickFilterButtonGroup';
 
 

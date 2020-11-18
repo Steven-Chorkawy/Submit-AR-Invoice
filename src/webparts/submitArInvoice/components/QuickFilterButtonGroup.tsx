@@ -10,7 +10,7 @@ import "@pnp/sp/site-users/web";
 import { Button, ButtonGroup } from '@progress/kendo-react-buttons';
 
 // Import my stuff
-import { IInvoiceItem } from './interface/InvoiceItem';
+import { IInvoiceItem } from './interface/MyInterfaces';
 import { InvoiceStatus, InvoiceActionResponseStatus } from './enums/MyEnums';
 import { ISiteUserInfo } from '@pnp/sp/site-users/types';
 
