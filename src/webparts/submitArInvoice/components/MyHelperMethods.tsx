@@ -151,7 +151,7 @@ export const GetUserByEmail = async (email: string): Promise<ISPUser> => {
     console.error('Error getting Id of user by Email ', error);
     throw error;
   }
-}
+};
 
 export const GetUserById = async (userId): Promise<ISPUser> => {
   if (userId > 0 && !isNaN(parseInt(userId))) {
@@ -162,11 +162,11 @@ export const GetUserById = async (userId): Promise<ISPUser> => {
       throw error;
     }
   }
-}
+};
 
 export const GetUserByLoginName = async (loginName: string): Promise<ISPUser> => {
   return await sp.web.siteUsers.getByLoginName(loginName).get();
-}
+};
 
 export const GetUsersByLoginName = async (users: Array<any>): Promise<Array<ISPUser>> => {
   let returnOutput: Array<ISPUser> = [];
@@ -175,5 +175,5 @@ export const GetUsersByLoginName = async (users: Array<any>): Promise<Array<ISPU
     returnOutput.push(await GetUserByLoginName(user.loginName));
   }
   return returnOutput;
-}
+};
 //#endregion Get User Methods

@@ -29,7 +29,7 @@ import { GLAccountsListViewComponent } from '../MyFinanceGLAccounts';
 import { InvoiceActionRequestTypes, InvoiceStatus, MyContentTypes } from '../enums/MyEnums';
 import { GetUsersByLoginName } from '../MyHelperMethods';
 import { MyLists } from '../enums/MyLists';
-import { IInvoiceItem } from '../interface/InvoiceItem';
+import { IInvoiceItem } from '../interface/MyInterfaces';
 import { MyAttachmentComponent } from '../MyAttachmentComponent';
 import { RequestApprovalCardComponent } from '../RequestApprovalDialogComponent';
 import { ActionStepsComponent } from '../ActionStepsComponent';

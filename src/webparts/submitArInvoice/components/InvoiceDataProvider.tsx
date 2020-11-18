@@ -16,7 +16,7 @@ import { IFile } from '@pnp/sp/files';
 import { MyLists } from './enums/MyLists';
 import { filter } from '@progress/kendo-data-query/dist/npm/transducers';
 import { MyContentTypes } from './enums/MyEnums';
-import { IInvoiceItem } from './interface/InvoiceItem';
+import { IInvoiceItem } from './interface/MyInterfaces';
 
 /** End PnP Imports */
 

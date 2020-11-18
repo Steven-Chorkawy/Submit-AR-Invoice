@@ -29,9 +29,8 @@ import { InvoiceActionRequestTypes } from '../enums/MyEnums';
 import { FinanceGridEditForm, IGPAttachmentProps } from './FinanceGridEditForm';
 import { FileRefCell } from '../FileRefCell';
 import { IDCell } from '../IDCell';
-import { IMySaveResult } from '../interface/IMySaveResult';
+import { IMySaveResult, IInvoiceUpdateItem } from '../interface/MyInterfaces';
 import { QuickFilterButtonGroup } from '../QuickFilterButtonGroup';
-import { IInvoiceUpdateItem } from '../interface/InvoiceItem';
 
 
 interface IFinanceGridState {
