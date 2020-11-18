@@ -786,58 +786,6 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
     this.setState({ productInEdit: Object.assign({}, dataItem) });
   }
 
-  /**
-   * Handle the Finance Edit form submit event.
-   * @param data JSON Object sent from the Kendo Form.
-   */
-  public onSubmit2 = async (data) => {
-
-    // Get all the invoices found in the state.  We will use this local variable later.
-    const invoices = this.state.invoices.data.slice();
-
-    try {
-      // Get the index of the current invoice we're modifying.
-      // We will use this later to update the state.
-      const index = invoices.findIndex(f => f.ID === data.ID);
-
-      /******************************************************************************
-       *
-       * Update the various properties and related records of the invoice here.
-       *
-       * 1. Update any properties that the form can edit.
-       * 2. Upload any new related attachments.
-       * 3. UPload the GP Attachment document if one is present.
-       *
-       ******************************************************************************/
-      Promise.all([
-        this._updateFormFields(data),
-        this._uploadRelatedDocuments(data),
-        this._uploadInvoiceDocument2(data)
-      ])
-        .then(response => {
-          // TODO: Confirm everything has saved correctly.
-          this.setState({ productInEdit: null });
-        })
-        .catch(e => {
-          console.log(e);
-          //TODO: Display an error message to the user.
-
-        });
-
-      // TODO: After everything is said and done this is where I can set the productInEdit variable to null, which will close the edit form.
-    } catch (error) {
-      // Let the user know that something has gone wrong and the upload failed.
-      console.log('Throwing the error here');
-      this.setState({
-        gpAttachmentProps: {
-          type: 'error',
-          errorMessage: 'Cannot Save GP Invoice'
-        }
-      });
-      throw error;
-    }
-  }
-
  /**
   * onSubmit
   */
