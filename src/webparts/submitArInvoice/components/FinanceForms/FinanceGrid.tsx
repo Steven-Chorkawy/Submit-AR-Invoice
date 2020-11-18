@@ -31,6 +31,7 @@ import { FileRefCell } from '../FileRefCell';
 import { IDCell } from '../IDCell';
 import { IMySaveResult } from '../interface/IMySaveResult';
 import { QuickFilterButtonGroup } from '../QuickFilterButtonGroup';
+import { IInvoiceUpdateItem } from '../interface/InvoiceItem';
 
 
 interface IFinanceGridState {
@@ -331,9 +332,19 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
   /**
    * onSubmit
    */
-  public onSubmit(e) {
-    console.log('onSubmit');
-    console.log(e);
+  public handleSubmit(event) {
+    console.log('handleSubmit');
+    console.log(event);
+
+    // TODO: We should also be getting the accountant whos approval is require. 
+    // TODO: We should also be getting the accounting clerk 2 whos approval is required.
+    let updateProperties = {
+      Invoice_x0020_Status: event.Invoice_x0020_Status,
+      Invoice_x0020_Number: event.Invoice_x0020_Number,
+      Batch_x0020_Number: event.Batch_x0020_Number
+    };
+
+    console.log(updateProperties);
   }
 
   /**
@@ -440,7 +451,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
             dataItem={this.state.productInEdit}
             statusData={this.state.statusData}
             siteUsersData={this.state.siteUsersData}
-            onSubmit={this.onSubmit}
+            onSubmit={this.handleSubmit}
             onNoteToDepChange={this.onNoteToDepChange}
             saveResult={this.state.saveResult}
             cancel={this.cancelEditForm}

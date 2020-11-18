@@ -420,18 +420,9 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
       }
     }
 
-    // This is where we are checking to see what type of invoice (request, or not) we are editing.
-    if (event.ContentTypeId === MyContentTypes["AR Request List Item"]) {
-      // Update a request item.
-      listName = MyLists["AR Invoice Requests"];
-    }
-    else {
-      // Update a document item.
-      listName = MyLists["AR Invoices"];
-    }
 
     sp.web.lists
-      .getByTitle(listName)
+      .getByTitle(MyLists["AR Invoice Requests"])
       .items
       .getById(currentEditItem.ID)
       .update(currentEditItem)
