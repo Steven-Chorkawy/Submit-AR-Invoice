@@ -9,6 +9,7 @@ import "@pnp/sp/lists";
 import "@pnp/sp/items";
 import { MyLists } from './enums/MyLists';
 import { IInvoiceAction } from './interface/InvoiceItem';
+import { ISPUser } from './interface/MyInterfaces';
 
 
 interface IMyKendoFilter {
@@ -141,3 +142,39 @@ export const SendApprovalResponse = async (response: string, comment: string, in
       });
   }
 };
+
+
+//#region Get User Methods
+export const GetUserByEmail = async (email: string): Promise<ISPUser> => {
+  try {
+    return await sp.web.siteUsers.getByEmail(email).get();
+  } catch (error) {
+    console.error('Error getting Id of user by Email ', error);
+    throw error;
+  }
+}
+
+export const GetUserById = async (userId): Promise<ISPUser> => {
+  if (userId > 0 && !isNaN(parseInt(userId))) {
+    try {
+      return await sp.web.siteUsers.getById(userId).get();
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+}
+
+export const GetUserByLoginName = async (loginName: string): Promise<ISPUser> => {
+  return await sp.web.siteUsers.getByLoginName(loginName).get();
+}
+
+export const GetUsersByLoginName = async (users: Array<any>): Promise<Array<ISPUser>> => {
+  let returnOutput: Array<ISPUser> = [];
+  for (let index = 0; index < users.length; index++) {
+    const user = users[index];
+    returnOutput.push(await GetUserByLoginName(user.loginName));
+  }
+  return returnOutput;
+}
+//#endregion Get User Methods

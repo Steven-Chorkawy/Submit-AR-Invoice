@@ -27,7 +27,7 @@ import "@pnp/sp/items";
 import * as MyFormComponents from '../MyFormComponents';
 import { GLAccountsListViewComponent } from '../MyFinanceGLAccounts';
 import { InvoiceActionRequestTypes, InvoiceStatus, MyContentTypes } from '../enums/MyEnums';
-
+import { GetUsersByLoginName } from '../MyHelperMethods';
 import { MyLists } from '../enums/MyLists';
 import { IInvoiceItem } from '../interface/InvoiceItem';
 import { MyAttachmentComponent } from '../MyAttachmentComponent';
@@ -162,14 +162,23 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                     <div style={{ marginBottom: "2px" }}>
                       formRenderProps.valueGetter('Invoice_x0020_Status') !== InvoiceStatus["Accountant Approval Required"] &&
                       <Field
-                        id={'Requires_x0020_Accountant_x0020_'}
-                        name={'Requires_x0020_Accountant_x0020_'}
-                        label="Requires Approval From Accountant"
-                        data={this.props.siteUsersData}
-                        dataItemKey="Id"
+                        id="Requires_x0020_Accountant_x0020_"
+                        name="Requires_x0020_Accountant_x0020_"
+                        label="* Requires Approval From Accountant"
+                        wrapperStyle={{ width: '100%' }}
+                        dataItemKey="Email"
                         textField="Title"
-                        component={MyFormComponents.FormComboBox}
-                        hint={`To enable set status to 'Accountant Approval Required'`}
+                        hint={'Send an approval request to one or more users.'}
+                        personSelectionLimit={1}
+                        context={this.props.context}
+                        selectedItems={e => {
+                          if (e && e.length > 0) {
+                            GetUsersByLoginName(e).then(res => {
+                              formRenderProps.onChange('Requires_x0020_Accountant_x0020_', { value: res });
+                            });
+                          }
+                        }}
+                        component={MyFormComponents.FormPeoplePicker}
                       />
                     </div>
                   }
