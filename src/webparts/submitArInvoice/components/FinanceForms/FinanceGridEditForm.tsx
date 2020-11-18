@@ -137,6 +137,11 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                       component={MyFormComponents.FormDropDownList}
                     />
                     {
+                      /**
+                       * * Note: This is not a form component!  
+                       * It's fields will not automatically be passed to this.props.onSubmit.
+                       * The values of these fields must be passed through the state. 
+                       */
                       formRenderProps.valueGetter('Invoice_x0020_Status') === InvoiceStatus["Hold for Department"] &&
                       this.state.productInEdit.Requested_x0020_By &&
                       this.props.dataItem.Invoice_x0020_Status !== InvoiceStatus["Hold for Department"] &&
