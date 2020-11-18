@@ -335,8 +335,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
     console.log('handleSubmit');
     console.log(event);
 
-    // TODO: We should also be getting the accountant whos approval is require. 
-    // TODO: We should also be getting the accounting clerk 2 whos approval is required.
+    // TODO: Get accounting clerk and or accountants approval here. 
     let updateProperties = {
       Invoice_x0020_Status: event.Invoice_x0020_Status,
       Invoice_x0020_Number: event.Invoice_x0020_Number,
