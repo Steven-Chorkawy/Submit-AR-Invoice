@@ -44,7 +44,7 @@ const STATUS_OPTIONS = [
         value: 'Void',
         type: 'none'
     },
-]
+];
 
 class OrdersListViewItemRender extends React.Component<any, any> {
     constructor(props) {
@@ -54,33 +54,33 @@ class OrdersListViewItemRender extends React.Component<any, any> {
         };
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
+    public componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps.dataItem.ID !== this.props.dataItem.ID) {
             this.setState({
                 item: this.props.dataItem
             });
         }
     }
-    enterEdit = () => {
+    public enterEdit = () => {
         this.setState({ item: { ...this.state.item, edit: true } });
     }
-    cancelEdit = () => {
+    public cancelEdit = () => {
         this.setState({ item: { ...this.state.item, edit: false } });
     }
-    handleChange = (e, field) => {
+    public handleChange = (e, field) => {
         let updatedItem = { ...this.state.item };
         updatedItem[field] = e.value;
         this.setState({ item: updatedItem });
     }
-    handleSave = () => {
+    public handleSave = () => {
         this.props.saveItem(this.state.item);
         this.setState({ item: { ...this.state.item, edit: false } });
     }
-    handleDelete = () => {
+    public handleDelete = () => {
         this.props.deleteItem(this.state.item);
     }
 
-    render() {
+    public render() {
         const item = this.props.dataItem;
         const cardTypes = {
             Pending: 'info',
@@ -128,7 +128,7 @@ class OrdersListViewItemRender extends React.Component<any, any> {
                         </CardBody>}
                 </Card>
             </div>
-        )
+        );
     }
 }
 
@@ -148,6 +148,11 @@ interface IOrdersListViewState {
     searchValue?: any;
     selectedChips?: any[];
 
+    /**
+     * *    Filter Example.
+     * *    
+     * *
+     */
     // filter: {
     //     logic: 'and', 
     //     filters: [
@@ -268,7 +273,7 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
                             filter: {
                                 logic: 'or',
                                 filters: e.value.map(f => {
-                                    return { field: 'Status', operator: 'contains', value: f }
+                                    return { field: 'Status', operator: 'contains', value: f };
                                 })
                             }
                         });
@@ -279,9 +284,9 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
                 />
             </div>
         );
-    };    
+    }    
 
-    private MyItemRender = props => <OrdersListViewItemRender {...props} saveItem={this.onOrderSave} deleteItem={e => console.log(e)} />
+    private MyItemRender = props => <OrdersListViewItemRender {...props} saveItem={this.onOrderSave} deleteItem={e => console.log(e)} />;
 
     public render() {
         return (
