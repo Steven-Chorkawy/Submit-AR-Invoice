@@ -148,6 +148,11 @@ interface IOrdersListViewState {
     searchValue?: any;
     selectedChips?: any[];
 
+    /**
+     * *    Filter Example.
+     * *    
+     * *
+     */
     // filter: {
     //     logic: 'and', 
     //     filters: [
