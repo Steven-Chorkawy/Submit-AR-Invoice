@@ -298,12 +298,14 @@ const QueryOrdersDate = (e: any, callBack: Function) => {
   // * .getAll() alone is the only method that works on large lists. 
   // * https://pnp.github.io/pnpjs/v1/sp/docs/items/#get-all-items
   // * .top() and .filter() will result in no items returned. 
-  sp.web.lists.getByTitle(MyLists.Orders).items.getAll().then(response => {
-    for (let index = 0; index < OrderStatus.length; index++) {
-      const status = OrderStatus[index];
-      console.log(status);
-      console.log(response.filter(f => { return f.Status === status; }));
-    }
+  sp.web.lists.getByTitle(MyLists.Orders).items.filter(`Status eq 'Pending'`).getAll().then(response => {
+    console.log('Orders...');
+    console.log(response);
+    // for (let index = 0; index < OrderStatus.length; index++) {
+    //   const status = OrderStatus[index];
+    //   console.log(status);
+    //   console.log(response.filter(f => { return f.Status === status; }));
+    // }
 
     if (e.filterEq) {
       callBack(response.filter(f => { return f[e.filterEq.field] === e.filterEq.value; }));
