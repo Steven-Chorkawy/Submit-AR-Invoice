@@ -181,7 +181,7 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
             ordersCount: 0,
         };
 
-        QueryOrdersDate({}, (orders) => {
+        QueryOrdersDate({ Status: 'Pending' }, (orders) => {
             // Create a new variable by reference. Changes made to 'a' will be reflected in 'b'.
             // let a = b
             // Create a new variable by value instead of reference. Changes made in 'visibleData' will not be reflected in 'orders'.
@@ -284,7 +284,7 @@ export class OrdersListView extends React.Component<any, IOrdersListViewState> {
                 />
             </div>
         );
-    }    
+    }
 
     private MyItemRender = props => <OrdersListViewItemRender {...props} saveItem={this.onOrderSave} deleteItem={e => console.log(e)} />;
 
