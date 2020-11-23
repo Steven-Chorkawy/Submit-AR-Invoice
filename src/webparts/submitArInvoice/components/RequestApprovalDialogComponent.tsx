@@ -34,6 +34,15 @@ export interface IRequestApprovalCardComponentProps {
     onDescriptionChange: any;
     // End Textbox
 }
+
+/**
+ * These are the properties that this component creates.  A parent component can use these as they see fit.
+ */
+export interface INewApproval {
+    Users: any[];
+    RequestType: InvoiceActionRequestTypes;
+    Description: string;
+}
 export class RequestApprovalCardComponent extends React.Component<IRequestApprovalCardComponentProps, any> {
     constructor(props) {
         super(props);

@@ -31,7 +31,7 @@ import { FileRefCell } from '../FileRefCell';
 import { IDCell } from '../IDCell';
 import { IMySaveResult, IInvoiceUpdateItem } from '../interface/MyInterfaces';
 import { QuickFilterButtonGroup } from '../QuickFilterButtonGroup';
-
+import { INewApproval } from '../RequestApprovalDialogComponent';
 
 interface IFinanceGridState {
   invoices: IInvoicesDataState;
@@ -48,7 +48,7 @@ interface IFinanceGridState {
   gpAttachmentProps: IGPAttachmentProps;
 
   // If Finance needs to send a note.
-  noteForDepartment?: string;
+  newApproval?: INewApproval;
 }
 
 interface IInvoicesDataState {
@@ -297,11 +297,18 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
     return input;
   }
 
-  public onNoteToDepChange = (e) => {
+  public onNoteChange = (e) => {
     this.setState({
-      noteForDepartment: e.target.value
+      newApproval: { ...this.state.newApproval, Description: e.target.value }
     });
   }
+
+  // TODO: Test to see what e is equal to.
+  public onApproverChange = (e) => {
+    console.log(e);
+  }
+
+  
   //#endregion Update Methods
 
   //#region CRUD Methods
@@ -334,6 +341,8 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
   public handleSubmit(event) {
     console.log('handleSubmit');
     console.log(event);
+    console.log('New Approvals');
+    console.log(this.state.newApproval);
 
     // TODO: Get accounting clerk and or accountants approval here. 
     let updateProperties = {
@@ -450,7 +459,8 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
             statusData={this.state.statusData}
             siteUsersData={this.state.siteUsersData}
             onSubmit={this.handleSubmit}
-            onNoteToDepChange={this.onNoteToDepChange}
+            onNoteChange={this.onNoteChange}
+            onApproverChange={this.onApproverChange}
             saveResult={this.state.saveResult}
             cancel={this.cancelEditForm}
             updateAccountDetails={(e) => {

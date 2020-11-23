@@ -50,7 +50,10 @@ interface IFinanceGridEditFormProps {
   statusData: any;
   siteUsersData: any;
   updateAccountDetails: any;
-  onNoteToDepChange?: any;
+
+
+  onApproverChange: any;
+  onNoteChange: any;
   context: any;
   onRelatedAttachmentAdd: Function;
   onRelatedAttachmentRemove: Function;
@@ -153,7 +156,8 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                           onRequestTypeChange={e => { /**Do Nothing */ }}
                           requestOptions={[{ key: InvoiceActionRequestTypes.EditRequired, text: InvoiceActionRequestTypes.EditRequired }]}
                           requestType={InvoiceActionRequestTypes.EditRequired}
-                          onDescriptionChange={this.props.onNoteToDepChange}
+                          onPeoplePickerChange={this.props.onApproverChange}
+                          onDescriptionChange={this.props.onNoteChange}
                         />
                       </div>
                     }
@@ -168,8 +172,8 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                         requestOptions={[{ key: InvoiceActionRequestTypes.AccountantApprovalRequired, text: InvoiceActionRequestTypes.AccountantApprovalRequired }]}
                         requestType={InvoiceActionRequestTypes.AccountantApprovalRequired}
 
-                        onPeoplePickerChange={e => { console.log(e); }}
-                        onDescriptionChange={this.props.onNoteToDepChange}
+                        onPeoplePickerChange={this.props.onApproverChange}
+                        onDescriptionChange={this.props.onNoteChange}
                       />
                       {/* <Field
                         id="Requires_x0020_Accountant_x0020_"
@@ -203,8 +207,8 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                         requestOptions={[{ key: InvoiceActionRequestTypes.AccountingClerkApprovalRequired, text: InvoiceActionRequestTypes.AccountingClerkApprovalRequired }]}
                         requestType={InvoiceActionRequestTypes.AccountingClerkApprovalRequired}
 
-                        onPeoplePickerChange={e => { console.log(e); }}
-                        onDescriptionChange={this.props.onNoteToDepChange}
+                        onPeoplePickerChange={this.props.onApproverChange}
+                        onDescriptionChange={this.props.onNoteChange}
                       />
                       {/* <Field
                         id="RequiresAccountingClerkTwoApprov"
