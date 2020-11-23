@@ -37,6 +37,9 @@ export interface IRequestApprovalCardComponentProps {
 export class RequestApprovalCardComponent extends React.Component<IRequestApprovalCardComponentProps, any> {
     constructor(props) {
         super(props);
+        this.state = {
+            Users: []
+        }
     }
 
     public render() {
@@ -68,8 +71,9 @@ export class RequestApprovalCardComponent extends React.Component<IRequestApprov
                                     personSelectionLimit={10}
                                     showHiddenInUI={false}
                                     principalTypes={[PrincipalType.User]}
-                                    selectedItems={this.props.onPeoplePickerChange}
+                                    selectedItems={e => { this.setState({ Users: e }); this.props.onPeoplePickerChange(e); }}
                                     defaultSelectedUsers={this.props.defaultUsers ? this.props.defaultUsers : []}
+
                                     isRequired={true}
                                 />
                                 : this.props.defaultUsers
@@ -79,10 +83,10 @@ export class RequestApprovalCardComponent extends React.Component<IRequestApprov
                                     // onPeoplePickerChange and defaultUsers are missing! 
                                     : <Error>... Something went wrong ...</Error>
                         }
-                        {/* {
+                        {
                             this.state.Users && (this.state.Users.length < 1) &&
                             <Error>Please Select one or more users.</Error>
-                        } */}
+                        }
                     </div>
                     <div style={{ marginBottom: '15px' }}>
                         <TextField label="Description" multiline rows={5} onChange={this.props.onDescriptionChange} />
