@@ -73,7 +73,7 @@ function GridButtons({ cancel, saveResult }) {
         <Button
           type={"submit"}
           style={{ width: '50%' }}
-          className="k-button k-primary"
+          primary={true}
           icon="save"
         >Save</Button>
         <Button
@@ -161,6 +161,7 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                   {
                     formRenderProps.valueGetter('Invoice_x0020_Status') === InvoiceStatus["Accountant Approval Required"] &&
                     <div style={{ marginBottom: "2px" }}>
+                      // TODO: Replace this field with a RequestApprovalCardComponent.
                       <Field
                         id="Requires_x0020_Accountant_x0020_"
                         name="Requires_x0020_Accountant_x0020_"
@@ -186,6 +187,7 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                     formRenderProps.valueGetter('Invoice_x0020_Status') === InvoiceStatus["Entered into GP"] &&
                     <div style={{ marginBottom: '2px' }}
                     >
+                      // TODO: Replace this field with a RequestApprovalCardComponent.
                       <Field
                         id="RequiresAccountingClerkTwoApprov"
                         name="RequiresAccountingClerkTwoApprov"
