@@ -305,10 +305,12 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
 
   // TODO: Test to see what e is equal to.
   public onApproverChange = (e) => {
-    console.log(e);
+    this.setState({
+      newApproval: { ...this.state.newApproval, Users: e }
+    });
   }
 
-  
+
   //#endregion Update Methods
 
   //#region CRUD Methods
@@ -338,11 +340,37 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
   /**
    * onSubmit
    */
-  public handleSubmit(event) {
+  public handleSubmit = (event) => {
     console.log('handleSubmit');
     console.log(event);
     console.log('New Approvals');
+    debugger;
     console.log(this.state.newApproval);
+
+    /**
+     * When status is equal to 'Accountant Approval Required', 'Hold for Department', or 'Entered into GP'
+     * a user must be selected to create an approval request. 
+     * 
+     * Here we can validate that a user has been selected by checking the this.state.newApproval.Users property. 
+     * If no user is provided, an error message will have already been displayed.
+     * All we need to do here is prevent the save event from occurring.
+     */
+    if (event.Invoice_x0020_Status === InvoiceStatus["Accountant Approval Required"]
+      || event.Invoice_x0020_Status === InvoiceStatus["Hold for Department"]
+      || event.Invoice_x0020_Status === InvoiceStatus["Entered into GP"]) {
+      // Status is set so that we require a users approval. 
+
+      // Check if the newApproval state has been set.  Without this we won't be able to get the users.
+      if (!this.state.newApproval) {
+        return; // Return to end the save event function.
+      }
+
+
+      // If the Users property is not set or if it is empty that means no user has been provided. 
+      if (!this.state.newApproval.Users || this.state.newApproval.Users.length === 0) {
+        return; // Return to end the save event function.
+      }
+    }
 
     // TODO: Get accounting clerk and or accountants approval here. 
     let updateProperties = {
@@ -351,6 +379,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
       Batch_x0020_Number: event.Batch_x0020_Number
     };
 
+    console.log('update these properties');
     console.log(updateProperties);
   }
 
