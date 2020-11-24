@@ -22,7 +22,7 @@ import { InvoiceDataProvider, QueryInvoiceData } from '../InvoiceDataProvider';
 import { MyCommandCell } from './MyCommandCell';
 import { filterBy } from '@progress/kendo-data-query';
 import { InvoiceStatus, MyGridStrings, MyContentTypes } from '../enums/MyEnums';
-import { ConvertQueryParamsToKendoFilter, BuildGUID, CreateInvoiceAction, GetUserByLoginName } from '../MyHelperMethods';
+import { ConvertQueryParamsToKendoFilter, BuildGUID, CreateInvoiceAction, GetUserByLoginName, GetUserByEmail } from '../MyHelperMethods';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { InvoiceActionRequestTypes } from '../enums/MyEnums';
@@ -304,6 +304,8 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
   }
 
   public onApproverChange = (e) => {
+    debugger;
+
     this.setState({
       newApproval: { ...this.state.newApproval, Users: e }
     });
@@ -349,58 +351,68 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
     // The index of the invoice that is currently in edit.
     const invoiceIndex = allInvoices.findIndex(f => f.ID === this.state.productInEdit.ID);
     const productInEditId = this.state.productInEdit.ID;
+    const requestedByEmail = this.state.productInEdit.Requested_x0020_By.EMail;
     /**
      * When status is equal to 'Accountant Approval Required', 'Hold for Department', or 'Entered into GP'
-     * a user must be selected to create an approval request. 
+     * and the event status does not equal the productInEdit status, a user must be selected to create an approval request. 
+     * 
+     * The reason for 'event.Invoice_x0020_Status !== this.state.productInEdit.Invoice_x0020_Status'
+     * is because we only want to validate this logic when the user has changed the Invoice Status.
      * 
      * Here we can validate that a user has been selected by checking the this.state.newApproval.Users property. 
      * If no user is provided, an error message will have already been displayed.
      * All we need to do here is prevent the save event from occurring.
      */
-    if (event.Invoice_x0020_Status === InvoiceStatus["Accountant Approval Required"]
-      || event.Invoice_x0020_Status === InvoiceStatus["Hold for Department"]
-      || event.Invoice_x0020_Status === InvoiceStatus["Entered into GP"]) {
-      // Check if the newApproval state has been set.  Without this we won't be able to get the users.
-      if (!this.state.newApproval) {
-        return; // Return to end the save event function.
-      }
+    debugger;
+    if (event.Invoice_x0020_Status !== this.state.productInEdit.Invoice_x0020_Status) {
+      if (event.Invoice_x0020_Status === InvoiceStatus["Accountant Approval Required"]
+        || event.Invoice_x0020_Status === InvoiceStatus["Hold for Department"]
+        || event.Invoice_x0020_Status === InvoiceStatus["Entered into GP"]) {
+        // Check if the newApproval state has been set.  Without this we won't be able to get the users.
+        if (!this.state.newApproval) {
+          return; // Return to end the save event function.
+        }
 
-      // If the Users property is not set or if it is empty that means no user has been provided. 
-      if (!this.state.newApproval.Users || this.state.newApproval.Users.length === 0) {
-        return; // Return to end the save event function.
-      }
+        // If the Users property is not set or if it is empty that means no user has been provided. 
+        // Ignore this check if status is hold for department because we will get the user from elsewhere.
+        if (event.Invoice_x0020_Status !== InvoiceStatus["Hold for Department"]) {
+          if (!this.state.newApproval.Users || this.state.newApproval.Users.length === 0) {
+            return; // Return to end the save event function.
+          }
+        }
 
-      let approvalRequestType = undefined;
-      // Since there cannot be a change event for the request type dropdown because there is only one option to select I'm setting the values here.
-      switch (event.Invoice_x0020_Status) {
-        case InvoiceStatus["Accountant Approval Required"]:
-          approvalRequestType = InvoiceActionRequestTypes.AccountantApprovalRequired;
-          break;
-        case InvoiceStatus["Hold for Department"]:
-          approvalRequestType = InvoiceActionRequestTypes.EditRequired;
-          break;
-        case InvoiceStatus["Entered into GP"]:
-          approvalRequestType = InvoiceActionRequestTypes.AccountingClerkApprovalRequired;
-          break;
-        default:
-          return; // End save function because something went wrong.
-      }
+        let approvalRequestType = undefined;
+        // Since there cannot be a change event for the request type dropdown because there is only one option to select I'm setting the values here.
+        switch (event.Invoice_x0020_Status) {
+          case InvoiceStatus["Accountant Approval Required"]:
+            approvalRequestType = InvoiceActionRequestTypes.AccountantApprovalRequired;
+            break;
+          case InvoiceStatus["Hold for Department"]:
+            approvalRequestType = InvoiceActionRequestTypes.EditRequired;
+            break;
+          case InvoiceStatus["Entered into GP"]:
+            approvalRequestType = InvoiceActionRequestTypes.AccountingClerkApprovalRequired;
+            break;
+          default:
+            return; // End save function because something went wrong.
+        }
 
-      // Create the approval request. 
-      this.state.newApproval.Users.map(user => {
-        GetUserByLoginName(user.loginName).then(u => {
-          CreateInvoiceAction(u.Id, approvalRequestType, productInEditId, this.state.newApproval.Description).then(actionRes => {
-            // Add the new action to the list of existing actions.
-            allInvoices[invoiceIndex].Actions = [...allInvoices[invoiceIndex].Actions, actionRes];
-            this.setState({
-              invoices: {
-                data: [...allInvoices],
-                total: allInvoices.length
-              }
+        // Create the approval request. 
+        this.state.newApproval.Users.map(user => {
+          GetUserByLoginName(user.loginName).then(u => {
+            CreateInvoiceAction(u.Id, approvalRequestType, productInEditId, this.state.newApproval.Description).then(actionRes => {
+              // Add the new action to the list of existing actions.
+              allInvoices[invoiceIndex].Actions = [...allInvoices[invoiceIndex].Actions, actionRes];
+              this.setState({
+                invoices: {
+                  data: [...allInvoices],
+                  total: allInvoices.length
+                }
+              });
             });
           });
         });
-      });
+      }
     }
     // End approval request validation. 
 

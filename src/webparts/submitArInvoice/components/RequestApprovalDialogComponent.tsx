@@ -12,6 +12,7 @@ import { ActionStepsComponent } from './ActionStepsComponent';
 
 import { InvoiceActionRequestTypes } from './enums/MyEnums';
 import { PersonaComponent } from './PersonaComponent';
+import { GetUsersByEmail } from './MyHelperMethods';
 
 const buttonStyles = { root: { marginRight: 8 } };
 
@@ -46,8 +47,25 @@ export interface INewApproval {
 export class RequestApprovalCardComponent extends React.Component<IRequestApprovalCardComponentProps, any> {
     constructor(props) {
         super(props);
+
+        /**
+         * This triggers the change event for each default user.  This allows the parent component that is
+         * calling this to handle default users and additional users the same way.
+         */
+        if (this.props.defaultUsers && this.props.onPeoplePickerChange) {
+            GetUsersByEmail(this.props.defaultUsers).then(res => {
+                // GetUsersByEmail returns a LoginName property, but when a PeoplePicker is changed it returns a loginName property. 
+                // To make them the same I'm changing the result of GetUsersByEmail here.
+                res = res.map(r => {
+                    return { ...r, loginName: r.LoginName }
+                });
+                debugger;
+                this.props.onPeoplePickerChange(res);
+            });
+        }
+
         this.state = {
-            Users: []
+            Users: this.props.defaultUsers ? [...this.props.defaultUsers] : []
         };
     }
 
@@ -82,7 +100,6 @@ export class RequestApprovalCardComponent extends React.Component<IRequestApprov
                                     principalTypes={[PrincipalType.User]}
                                     selectedItems={e => { this.setState({ Users: e }); this.props.onPeoplePickerChange(e); }}
                                     defaultSelectedUsers={this.props.defaultUsers ? this.props.defaultUsers : []}
-
                                     isRequired={true}
                                 />
                                 : this.props.defaultUsers
