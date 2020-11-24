@@ -57,7 +57,7 @@ export class RequestApprovalCardComponent extends React.Component<IRequestApprov
                 // GetUsersByEmail returns a LoginName property, but when a PeoplePicker is changed it returns a loginName property. 
                 // To make them the same I'm changing the result of GetUsersByEmail here.
                 res = res.map(r => {
-                    return { ...r, loginName: r.LoginName }
+                    return { ...r, loginName: r.LoginName };
                 });
                 debugger;
                 this.props.onPeoplePickerChange(res);

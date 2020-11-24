@@ -395,7 +395,7 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
                     context={this.props.context}
                     selectedItems={e => {
                       if (e && e.length > 0) {
-                        this.getUsersByLoginName(e)
+                        GetUsersByLoginName(e)
                           .then(res => {
                             formRenderProps.onChange('RequiresAuthorizationBy', { value: res });
                           });
