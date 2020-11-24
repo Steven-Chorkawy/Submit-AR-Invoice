@@ -48,7 +48,7 @@ export class RequestApprovalCardComponent extends React.Component<IRequestApprov
         super(props);
         this.state = {
             Users: []
-        }
+        };
     }
 
     public render() {

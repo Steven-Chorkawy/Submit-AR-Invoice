@@ -295,6 +295,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
         Request_x0020_Type: e.Request_x0020_Type
       };
 
+      // TODO: Maybe use CreateInvoiceAction method from the MyHelperMethods file. 
       sp.web.lists.getByTitle(MyLists.InvoiceActionRequired).items.add(obj)
         .then(response => {
           response.item

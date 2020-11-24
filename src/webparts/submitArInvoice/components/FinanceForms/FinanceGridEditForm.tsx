@@ -54,6 +54,7 @@ interface IFinanceGridEditFormProps {
 
   onApproverChange: any;
   onNoteChange: any;
+
   context: any;
   onRelatedAttachmentAdd: Function;
   onRelatedAttachmentRemove: Function;
@@ -152,8 +153,8 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                         <RequestApprovalCardComponent
                           context={this.props.context}
                           defaultUsers={[this.state.productInEdit.Requested_x0020_By.EMail]}
-                          // Do nothing because there will only be one option. 
-                          onRequestTypeChange={e => { /**Do Nothing */ }}
+                          // Do nothing.
+                          onRequestTypeChange={e => { }}
                           requestOptions={[{ key: InvoiceActionRequestTypes.EditRequired, text: InvoiceActionRequestTypes.EditRequired }]}
                           requestType={InvoiceActionRequestTypes.EditRequired}
                           onPeoplePickerChange={this.props.onApproverChange}
@@ -167,33 +168,12 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                     <div style={{ marginBottom: "2px" }}>
                       <RequestApprovalCardComponent
                         context={this.props.context}
-                        // Do nothing because there will only be one option. 
-                        onRequestTypeChange={e => { console.log(e); }}
+                        onRequestTypeChange={e => { }}
                         requestOptions={[{ key: InvoiceActionRequestTypes.AccountantApprovalRequired, text: InvoiceActionRequestTypes.AccountantApprovalRequired }]}
                         requestType={InvoiceActionRequestTypes.AccountantApprovalRequired}
-
                         onPeoplePickerChange={this.props.onApproverChange}
                         onDescriptionChange={this.props.onNoteChange}
                       />
-                      {/* <Field
-                        id="Requires_x0020_Accountant_x0020_"
-                        name="Requires_x0020_Accountant_x0020_"
-                        label="* Requires Approval From Accountant"
-                        wrapperStyle={{ width: '100%' }}
-                        dataItemKey="Email"
-                        textField="Title"
-                        hint={'Send an accountant approval request.'}
-                        personSelectionLimit={1}
-                        context={this.props.context}
-                        selectedItems={e => {
-                          if (e && e.length > 0) {
-                            GetUsersByLoginName(e).then(res => {
-                              formRenderProps.onChange('Requires_x0020_Accountant_x0020_', { value: res });
-                            });
-                          }
-                        }}
-                        component={MyFormComponents.FormPeoplePicker}
-                      /> */}
                     </div>
                   }
                   {
@@ -203,31 +183,13 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                       <RequestApprovalCardComponent
                         context={this.props.context}
                         // Do nothing because there will only be one option. 
-                        onRequestTypeChange={e => { console.log(e); }}
+                        onRequestTypeChange={e => { }}
                         requestOptions={[{ key: InvoiceActionRequestTypes.AccountingClerkApprovalRequired, text: InvoiceActionRequestTypes.AccountingClerkApprovalRequired }]}
                         requestType={InvoiceActionRequestTypes.AccountingClerkApprovalRequired}
 
                         onPeoplePickerChange={this.props.onApproverChange}
                         onDescriptionChange={this.props.onNoteChange}
                       />
-                      {/* <Field
-                        id="RequiresAccountingClerkTwoApprov"
-                        name="RequiresAccountingClerkTwoApprov"
-                        label="* Requires Approval From Accounting Clerk 2"
-                        wrapperStyle={{ width: '100%' }}
-                        dataItemKey="Email"
-                        textField="Title"
-                        personSelectionLimit={1}
-                        context={this.props.context}
-                        selectedItems={e => {
-                          if (e && e.length > 0) {
-                            GetUsersByLoginName(e).then(res => {
-                              formRenderProps.onChange('RequiresAccountingClerkTwoApprov', { value: res });
-                            });
-                          }
-                        }}
-                        component={MyFormComponents.FormPeoplePicker}
-                      /> */}
                     </div>
                   }
 

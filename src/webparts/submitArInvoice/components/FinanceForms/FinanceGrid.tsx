@@ -22,7 +22,7 @@ import { InvoiceDataProvider, QueryInvoiceData } from '../InvoiceDataProvider';
 import { MyCommandCell } from './MyCommandCell';
 import { filterBy } from '@progress/kendo-data-query';
 import { InvoiceStatus, MyGridStrings, MyContentTypes } from '../enums/MyEnums';
-import { ConvertQueryParamsToKendoFilter, BuildGUID, CreateInvoiceAction } from '../MyHelperMethods';
+import { ConvertQueryParamsToKendoFilter, BuildGUID, CreateInvoiceAction, GetUserByLoginName } from '../MyHelperMethods';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { InvoiceActionRequestTypes } from '../enums/MyEnums';
@@ -303,10 +303,15 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
     });
   }
 
-  // TODO: Test to see what e is equal to.
   public onApproverChange = (e) => {
     this.setState({
       newApproval: { ...this.state.newApproval, Users: e }
+    });
+  }
+
+  public onRequestTypeChange = (e, options, index) => {
+    this.setState({
+      newApproval: { ...this.state.newApproval, RequestType: options.text }
     });
   }
 
@@ -358,19 +363,46 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
     if (event.Invoice_x0020_Status === InvoiceStatus["Accountant Approval Required"]
       || event.Invoice_x0020_Status === InvoiceStatus["Hold for Department"]
       || event.Invoice_x0020_Status === InvoiceStatus["Entered into GP"]) {
-      // Status is set so that we require a users approval. 
-
       // Check if the newApproval state has been set.  Without this we won't be able to get the users.
       if (!this.state.newApproval) {
         return; // Return to end the save event function.
       }
 
-
       // If the Users property is not set or if it is empty that means no user has been provided. 
       if (!this.state.newApproval.Users || this.state.newApproval.Users.length === 0) {
         return; // Return to end the save event function.
       }
+
+      let approvalRequestType = undefined;
+      // Since there cannot be a change event for the request type dropdown because there is only one option to select I'm setting the values here.
+      switch (event.Invoice_x0020_Status) {
+        case InvoiceStatus["Accountant Approval Required"]:
+          approvalRequestType = InvoiceActionRequestTypes.AccountantApprovalRequired;
+          break;
+        case InvoiceStatus["Hold for Department"]:
+          approvalRequestType = InvoiceActionRequestTypes.EditRequired;
+          break;
+        case InvoiceStatus["Entered into GP"]:
+          approvalRequestType = InvoiceActionRequestTypes.AccountingClerkApprovalRequired;
+          break;
+        default:
+          return; // End save function because something went wrong.
+      }
+
+      // Create the approval request. 
+      this.state.newApproval.Users.map(user => {
+        GetUserByLoginName(user.loginName).then(u => {
+          debugger;
+          console.log(u);
+          CreateInvoiceAction(u.Id, approvalRequestType, this.state.productInEdit.ID, this.state.newApproval.Description).then(actionRes => {
+            debugger;
+            console.log(actionRes);
+            // TODO: Update invoice state data here to include the new requests. 
+          });
+        });
+      });
     }
+    // End approval request validation. 
 
     // TODO: Get accounting clerk and or accountants approval here. 
     let updateProperties = {

@@ -62,12 +62,10 @@ export const BuildGUID = () => {
  * @param assignedToId Users who's approval is required.
  * @param requestType What type of request this is.
  * @param arRequestId AR Request ID
- * @param arInvoiceId AR Invoice ID (optional)
  */
-export const CreateInvoiceAction = async (assignedToId: number, requestType: InvoiceActionRequestTypes, arRequestId: number, arInvoiceId?: number, message?: string) => {
+export const CreateInvoiceAction = async (assignedToId: number, requestType: InvoiceActionRequestTypes, arRequestId: number, message?: string) => {
   let newAction: IInvoiceActionRequired = {
     AR_x0020_Invoice_x0020_RequestId: arRequestId,
-    AR_x0020_InvoiceId: arInvoiceId,
     Title: 'Approval Required',
     AssignedToId: assignedToId,
     Body: message ? message : 'Approval Required',
@@ -79,7 +77,10 @@ export const CreateInvoiceAction = async (assignedToId: number, requestType: Inv
     .items
     .add(newAction)
     .then(async result => {
-      return await result.item.get();
+      return await result.item
+        .select('*, AssignedTo/EMail, AssignedTo/Title, Author/EMail, Author/Title')
+        .expand('AssignedTo, Author')
+        .get();
     });
 };
 
