@@ -154,6 +154,17 @@ export const GetUserByEmail = async (email: string): Promise<ISPUser> => {
   }
 };
 
+export const GetUsersByEmail = async (emails: string[]): Promise<ISPUser[]> => {
+  let output:ISPUser[] = [];
+
+  for (let index = 0; index < emails.length; index++) {
+    const email = emails[index];
+    output.push(await GetUserByEmail(email));
+  }
+
+  return output; 
+};
+
 export const GetUserById = async (userId): Promise<ISPUser> => {
   if (userId > 0 && !isNaN(parseInt(userId))) {
     try {
