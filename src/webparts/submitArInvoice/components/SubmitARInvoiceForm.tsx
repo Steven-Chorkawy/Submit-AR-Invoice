@@ -27,7 +27,7 @@ import * as MyFormComponents from './MyFormComponents';
 import { IUploadingFile } from './IMyFormState';
 import * as MyValidators from './validators.jsx';
 import { MyGLAccountComponent } from './MyGLAccountComponent';
-import { BuildGUID } from './MyHelperMethods';
+import { BuildGUID, GetUserProfile } from './MyHelperMethods';
 import { MyLists } from './enums/MyLists';
 import './PersonaComponent';
 
@@ -83,6 +83,17 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
           standardTerms: res['Choices']
         });
       });
+
+
+    // Current user will be used to set default values on the form. 
+    sp.web.currentUser.get().then(user => {
+      debugger;
+      GetUserProfile(user.LoginName, e => {
+        this.setState({
+          currentUser: e
+        });
+      });
+    });
 
     this.state = {
       MyFiles: [],
@@ -349,7 +360,9 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
 
   public render() {
     return (
-        <div style={{ padding: '5px' }} key={this.state.stateHolder ? this.state.stateHolder : 0}>
+      <div style={{ padding: '5px' }} key={this.state.stateHolder ? this.state.stateHolder : 0}>
+        {
+          this.state.currentUser &&
           <Form
             onSubmit={this.handleSubmit}
 
@@ -537,7 +550,8 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
                 {(this.state.MyFiles.length > 0) && this.UploadStatusCard()}
               </FormElement>
             )} />
-        </div>
+        }
+      </div>
     );
   }
 }
