@@ -317,7 +317,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
   //#endregion Update Methods
 
   //#region CRUD Methods
-  public itemChange = (event) => {;
+  public itemChange = (event) => {
     const data = this.state.invoices.data.map(item =>
       item.ID === event.dataItem.ID ? { ...item, [event.field]: event.value } : item
     );
