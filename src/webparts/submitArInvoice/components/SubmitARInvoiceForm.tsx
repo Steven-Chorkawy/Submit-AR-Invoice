@@ -27,7 +27,9 @@ import * as MyFormComponents from './MyFormComponents';
 import { IUploadingFile } from './IMyFormState';
 import * as MyValidators from './validators.jsx';
 import { MyGLAccountComponent } from './MyGLAccountComponent';
-import { BuildGUID, GetUserByEmail, GetUserById, GetUserByLoginName, GetUsersByLoginName } from './MyHelperMethods';
+
+import { BuildGUID, GetUserByEmail, GetUserById, GetUserByLoginName, GetUsersByLoginName, GetUserProfile } from './MyHelperMethods';
+
 import { MyLists } from './enums/MyLists';
 import './PersonaComponent';
 
@@ -76,6 +78,17 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
           standardTerms: res['Choices']
         });
       });
+
+
+    // Current user will be used to set default values on the form. 
+    sp.web.currentUser.get().then(user => {
+      debugger;
+      GetUserProfile(user.LoginName, e => {
+        this.setState({
+          currentUser: e
+        });
+      });
+    });
 
     this.state = {
       MyFiles: [],
@@ -307,100 +320,104 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
   public render() {
     return (
       <div style={{ padding: '5px' }} key={this.state.stateHolder ? this.state.stateHolder : 0}>
-        <Form
-          onSubmit={this.handleSubmit}
+        {
+          this.state.currentUser &&
+          <Form
+            onSubmit={this.handleSubmit}
 
-          initialValues={{
-            Date: new Date(),
-            Urgent: false,
-            StandardTerms: 'NET 30, 1% INTEREST CHARGED',
-            GLAccounts: [],
-            Department: this.state.currentUser && this.state.currentUser.Props['SPS-Department']
-          }}
+            initialValues={{
+              Date: new Date(),
+              Urgent: false,
+              StandardTerms: 'NET 30, 1% INTEREST CHARGED',
+              GLAccounts: [],
+              Department: this.state.currentUser && this.state.currentUser.Props['SPS-Department']
+            }}
 
-          render={(formRenderProps) => (
-            <FormElement >
-              <legend className={'k-form-legend'}>ACCOUNTS RECEIVABLE - INVOICE REQUISITION </legend>
+            render={(formRenderProps) => (
+              <FormElement >
+                <legend className={'k-form-legend'}>ACCOUNTS RECEIVABLE - INVOICE REQUISITION </legend>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Field
-                  id="Requested_x0020_By"
-                  name="Requested_x0020_By"
-                  label="Requested By"
-                  wrapperStyle={{ width: '100%' }}
-                  context={this.props.context}
-                  userEmail={this.props.context.pageContext.user.email}
-                  component={MyFormComponents.FormPersonaDisplay}
-                />
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Field
+                    id="Requested_x0020_By"
+                    name="Requested_x0020_By"
+                    label="Requested By"
+                    wrapperStyle={{ width: '100%' }}
+                    context={this.props.context}
+                    userEmail={this.props.context.pageContext.user.email}
+                    component={MyFormComponents.FormPersonaDisplay}
+                  />
 
-                <Field
-                  id={'Date'}
-                  name={'Date'}
-                  label={'* Date'}
-                  component={MyFormComponents.FormDatePicker}
-                  validator={MyValidators.dateValidator}
-                  wrapperStyle={{ width: '50%' }}
-                />
-              </div>
+                  <Field
+                    id={'Date'}
+                    name={'Date'}
+                    label={'* Date'}
+                    component={MyFormComponents.FormDatePicker}
+                    validator={MyValidators.dateValidator}
+                    wrapperStyle={{ width: '50%' }}
+                  />
+                </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Field
-                  id="Department"
-                  name="Department"
-                  label="* Department"
-                  wrapperStyle={{ width: '50%' }}
-                  data={[
-                    'Administration',
-                    'Clerks Department',
-                    'Community Service',
-                    'Corporate Services Department',
-                    'Emergency Services',
-                    'Engineering Services',
-                    'Finance',
-                    'Legal Services Department',
-                    'Mayor & Council',
-                    'Operations',
-                    'Planning Services'
-                  ]}
-                  validator={MyValidators.departmentValidator}
-                  component={MyFormComponents.FormDropDownList}
-                />
-              </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Field
+                    id="Department"
+                    name="Department"
+                    label="* Department"
+                    wrapperStyle={{ width: '50%' }}
+                    data={[
+                      'Administration',
+                      'Clerks Department',
+                      'Community Service',
+                      'Corporate Services Department',
+                      'Emergency Services',
+                      'Engineering Services',
+                      'Finance',
+                      'Legal Services Department',
+                      'Mayor & Council',
+                      'Operations',
+                      'Planning Services'
+                    ]}
+                    validator={MyValidators.departmentValidator}
+                    component={MyFormComponents.FormDropDownList}
+                  />
+                </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Field
-                  id="RequiresAuthorizationBy"
-                  name="RequiresAuthorizationBy"
-                  label="* Requires Authorization By"
-                  wrapperStyle={{ width: '100%' }}
-                  dataItemKey="Email"
-                  textField="Title"
-                  hint={'Send an approval request to one or more users.'}
-                  personSelectionLimit={10}
-                  context={this.props.context}
-                  selectedItems={e => {
-                    if (e && e.length > 0) {
-                      GetUsersByLoginName(e).then(res => {
-                        formRenderProps.onChange('RequiresAuthorizationBy', { value: res });
-                      });
-                    }
-                  }}
-                  component={MyFormComponents.FormPeoplePicker}
-                />
-              </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Field
+                    id="RequiresAuthorizationBy"
+                    name="RequiresAuthorizationBy"
+                    label="* Requires Authorization By"
+                    wrapperStyle={{ width: '100%' }}
+                    dataItemKey="Email"
+                    textField="Title"
+                    hint={'Send an approval request to one or more users.'}
+                    personSelectionLimit={10}
+                    context={this.props.context}
+                    selectedItems={e => {
+                      if (e && e.length > 0) {
+                        this.getUsersByLoginName(e)
+                          .then(res => {
+                            formRenderProps.onChange('RequiresAuthorizationBy', { value: res });
+                          });
+                      }
+                    }}
+                    component={MyFormComponents.FormPeoplePicker}
+                  />
+                </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Field
-                  id="Urgent"
-                  name="Urgent"
-                  label="Urgent"
-                  onLabel="Yes"
-                  offLabel="No"
-                  labelPlacement={'before'}
-                  component={MyFormComponents.FormCheckbox}
-                  hint={'Flag emails as high priority.'}
-                />
-              </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Field
+                    id="Urgent"
+                    name="Urgent"
+                    label="Urgent"
+                    onLabel="Yes"
+                    offLabel="No"
+                    labelPlacement={'before'}
+                    component={MyFormComponents.FormCheckbox}
+                    hint={'Flag emails as high priority.'}
+                  />
+                </div>
+
               <Field
                 id="Customer"
                 name="Customer"
@@ -479,6 +496,7 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
                 multiple={true}
                 component={MyFormComponents.FormUpload}
               />
+                
               <hr />
 
               <div className="k-form-buttons">
@@ -493,6 +511,7 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
               {(this.state.MyFiles.length > 0) && this.UploadStatusCard()}
             </FormElement>
           )} />
+        }
       </div>
     );
   }

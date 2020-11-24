@@ -28,6 +28,7 @@ import { DropDownList, AutoComplete, MultiSelect, ComboBox } from '@progress/ken
 // Office UI Imports
 import { Persona, PersonaSize } from 'office-ui-fabric-react/lib/Persona';
 import { Shimmer, ShimmerElementsGroup, ShimmerElementType } from 'office-ui-fabric-react/lib/Shimmer';
+import { GetUserProfile } from './MyHelperMethods';
 
 
 // TODO : Make a Persona class that takes user, user email, or user id as a property. 
@@ -48,7 +49,7 @@ interface IPersonaComponentState {
 export class PersonaComponent extends React.Component<IPersonaComponentProps, IPersonaComponentState> {
     constructor(props) {
         super(props);
-    
+
         this.state = {
             userProfile: undefined
         };
@@ -78,17 +79,9 @@ export class PersonaComponent extends React.Component<IPersonaComponentProps, IP
      * @param user ISiteUserInfo 
      */
     private setUserProfileStateFromSiteUser = (user: ISiteUserInfo) => {
-        sp.profiles.getPropertiesFor(user.LoginName).then(userProfileRes => {
-            // This converts UserProfileProperties from an array of key value pairs [{Key:'', Value: ''},{Key:'', Value: ''}]
-            // Into an array of objects [{'Key': 'Value'}, {'Key: 'Value'}]
-            let props = {};
-            userProfileRes.UserProfileProperties.map(p => {
-                props[p.Key] = p.Value;
-            });
-            userProfileRes['Props'] = { ...props };
-
+        GetUserProfile(user.LoginName, (e) => {
             this.setState({
-                userProfile: userProfileRes
+                userProfile: e
             });
         });
     }
