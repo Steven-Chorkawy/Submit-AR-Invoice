@@ -314,8 +314,6 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
       newApproval: { ...this.state.newApproval, RequestType: options.text }
     });
   }
-
-
   //#endregion Update Methods
 
   //#region CRUD Methods
