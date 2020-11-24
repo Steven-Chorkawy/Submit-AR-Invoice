@@ -57,14 +57,18 @@ const CustomStep = (props) => {
                 <span className={`k-step-indicator-icon k-icon ${parseActionType(props)}`}></span>
             </span>
             <Card
-                style={{ marginBottom: '5px' }}
+                style={{ marginBottom: '5px', width: '100%' }}
                 type={
                     props.Response_x0020_Status === InvoiceActionResponseStatus.Waiting ? 'info' :
                         props.Response_x0020_Status === InvoiceActionResponseStatus.Approved ? 'success' :
                             props.Response_x0020_Status === InvoiceActionResponseStatus.Denied || props.Response_x0020_Status === InvoiceActionResponseStatus.Rejected ? 'error' :
                                 ''
                 }>
-                <ActivityItem
+                <CardSubtitle>{props.Request_x0020_Type} | {props.Response_x0020_Status === InvoiceActionResponseStatus.Waiting ? `Waiting for ` : `${props.Response_x0020_Status} by `} {props.AssignedTo.Title}</CardSubtitle>
+                <CardBody style={{ wordWrap: 'normal' }}>
+                    {JSON.stringify(props)}
+                </CardBody>
+                {/* <ActivityItem
                     {
                     ...{
                         label: props.Request_x0020_Type,
@@ -78,7 +82,7 @@ const CustomStep = (props) => {
                     }
                     }
                     key={props.ID}
-                />
+                /> */}
             </Card>
         </Step>
     );
@@ -96,9 +100,7 @@ export class ActionStepsComponent extends React.Component<IActionStepsComponentP
                 <Stepper
                     items={this.props.actions}
                     item={CustomStep}
-                    value={
-                        this.props.actions.map(el => el.Response_x0020_Status).lastIndexOf(InvoiceActionResponseStatus.Approved)
-                    }
+                    value={this.props.actions.map(el => el.Response_x0020_Status).lastIndexOf(InvoiceActionResponseStatus.Approved)}
                     orientation={'vertical'}
                 />
                 {
