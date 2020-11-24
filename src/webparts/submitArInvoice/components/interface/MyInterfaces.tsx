@@ -11,7 +11,6 @@ export interface IARInvoiceAccount {
 }
 
 export interface IInvoiceActionRequired {
-    AR_x0020_InvoiceId?: number;
     ReceivedARRequestId?: number;
     AR_x0020_Invoice_x0020_RequestId?: number;
     Title: string;
