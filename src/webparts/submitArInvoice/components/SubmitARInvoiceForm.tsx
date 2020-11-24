@@ -82,7 +82,6 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
 
     // Current user will be used to set default values on the form. 
     sp.web.currentUser.get().then(user => {
-      debugger;
       GetUserProfile(user.LoginName, e => {
         this.setState({
           currentUser: e

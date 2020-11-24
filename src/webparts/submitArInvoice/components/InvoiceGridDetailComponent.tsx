@@ -27,8 +27,6 @@ export class InvoiceGridDetailComponent extends GridDetailRow {
   public render() {
     return (
       <div style={{ maxWidth: this._maxWidth }}>
-        {console.log('Grid Detail Row.')}
-        {console.log(this.props.dataItem)}
         <div className={'row'}>
           {
             this.props.dataItem.Actions && this.props.dataItem.Actions.length > 0 &&

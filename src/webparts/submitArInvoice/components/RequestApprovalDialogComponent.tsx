@@ -59,7 +59,6 @@ export class RequestApprovalCardComponent extends React.Component<IRequestApprov
                 res = res.map(r => {
                     return { ...r, loginName: r.LoginName };
                 });
-                debugger;
                 this.props.onPeoplePickerChange(res);
             });
         }

@@ -303,9 +303,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
     });
   }
 
-  public onApproverChange = (e) => {
-    debugger;
-
+  public onApproverChange = (e) => {    
     this.setState({
       newApproval: { ...this.state.newApproval, Users: e }
     });
@@ -319,9 +317,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
   //#endregion Update Methods
 
   //#region CRUD Methods
-  public itemChange = (event) => {
-    console.log('itemChange');
-    console.log(event);
+  public itemChange = (event) => {;
     const data = this.state.invoices.data.map(item =>
       item.ID === event.dataItem.ID ? { ...item, [event.field]: event.value } : item
     );
@@ -363,7 +359,6 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
      * If no user is provided, an error message will have already been displayed.
      * All we need to do here is prevent the save event from occurring.
      */
-    debugger;
     if (event.Invoice_x0020_Status !== this.state.productInEdit.Invoice_x0020_Status) {
       if (event.Invoice_x0020_Status === InvoiceStatus["Accountant Approval Required"]
         || event.Invoice_x0020_Status === InvoiceStatus["Hold for Department"]
@@ -424,9 +419,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
     };
 
     sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(productInEditId).update(updateProperties).then(value => {
-      debugger;
-      allInvoices[invoiceIndex] = { ...allInvoices[invoiceIndex], ...updateProperties };
-      debugger;
+      allInvoices[invoiceIndex] = { ...allInvoices[invoiceIndex], ...updateProperties };  
       // If all goes well we can remove the product in edit. 
       this.setState({
         invoices: {
