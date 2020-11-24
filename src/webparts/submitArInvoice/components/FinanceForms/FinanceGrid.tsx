@@ -346,12 +346,11 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
    * onSubmit
    */
   public handleSubmit = (event) => {
-    console.log('handleSubmit');
-    console.log(event);
-    console.log('New Approvals');
-    debugger;
-    console.log(this.state.newApproval);
-
+    // Hold all the invoices, we will use this to update the entire state later. 
+    let allInvoices = this.state.invoices.data;
+    // The index of the invoice that is currently in edit.
+    const invoiceIndex = allInvoices.findIndex(f => f.ID === this.state.productInEdit.ID);
+    const productInEditId = this.state.productInEdit.ID;
     /**
      * When status is equal to 'Accountant Approval Required', 'Hold for Department', or 'Entered into GP'
      * a user must be selected to create an approval request. 
@@ -392,12 +391,15 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
       // Create the approval request. 
       this.state.newApproval.Users.map(user => {
         GetUserByLoginName(user.loginName).then(u => {
-          debugger;
-          console.log(u);
-          CreateInvoiceAction(u.Id, approvalRequestType, this.state.productInEdit.ID, this.state.newApproval.Description).then(actionRes => {
-            debugger;
-            console.log(actionRes);
-            // TODO: Update invoice state data here to include the new requests. 
+          CreateInvoiceAction(u.Id, approvalRequestType, productInEditId, this.state.newApproval.Description).then(actionRes => {
+            // Add the new action to the list of existing actions.
+            allInvoices[invoiceIndex].Actions = [...allInvoices[invoiceIndex].Actions, actionRes];
+            this.setState({
+              invoices: {
+                data: [...allInvoices],
+                total: allInvoices.length
+              }
+            });
           });
         });
       });
@@ -411,8 +413,21 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
       Batch_x0020_Number: event.Batch_x0020_Number
     };
 
-    console.log('update these properties');
-    console.log(updateProperties);
+    sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(productInEditId).update(updateProperties).then(value => {
+      debugger;
+      allInvoices[invoiceIndex] = { ...allInvoices[invoiceIndex], ...updateProperties };
+      debugger;
+      // If all goes well we can remove the product in edit. 
+      this.setState({
+        invoices: {
+          data: [...allInvoices],
+          total: allInvoices.length
+        },
+        productInEdit: undefined
+      });
+    }).catch(reason => {
+      alert('Something went wrong!  Could not save.');
+    });
   }
 
   /**
