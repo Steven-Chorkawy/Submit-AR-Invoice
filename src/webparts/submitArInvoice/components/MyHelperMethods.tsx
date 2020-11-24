@@ -1,6 +1,5 @@
 import { UrlQueryParameterCollection } from '@microsoft/sp-core-library';
-import { InvoiceActionRequiredRequestType, IInvoiceActionRequired } from './interface/IInvoiceActionRequired';
-import { InvoiceActionResponseStatus, MyContentTypes } from './enums/MyEnums';
+import { InvoiceActionRequestTypes, InvoiceActionResponseStatus, MyContentTypes } from './enums/MyEnums';
 import { sp } from "@pnp/sp";
 import "@pnp/sp/webs";
 import "@pnp/sp/files";
@@ -8,7 +7,8 @@ import "@pnp/sp/folders";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
 import { MyLists } from './enums/MyLists';
-import { IInvoiceAction } from './interface/InvoiceItem';
+import { IInvoiceAction, IInvoiceActionRequired } from './interface/MyInterfaces';
+import { ISPUser } from './interface/MyInterfaces';
 
 
 interface IMyKendoFilter {
@@ -62,12 +62,10 @@ export const BuildGUID = () => {
  * @param assignedToId Users who's approval is required.
  * @param requestType What type of request this is.
  * @param arRequestId AR Request ID
- * @param arInvoiceId AR Invoice ID (optional)
  */
-export const CreateInvoiceAction = async (assignedToId: number, requestType: InvoiceActionRequiredRequestType, arRequestId: number, arInvoiceId?: number, message?: string) => {
+export const CreateInvoiceAction = async (assignedToId: number, requestType: InvoiceActionRequestTypes, arRequestId: number, message?: string) => {
   let newAction: IInvoiceActionRequired = {
     AR_x0020_Invoice_x0020_RequestId: arRequestId,
-    AR_x0020_InvoiceId: arInvoiceId,
     Title: 'Approval Required',
     AssignedToId: assignedToId,
     Body: message ? message : 'Approval Required',
@@ -79,7 +77,10 @@ export const CreateInvoiceAction = async (assignedToId: number, requestType: Inv
     .items
     .add(newAction)
     .then(async result => {
-      return await result.item.get();
+      return await result.item
+        .select('*, AssignedTo/EMail, AssignedTo/Title, Author/EMail, Author/Title')
+        .expand('AssignedTo, Author')
+        .get();
     });
 };
 
@@ -142,7 +143,52 @@ export const SendApprovalResponse = async (response: string, comment: string, in
   }
 };
 
-/**
+//#region Get User Methods
+export const GetUserByEmail = async (email: string): Promise<ISPUser> => {
+  try {
+    return await sp.web.siteUsers.getByEmail(email).get();
+  } catch (error) {
+    console.error('Error getting Id of user by Email ', error);
+    throw error;
+  }
+};
+
+export const GetUsersByEmail = async (emails: string[]): Promise<ISPUser[]> => {
+  let output:ISPUser[] = [];
+
+  for (let index = 0; index < emails.length; index++) {
+    const email = emails[index];
+    output.push(await GetUserByEmail(email));
+  }
+
+  return output; 
+};
+
+export const GetUserById = async (userId): Promise<ISPUser> => {
+  if (userId > 0 && !isNaN(parseInt(userId))) {
+    try {
+      return await sp.web.siteUsers.getById(userId).get();
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+};
+
+export const GetUserByLoginName = async (loginName: string): Promise<ISPUser> => {
+  return await sp.web.siteUsers.getByLoginName(loginName).get();
+};
+
+export const GetUsersByLoginName = async (users: Array<any>): Promise<Array<ISPUser>> => {
+  let returnOutput: Array<ISPUser> = [];
+  for (let index = 0; index < users.length; index++) {
+    const user = users[index];
+    returnOutput.push(await GetUserByLoginName(user.loginName));
+  }
+  return returnOutput;
+};
+    
+    /**
  * Get user profile details.
  * @param loginName A Users LoginName
  * @param callBack Call Back method is passed the users profile.
@@ -160,3 +206,5 @@ export const GetUserProfile = async (loginName: string, callBack: Function) => {
     callBack(userProfileRes);
   });
 };
+//#endregion Get User Methods
+

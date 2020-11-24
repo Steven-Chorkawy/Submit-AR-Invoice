@@ -35,8 +35,7 @@ import { MyLists } from '../enums/MyLists';
 import { MyContentTypes } from '../enums/MyEnums';
 import { FileRefCell } from '../FileRefCell';
 import { IDCell } from '../IDCell';
-import { IInvoiceItem, IPersonField, IInvoiceUpdateItem } from '../interface/InvoiceItem';
-import { IMySaveResult } from '../interface/IMySaveResult';
+import { IInvoiceItem, IInvoiceUpdateItem, IMySaveResult } from '../interface/MyInterfaces';
 import { QuickFilterButtonGroup } from '../QuickFilterButtonGroup';
 
 
@@ -296,6 +295,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
         Request_x0020_Type: e.Request_x0020_Type
       };
 
+      // TODO: Maybe use CreateInvoiceAction method from the MyHelperMethods file. 
       sp.web.lists.getByTitle(MyLists.InvoiceActionRequired).items.add(obj)
         .then(response => {
           response.item
@@ -385,9 +385,6 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
    * @param event Data Submitted from form.
    */
   public handleSubmit = (event) => {
-    // Used to determine if we're updating an invoice request or an invoice.
-    let listName = '';
-
     let currentEditItem: IInvoiceUpdateItem = {
       Id: event.Id,
       ID: event.ID,
@@ -423,18 +420,9 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
       }
     }
 
-    // This is where we are checking to see what type of invoice (request, or not) we are editing.
-    if (event.ContentTypeId === MyContentTypes["AR Request List Item"]) {
-      // Update a request item.
-      listName = MyLists["AR Invoice Requests"];
-    }
-    else {
-      // Update a document item.
-      listName = MyLists["AR Invoices"];
-    }
 
     sp.web.lists
-      .getByTitle(listName)
+      .getByTitle(MyLists["AR Invoice Requests"])
       .items
       .getById(currentEditItem.ID)
       .update(currentEditItem)

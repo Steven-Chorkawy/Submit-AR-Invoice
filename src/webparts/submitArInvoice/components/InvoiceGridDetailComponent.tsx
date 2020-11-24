@@ -8,7 +8,7 @@ import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/
 
 // Custom Imports
 import { ActionStepsComponent } from './ActionStepsComponent';
-import { IInvoiceItem } from './interface/InvoiceItem';
+import { IInvoiceItem } from './interface/MyInterfaces';
 import { GLAccountsListView, GLAccountsListViewDisplayMode } from './MyFinanceGLAccounts';
 
 
@@ -45,15 +45,14 @@ export class InvoiceGridDetailComponent extends GridDetailRow {
           {
             this.props.dataItem.AccountDetails &&
             <div className={this._bsColClassNames}>
-            <Card>
-              <CardBody>
-                <CardTitle>GL Account Codes</CardTitle>
-                <GLAccountsListView editable={false} displayMode={GLAccountsListViewDisplayMode.vertical} value={this.props.dataItem.AccountDetails} />
-              </CardBody>
-            </Card>
-          </div>
+              <Card>
+                <CardBody>
+                  <CardTitle>GL Account Codes</CardTitle>
+                  <GLAccountsListView editable={false} displayMode={GLAccountsListViewDisplayMode.vertical} value={this.props.dataItem.AccountDetails} />
+                </CardBody>
+              </Card>
+            </div>
           }
-          <div className={this._bsColClassNames}>3</div>
         </div>
       </div>
     );

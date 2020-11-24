@@ -4,7 +4,7 @@ import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import { ListView, ListViewHeader, ListViewFooter } from '@progress/kendo-react-listview';
 import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/kendo-react-layout';
 import { Button } from '@progress/kendo-react-buttons';
-import { IInvoiceAction } from './interface/InvoiceItem';
+import { IInvoiceAction } from './interface/MyInterfaces';
 import { InvoiceActionResponseStatus } from './enums/MyEnums';
 
 interface IActionResponseComponentProps {

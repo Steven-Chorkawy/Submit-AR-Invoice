@@ -8,9 +8,8 @@ import { Button } from '@progress/kendo-react-buttons';
 import { ActivityItem, IActivityItemProps, Link, mergeStyleSets } from 'office-ui-fabric-react';
 import Moment from 'react-moment';
 
-import { IInvoiceAction } from './interface/InvoiceItem';
-import { InvoiceActionResponseStatus } from './enums/MyEnums';
-import { IInvoiceActionRequired, InvoiceActionRequiredRequestType } from './interface/IInvoiceActionRequired';
+import { IInvoiceAction } from './interface/MyInterfaces';
+import { InvoiceActionResponseStatus, InvoiceActionRequestTypes } from './enums/MyEnums';
 
 import { PersonaComponent } from './PersonaComponent';
 import { PersonaSize } from '@fluentui/react';
@@ -32,12 +31,12 @@ const classNames = mergeStyleSets({
 const parseActionType = (action) => {
     let output = 'k-i-info';
     switch (action.Request_x0020_Type) {
-        case InvoiceActionRequiredRequestType.DepartmentApprovalRequired:
-        case InvoiceActionRequiredRequestType.AccountantApprovalRequired:
-        case InvoiceActionRequiredRequestType.AccountingClerk2ApprovalRequired:
+        case InvoiceActionRequestTypes.DepartmentApprovalRequired:
+        case InvoiceActionRequestTypes.AccountantApprovalRequired:
+        case InvoiceActionRequestTypes.AccountingClerkApprovalRequired:
             output = 'k-i-check';
             break;
-        case InvoiceActionRequiredRequestType.EditRequired:
+        case InvoiceActionRequestTypes.EditRequired:
             output = 'k-i-edit';
             break;
         default:

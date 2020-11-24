@@ -19,7 +19,7 @@ import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
 import { MyAttachmentComponent } from '../MyAttachmentComponent';
 import { ActionStepsComponent } from '../ActionStepsComponent';
 
-import { IInvoiceItem } from '../interface/InvoiceItem';
+import { IInvoiceItem } from '../interface/MyInterfaces';
 import { InvoiceActionResponseStatus } from '../enums/MyEnums';
 import { MyLists } from '../enums/MyLists';
 
