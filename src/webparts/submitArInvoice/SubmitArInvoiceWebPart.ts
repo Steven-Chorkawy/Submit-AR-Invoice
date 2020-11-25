@@ -175,7 +175,7 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
           { context: this.context }
         );
 
-        ReactDom.render(financeForm, this.domElement);
+        ReactDom.render(invoiceListView, this.domElement);
         break;
       default:
         break;
@@ -204,7 +204,7 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
                     { key: ActiveDisplay.CreateARForm, text: 'Create AR Form' },
                     { key: ActiveDisplay.DepartmentForm, text: 'Departments Form' },
                     { key: ActiveDisplay.FinanceForm, text: 'Finance Form' },
-                    { key: ActiveDisplay.DepartmentListView, text: 'Department List View' },
+                    { key: ActiveDisplay.InvoiceListView, text: 'Invoice List View' },
                   ]
                 }),
               ]
