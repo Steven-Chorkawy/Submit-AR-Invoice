@@ -80,6 +80,36 @@ class LoadingPanel extends React.Component {
   }
 }
 
+const QueryInvoiceData2 = (e, callBack: Function) => {
+  const includeString = `*,
+  Requested_x0020_By/Id,
+  Requested_x0020_By/Title,
+  Requested_x0020_By/EMail,
+  Requires_x0020_Department_x0020_/Id,
+  Requires_x0020_Department_x0020_/Title,
+  Requires_x0020_Department_x0020_/EMail,
+  Requires_x0020_Accountant_x0020_/Id,
+  Requires_x0020_Accountant_x0020_/Title,
+  Requires_x0020_Accountant_x0020_/EMail,
+  RequiresAccountingClerkTwoApprov/Id,
+  RequiresAccountingClerkTwoApprov/Title,
+  RequiresAccountingClerkTwoApprov/EMail,
+  RelatedAttachments/Title,
+  RelatedAttachments/Id,
+  RelatedAttachments/ID`;
+
+  const expandString = `
+  Requested_x0020_By,
+  Requires_x0020_Department_x0020_,
+  Requires_x0020_Accountant_x0020_,
+  RequiresAccountingClerkTwoApprov,
+  RelatedAttachments`;
+
+  sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.select(includeString).expand(expandString).getAll().then(async response => {
+    callBack(response);
+  });
+}
+
 // TODO: Test that this function works by calling it in another method.
 // TODO: Replace the logic in the original calling method with this function.
 /**
@@ -269,8 +299,7 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
 
             // Add the customer data.
             // The reason I'm doing this here and not in the extend is because some fields from the customer list weren't working!!!
-            if(processedResponse.data[index].CustomerId)
-            {
+            if (processedResponse.data[index].CustomerId) {
               let customer = await sp.web.lists.getByTitle(MyLists.Customers).items.getById(processedResponse.data[index].CustomerId).get();
               processedResponse.data[index].Customer = customer;
             }
@@ -382,4 +411,4 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
 
 
 
-export { InvoiceDataProvider, QueryInvoiceData };
+export { InvoiceDataProvider, QueryInvoiceData, QueryInvoiceData2 };
