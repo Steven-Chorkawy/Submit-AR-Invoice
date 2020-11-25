@@ -28,6 +28,7 @@ import * as strings from 'SubmitArInvoiceWebPartStrings';
 
 import { SubmitARInvoiceForm, IMyFormProps } from './components/SubmitARInvoiceForm';
 import { FinanceGrid } from './components/FinanceForms/FinanceGrid';
+import { InvoiceListView } from './components/InvoiceListView/InvoiceListView';
 import { DepartmentGrid } from './components/DepartmentForm/DepartmentGrid';
 import { DepartmentListView } from './components/DepartmentForm/DepartmentListView';
 
@@ -41,7 +42,8 @@ export enum ActiveDisplay {
   CreateARForm = 1,
   DepartmentForm = 2,
   FinanceForm = 3,
-  DepartmentListView = 4
+  DepartmentListView = 4,
+  InvoiceListView = 5
 }
 
 
@@ -166,6 +168,15 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
         ReactDom.render(financeForm, this.domElement);
         break;
 
+
+      case ActiveDisplay.InvoiceListView:
+        let invoiceListView: React.ReactElement = React.createElement(
+          InvoiceListView,
+          { context: this.context }
+        );
+
+        ReactDom.render(financeForm, this.domElement);
+        break;
       default:
         break;
     }
