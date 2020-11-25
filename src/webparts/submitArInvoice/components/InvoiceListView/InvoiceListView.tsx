@@ -13,11 +13,12 @@ import "@pnp/sp/items";
 // Kendo Imports.
 import { filterBy } from '@progress/kendo-data-query';
 import { ListView } from '@progress/kendo-react-listview';
-import { Card, CardTitle, CardImage, CardBody, CardSubtitle } from '@progress/kendo-react-layout';
+import { Card, CardTitle, CardImage, CardBody, CardSubtitle, CardActions } from '@progress/kendo-react-layout';
 import { Input } from '@progress/kendo-react-inputs';
 import { FloatingLabel } from '@progress/kendo-react-labels';
 import { ChipList, Chip } from '@progress/kendo-react-buttons';
 import { DropDownList } from '@progress/kendo-react-dropdowns';
+import { Button, SplitButton, DropDownButton } from '@progress/kendo-react-buttons';
 
 // Fluent UI Imports. 
 import { Shimmer } from 'office-ui-fabric-react/lib/Shimmer';
@@ -63,6 +64,9 @@ interface IInvoiceListViewState {
 
 }
 
+/**
+ * An Item in the InvoiceListView list. 
+ */
 class InvoiceListViewItemRender extends React.Component<any, any> {
 	constructor(props) {
 		super(props);
@@ -78,7 +82,10 @@ class InvoiceListViewItemRender extends React.Component<any, any> {
 			});
 		}
 	}
+
+	//#region CRUD Methods
 	public enterEdit = () => {
+		debugger;
 		this.setState({ item: { ...this.state.item, edit: true } });
 	}
 	public cancelEdit = () => {
@@ -96,17 +103,18 @@ class InvoiceListViewItemRender extends React.Component<any, any> {
 	public handleDelete = () => {
 		this.props.deleteItem(this.state.item);
 	}
+	//#endregion
 
 	//#region Component Functions
-	private EditBody = (props?:any) => {
+	private EditBody = (props?: any) => {
 		const item = this.props.dataItem;
 		return (
 			<CardBody>
 				<div className='k-hbox k-justify-content-between k-flex-wrap'>
-					<div style={{ width: '40%', padding: '5 0' }}>
+					<div style={{ width: '40%', padding: '5 0', wordWrap: 'break-word' }}>
 						{JSON.stringify(item)}
 					</div>
-					<div style={{ width: '25%', padding: '5 0' }}>
+					<div style={{ width: '60%', padding: '5 0' }}>
 						<button className='k-button k-primary' style={{ marginRight: 5 }} onClick={this.handleSave}>Save</button>
 						<button className='k-button' onClick={this.cancelEdit}>Cancel</button>
 					</div>
@@ -115,45 +123,60 @@ class InvoiceListViewItemRender extends React.Component<any, any> {
 		);
 	}
 
-	private ViewBody = (props?:any) => {
-		debugger;
+	private ViewBody = (props?: any) => {
 		const item = this.props.dataItem;
-		console.log(item);
+
+		const iconItems = [
+			{ text: "Edit", icon: "edit" },
+			{ text: "Cancel", icon: "cancel" },
+			{ text: "Request Approval", icon: "check" }
+		];
+
+		const onItemClick = (e) => {
+			switch (e.item.text.toLowerCase()) {
+				case "edit":
+					this.enterEdit();
+					break;
+				case "cancel":
+					alert('TODO: Open Cancel Dialog.');
+					break;
+				case "request approval":
+					alert('TODO: Open Approval Dialog.');
+					break;
+				default:
+					alert('No action set for this button');
+					break;
+			}
+		};
 		return (
 			<CardBody>
 				<div className='k-hbox k-justify-content-between k-flex-wrap'>
-					<div style={{ width: '40%', padding: '5 0' }}>
+					<div style={{ width: '90%', padding: '5 0' }}>
 						<CardTitle style={{ fontSize: 16 }}>
-							{item.ID} | {item.Title}
+							{item.Urgent && <span className={'k-icon k-i-warning'}></span>} <span>{item.ID}</span> | {item.Invoice_x0020_Status} | {item.Title}
 						</CardTitle>
 						<CardSubtitle>
-							{item.Status}
+							sub title here
 						</CardSubtitle>
 					</div>
-					<div style={{ width: '25%', padding: '5 0' }}>
-						<button className='k-button k-primary' style={{ marginRight: 5 }} onClick={this.enterEdit}>Edit</button>
-						<button className='k-button' onClick={this.handleDelete}>Delete</button>
+					<div style={{ width: '10%', padding: '5 0' }}>
+						<SplitButton items={iconItems} text={'Edit'} icon={'edit'} look="flat" onButtonClick={this.enterEdit} onItemClick={(e) => onItemClick(e)} />
 					</div>
 				</div>
+				<CardActions layout='stretched'>
+					<Button className={'k-text-success'} icon='check' look='flat'>Approve</Button>
+					<Button className={'k-text-error'} icon='times' look='flat'>Deny</Button>
+				</CardActions>
 			</CardBody>
 		);
 	}
 	//#endregion
 
 	public render() {
-		const item = this.props.dataItem;
-		const cardTypes = {
-			Pending: 'info',
-			Approved: 'success',
-			Deny: 'error',
-			void: null
-		};
 		return (
-			<div key={this.props.dataItem.ID}>
-				<Card orientation='horizontal' type={cardTypes[this.props.dataItem.Status]} style={{ borderWidth: '0px 0px 1px' }}>
-					{this.state.item.edit ? this.EditBody(): this.ViewBody()}
-				</Card>
-			</div>
+			<Card key={this.props.dataItem.ID} orientation='horizontal' style={{ marginBottom: '2.5px', marginTop: '2.5px' }}>
+				{this.state.item.edit ? this.EditBody() : this.ViewBody()}
+			</Card>
 		);
 	}
 }
@@ -169,6 +192,7 @@ export class InvoiceListView extends React.Component<any, IInvoiceListViewState>
 			allInvoices: undefined,
 		};
 
+		// ! This is what populates the list view with data. 
 		QueryInvoiceData2(null, invoices => {
 			// Create a new variable by reference. Changes made to 'a' will be reflected in 'b'.
 			// let a = b
@@ -234,13 +258,15 @@ export class InvoiceListView extends React.Component<any, IInvoiceListViewState>
 	public render() {
 		return (
 			this.state.data ?
-				<ListView
-					onScroll={this.scrollHandler}
-					data={this.state.data}
-					item={this.MyItemRender}
-					style={{ width: "100%", height: 530 }}
-					header={this.MyHeader}
-				/> :
+				<div>
+					<ListView
+						onScroll={this.scrollHandler}
+						data={this.state.data}
+						item={this.MyItemRender}
+						style={{ width: "100%", minHeight: 530 }}
+						header={this.MyHeader}
+					/>
+				</div> :
 				<div>
 					<div style={{ padding: 2 }}>
 						<Shimmer />
