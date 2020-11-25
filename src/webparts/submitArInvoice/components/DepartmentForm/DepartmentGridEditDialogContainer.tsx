@@ -8,19 +8,15 @@ import { Form, FormElement, Field, FieldArray } from '@progress/kendo-react-form
 import { Button } from '@progress/kendo-react-buttons';
 import { Card, CardTitle, CardBody } from '@progress/kendo-react-layout';
 import { filterBy } from '@progress/kendo-data-query';
-import { Label, Error, Hint, FloatingLabel } from '@progress/kendo-react-labels';
-
-import { Facepile, Panel, PanelType, PrimaryButton, DefaultButton, Dropdown, TextField } from '@fluentui/react';
+import { Label } from '@progress/kendo-react-labels';
 
 import * as MyFormComponents from '../MyFormComponents';
 import * as MyValidators from '../validators.jsx';
 import { GLAccountsListViewComponent } from '../MyFinanceGLAccounts';
-import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
 import { MyAttachmentComponent } from '../MyAttachmentComponent';
 import { ActionStepsComponent } from '../ActionStepsComponent';
 
 import { IInvoiceItem } from '../interface/MyInterfaces';
-import { InvoiceActionResponseStatus } from '../enums/MyEnums';
 import { MyLists } from '../enums/MyLists';
 
 interface IDepartmentGridEditDialogContainerState {
