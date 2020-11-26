@@ -287,7 +287,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
       const user = e.Users[index];
 
       let obj = {
-        Title: 'Approval Required',
+        Title: e.Request_x0020_Type,
         AssignedToId: user.Id,
         AR_x0020_Invoice_x0020_RequestId: reqForInvoice.ID,
         Body: e.Description,
@@ -640,7 +640,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
           .items
           .add(cancelReqUpdateObj)
           .then(createRes => {
-            var indexOf = this.state.data.data.findIndex(f => f.ID === dataItem.Id);;
+            var indexOf = this.state.data.data.findIndex(f => f.ID === dataItem.Id);
 
             // Update the state objects.
             sp.web.lists.getByTitle(MyLists["Cancel Invoice Request"])
@@ -732,7 +732,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
 
         </Grid>
         {
-          this.state.productInEdit ?
+          this.state.productInEdit &&
             <DepartmentGridEditDialogContainer
               context={this.props.context}
               dataItem={this.state.productInEdit}
@@ -763,13 +763,14 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
               }
               cancel={this.cancel}
             />
-            : this.state.productInCancel ?
-              <MyCancelDialogContainer
-                dataItem={this.state.productInCancel}
-                save={this.sendCancelRequest}
-                cancel={() => { this.setState({ productInCancel: undefined }); }}
-              />
-              : null
+        }
+        {
+          this.state.productInCancel &&
+          <MyCancelDialogContainer
+            dataItem={this.state.productInCancel}
+            save={this.sendCancelRequest}
+            cancel={() => { this.setState({ productInCancel: undefined }); }}
+          />
         }
         {
           this.state.productInApproval &&
@@ -849,7 +850,7 @@ export function MyCommandCell({ edit, cancel, approvalResponse, requestApproval,
           case "cancel":
             cancel(dataItem);
             break;
-          case "Request User Action":
+          case "request user action":
             requestApproval(dataItem);
             break;
           default:
