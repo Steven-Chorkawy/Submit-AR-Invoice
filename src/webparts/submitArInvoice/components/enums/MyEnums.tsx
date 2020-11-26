@@ -11,7 +11,8 @@ export enum InvoiceStatus {
   'Hold for Finance' = 'Hold for Finance',
   'Ready to Invoice' = 'Ready to Invoice',
   'Entered into GP' = 'Entered into GP',
-  'Completed' = 'Completed'
+  'Completed' = 'Completed',
+  'Cancelled' = 'Cancelled'
 }
 
 /**
