@@ -613,6 +613,17 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
       });
   }
 
+  /**
+   * TODO: This  method should also create approval requests. 
+   * * The approval request should a type of InvoiceActionRequestTypes.CancelRequest.
+   */
+  /**
+   * ! What if I removed the Cancel Request list and only used the Invoice Action list.
+   * ! That way to submit a Cancel Request a user could do it the same way they submit an approval. 
+   * ! The cancel request would also be approved or denied by the user as well same as an approval request.
+   * ! Then the only way we would keep track of if an invoice is cancelled or not would be through it's status
+   * ! and it's 'action' requests. 
+   */
   public sendCancelRequest = () => {
     sp.web.currentUser.get()
       .then(currentUser => {
@@ -620,46 +631,26 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
 
         var cancelReqUpdateObj = {
           Title: 'Invoice Cancel Request',
-          //Invoice_x0020_NumberId: dataItem.ID,
+          AR_x0020_Invoice_x0020_RequestId: dataItem.ID,
           Requested_x0020_ById: currentUser.Id,
           Requester_x0020_Comments: dataItem.CancelComment
         };
-
-        if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
-          cancelReqUpdateObj['AR_x0020_Invoice_x0020_RequestId'] = dataItem.Id;
-        }
-        else {
-          cancelReqUpdateObj['Invoice_x0020_NumberId'] = dataItem.Id;
-          cancelReqUpdateObj['AR_x0020_Invoice_x0020_RequestId'] = dataItem.AR_x0020_RequestId;
-        }
 
         sp.web.lists.getByTitle(MyLists["Cancel Invoice Request"])
           .items
           .add(cancelReqUpdateObj)
           .then(createRes => {
+            var indexOf = this.state.data.data.findIndex(f => f.ID === dataItem.Id);;
 
-            var indexOf = -1;
-            var arReqId = -1;
-
-            if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
-              indexOf = this.state.data.data.findIndex(f => f.ID === dataItem.Id);
-              arReqId = dataItem.Id;
-            }
-            else {
-              indexOf = this.state.data.data.findIndex(f => f.AR_x0020_RequestId === dataItem.AR_x0020_RequestId);
-              arReqId = dataItem.AR_x0020_RequestId;
-            }
-
+            // Update the state objects.
             sp.web.lists.getByTitle(MyLists["Cancel Invoice Request"])
               .items.getById(createRes.data.Id)
               .select('*, Requested_x0020_By/EMail, Requested_x0020_By/Title')
               .expand('Requested_x0020_By')
               .get()
               .then(response => {
-
                 var updatedARs = this.state.data.data;
                 updatedARs[indexOf].CancelRequests.push(response);
-
                 this.setState({
                   data: {
                     data: updatedARs,
