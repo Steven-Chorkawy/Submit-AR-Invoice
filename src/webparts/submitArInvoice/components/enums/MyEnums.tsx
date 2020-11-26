@@ -25,11 +25,20 @@ export enum InvoiceActionResponseStatus {
   Waiting = 'Waiting'
 }
 
+/**
+ * * Here are the values copied directly from the SharePoint column settings as of November 26 2020. 
+ * Department Approval Required
+ * Accountant Approval Required
+ * Accounting Clerk2 Approval Required
+ * Edit Required
+ * Cancel Request
+ */
 export enum InvoiceActionRequestTypes {
   DepartmentApprovalRequired = 'Department Approval Required',
   AccountantApprovalRequired = 'Accountant Approval Required',
   AccountingClerkApprovalRequired = 'Accounting Clerk2 Approval Required',
-  EditRequired = 'Edit Required'
+  EditRequired = 'Edit Required',
+  CancelRequest = 'Cancel Request'
 }
 
 export enum MyGridStrings {
