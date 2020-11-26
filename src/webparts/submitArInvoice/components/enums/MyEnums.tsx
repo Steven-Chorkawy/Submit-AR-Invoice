@@ -26,12 +26,14 @@ export enum InvoiceActionResponseStatus {
 }
 
 /**
+ * These are the possible request types (Request_x0020_Type) that an Invoice Action can have. 
+ * 
  * * Here are the values copied directly from the SharePoint column settings as of November 26 2020. 
- * Department Approval Required
- * Accountant Approval Required
- * Accounting Clerk2 Approval Required
- * Edit Required
- * Cancel Request
+ * * Department Approval Required
+ * * Accountant Approval Required
+ * * Accounting Clerk2 Approval Required
+ * * Edit Required
+ * * Cancel Request
  */
 export enum InvoiceActionRequestTypes {
   DepartmentApprovalRequired = 'Department Approval Required',
