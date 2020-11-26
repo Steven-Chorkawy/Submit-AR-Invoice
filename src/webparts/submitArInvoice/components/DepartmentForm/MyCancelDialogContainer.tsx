@@ -2,13 +2,19 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 
+// Kendo Imports
 import { Dialog, DialogActionsBar } from '@progress/kendo-react-dialogs';
+
+// Fluent UI Imports
+import { Panel, PanelType, PrimaryButton, DefaultButton, Dropdown, TextField, IDropdownOption, Label } from '@fluentui/react';
 
 interface IMyEditDialogContainerProps {
   dataItem: any;
   cancel: any;
   save: any;
 }
+
+const buttonStyles = { root: { marginRight: 8 } };
 
 export class MyCancelDialogContainer extends React.Component<IMyEditDialogContainerProps, any> {
   constructor(props) {
@@ -36,22 +42,29 @@ export class MyCancelDialogContainer extends React.Component<IMyEditDialogContai
     });
   }
 
+  //#region Render Methods
+  private onRenderFooterContent = (props) => (
+    <div>
+      <PrimaryButton onClick={this.props.save} styles={buttonStyles}>Save</PrimaryButton>
+      <DefaultButton onClick={this.props.cancel}>Cancel</DefaultButton>
+    </div>
+  )
+  //#endregion
+
   public render() {
     return (
-      <Dialog onClose={this.props.cancel} title={"Cancel AR Invoice Request"} minWidth="200px" width="40%">
-        <h4>Enter Cancel Comment</h4>
-        <textarea style={{width:'100%'}} id={'CancelComment'} onChange={this.onDialogInputChange}></textarea>
-        <DialogActionsBar>
-          <button
-            className="k-button k-primary"
-            onClick={this.props.save}
-          >Send Cancel Request</button>
-          <button
-            className="k-button"
-            onClick={this.props.cancel}
-          >Close</button>
-        </DialogActionsBar>
-      </Dialog>
+      <Panel
+        isOpen={true}
+        onDismiss={this.props.cancel}
+        type={PanelType.medium}
+        closeButtonAriaLabel="Close"
+        headerText="Submit Cancel Request"
+        onRenderFooterContent={this.onRenderFooterContent}
+        isFooterAtBottom={true}
+      >
+        <Label>Comment for Cancel Request</Label>
+        <textarea style={{ width: '100%' }} id={'CancelComment'} onChange={this.onDialogInputChange}></textarea>
+      </Panel>
     );
   }
 }
