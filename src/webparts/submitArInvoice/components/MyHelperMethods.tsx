@@ -84,7 +84,7 @@ export const CreateInvoiceAction = async (assignedToId: number, requestType: Inv
     });
 };
 
-export const UpdateAccountDetails = (invoices: any, newAccount: Array<any>, setStateCallBack: Function) => {
+export const UpdateAccountDetails = (invoices: any, newAccount: any[], setStateCallBack: Function) => {
   let data = invoices.data;
 
   for (let index = 0; index < newAccount.length; index++) {
@@ -144,13 +144,10 @@ export const SendApprovalResponse = async (response: string, comment: string, in
 };
 
 
-export const GetDepartments = async function():Promise<any[]> {
-  //console.log(value.Choices);
-  let field: any = await sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).fields.getByTitle('Department').get();
-  console.log(field);
-  debugger;
+export const GetDepartments = async (): Promise<any[]> => {
+  let field: any = await sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).fields.getByTitle('Department').select('Choices').get();
   return field.Choices;
-}
+};
 
 //#region Get User Methods
 export const GetUserByEmail = async (email: string): Promise<ISPUser> => {

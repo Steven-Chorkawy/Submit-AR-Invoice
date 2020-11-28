@@ -27,7 +27,7 @@ interface IDepartmentGridEditDialogContainerState {
   MiscCustomerDetails?: any;
   loading?: boolean;
   standardTerms: Array<any>;
-  departments?: any[];
+  departments: any[];
 }
 
 function GridButtons({ cancel, saveResult }) {
@@ -70,7 +70,8 @@ export class DepartmentGridEditDialogContainer extends React.Component<any, IDep
       },
       customerList: this.props.customers,
       receivedCustomerList: this.props.customers,
-      standardTerms: this.props.departments ? this.props.departments : []
+      standardTerms: [],
+      departments: this.props.departments ? [...this.props.departments] : []
     };
 
     sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).fields
@@ -83,10 +84,12 @@ export class DepartmentGridEditDialogContainer extends React.Component<any, IDep
         });
       });
 
+
     if (!this.props.departments) {
       GetDepartments().then(value => {
+        debugger;
         this.setState({
-          departments: value
+          departments: [...value]
         });
       });
     }
