@@ -143,6 +143,15 @@ export const SendApprovalResponse = async (response: string, comment: string, in
   }
 };
 
+
+export const GetDepartments = async function():Promise<any[]> {
+  //console.log(value.Choices);
+  let field: any = await sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).fields.getByTitle('Department').get();
+  console.log(field);
+  debugger;
+  return field.Choices;
+}
+
 //#region Get User Methods
 export const GetUserByEmail = async (email: string): Promise<ISPUser> => {
   try {
@@ -154,14 +163,14 @@ export const GetUserByEmail = async (email: string): Promise<ISPUser> => {
 };
 
 export const GetUsersByEmail = async (emails: string[]): Promise<ISPUser[]> => {
-  let output:ISPUser[] = [];
+  let output: ISPUser[] = [];
 
   for (let index = 0; index < emails.length; index++) {
     const email = emails[index];
     output.push(await GetUserByEmail(email));
   }
 
-  return output; 
+  return output;
 };
 
 export const GetUserById = async (userId): Promise<ISPUser> => {
@@ -187,12 +196,12 @@ export const GetUsersByLoginName = async (users: Array<any>): Promise<Array<ISPU
   }
   return returnOutput;
 };
-    
-    /**
- * Get user profile details.
- * @param loginName A Users LoginName
- * @param callBack Call Back method is passed the users profile.
- */
+
+/**
+* Get user profile details.
+* @param loginName A Users LoginName
+* @param callBack Call Back method is passed the users profile.
+*/
 export const GetUserProfile = async (loginName: string, callBack: Function) => {
   sp.profiles.getPropertiesFor(loginName).then(userProfileRes => {
     // This converts UserProfileProperties from an array of key value pairs [{Key:'', Value: ''},{Key:'', Value: ''}]
