@@ -29,7 +29,7 @@ import { RequestApprovalDialogComponent } from '../RequestApprovalDialogComponen
 import { MyCancelDialogContainer } from './MyCancelDialogContainer';
 import { InvoiceDataProvider } from '../InvoiceDataProvider';
 import { InvoiceActionResponseStatus, InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
-import { ConvertQueryParamsToKendoFilter, UpdateAccountDetails } from '../MyHelperMethods';
+import { ConvertQueryParamsToKendoFilter, UpdateAccountDetails, GetDepartments } from '../MyHelperMethods';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { MyContentTypes } from '../enums/MyEnums';
@@ -37,7 +37,6 @@ import { FileRefCell } from '../FileRefCell';
 import { IDCell } from '../IDCell';
 import { IInvoiceItem, IInvoiceUpdateItem, IMySaveResult } from '../interface/MyInterfaces';
 import { QuickFilterButtonGroup } from '../QuickFilterButtonGroup';
-
 
 type DepartmentGridState = {
   data: any;
@@ -53,6 +52,7 @@ type DepartmentGridState = {
   siteUsersData: any;
   currentUser?: any;
   saveResult?: IMySaveResult;
+  departments: any[];
 };
 
 export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
@@ -70,6 +70,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
         logic: "and",
         filters: defaultFilters
       },
+      departments: [],
       productInEdit: undefined,
       productInCancel: undefined,
       productInApproval: undefined,
@@ -83,20 +84,26 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
       }
     };
 
-    sp.web.currentUser.get()
-      .then(user => {
-        this.setState({
-          currentUser: user
-        });
-
-        this.CommandCell = MyCommandCell({
-          edit: this.onEdit,
-          cancel: this.onInvoiceCancel,
-          approvalResponse: this.onApprovalResponse,
-          requestApproval: this.onRequestApproval,
-          currentUser: user
-        });
+    GetDepartments().then(value => {
+      debugger;
+      this.setState({
+        departments: [...value]
       });
+    });
+
+    sp.web.currentUser.get().then(user => {
+      this.setState({
+        currentUser: user
+      });
+
+      this.CommandCell = MyCommandCell({
+        edit: this.onEdit,
+        cancel: this.onInvoiceCancel,
+        approvalResponse: this.onApprovalResponse,
+        requestApproval: this.onRequestApproval,
+        currentUser: user
+      });
+    });
   }
 
   private CommandCell;
@@ -749,6 +756,8 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
               siteUsers={this.props.siteUsers}
               currentUser={this.state.currentUser}
               saveResult={this.state.saveResult}
+              departments={this.state.departments}
+
               onSubmit={this.handleSubmit}
               onRelatedAttachmentAdd={this.updateRelatedAttachments}
               onRelatedAttachmentRemove={this.removeRelatedAttachments}
