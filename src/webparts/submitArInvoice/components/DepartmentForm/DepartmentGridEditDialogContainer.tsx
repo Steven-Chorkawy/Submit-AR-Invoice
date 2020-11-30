@@ -87,7 +87,6 @@ export class DepartmentGridEditDialogContainer extends React.Component<any, IDep
 
     if (!this.props.departments) {
       GetDepartments().then(value => {
-        debugger;
         this.setState({
           departments: [...value]
         });
@@ -103,10 +102,10 @@ export class DepartmentGridEditDialogContainer extends React.Component<any, IDep
     return React.cloneElement(li, li.props, itemChildren);
   }
 
-  public customerFilterChange = (event) => {
+  public customerFilterChange = e => {
     setTimeout(() => {
       this.setState({
-        customerList: this.filterData(event.filter),
+        customerList: this.filterData(e.filter),
         loading: false
       });
     }, 500);
@@ -118,7 +117,7 @@ export class DepartmentGridEditDialogContainer extends React.Component<any, IDep
   }
   //#endregion
 
-  public onActionResponseSent = (e) => {
+  public onActionResponseSent = e => {
     this.props.cancel();
     this.forceUpdate();
   }

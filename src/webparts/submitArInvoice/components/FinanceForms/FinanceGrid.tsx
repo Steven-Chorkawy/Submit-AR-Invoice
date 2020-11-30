@@ -212,15 +212,15 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
     });
   }
 
-  public dataStateChange = (e) => {
+  public dataStateChange = e => {
     this.setState({
       ...this.state,
       dataState: e.data
     });
   }
 
-  public expandChange = (event) => {
-    event.dataItem.expanded = !event.dataItem.expanded;
+  public expandChange = e => {
+    e.dataItem.expanded = !e.dataItem.expanded;
     this.forceUpdate();
   }
 
@@ -235,7 +235,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
     });
   }
 
-  public onFilterChange = (e) => {
+  public onFilterChange = e => {
     var newData = filterBy(this.state.receivedData.data, e.filter);
     newData.map(invoice => invoice.expanded = this.state.allRowsExpanded);
     var newStateData = {
@@ -297,13 +297,13 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
     return input;
   }
 
-  public onNoteChange = (e) => {
+  public onNoteChange = e => {
     this.setState({
       newApproval: { ...this.state.newApproval, Description: e.target.value }
     });
   }
 
-  public onApproverChange = (e) => {    
+  public onApproverChange = e => {    
     this.setState({
       newApproval: { ...this.state.newApproval, Users: e }
     });
@@ -317,9 +317,9 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
   //#endregion Update Methods
 
   //#region CRUD Methods
-  public itemChange = (event) => {
+  public itemChange = e => {
     const data = this.state.invoices.data.map(item =>
-      item.ID === event.dataItem.ID ? { ...item, [event.field]: event.value } : item
+      item.ID === e.dataItem.ID ? { ...item, [e.field]: e.value } : item
     );
 
     this.setState({
@@ -341,13 +341,12 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
   /**
    * onSubmit
    */
-  public handleSubmit = (event) => {
+  public handleSubmit = e => {
     // Hold all the invoices, we will use this to update the entire state later. 
     let allInvoices = this.state.invoices.data;
     // The index of the invoice that is currently in edit.
     const invoiceIndex = allInvoices.findIndex(f => f.ID === this.state.productInEdit.ID);
     const productInEditId = this.state.productInEdit.ID;
-    const requestedByEmail = this.state.productInEdit.Requested_x0020_By.EMail;
     /**
      * When status is equal to 'Accountant Approval Required', 'Hold for Department', or 'Entered into GP'
      * and the event status does not equal the productInEdit status, a user must be selected to create an approval request. 
@@ -359,10 +358,10 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
      * If no user is provided, an error message will have already been displayed.
      * All we need to do here is prevent the save event from occurring.
      */
-    if (event.Invoice_x0020_Status !== this.state.productInEdit.Invoice_x0020_Status) {
-      if (event.Invoice_x0020_Status === InvoiceStatus["Accountant Approval Required"]
-        || event.Invoice_x0020_Status === InvoiceStatus["Hold for Department"]
-        || event.Invoice_x0020_Status === InvoiceStatus["Entered into GP"]) {
+    if (e.Invoice_x0020_Status !== this.state.productInEdit.Invoice_x0020_Status) {
+      if (e.Invoice_x0020_Status === InvoiceStatus["Accountant Approval Required"]
+        || e.Invoice_x0020_Status === InvoiceStatus["Hold for Department"]
+        || e.Invoice_x0020_Status === InvoiceStatus["Entered into GP"]) {
         // Check if the newApproval state has been set.  Without this we won't be able to get the users.
         if (!this.state.newApproval) {
           return; // Return to end the save event function.
@@ -370,7 +369,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
 
         // If the Users property is not set or if it is empty that means no user has been provided. 
         // Ignore this check if status is hold for department because we will get the user from elsewhere.
-        if (event.Invoice_x0020_Status !== InvoiceStatus["Hold for Department"]) {
+        if (e.Invoice_x0020_Status !== InvoiceStatus["Hold for Department"]) {
           if (!this.state.newApproval.Users || this.state.newApproval.Users.length === 0) {
             return; // Return to end the save event function.
           }
@@ -378,7 +377,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
 
         let approvalRequestType = undefined;
         // Since there cannot be a change event for the request type dropdown because there is only one option to select I'm setting the values here.
-        switch (event.Invoice_x0020_Status) {
+        switch (e.Invoice_x0020_Status) {
           case InvoiceStatus["Accountant Approval Required"]:
             approvalRequestType = InvoiceActionRequestTypes.AccountantApprovalRequired;
             break;
@@ -413,9 +412,9 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
 
     // TODO: Get accounting clerk and or accountants approval here. 
     let updateProperties = {
-      Invoice_x0020_Status: event.Invoice_x0020_Status,
-      Invoice_x0020_Number: event.Invoice_x0020_Number,
-      Batch_x0020_Number: event.Batch_x0020_Number
+      Invoice_x0020_Status: e.Invoice_x0020_Status,
+      Invoice_x0020_Number: e.Invoice_x0020_Number,
+      Batch_x0020_Number: e.Batch_x0020_Number
     };
 
     sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(productInEditId).update(updateProperties).then(value => {

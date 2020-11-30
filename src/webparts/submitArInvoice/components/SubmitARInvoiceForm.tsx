@@ -298,9 +298,8 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
     return React.cloneElement(li, li.props, itemChildren);
   }
 
-  public onCustomCustomerChange = (event) => {
-
-    let target = event.target;
+  public onCustomCustomerChange = e => {
+    let target = e.target;
     let value = target.type === 'checkbox' ? target.checked : target.value;
 
     this.setState({
@@ -308,10 +307,10 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
     });
   }
 
-  public customerFilterChange = (event) => {
+  public customerFilterChange = e => {
     setTimeout(() => {
       this.setState({
-        customerList: this.filterData(event.filter),
+        customerList: this.filterData(e.filter),
         loading: false
       });
     }, 500);

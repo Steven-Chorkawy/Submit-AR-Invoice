@@ -73,7 +73,8 @@ export class RequestApprovalCardComponent extends React.Component<IRequestApprov
             { key: InvoiceActionRequestTypes.DepartmentApprovalRequired, text: InvoiceActionRequestTypes.DepartmentApprovalRequired },
             { key: InvoiceActionRequestTypes.EditRequired, text: InvoiceActionRequestTypes.EditRequired },
             { key: InvoiceActionRequestTypes.AccountantApprovalRequired, text: InvoiceActionRequestTypes.AccountantApprovalRequired },
-            { key: InvoiceActionRequestTypes.AccountingClerkApprovalRequired, text: InvoiceActionRequestTypes.AccountingClerkApprovalRequired }
+            { key: InvoiceActionRequestTypes.AccountingClerkApprovalRequired, text: InvoiceActionRequestTypes.AccountingClerkApprovalRequired },
+            { key: InvoiceActionRequestTypes.CancelRequest, text: InvoiceActionRequestTypes.CancelRequest }
         ];
 
         return (
@@ -126,12 +127,12 @@ export class RequestApprovalDialogComponent extends React.Component<any, any> {
     constructor(props) {
         super(props);
         this.state = {
-            Request_x0020_Type: InvoiceActionRequestTypes.DepartmentApprovalRequired,
+            Request_x0020_Type: this.props.requestType ? this.props.requestType : InvoiceActionRequestTypes.DepartmentApprovalRequired,
             Users: []
         };
     }
 
-    private _PeoplePickerChange = (e) => {
+    private _PeoplePickerChange = e => {
         this.setState({
             Users: []
         });
@@ -183,6 +184,8 @@ export class RequestApprovalDialogComponent extends React.Component<any, any> {
                     onRequestTypeChange={this._RequestTypeChange}
                     onPeoplePickerChange={this._PeoplePickerChange}
                     onDescriptionChange={this._DescriptionChange}
+                    requestType={this.state.Request_x0020_Type}
+                    requestOptions={this.props.requestOptions ? this.props.requestOptions : undefined}
                 />
                 <Card>
                     <CardBody>

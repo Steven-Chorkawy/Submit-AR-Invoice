@@ -362,21 +362,21 @@ export const FormUpload = (fieldRenderProps) => {
   const errorId = showValidationMessage ? `${id}_error` : '';
   const labelId = label ? `${id}_label` : '';
 
-  const onChangeHandler = (event) => {
-    fieldRenderProps.onChange({ value: event.newState });
+  const onChangeHandler = e => {
+    fieldRenderProps.onChange({ value: e.newState });
 
     if (fieldRenderProps.myOnChange) {
       fieldRenderProps.myOnChange.call(undefined, {
         target: {
-          value: event.newState,
-          props: event.target.props
+          value: e.newState,
+          props: e.target.props
         }
       });
     }
   };
 
-  const onRemoveHandler = (event) => {
-    fieldRenderProps.onChange({ value: event.newState });
+  const onRemoveHandler = e => {
+    fieldRenderProps.onChange({ value: e.newState });
   };
 
   return (
