@@ -665,9 +665,8 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
   //#endregion
 
   public RowRender(trElement, props) {
-    const redBackgroundColor = { backgroundColor: "rgb(243, 23, 0, 0.32)" };
     // Set the rows background color to red if status is cancelled. 
-    return React.cloneElement(trElement, props.dataItem.Status === InvoiceStatus.Cancelled ? { style: redBackgroundColor } : {}, trElement.props.children);
+    return React.cloneElement(trElement, props.dataItem.Status === InvoiceStatus.Cancelled ? { style: { backgroundColor: "rgb(243, 23, 0, 0.32)" } } : {}, trElement.props.children);
   }
 
   public render() {
