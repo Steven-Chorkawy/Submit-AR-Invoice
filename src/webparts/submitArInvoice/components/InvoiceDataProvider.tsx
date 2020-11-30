@@ -60,9 +60,8 @@ enum ARLoadQuery {
   InvoiceActions = 1,
   RelatedAttachments = 2,
   FilesRelatedAttachments = 3,
-  CancelRequests = 4,
-  ARInvoiceDocuments = 5,
-  ARInvoiceLink = 6,
+  ARInvoiceDocuments = 4,
+  ARInvoiceLink = 5,
 }
 
 class LoadingPanel extends React.Component {
@@ -85,7 +84,7 @@ class LoadingPanel extends React.Component {
 /**
  * Run the query that populate all the invoices.
  */
-const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
+export const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
 
   const includeString = `*,
     Requested_x0020_By/Id,
@@ -188,12 +187,6 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
         //TODO: How can I filter these results? I don't need every file.
         sp.web.getFolderByServerRelativePath(MyLists["Related Invoice Attachments"])
           .files(),
-        sp.web.lists.getByTitle(MyLists["Cancel Invoice Request"])
-          .items
-          .select('*, Requested_x0020_By/EMail, Requested_x0020_By/Title')
-          .expand('Requested_x0020_By')
-          .filter(invoiceIds.join(' or '))
-          .getAll(),
         sp.web.lists.getByTitle(MyLists["AR Invoices"])
           .items
           .select(includeARDocumentString)
@@ -229,34 +222,14 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
               processedResponse.data[index].ServerRedirectedEmbedUri = url;
             }
 
-            // For Request Content Type
-            if (processedResponse.data[index].ContentTypeId === MyContentTypes["AR Request List Item"]) {
-              processedResponse.data[index].AccountDetails = values[ARLoadQuery.GLAccounts]
-                .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === processedResponse.data[index].ID) || [];
+            processedResponse.data[index].AccountDetails = values[ARLoadQuery.GLAccounts]
+              .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === processedResponse.data[index].ID) || [];
 
-              processedResponse.data[index].Actions = values[ARLoadQuery.InvoiceActions]
-                .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === processedResponse.data[index].ID) || [];
+            processedResponse.data[index].Actions = values[ARLoadQuery.InvoiceActions]
+              .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === processedResponse.data[index].ID) || [];
 
-              processedResponse.data[index].RelatedAttachments = values[ARLoadQuery.RelatedAttachments]
-                .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === processedResponse.data[index].ID) || [];
-
-              processedResponse.data[index].CancelRequests = values[ARLoadQuery.CancelRequests]
-                .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === processedResponse.data[index].ID) || [];
-            }
-            // For Invoice Document Content Type
-            else {
-              processedResponse.data[index].AccountDetails = values[ARLoadQuery.GLAccounts]
-                .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === processedResponse.data[index].AR_x0020_RequestId) || [];
-
-              processedResponse.data[index].Actions = values[ARLoadQuery.InvoiceActions]
-                .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === processedResponse.data[index].AR_x0020_RequestId) || [];
-
-              processedResponse.data[index].RelatedAttachments = values[ARLoadQuery.RelatedAttachments]
-                .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === processedResponse.data[index].AR_x0020_RequestId) || [];
-
-              processedResponse.data[index].CancelRequests = values[ARLoadQuery.CancelRequests]
-                .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === processedResponse.data[index].AR_x0020_RequestId) || [];
-            }
+            processedResponse.data[index].RelatedAttachments = values[ARLoadQuery.RelatedAttachments]
+              .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === processedResponse.data[index].ID) || [];
 
             // Add ServerDirectUrl if required.
             processedResponse.data[index].RelatedAttachments.map(relatedAttachments => {
@@ -269,8 +242,7 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
 
             // Add the customer data.
             // The reason I'm doing this here and not in the extend is because some fields from the customer list weren't working!!!
-            if(processedResponse.data[index].CustomerId)
-            {
+            if (processedResponse.data[index].CustomerId) {
               let customer = await sp.web.lists.getByTitle(MyLists.Customers).items.getById(processedResponse.data[index].CustomerId).get();
               processedResponse.data[index].Customer = customer;
             }
@@ -288,7 +260,7 @@ const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
     });
 };
 
-class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IInvoiceDataProviderState> {
+export class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IInvoiceDataProviderState> {
   constructor(props) {
     super(props);
   }
@@ -379,7 +351,3 @@ class InvoiceDataProvider extends React.Component<IInvoiceDataProviderProps, IIn
     return this.pending && <LoadingPanel />;
   }
 }
-
-
-
-export { InvoiceDataProvider, QueryInvoiceData };
