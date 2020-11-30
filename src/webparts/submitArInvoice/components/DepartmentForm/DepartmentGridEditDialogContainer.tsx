@@ -8,19 +8,16 @@ import { Form, FormElement, Field, FieldArray } from '@progress/kendo-react-form
 import { Button } from '@progress/kendo-react-buttons';
 import { Card, CardTitle, CardBody } from '@progress/kendo-react-layout';
 import { filterBy } from '@progress/kendo-data-query';
-import { Label, Error, Hint, FloatingLabel } from '@progress/kendo-react-labels';
-
-import { Facepile, Panel, PanelType, PrimaryButton, DefaultButton, Dropdown, TextField } from '@fluentui/react';
+import { Label } from '@progress/kendo-react-labels';
 
 import * as MyFormComponents from '../MyFormComponents';
 import * as MyValidators from '../validators.jsx';
 import { GLAccountsListViewComponent } from '../MyFinanceGLAccounts';
-import { MyRelatedAttachmentComponent } from '../MyRelatedAttachmentComponent';
 import { MyAttachmentComponent } from '../MyAttachmentComponent';
 import { ActionStepsComponent } from '../ActionStepsComponent';
+import { GetDepartments } from '../MyHelperMethods';
 
 import { IInvoiceItem } from '../interface/MyInterfaces';
-import { InvoiceActionResponseStatus } from '../enums/MyEnums';
 import { MyLists } from '../enums/MyLists';
 
 interface IDepartmentGridEditDialogContainerState {
@@ -30,6 +27,7 @@ interface IDepartmentGridEditDialogContainerState {
   MiscCustomerDetails?: any;
   loading?: boolean;
   standardTerms: Array<any>;
+  departments: any[];
 }
 
 function GridButtons({ cancel, saveResult }) {
@@ -72,7 +70,8 @@ export class DepartmentGridEditDialogContainer extends React.Component<any, IDep
       },
       customerList: this.props.customers,
       receivedCustomerList: this.props.customers,
-      standardTerms: []
+      standardTerms: [],
+      departments: this.props.departments ? [...this.props.departments] : []
     };
 
     sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).fields
@@ -84,6 +83,16 @@ export class DepartmentGridEditDialogContainer extends React.Component<any, IDep
           standardTerms: res['Choices']
         });
       });
+
+
+    if (!this.props.departments) {
+      GetDepartments().then(value => {
+        debugger;
+        this.setState({
+          departments: [...value]
+        });
+      });
+    }
   }
 
   //#region Customer Component Methods
@@ -140,19 +149,7 @@ export class DepartmentGridEditDialogContainer extends React.Component<any, IDep
                       name="Department"
                       label="* Department"
                       wrapperStyle={{ width: '100%' }}
-                      data={[
-                        'Administration',
-                        'Clerks Department',
-                        'Community Service',
-                        'Corporate Services Department',
-                        'Emergency Services',
-                        'Engineering Services',
-                        'Finance',
-                        'Legal Services Department',
-                        'Mayor & Council',
-                        'Operations',
-                        'Planning Services'
-                      ]}
+                      data={this.state.departments ? this.state.departments : []}
                       component={MyFormComponents.FormDropDownList}
                     />
                     <Field
