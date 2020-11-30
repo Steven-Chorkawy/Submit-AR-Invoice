@@ -26,9 +26,8 @@ import { filterBy, orderBy, groupBy } from '@progress/kendo-data-query';
 import { DepartmentGridEditDialogContainer } from './DepartmentGridEditDialogContainer';
 import { ApprovalDialogContainer } from '../ApprovalDialogContainer';
 import { RequestApprovalDialogComponent } from '../RequestApprovalDialogComponent';
-import { MyCancelDialogContainer } from './MyCancelDialogContainer';
 import { InvoiceDataProvider } from '../InvoiceDataProvider';
-import { InvoiceActionResponseStatus, InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
+import { InvoiceActionRequestTypes, InvoiceActionResponseStatus, InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
 import { ConvertQueryParamsToKendoFilter, UpdateAccountDetails } from '../MyHelperMethods';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
@@ -45,10 +44,19 @@ type DepartmentGridState = {
   filter: any;
   result?: any;
   dataState?: any;
+
+  // Invoice object.  This is used to save & open the dialog.
   productInEdit: any;
-  productInCancel: any;
+
+  // Invoice object.  This is used to save & open the dialog.
   productInApproval: any;
+
+  // Invoice object.  This is used to save & open the dialog.
   requestingApprovalFor: any;
+
+  // Lets us know if requestingApprovalFor is specifically for a cancel request. 
+  isCancelRequest: boolean;
+
   statusData: any;
   siteUsersData: any;
   currentUser?: any;
@@ -71,7 +79,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
         filters: defaultFilters
       },
       productInEdit: undefined,
-      productInCancel: undefined,
+      isCancelRequest: false,
       productInApproval: undefined,
       requestingApprovalFor: undefined,
       dataState: {
@@ -102,8 +110,6 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
   private CommandCell;
 
   //#region Methods
-  public MyCustomCell = (props) => <FileRefCell {...props} />;
-
   public dataStateChange = e => {
     this.setState({
       ...this.state,
@@ -256,9 +262,14 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
     this.setState({ productInEdit: Object.assign({}, dataItem) });
   }
 
+  /**
+   * Set the state variable to open the Requesting Approval for dialog. 
+   * @param dataItem Invoice object
+   */
   public onInvoiceCancel = dataItem => {
     this.setState({
-      productInCancel: Object.assign({}, dataItem)
+      isCancelRequest: true,
+      requestingApprovalFor: Object.assign({}, dataItem),
     });
   }
 
@@ -608,66 +619,25 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
   }
 
   /**
-   * TODO: This  method should also create approval requests. 
-   * * The approval request should a type of InvoiceActionRequestTypes.CancelRequest.
-   */
-  /**
-   * ! What if I removed the Cancel Request list and only used the Invoice Action list.
-   * ! That way to submit a Cancel Request a user could do it the same way they submit an approval. 
-   * ! The cancel request would also be approved or denied by the user as well same as an approval request.
-   * ! Then the only way we would keep track of if an invoice is cancelled or not would be through it's status
-   * ! and it's 'action' requests. 
-   */
-  public sendCancelRequest = () => {
-    sp.web.currentUser.get()
-      .then(currentUser => {
-        const dataItem = this.state.productInCancel;
-
-        var cancelReqUpdateObj = {
-          Title: 'Invoice Cancel Request',
-          AR_x0020_Invoice_x0020_RequestId: dataItem.ID,
-          Requested_x0020_ById: currentUser.Id,
-          Requester_x0020_Comments: dataItem.CancelComment
-        };
-
-        sp.web.lists.getByTitle(MyLists["Cancel Invoice Request"])
-          .items
-          .add(cancelReqUpdateObj)
-          .then(createRes => {
-            var indexOf = this.state.data.data.findIndex(f => f.ID === dataItem.Id);
-
-            // Update the state objects.
-            sp.web.lists.getByTitle(MyLists["Cancel Invoice Request"])
-              .items.getById(createRes.data.Id)
-              .select('*, Requested_x0020_By/EMail, Requested_x0020_By/Title')
-              .expand('Requested_x0020_By')
-              .get()
-              .then(response => {
-                var updatedARs = this.state.data.data;
-                updatedARs[indexOf].CancelRequests.push(response);
-                this.setState({
-                  data: {
-                    data: updatedARs,
-                    total: updatedARs.length
-                  },
-                  productInCancel: undefined
-                });
-              });
-          });
-      });
-  }
-
-  /**
    * Cancel any edits made to an invoice.
    * All state objects that are used to open forms and dialogs will be set to undefined.  This will close the forms/dialogs and not save any changes.
    */
-  public cancel = () => { this.setState({ productInEdit: undefined, productInApproval: undefined, productInCancel: undefined, requestingApprovalFor: undefined }); }
+  public cancel = () => { this.setState({ productInEdit: undefined, productInApproval: undefined, isCancelRequest: undefined, requestingApprovalFor: undefined }); }
   //#endregion
+
+  //#region Render Component Methods
+  public MyCustomCell = props => <FileRefCell {...props} />;
 
   public RowRender(trElement, props) {
     // Set the rows background color to red if status is cancelled. 
-    return React.cloneElement(trElement, props.dataItem.Status === InvoiceStatus.Cancelled ? { style: { backgroundColor: "rgb(243, 23, 0, 0.32)" } } : {}, trElement.props.children);
+    return React.cloneElement(
+      trElement,
+      props.dataItem.Status === InvoiceStatus.Cancelled ? { style: { backgroundColor: "rgb(243, 23, 0, 0.32)" } } : {},
+      trElement.props.children
+    );
   }
+  //#endregion
+
 
   public render() {
     return (
@@ -748,14 +718,6 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
           />
         }
         {
-          this.state.productInCancel &&
-          <MyCancelDialogContainer
-            dataItem={this.state.productInCancel}
-            save={this.sendCancelRequest}
-            cancel={this.cancel}
-          />
-        }
-        {
           this.state.productInApproval &&
           <ApprovalDialogContainer
             context={this.props.context}
@@ -784,9 +746,10 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
           <RequestApprovalDialogComponent
             context={this.props.context}
             dataItem={this.state.requestingApprovalFor}
+            requestType={this.state.isCancelRequest ? InvoiceActionRequestTypes.CancelRequest : undefined}
             currentUser={this.state.currentUser}
             onSave={this.onApprovalRequestSave}
-            onDismiss={() => this.setState({ requestingApprovalFor: undefined })}
+            onDismiss={this.cancel}
           />
         }
         <InvoiceDataProvider

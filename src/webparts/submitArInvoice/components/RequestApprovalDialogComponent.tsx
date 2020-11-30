@@ -185,6 +185,7 @@ export class RequestApprovalDialogComponent extends React.Component<any, any> {
                     onRequestTypeChange={this._RequestTypeChange}
                     onPeoplePickerChange={this._PeoplePickerChange}
                     onDescriptionChange={this._DescriptionChange}
+                    {...this.props}
                 />
                 <Card>
                     <CardBody>
