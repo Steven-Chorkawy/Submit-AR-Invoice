@@ -54,8 +54,8 @@ type DepartmentGridState = {
   // Invoice object.  This is used to save & open the dialog.
   requestingApprovalFor: any;
 
-  // Lets us know if requestingApprovalFor is specifically for a cancel request. 
-  isCancelRequest: boolean;
+  // This is used to set the default dropdown when requesting an action. 
+  requestType: InvoiceActionRequestTypes;
 
   statusData: any;
   siteUsersData: any;
@@ -79,7 +79,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
         filters: defaultFilters
       },
       productInEdit: undefined,
-      isCancelRequest: false,
+      requestType: undefined,
       productInApproval: undefined,
       requestingApprovalFor: undefined,
       dataState: {
@@ -268,7 +268,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
    */
   public onInvoiceCancel = dataItem => {
     this.setState({
-      isCancelRequest: true,
+      requestType: InvoiceActionRequestTypes.CancelRequest,
       requestingApprovalFor: Object.assign({}, dataItem),
     });
   }
@@ -622,7 +622,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
    * Cancel any edits made to an invoice.
    * All state objects that are used to open forms and dialogs will be set to undefined.  This will close the forms/dialogs and not save any changes.
    */
-  public cancel = () => { this.setState({ productInEdit: undefined, productInApproval: undefined, isCancelRequest: undefined, requestingApprovalFor: undefined }); }
+  public cancel = () => { this.setState({ productInEdit: undefined, productInApproval: undefined, requestType: undefined, requestingApprovalFor: undefined }); };
   //#endregion
 
   //#region Render Component Methods
@@ -746,7 +746,12 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
           <RequestApprovalDialogComponent
             context={this.props.context}
             dataItem={this.state.requestingApprovalFor}
-            requestType={this.state.isCancelRequest ? InvoiceActionRequestTypes.CancelRequest : undefined}
+            requestType={this.state.requestType ? this.state.requestType : undefined}
+            requestOptions={[
+              { key: InvoiceActionRequestTypes.DepartmentApprovalRequired, text: InvoiceActionRequestTypes.DepartmentApprovalRequired },
+              { key: InvoiceActionRequestTypes.EditRequired, text: InvoiceActionRequestTypes.EditRequired },
+              { key: InvoiceActionRequestTypes.CancelRequest, text: InvoiceActionRequestTypes.CancelRequest }
+            ]}
             currentUser={this.state.currentUser}
             onSave={this.onApprovalRequestSave}
             onDismiss={this.cancel}
@@ -773,6 +778,16 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
 
 
 export function MyCommandCell({ edit, cancel, approvalResponse, requestApproval, currentUser }) {
+
+  /**
+   * Defines the text that can be used in the SplitButton of this component. 
+   */
+  enum MyCommandCellOptions {
+    Edit = 'Edit',
+    Cancel = 'Cancel',
+    RequestUserAction = 'Request User Action'
+  }
+
   return class extends GridCell {
     constructor(props) {
       super(props);
@@ -782,15 +797,19 @@ export function MyCommandCell({ edit, cancel, approvalResponse, requestApproval,
       const { dataItem } = this.props;
       const needsApproval: Boolean = dataItem.Actions.some(y => y.Response_x0020_Status === InvoiceActionResponseStatus.Waiting && y.AssignedToId === currentUser.Id);
 
+      /**
+       * When a SplitButton is clicked. 
+       * @param e SplitButtonItemClickEvent
+       */
       const onItemClick = e => {
-        switch (e.item.text.toLowerCase()) {
-          case "edit":
+        switch (e.item.text) {
+          case MyCommandCellOptions.Edit:
             edit(dataItem);
             break;
-          case "cancel":
+          case MyCommandCellOptions.Cancel:
             cancel(dataItem);
             break;
-          case "request user action":
+          case MyCommandCellOptions.RequestUserAction:
             requestApproval(dataItem);
             break;
           default:
@@ -798,10 +817,11 @@ export function MyCommandCell({ edit, cancel, approvalResponse, requestApproval,
         }
       };
 
+      // This is is how we define which buttons are available in the SplitButton component. 
       const iconItems = [
-        { text: "Edit", icon: "edit" },
-        { text: "Cancel", icon: "cancel" },
-        { text: "Request User Action", icon: "check" }
+        { text: MyCommandCellOptions.Edit, icon: "edit" },
+        { text: MyCommandCellOptions.RequestUserAction, icon: "check" },
+        { text: MyCommandCellOptions.Cancel, icon: "cancel" },
       ];
 
       return (

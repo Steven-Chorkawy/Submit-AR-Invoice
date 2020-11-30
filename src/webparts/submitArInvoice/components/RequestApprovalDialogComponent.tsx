@@ -127,7 +127,7 @@ export class RequestApprovalDialogComponent extends React.Component<any, any> {
     constructor(props) {
         super(props);
         this.state = {
-            Request_x0020_Type: InvoiceActionRequestTypes.DepartmentApprovalRequired,
+            Request_x0020_Type: this.props.requestType ? this.props.requestType : InvoiceActionRequestTypes.DepartmentApprovalRequired,
             Users: []
         };
     }
@@ -184,7 +184,8 @@ export class RequestApprovalDialogComponent extends React.Component<any, any> {
                     onRequestTypeChange={this._RequestTypeChange}
                     onPeoplePickerChange={this._PeoplePickerChange}
                     onDescriptionChange={this._DescriptionChange}
-                    {...this.props}
+                    requestType={this.state.Request_x0020_Type}
+                    requestOptions={this.props.requestOptions ? this.props.requestOptions : undefined}
                 />
                 <Card>
                     <CardBody>
