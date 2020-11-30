@@ -133,7 +133,7 @@ export class RequestApprovalDialogComponent extends React.Component<any, any> {
         };
     }
 
-    private _PeoplePickerChange = (e) => {
+    private _PeoplePickerChange = e => {
         this.setState({
             Users: []
         });

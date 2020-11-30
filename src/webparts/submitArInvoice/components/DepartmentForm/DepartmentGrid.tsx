@@ -104,15 +104,15 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
   //#region Methods
   public MyCustomCell = (props) => <FileRefCell {...props} />;
 
-  public dataStateChange = (e) => {
+  public dataStateChange = e => {
     this.setState({
       ...this.state,
       dataState: e.data
     });
   }
 
-  public expandChange = (event) => {
-    event.dataItem[event.target.props.expandField] = event.value;
+  public expandChange = e => {
+    e.dataItem[e.target.props.expandField] = e.value;
     this.setState({
       result: Object.assign({}, this.state.result),
       dataState: this.state.dataState
@@ -168,7 +168,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
     });
   }
 
-  public onFilterChange = (e) => {
+  public onFilterChange = e => {
     var newData = this._filterMyData(this.state.receivedData, e.filter);
 
     var newStateData = {
@@ -276,7 +276,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
    * Save the approval request data from the Panel.
    * @param e Data from form
    */
-  public onApprovalRequestSave = (e) => {
+  public onApprovalRequestSave = e => {
     let reqForInvoice = this.state.requestingApprovalFor;
     // Close the dialog. 
     this.setState({
@@ -367,9 +367,9 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
     });
   }
 
-  // Handle custom customer change event.
-  public onCustomCustomerChange = (event) => {
-    let target = event.target;
+  // Handle custom customer change e.
+  public onCustomCustomerChange = e => {
+    let target = e.target;
     let value = target.type === 'checkbox' ? target.checked : target.value;
 
     this.setState({
@@ -384,30 +384,30 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
    * Save the edit dialog box form.
    * @param event Data Submitted from form.
    */
-  public handleSubmit = (event) => {
+  public handleSubmit = e => {
     let currentEditItem: IInvoiceUpdateItem = {
-      Id: event.Id,
-      ID: event.ID,
-      Department: event.Department,
-      Date: event.Date,
-      Requested_x0020_ById: event.Requested_x0020_ById,
-      Urgent: event.Urgent,
-      CustomerId: event.CustomerId,
-      Customer_x0020_PO_x0020_Number: event.Customer_x0020_PO_x0020_Number,
-      Invoice_x0020_Details: event.Invoice_x0020_Details,
-      MiscCustomerName: event.MiscCustomerName,
-      MiscCustomerDetails: event.MiscCustomerDetails,
-      DirtyField: event.DirtyField,
+      Id: e.Id,
+      ID: e.ID,
+      Department: e.Department,
+      Date: e.Date,
+      Requested_x0020_ById: e.Requested_x0020_ById,
+      Urgent: e.Urgent,
+      CustomerId: e.CustomerId,
+      Customer_x0020_PO_x0020_Number: e.Customer_x0020_PO_x0020_Number,
+      Invoice_x0020_Details: e.Invoice_x0020_Details,
+      MiscCustomerName: e.MiscCustomerName,
+      MiscCustomerDetails: e.MiscCustomerDetails,
+      DirtyField: e.DirtyField,
       Requires_x0020_Department_x0020_Id: {
-        results: event.Requires_x0020_Department_x0020_.map(f => f.Id)
+        results: e.Requires_x0020_Department_x0020_.map(f => f.Id)
       }
     };
 
     // Check to see if the submitted customer contains an ID field.
     // If it does not that means that we're taking in a Misc Customer and will need to parse out the data.
-    if (!event.Customer.hasOwnProperty('ID')) {
+    if (!e.Customer.hasOwnProperty('ID')) {
       // This means we need to take out the customer name.
-      currentEditItem.MiscCustomerName = event.Customer.Customer_x0020_Name;
+      currentEditItem.MiscCustomerName = e.Customer.Customer_x0020_Name;
       currentEditItem.DirtyField = new Date();
 
       // If a customer was previously selected it's ID will still be present.
@@ -415,8 +415,8 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
     }
     else {
       // If a custom ID is present then we will need to update the Customer ID property incase it's been changed.
-      if (currentEditItem.CustomerId !== event.Customer.Id) {
-        currentEditItem.CustomerId = event.Customer.Id;
+      if (currentEditItem.CustomerId !== e.Customer.Id) {
+        currentEditItem.CustomerId = e.Customer.Id;
       }
     }
 
@@ -426,7 +426,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
       .items
       .getById(currentEditItem.ID)
       .update(currentEditItem)
-      .then(f => {
+      .then(() => {
         // Update the invoices in the state.
         let allInvoices = this.state.data.data;
         const invoiceIndex = allInvoices.findIndex(fInvoice => fInvoice.ID === currentEditItem.ID);
@@ -435,9 +435,9 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
 
         allInvoices.splice(invoiceIndex, 1, oldInvoiceData);
 
-        if (event.RelatedAttachments) {
-          for (let index = 0; index < event.RelatedAttachments.length; index++) {
-            const element = event.RelatedAttachments[index];
+        if (e.RelatedAttachments) {
+          for (let index = 0; index < e.RelatedAttachments.length; index++) {
+            const element = e.RelatedAttachments[index];
 
             // If the attachment does not have an ID that means it is a new attachment.
             if (!element.hasOwnProperty('Id')) {
@@ -450,28 +450,28 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
                       const itemProxy: any = Object.assign({}, item);
                       let relatedAttachmentUpdateObject = {
                         Title: element.name,
-                        AR_x0020_Invoice_x0020_RequestId: event.Id
+                        AR_x0020_Invoice_x0020_RequestId: e.Id
                       };
 
-                      if (event.ContentTypeId === MyContentTypes["AR Request List Item"]) {
-                        relatedAttachmentUpdateObject['AR_x0020_Invoice_x0020_RequestId'] = event.ID;
+                      if (e.ContentTypeId === MyContentTypes["AR Request List Item"]) {
+                        relatedAttachmentUpdateObject['AR_x0020_Invoice_x0020_RequestId'] = e.ID;
                       }
                       else {
-                        relatedAttachmentUpdateObject['ARInvoiceId'] = event.ID;
+                        relatedAttachmentUpdateObject['ARInvoiceId'] = e.ID;
                       }
 
                       sp.web.lists.getByTitle(MyLists["Related Invoice Attachments"])
                         .items.getById(itemProxy.ID)
                         .update(relatedAttachmentUpdateObject)
                         .then(rAttachmentRes => {
-                          let currentRAttachmentIds = event.RelatedAttachments
+                          let currentRAttachmentIds = e.RelatedAttachments
                             .filter(fromRelatedAttachments => fromRelatedAttachments.hasOwnProperty('Id'))
                             .map(fromRelatedAttachmentsMap => fromRelatedAttachmentsMap.Id);
                           currentRAttachmentIds.push(itemProxy.ID);
 
                           // Update the request item with this new object.
                           sp.web.lists.getByTitle(MyLists["AR Invoice Requests"])
-                            .items.getById(event.Id)
+                            .items.getById(e.Id)
                             .update({
                               RelatedAttachmentsId: {
                                 results: currentRAttachmentIds
@@ -492,10 +492,9 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
           productInEdit: null
         });
       })
-      .catch(e => {
-        var res = e;
+      .catch(reason => {
         console.log('Error while updating invoice');
-        console.log(e);
+        console.log(reason);
 
         this.setState({
           saveResult: {
@@ -832,8 +831,6 @@ export function MyCommandCell({ edit, cancel, approvalResponse, requestApproval,
       const { dataItem } = this.props;
       const needsApproval: Boolean = dataItem.Actions.some(y => y.Response_x0020_Status === InvoiceActionResponseStatus.Waiting && y.AssignedToId === currentUser.Id);
 
-      const isNewItem = dataItem.ID === undefined;
-
       const onItemClick = e => {
         switch (e.item.text.toLowerCase()) {
           case "edit":
@@ -854,11 +851,6 @@ export function MyCommandCell({ edit, cancel, approvalResponse, requestApproval,
         { text: "Edit", icon: "edit" },
         { text: "Cancel", icon: "cancel" },
         { text: "Request User Action", icon: "check" }
-      ];
-
-      const approveDenyItems = [
-        { text: "Approve", icon: "check-outline" },
-        { text: "Deny", icon: "close-outline" }
       ];
 
       return (

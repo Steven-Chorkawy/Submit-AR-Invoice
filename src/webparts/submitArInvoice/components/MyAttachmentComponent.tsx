@@ -117,7 +117,7 @@ export class MyAttachmentComponent extends React.Component<IMyAttachmentComponen
      * Upload a document as soon as it has been added to the upload widget.
      * @param e Upload widgets event object.
      */
-    private _onAdd = (e) => {
+    private _onAdd = e => {
         let newFiles = e.affectedFiles.map(file => (
             { status: UploadFileStatus.Uploading, name: file.name, progress: 0, uid: file.uid }
         ));
@@ -201,7 +201,7 @@ export class MyAttachmentComponent extends React.Component<IMyAttachmentComponen
         }
     }
 
-    private _onRemove = (e) => {
+    private _onRemove = e => {
         for (let index = 0; index < e.affectedFiles.length; index++) {
             const file = e.affectedFiles[index];
 

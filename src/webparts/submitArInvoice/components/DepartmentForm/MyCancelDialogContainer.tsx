@@ -25,8 +25,8 @@ export class MyCancelDialogContainer extends React.Component<IMyEditDialogContai
     };
   }
 
-  public onDialogInputChange = (event) => {
-    let target = event.target;
+  public onDialogInputChange = e => {
+    let target = e.target;
     let value = target.type === 'checkbox' ? target.checked : target.value;
     let name = (target.props && target.props.name !== undefined) ? target.props.name : (target.name !== undefined) ? target.name : target.props.id;
 

@@ -24,7 +24,7 @@ class MyItemCardRender extends React.Component<IMyItemCardRender, any> {
     };
   }
 
-  public onShowMoreDetails = (e) => {
+  public onShowMoreDetails = e => {
     this.setState({
       showMoreDetails: !this.state.showMoreDetails
     });

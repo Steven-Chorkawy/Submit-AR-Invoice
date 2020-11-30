@@ -95,7 +95,7 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
   //#endregion Filter Invoice Methods
 
   //#region Helper Methods
-  private _filterButtonClickEvent = (e) => {
+  private _filterButtonClickEvent = e => {
     this.setState({
       selected: parseInt(e.target.id)
     });
