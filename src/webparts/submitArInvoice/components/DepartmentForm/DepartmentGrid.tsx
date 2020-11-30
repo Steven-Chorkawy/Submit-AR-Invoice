@@ -416,7 +416,6 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
       }
     }
 
-
     sp.web.lists
       .getByTitle(MyLists["AR Invoice Requests"])
       .items
