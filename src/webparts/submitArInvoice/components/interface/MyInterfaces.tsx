@@ -125,8 +125,6 @@ export interface IInvoiceQueryItem {
  */
 export interface IInvoiceItem extends IInvoiceQueryItem {
 
-    CancelRequests: Array<IInvoiceCancelRequest>;
-
     AccountDetails: Array<any>;
 
     Actions: Array<IInvoiceAction>;
@@ -174,31 +172,6 @@ export interface IInvoiceUpdateItem {
     MiscCustomerDetails: string;
     DirtyField: Date;
     //AR_x0020_RequestId: number;
-}
-
-
-/**
- * CancelRequest that is attached to the invoice output object.
- */
-export interface IInvoiceCancelRequest {
-    Requested_x0020_By: IPersonField;
-    Id: number;
-    ID: number;
-
-    ContentTypeId: string;
-
-    Title: string;
-
-    Invoice_x0020_NumberId: number;
-    AR_x0020_Invoice_x0020_RequestId: number;
-
-    Requested_x0020_ById: number;
-    Requester_x0020_Comments: number;
-    Request_x0020_Denied_x0020_ById?: number;
-    Request_x0020_Denied_x0020_By_x0?: Date;
-    Requires_x0020_Approval_x0020_FrId?: number;
-    Modified: Date;
-    Created: Date;
 }
 
 export interface IMySaveResult {
