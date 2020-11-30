@@ -662,6 +662,9 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
       });
   }
 
+  /**
+   * Cancel any edits made to an invoice.
+   */
   public cancel = () => {
     this.setState({ productInEdit: undefined });
   }
