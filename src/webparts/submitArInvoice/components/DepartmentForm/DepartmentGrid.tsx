@@ -203,7 +203,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
 
   //#region CRUD Methods
 
-  public updateAccountDetailsForApproval = (data) => {
+  public updateAccountDetailsForApproval = data => {
     UpdateAccountDetails(
       this.state.data,
       data,
@@ -252,11 +252,11 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
       });
   }
 
-  public onEdit = (dataItem) => {
+  public onEdit = dataItem => {
     this.setState({ productInEdit: Object.assign({}, dataItem) });
   }
 
-  public onInvoiceCancel = (dataItem) => {
+  public onInvoiceCancel = dataItem => {
     this.setState({
       productInCancel: Object.assign({}, dataItem)
     });
@@ -266,7 +266,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
    * When a user requests an approval for an invoice this will open the dialog. 
    * @param dataItem Invoice that needs an approval.
    */
-  public onRequestApproval = (dataItem) => {
+  public onRequestApproval = dataItem => {
     this.setState({ requestingApprovalFor: Object.assign({}, dataItem) });
   }
 
@@ -277,9 +277,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
   public onApprovalRequestSave = e => {
     let reqForInvoice = this.state.requestingApprovalFor;
     // Close the dialog. 
-    this.setState({
-      requestingApprovalFor: undefined
-    });
+    this.setState({ requestingApprovalFor: undefined });
 
     for (let index = 0; index < e.Users.length; index++) {
       const user = e.Users[index];
@@ -328,7 +326,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
    * When a user clicks Approve/Deny.
    * @param dataItem Item user wants to approve.
    */
-  public onApprovalResponse = (dataItem) => {
+  public onApprovalResponse = dataItem => {
     this.setState({
       productInApproval: Object.assign({}, dataItem)
     });
@@ -338,7 +336,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
    * When a user submits an approval response. 
    * @param dataItem Approval Modified.
    */
-  public approvalResponseSent = (approvalItem) => {
+  public approvalResponseSent = approvalItem => {
     // This is the invoice that we will need to update in state.data.data
     let allInvoices = this.state.data.data;
     const invoiceIndex = allInvoices.findIndex(a => a.ID === this.state.productInApproval.ID);
