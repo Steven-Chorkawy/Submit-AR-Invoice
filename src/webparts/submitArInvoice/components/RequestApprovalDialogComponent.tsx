@@ -75,7 +75,6 @@ export class RequestApprovalCardComponent extends React.Component<IRequestApprov
             { key: InvoiceActionRequestTypes.AccountantApprovalRequired, text: InvoiceActionRequestTypes.AccountantApprovalRequired },
             { key: InvoiceActionRequestTypes.AccountingClerkApprovalRequired, text: InvoiceActionRequestTypes.AccountingClerkApprovalRequired },
             { key: InvoiceActionRequestTypes.CancelRequest, text: InvoiceActionRequestTypes.CancelRequest }
-
         ];
 
         return (
