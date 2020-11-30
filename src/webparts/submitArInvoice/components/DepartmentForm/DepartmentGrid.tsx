@@ -659,10 +659,9 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
 
   /**
    * Cancel any edits made to an invoice.
+   * All state objects that are used to open forms and dialogs will be set to undefined.  This will close the forms/dialogs and not save any changes.
    */
-  public cancel = () => {
-    this.setState({ productInEdit: undefined, productInApproval: undefined, productInCancel: undefined, requestingApprovalFor: undefined });
-  }
+  public cancel = () => { this.setState({ productInEdit: undefined, productInApproval: undefined, productInCancel: undefined, requestingApprovalFor: undefined }); }
   //#endregion
 
   public RowRender(trElement, props) {
