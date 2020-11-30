@@ -267,9 +267,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
    * @param dataItem Invoice that needs an approval.
    */
   public onRequestApproval = (dataItem) => {
-    this.setState({
-      requestingApprovalFor: Object.assign({}, dataItem)
-    });
+    this.setState({ requestingApprovalFor: Object.assign({}, dataItem) });
   }
 
   /**
@@ -666,7 +664,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
    * Cancel any edits made to an invoice.
    */
   public cancel = () => {
-    this.setState({ productInEdit: undefined, productInApproval: undefined, productInCancel: undefined });
+    this.setState({ productInEdit: undefined, productInApproval: undefined, productInCancel: undefined, requestingApprovalFor: undefined });
   }
   //#endregion
 
