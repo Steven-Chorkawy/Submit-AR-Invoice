@@ -666,7 +666,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
    * Cancel any edits made to an invoice.
    */
   public cancel = () => {
-    this.setState({ productInEdit: undefined });
+    this.setState({ productInEdit: undefined, productInApproval: undefined, productInCancel: undefined });
   }
   //#endregion
 
@@ -750,11 +750,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
               });
             }}
             onCustomCustomerChange={this.onCustomCustomerChange}
-            onAddNewApproval={e =>
-              this.setState({
-                requestingApprovalFor: this.state.productInEdit
-              })
-            }
+            onAddNewApproval={() => this.setState({ requestingApprovalFor: this.state.productInEdit })}
             cancel={this.cancel}
           />
         }
@@ -763,7 +759,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
           <MyCancelDialogContainer
             dataItem={this.state.productInCancel}
             save={this.sendCancelRequest}
-            cancel={() => { this.setState({ productInCancel: undefined }); }}
+            cancel={this.cancel}
           />
         }
         {
@@ -787,7 +783,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
             onResponseSent={this.approvalResponseSent}
             onRelatedAttachmentAdd={this.updateRelatedAttachments}
             onRelatedAttachmentRemove={this.removeRelatedAttachments}
-            cancel={() => { this.setState({ productInApproval: undefined }); }}
+            cancel={this.cancel}
           />
         }
         {
@@ -797,11 +793,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
             dataItem={this.state.requestingApprovalFor}
             currentUser={this.state.currentUser}
             onSave={this.onApprovalRequestSave}
-            onDismiss={() =>
-              this.setState({
-                requestingApprovalFor: undefined
-              })
-            }
+            onDismiss={() => this.setState({ requestingApprovalFor: undefined })}
           />
         }
         <InvoiceDataProvider
