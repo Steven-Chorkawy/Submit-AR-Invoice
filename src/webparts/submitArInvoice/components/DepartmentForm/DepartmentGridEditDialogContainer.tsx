@@ -87,7 +87,6 @@ export class DepartmentGridEditDialogContainer extends React.Component<any, IDep
 
     if (!this.props.departments) {
       GetDepartments().then(value => {
-        debugger;
         this.setState({
           departments: [...value]
         });

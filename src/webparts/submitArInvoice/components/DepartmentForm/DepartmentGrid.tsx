@@ -93,7 +93,6 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
     };
 
     GetDepartments().then(value => {
-      debugger;
       this.setState({
         departments: [...value]
       });
