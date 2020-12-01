@@ -84,7 +84,7 @@ class LoadingPanel extends React.Component {
  * @param e object input
  * @param callBack IInvoiceQueryItem2[]
  */
-export const QueryInvoiceData2 = (e, callBack: Function)  => {
+export const QueryInvoiceData2 = (e, callBack: Function) => {
   const includeString = `*,
   Requested_x0020_By/Id,
   Requested_x0020_By/Title,
@@ -115,7 +115,18 @@ export const QueryInvoiceData2 = (e, callBack: Function)  => {
   RelatedAttachments,
   Customer`;
 
+  // ! I don't like doing this. It feels wrong.
   sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.select(includeString).expand(expandString).getAll().then(async response => {
+    let accountsList = sp.web.lists.getByTitle(MyLists["AR Invoice Accounts"]);
+    for (let index = 0; index < response.length; index++) {
+      const invoice = response[index];
+      accountsList.items.filter(`AR_x0020_Invoice_x0020_Request/ID eq ${invoice.ID}`).getAll().then(accountResponse => {
+        console.log(index);
+        console.log(accountResponse);
+        response[index].AccountDetails = accountResponse;
+      });
+    }
+
     callBack(response);
   });
 };

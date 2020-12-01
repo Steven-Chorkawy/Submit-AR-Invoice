@@ -171,6 +171,18 @@ class InvoiceListViewItemRender extends React.Component<any, any> {
 									}
 								</CardBody>
 							</Card>
+							{
+								item.AccountDetails &&
+								<Card>
+									<CardBody>
+										{
+											item.AccountDetails.map(account => {
+												return <div>{account.Account_x0020_Code} | {account.Total_x0020_Invoice}</div>
+											})
+										}
+									</CardBody>
+								</Card>
+							}
 						</CardBody>
 					</div>
 					<div style={{ width: '10%', padding: '5 0' }}>

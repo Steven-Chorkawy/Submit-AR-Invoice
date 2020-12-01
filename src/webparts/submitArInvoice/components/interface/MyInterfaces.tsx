@@ -152,7 +152,8 @@ export interface IInvoiceQueryItem2 {
     Requires_x0020_Completed_x0020_AId?: number;
     Invoice_x0020_Status: any; // There has to be an invoice status type somewhere.
     Standard_x0020_Terms: string;
-    AccountDetailsId: any[];
+    AccountDetailsId?: any[];
+    AccountDetails?: any[];
     MiscCustomerName?: string;
     MiscCustomerDetails?: string;
     Requires_x0020_Department_x0020_Id: number[];
