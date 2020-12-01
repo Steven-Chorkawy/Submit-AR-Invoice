@@ -28,7 +28,7 @@ import { IUploadingFile } from './IMyFormState';
 import * as MyValidators from './validators.jsx';
 import { MyGLAccountComponent } from './MyGLAccountComponent';
 
-import { BuildGUID, GetUserByEmail, GetUserById, GetUserByLoginName, GetUsersByLoginName, GetUserProfile } from './MyHelperMethods';
+import { BuildGUID, GetUserByEmail, GetUserById, GetUserByLoginName, GetUsersByLoginName, GetUserProfile, GetDepartments } from './MyHelperMethods';
 
 import { MyLists } from './enums/MyLists';
 import './PersonaComponent';
@@ -78,6 +78,13 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
           standardTerms: res['Choices']
         });
       });
+
+
+    GetDepartments().then(value => {
+      this.setState({
+        departments: value
+      });
+    });
 
 
     // Current user will be used to set default values on the form. 
@@ -291,9 +298,8 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
     return React.cloneElement(li, li.props, itemChildren);
   }
 
-  public onCustomCustomerChange = (event) => {
-
-    let target = event.target;
+  public onCustomCustomerChange = e => {
+    let target = e.target;
     let value = target.type === 'checkbox' ? target.checked : target.value;
 
     this.setState({
@@ -301,10 +307,10 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
     });
   }
 
-  public customerFilterChange = (event) => {
+  public customerFilterChange = e => {
     setTimeout(() => {
       this.setState({
-        customerList: this.filterData(event.filter),
+        customerList: this.filterData(e.filter),
         loading: false
       });
     }, 500);
@@ -363,19 +369,7 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
                     name="Department"
                     label="* Department"
                     wrapperStyle={{ width: '50%' }}
-                    data={[
-                      'Administration',
-                      'Clerks Department',
-                      'Community Service',
-                      'Corporate Services Department',
-                      'Emergency Services',
-                      'Engineering Services',
-                      'Finance',
-                      'Legal Services Department',
-                      'Mayor & Council',
-                      'Operations',
-                      'Planning Services'
-                    ]}
+                    data={this.state.departments ? this.state.departments : []}
                     validator={MyValidators.departmentValidator}
                     component={MyFormComponents.FormDropDownList}
                   />
@@ -417,99 +411,99 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
                   />
                 </div>
 
-              <Field
-                id="Customer"
-                name="Customer"
-                label="* Customer"
-                wrapperStyle={{ width: '100%' }}
-                data={this.state.customerList}
-                dataItemKey="Id"
-                textField="Customer_x0020_Name"
-                validator={MyValidators.requiresCustomer}
-                allowCustom={true}
-                itemRender={this.customerItemRender}
-                component={MyFormComponents.CustomerComboBox}
-                filterable={true}
-                suggest={true}
-                onFilterChange={this.customerFilterChange}
-                onCustomCusteromChange={this.onCustomCustomerChange}
-              />
-              {
-                formRenderProps.valueGetter('Customer') !== undefined &&
-                formRenderProps.valueGetter('Customer') !== null &&
-                formRenderProps.valueGetter('Customer').hasOwnProperty('ID') !== undefined &&
                 <Field
-                  id={'MiscCustomerDetails'}
-                  name={'MiscCustomerDetails'}
-                  label={'Enter Additional Customer Details'}
-                  placeholder={'Address, Postal Code, Contact, etc....'}
+                  id="Customer"
+                  name="Customer"
+                  label="* Customer"
+                  wrapperStyle={{ width: '100%' }}
+                  data={this.state.customerList}
+                  dataItemKey="Id"
+                  textField="Customer_x0020_Name"
+                  validator={MyValidators.requiresCustomer}
+                  allowCustom={true}
+                  itemRender={this.customerItemRender}
+                  component={MyFormComponents.CustomerComboBox}
+                  filterable={true}
+                  suggest={true}
+                  onFilterChange={this.customerFilterChange}
+                  onCustomCusteromChange={this.onCustomCustomerChange}
+                />
+                {
+                  formRenderProps.valueGetter('Customer') !== undefined &&
+                  formRenderProps.valueGetter('Customer') !== null &&
+                  formRenderProps.valueGetter('Customer').hasOwnProperty('ID') !== undefined &&
+                  <Field
+                    id={'MiscCustomerDetails'}
+                    name={'MiscCustomerDetails'}
+                    label={'Enter Additional Customer Details'}
+                    placeholder={'Address, Postal Code, Contact, etc....'}
+                    component={MyFormComponents.FormTextArea}
+                  />
+                }
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Field
+                    id="CustomerPONumber"
+                    name="CustomerPONumber"
+                    label="Customer PO Number"
+                    //validator={MyValidators.requiresCustomerPONUmber}
+                    component={MyFormComponents.FormInput}
+                  />
+
+                  <Field
+                    id="StandardTerms"
+                    name="StandardTerms"
+                    label="Standard Terms"
+                    wrapperStyle={{ width: '50%', marginRight: '18px' }}
+                    defaultValue='NET 30, 1% INTEREST CHARGED'
+                    data={
+                      this.state.standardTerms
+                        ? this.state.standardTerms
+                        : []
+                    }
+                    component={MyFormComponents.FormDropDownList}
+                  />
+                </div>
+
+                <Field
+                  id="InvoiceDetails"
+                  name="InvoiceDetails"
+                  label="Invoice Details"
                   component={MyFormComponents.FormTextArea}
                 />
-              }
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Field
-                  id="CustomerPONumber"
-                  name="CustomerPONumber"
-                  label="Customer PO Number"
-                  //validator={MyValidators.requiresCustomerPONUmber}
-                  component={MyFormComponents.FormInput}
-                />
+
+                <div style={{ width: '100%' }} className={'k-form-field'}>
+                  <FieldArray
+                    name="GLAccounts"
+                    label="G/L Accounts"
+                    component={MyGLAccountComponent}
+                  />
+                </div>
+
+                <hr />
 
                 <Field
-                  id="StandardTerms"
-                  name="StandardTerms"
-                  label="Standard Terms"
-                  wrapperStyle={{ width: '50%', marginRight: '18px' }}
-                  defaultValue='NET 30, 1% INTEREST CHARGED'
-                  data={
-                    this.state.standardTerms
-                      ? this.state.standardTerms
-                      : []
-                  }
-                  component={MyFormComponents.FormDropDownList}
+                  id="RelatedInvoiceAttachments"
+                  name="RelatedInvoiceAttachments"
+                  label="Upload Related Attachments"
+                  batch={false}
+                  multiple={true}
+                  component={MyFormComponents.FormUpload}
                 />
-              </div>
 
-              <Field
-                id="InvoiceDetails"
-                name="InvoiceDetails"
-                label="Invoice Details"
-                component={MyFormComponents.FormTextArea}
-              />
+                <hr />
 
-              <div style={{ width: '100%' }} className={'k-form-field'}>
-                <FieldArray
-                  name="GLAccounts"
-                  label="G/L Accounts"
-                  component={MyGLAccountComponent}
-                />
-              </div>
+                <div className="k-form-buttons">
+                  <Button
+                    primary={true}
+                    type={'submit'}
+                    icon="save"
+                  >Submit AR Invoice Request</Button>
+                  <Button onClick={formRenderProps.onFormReset}>Clear</Button>
+                </div>
 
-              <hr />
-
-              <Field
-                id="RelatedInvoiceAttachments"
-                name="RelatedInvoiceAttachments"
-                label="Upload Related Attachments"
-                batch={false}
-                multiple={true}
-                component={MyFormComponents.FormUpload}
-              />
-                
-              <hr />
-
-              <div className="k-form-buttons">
-                <Button
-                  primary={true}
-                  type={'submit'}
-                  icon="save"
-                >Submit AR Invoice Request</Button>
-                <Button onClick={formRenderProps.onFormReset}>Clear</Button>
-              </div>
-
-              {(this.state.MyFiles.length > 0) && this.UploadStatusCard()}
-            </FormElement>
-          )} />
+                {(this.state.MyFiles.length > 0) && this.UploadStatusCard()}
+              </FormElement>
+            )} />
         }
       </div>
     );

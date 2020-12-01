@@ -21,6 +21,7 @@ interface IMyAttachmentComponentProps {
     documentLibrary: string;
     onAdd: Function;
     onRemove: Function;
+    disabled?: boolean;
 }
 
 interface IUploadFileInfo {
@@ -40,7 +41,7 @@ interface IMyAttachmentComponentState {
 /**
  * Render each individual file. 
  */
-class CustomListItemUI extends React.Component<any> {
+export class CustomAttachmentItemUI extends React.Component<any> {
     constructor(props) {
         super(props);
     }
@@ -68,7 +69,7 @@ class CustomListItemUI extends React.Component<any> {
                     </span>
                     <strong className='k-upload-status'>
                         {
-                            file.id &&
+                            file.id && this.props.onRemove &&
                             <Button
                                 icon={'close'}
                                 type={'button'}
@@ -117,7 +118,7 @@ export class MyAttachmentComponent extends React.Component<IMyAttachmentComponen
      * Upload a document as soon as it has been added to the upload widget.
      * @param e Upload widgets event object.
      */
-    private _onAdd = (e) => {
+    private _onAdd = e => {
         let newFiles = e.affectedFiles.map(file => (
             { status: UploadFileStatus.Uploading, name: file.name, progress: 0, uid: file.uid }
         ));
@@ -201,7 +202,7 @@ export class MyAttachmentComponent extends React.Component<IMyAttachmentComponen
         }
     }
 
-    private _onRemove = (e) => {
+    private _onRemove = e => {
         for (let index = 0; index < e.affectedFiles.length; index++) {
             const file = e.affectedFiles[index];
 
@@ -240,7 +241,7 @@ export class MyAttachmentComponent extends React.Component<IMyAttachmentComponen
         }
     }
 
-    private MyItemRender = (props) => <CustomListItemUI {...props} />;
+    private MyItemRender = (props) => <CustomAttachmentItemUI {...props} />;
 
     public render() {
         return (
@@ -263,6 +264,7 @@ export class MyAttachmentComponent extends React.Component<IMyAttachmentComponen
                         listItemUI={this.MyItemRender}
                         myOnAdd={this._onAdd}
                         myOnRemove={this._onRemove}
+                        {...this.props}
                     />
                 </CardBody>
             </Card>

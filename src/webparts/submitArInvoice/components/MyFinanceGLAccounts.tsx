@@ -79,7 +79,7 @@ class GLAccountsListViewItemRender extends React.Component<any, any> {
     return output;
   }
 
-  private _calculateHSTAmount = (e) => {
+  private _calculateHSTAmount = e => {
     return (e.item.HST_x0020_Taxable === true) ? e.item.Amount * 0.13 : 0;
   }
 
@@ -236,7 +236,7 @@ export class GLAccountsListView extends React.Component<any, any> {
     }
   }
 
-  public deleteAccount = (e) => {
+  public deleteAccount = e => {
     let values = this.state.value;
 
     if (e.ID) {

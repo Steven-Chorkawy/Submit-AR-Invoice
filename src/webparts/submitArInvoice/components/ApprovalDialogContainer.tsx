@@ -78,7 +78,7 @@ export class ApprovalDialogContainer extends React.Component<any, IApprovalDialo
         return output;
     }
 
-    private _onConfirmClick = (e) => {
+    private _onConfirmClick = e => {
         // _validateSubmit will apply any warning messages required. 
         if (this._validateSubmit()) {
             SendApprovalResponse(this.state.response, this.state.comment, this.state.approvalRequest)

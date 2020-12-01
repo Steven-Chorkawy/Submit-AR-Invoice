@@ -102,8 +102,8 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
     };
   }
 
-  public onDialogInputChange = (event) => {
-    let target = event.target;
+  public onDialogInputChange = e => {
+    let target = e.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = (target.props && target.props.name !== undefined) ? target.props.name : (target.name !== undefined) ? target.name : target.props.id;
     const edited = this.state.productInEdit;
@@ -113,7 +113,7 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
     });
   }
 
-  public onActionResponseSent = (e) => {
+  public onActionResponseSent = e => {
     this.setState({
       productInEdit: null
     });

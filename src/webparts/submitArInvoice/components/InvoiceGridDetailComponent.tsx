@@ -10,6 +10,7 @@ import { Card, CardTitle, CardSubtitle, CardBody, CardActions } from '@progress/
 import { ActionStepsComponent } from './ActionStepsComponent';
 import { IInvoiceItem } from './interface/MyInterfaces';
 import { GLAccountsListView, GLAccountsListViewDisplayMode } from './MyFinanceGLAccounts';
+import { CustomAttachmentItemUI, MyAttachmentComponent } from './MyAttachmentComponent';
 
 
 export class InvoiceGridDetailComponent extends GridDetailRow {
@@ -39,7 +40,6 @@ export class InvoiceGridDetailComponent extends GridDetailRow {
               </Card>
             </div>
           }
-
           {
             this.props.dataItem.AccountDetails &&
             <div className={this._bsColClassNames}>
@@ -47,6 +47,27 @@ export class InvoiceGridDetailComponent extends GridDetailRow {
                 <CardBody>
                   <CardTitle>GL Account Codes</CardTitle>
                   <GLAccountsListView editable={false} displayMode={GLAccountsListViewDisplayMode.vertical} value={this.props.dataItem.AccountDetails} />
+                </CardBody>
+              </Card>
+            </div>
+          }
+          {
+            this.props.dataItem.RelatedAttachments &&
+            <div className={this._bsColClassNames}>
+              <Card>
+                <CardBody>
+                  <CardTitle>Related Attachments</CardTitle>
+                  <div className='k-card-list'>
+                    {
+                      this.props.dataItem.RelatedAttachments.map(file => {
+                        return (
+                          <a dir='ltr' className='k-card k-card-vertical' href={file.ServerRedirectedEmbedUrl} target='_blank' data-interception='off' >
+                            <span className="k-file-name k-card-body" title={file.Title}>{file.Title}</span>
+                          </a>
+                        );
+                      })
+                    }
+                  </div>
                 </CardBody>
               </Card>
             </div>

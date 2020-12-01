@@ -26,10 +26,9 @@ import { filterBy, orderBy, groupBy } from '@progress/kendo-data-query';
 import { DepartmentGridEditDialogContainer } from './DepartmentGridEditDialogContainer';
 import { ApprovalDialogContainer } from '../ApprovalDialogContainer';
 import { RequestApprovalDialogComponent } from '../RequestApprovalDialogComponent';
-import { MyCancelDialogContainer } from './MyCancelDialogContainer';
 import { InvoiceDataProvider } from '../InvoiceDataProvider';
-import { InvoiceActionResponseStatus, InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
-import { ConvertQueryParamsToKendoFilter, UpdateAccountDetails } from '../MyHelperMethods';
+import { InvoiceActionRequestTypes, InvoiceActionResponseStatus, InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
+import { ConvertQueryParamsToKendoFilter, UpdateAccountDetails, GetDepartments } from '../MyHelperMethods';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { MyContentTypes } from '../enums/MyEnums';
@@ -38,21 +37,30 @@ import { IDCell } from '../IDCell';
 import { IInvoiceItem, IInvoiceUpdateItem, IMySaveResult } from '../interface/MyInterfaces';
 import { QuickFilterButtonGroup } from '../QuickFilterButtonGroup';
 
-
 type DepartmentGridState = {
   data: any;
   receivedData: Array<IInvoiceItem>;
   filter: any;
   result?: any;
   dataState?: any;
+
+  // Invoice object.  This is used to save & open the dialog.
   productInEdit: any;
-  productInCancel: any;
+
+  // Invoice object.  This is used to save & open the dialog.
   productInApproval: any;
+
+  // Invoice object.  This is used to save & open the dialog.
   requestingApprovalFor: any;
+
+  // This is used to set the default dropdown when requesting an action. 
+  requestType: InvoiceActionRequestTypes;
+
   statusData: any;
   siteUsersData: any;
   currentUser?: any;
   saveResult?: IMySaveResult;
+  departments: any[];
 };
 
 export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
@@ -70,8 +78,9 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
         logic: "and",
         filters: defaultFilters
       },
+      departments: [],
       productInEdit: undefined,
-      productInCancel: undefined,
+      requestType: undefined,
       productInApproval: undefined,
       requestingApprovalFor: undefined,
       dataState: {
@@ -83,36 +92,39 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
       }
     };
 
-    sp.web.currentUser.get()
-      .then(user => {
-        this.setState({
-          currentUser: user
-        });
-
-        this.CommandCell = MyCommandCell({
-          edit: this.onEdit,
-          cancel: this.onInvoiceCancel,
-          approvalResponse: this.onApprovalResponse,
-          requestApproval: this.onRequestApproval,
-          currentUser: user
-        });
+    GetDepartments().then(value => {
+      this.setState({
+        departments: [...value]
       });
+    });
+
+    sp.web.currentUser.get().then(user => {
+      this.setState({
+        currentUser: user
+      });
+
+      this.CommandCell = MyCommandCell({
+        edit: this.onEdit,
+        cancel: this.onInvoiceCancel,
+        approvalResponse: this.onApprovalResponse,
+        requestApproval: this.onRequestApproval,
+        currentUser: user
+      });
+    });
   }
 
   private CommandCell;
 
   //#region Methods
-  public MyCustomCell = (props) => <FileRefCell {...props} />;
-
-  public dataStateChange = (e) => {
+  public dataStateChange = e => {
     this.setState({
       ...this.state,
       dataState: e.data
     });
   }
 
-  public expandChange = (event) => {
-    event.dataItem[event.target.props.expandField] = event.value;
+  public expandChange = e => {
+    e.dataItem[e.target.props.expandField] = e.value;
     this.setState({
       result: Object.assign({}, this.state.result),
       dataState: this.state.dataState
@@ -168,7 +180,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
     });
   }
 
-  public onFilterChange = (e) => {
+  public onFilterChange = e => {
     var newData = this._filterMyData(this.state.receivedData, e.filter);
 
     var newStateData = {
@@ -203,7 +215,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
 
   //#region CRUD Methods
 
-  public updateAccountDetailsForApproval = (data) => {
+  public updateAccountDetailsForApproval = data => {
     UpdateAccountDetails(
       this.state.data,
       data,
@@ -252,13 +264,18 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
       });
   }
 
-  public onEdit = (dataItem) => {
+  public onEdit = dataItem => {
     this.setState({ productInEdit: Object.assign({}, dataItem) });
   }
 
-  public onInvoiceCancel = (dataItem) => {
+  /**
+   * Set the state variable to open the Requesting Approval for dialog. 
+   * @param dataItem Invoice object
+   */
+  public onInvoiceCancel = dataItem => {
     this.setState({
-      productInCancel: Object.assign({}, dataItem)
+      requestType: InvoiceActionRequestTypes.CancelRequest,
+      requestingApprovalFor: Object.assign({}, dataItem),
     });
   }
 
@@ -266,28 +283,24 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
    * When a user requests an approval for an invoice this will open the dialog. 
    * @param dataItem Invoice that needs an approval.
    */
-  public onRequestApproval = (dataItem) => {
-    this.setState({
-      requestingApprovalFor: Object.assign({}, dataItem)
-    });
+  public onRequestApproval = dataItem => {
+    this.setState({ requestingApprovalFor: Object.assign({}, dataItem) });
   }
 
   /**
    * Save the approval request data from the Panel.
    * @param e Data from form
    */
-  public onApprovalRequestSave = (e) => {
+  public onApprovalRequestSave = e => {
     let reqForInvoice = this.state.requestingApprovalFor;
     // Close the dialog. 
-    this.setState({
-      requestingApprovalFor: undefined
-    });
+    this.setState({ requestingApprovalFor: undefined });
 
     for (let index = 0; index < e.Users.length; index++) {
       const user = e.Users[index];
 
       let obj = {
-        Title: 'Approval Required',
+        Title: e.Request_x0020_Type,
         AssignedToId: user.Id,
         AR_x0020_Invoice_x0020_RequestId: reqForInvoice.ID,
         Body: e.Description,
@@ -330,7 +343,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
    * When a user clicks Approve/Deny.
    * @param dataItem Item user wants to approve.
    */
-  public onApprovalResponse = (dataItem) => {
+  public onApprovalResponse = dataItem => {
     this.setState({
       productInApproval: Object.assign({}, dataItem)
     });
@@ -340,7 +353,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
    * When a user submits an approval response. 
    * @param dataItem Approval Modified.
    */
-  public approvalResponseSent = (approvalItem) => {
+  public approvalResponseSent = approvalItem => {
     // This is the invoice that we will need to update in state.data.data
     let allInvoices = this.state.data.data;
     const invoiceIndex = allInvoices.findIndex(a => a.ID === this.state.productInApproval.ID);
@@ -367,9 +380,9 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
     });
   }
 
-  // Handle custom customer change event.
-  public onCustomCustomerChange = (event) => {
-    let target = event.target;
+  // Handle custom customer change e.
+  public onCustomCustomerChange = e => {
+    let target = e.target;
     let value = target.type === 'checkbox' ? target.checked : target.value;
 
     this.setState({
@@ -384,30 +397,30 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
    * Save the edit dialog box form.
    * @param event Data Submitted from form.
    */
-  public handleSubmit = (event) => {
+  public handleSubmit = e => {
     let currentEditItem: IInvoiceUpdateItem = {
-      Id: event.Id,
-      ID: event.ID,
-      Department: event.Department,
-      Date: event.Date,
-      Requested_x0020_ById: event.Requested_x0020_ById,
-      Urgent: event.Urgent,
-      CustomerId: event.CustomerId,
-      Customer_x0020_PO_x0020_Number: event.Customer_x0020_PO_x0020_Number,
-      Invoice_x0020_Details: event.Invoice_x0020_Details,
-      MiscCustomerName: event.MiscCustomerName,
-      MiscCustomerDetails: event.MiscCustomerDetails,
-      DirtyField: event.DirtyField,
+      Id: e.Id,
+      ID: e.ID,
+      Department: e.Department,
+      Date: e.Date,
+      Requested_x0020_ById: e.Requested_x0020_ById,
+      Urgent: e.Urgent,
+      CustomerId: e.CustomerId,
+      Customer_x0020_PO_x0020_Number: e.Customer_x0020_PO_x0020_Number,
+      Invoice_x0020_Details: e.Invoice_x0020_Details,
+      MiscCustomerName: e.MiscCustomerName,
+      MiscCustomerDetails: e.MiscCustomerDetails,
+      DirtyField: e.DirtyField,
       Requires_x0020_Department_x0020_Id: {
-        results: event.Requires_x0020_Department_x0020_.map(f => f.Id)
+        results: e.Requires_x0020_Department_x0020_.map(f => f.Id)
       }
     };
 
     // Check to see if the submitted customer contains an ID field.
     // If it does not that means that we're taking in a Misc Customer and will need to parse out the data.
-    if (!event.Customer.hasOwnProperty('ID')) {
+    if (!e.Customer.hasOwnProperty('ID')) {
       // This means we need to take out the customer name.
-      currentEditItem.MiscCustomerName = event.Customer.Customer_x0020_Name;
+      currentEditItem.MiscCustomerName = e.Customer.Customer_x0020_Name;
       currentEditItem.DirtyField = new Date();
 
       // If a customer was previously selected it's ID will still be present.
@@ -415,18 +428,17 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
     }
     else {
       // If a custom ID is present then we will need to update the Customer ID property incase it's been changed.
-      if (currentEditItem.CustomerId !== event.Customer.Id) {
-        currentEditItem.CustomerId = event.Customer.Id;
+      if (currentEditItem.CustomerId !== e.Customer.Id) {
+        currentEditItem.CustomerId = e.Customer.Id;
       }
     }
-
 
     sp.web.lists
       .getByTitle(MyLists["AR Invoice Requests"])
       .items
       .getById(currentEditItem.ID)
       .update(currentEditItem)
-      .then(f => {
+      .then(() => {
         // Update the invoices in the state.
         let allInvoices = this.state.data.data;
         const invoiceIndex = allInvoices.findIndex(fInvoice => fInvoice.ID === currentEditItem.ID);
@@ -435,9 +447,9 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
 
         allInvoices.splice(invoiceIndex, 1, oldInvoiceData);
 
-        if (event.RelatedAttachments) {
-          for (let index = 0; index < event.RelatedAttachments.length; index++) {
-            const element = event.RelatedAttachments[index];
+        if (e.RelatedAttachments) {
+          for (let index = 0; index < e.RelatedAttachments.length; index++) {
+            const element = e.RelatedAttachments[index];
 
             // If the attachment does not have an ID that means it is a new attachment.
             if (!element.hasOwnProperty('Id')) {
@@ -450,28 +462,28 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
                       const itemProxy: any = Object.assign({}, item);
                       let relatedAttachmentUpdateObject = {
                         Title: element.name,
-                        AR_x0020_Invoice_x0020_RequestId: event.Id
+                        AR_x0020_Invoice_x0020_RequestId: e.Id
                       };
 
-                      if (event.ContentTypeId === MyContentTypes["AR Request List Item"]) {
-                        relatedAttachmentUpdateObject['AR_x0020_Invoice_x0020_RequestId'] = event.ID;
+                      if (e.ContentTypeId === MyContentTypes["AR Request List Item"]) {
+                        relatedAttachmentUpdateObject['AR_x0020_Invoice_x0020_RequestId'] = e.ID;
                       }
                       else {
-                        relatedAttachmentUpdateObject['ARInvoiceId'] = event.ID;
+                        relatedAttachmentUpdateObject['ARInvoiceId'] = e.ID;
                       }
 
                       sp.web.lists.getByTitle(MyLists["Related Invoice Attachments"])
                         .items.getById(itemProxy.ID)
                         .update(relatedAttachmentUpdateObject)
                         .then(rAttachmentRes => {
-                          let currentRAttachmentIds = event.RelatedAttachments
+                          let currentRAttachmentIds = e.RelatedAttachments
                             .filter(fromRelatedAttachments => fromRelatedAttachments.hasOwnProperty('Id'))
                             .map(fromRelatedAttachmentsMap => fromRelatedAttachmentsMap.Id);
                           currentRAttachmentIds.push(itemProxy.ID);
 
                           // Update the request item with this new object.
                           sp.web.lists.getByTitle(MyLists["AR Invoice Requests"])
-                            .items.getById(event.Id)
+                            .items.getById(e.Id)
                             .update({
                               RelatedAttachmentsId: {
                                 results: currentRAttachmentIds
@@ -492,10 +504,9 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
           productInEdit: null
         });
       })
-      .catch(e => {
-        var res = e;
+      .catch(reason => {
         console.log('Error while updating invoice');
-        console.log(e);
+        console.log(reason);
 
         this.setState({
           saveResult: {
@@ -613,81 +624,26 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
       });
   }
 
-  public sendCancelRequest = () => {
-    sp.web.currentUser.get()
-      .then(currentUser => {
-        const dataItem = this.state.productInCancel;
+  /**
+   * Cancel any edits made to an invoice.
+   * All state objects that are used to open forms and dialogs will be set to undefined.  This will close the forms/dialogs and not save any changes.
+   */
+  public cancel = () => { this.setState({ productInEdit: undefined, productInApproval: undefined, requestType: undefined, requestingApprovalFor: undefined }); };
+  //#endregion
 
-        var cancelReqUpdateObj = {
-          Title: 'Invoice Cancel Request',
-          //Invoice_x0020_NumberId: dataItem.ID,
-          Requested_x0020_ById: currentUser.Id,
-          Requester_x0020_Comments: dataItem.CancelComment
-        };
+  //#region Render Component Methods
+  public MyCustomCell = props => <FileRefCell {...props} />;
 
-        if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
-          cancelReqUpdateObj['AR_x0020_Invoice_x0020_RequestId'] = dataItem.Id;
-        }
-        else {
-          cancelReqUpdateObj['Invoice_x0020_NumberId'] = dataItem.Id;
-          cancelReqUpdateObj['AR_x0020_Invoice_x0020_RequestId'] = dataItem.AR_x0020_RequestId;
-        }
-
-        sp.web.lists.getByTitle(MyLists["Cancel Invoice Request"])
-          .items
-          .add(cancelReqUpdateObj)
-          .then(createRes => {
-
-            var indexOf = -1;
-            var arReqId = -1;
-
-            if (dataItem.ContentTypeId === MyContentTypes["AR Request List Item"]) {
-              indexOf = this.state.data.data.findIndex(f => f.ID === dataItem.Id);
-              arReqId = dataItem.Id;
-            }
-            else {
-              indexOf = this.state.data.data.findIndex(f => f.AR_x0020_RequestId === dataItem.AR_x0020_RequestId);
-              arReqId = dataItem.AR_x0020_RequestId;
-            }
-
-            sp.web.lists.getByTitle(MyLists["Cancel Invoice Request"])
-              .items.getById(createRes.data.Id)
-              .select('*, Requested_x0020_By/EMail, Requested_x0020_By/Title')
-              .expand('Requested_x0020_By')
-              .get()
-              .then(response => {
-
-                var updatedARs = this.state.data.data;
-                updatedARs[indexOf].CancelRequests.push(response);
-
-                this.setState({
-                  data: {
-                    data: updatedARs,
-                    total: updatedARs.length
-                  },
-                  productInCancel: undefined
-                });
-              });
-          });
-      });
-  }
-
-  public cancel = () => {
-    this.setState({ productInEdit: undefined });
+  public RowRender(trElement, props) {
+    // Set the rows background color to red if status is cancelled. 
+    return React.cloneElement(
+      trElement,
+      props.dataItem.Status === InvoiceStatus.Cancelled ? { style: { backgroundColor: "rgb(243, 23, 0, 0.32)" } } : {},
+      trElement.props.children
+    );
   }
   //#endregion
 
-  public rowRender(trElement, props) {
-    const red = { backgroundColor: "rgb(243, 23, 0, 0.32)" };
-    const trProps = { style: props.dataItem.CancelRequests.length > 0 && red };
-
-    if (props.dataItem.CancelRequests.length > 0) {
-      return React.cloneElement(trElement, { ...trProps }, trElement.props.children);
-    }
-    else {
-      return React.cloneElement(trElement, trElement.props.children);
-    }
-  }
 
   public render() {
     return (
@@ -712,7 +668,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
           expandField="expanded"
 
           detail={InvoiceGridDetailComponent}
-          rowRender={this.rowRender}
+          rowRender={this.RowRender}
         >
           <GridToolbar>
             {this.state.filter && this.state.filter.filters.length > 0 && (
@@ -720,7 +676,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
                 title="Clear All Filters"
                 className="k-button"
                 icon="filter-clear"
-                onClick={_ => { this.onFilterChange({ filter: { ...this.state.filter, filters: [] } }); }}
+                onClick={() => { this.onFilterChange({ filter: { ...this.state.filter, filters: [] } }); }}
               >Clear All Filters</Button>
             )}
             <QuickFilterButtonGroup
@@ -729,56 +685,43 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
             />
           </GridToolbar>
 
-          {/* <Column width="75px" field="" title="" filterable={false} sortable={false} cell={this.MyCustomCell} /> */}
-          <Column field="ID" title="ID" width="75px" filterable={false} cell={(props) => <IDCell {...props} />} />
+          <Column field="ID" title="ID" width="75px" filterable={false} cell={props => <IDCell {...props} />} />
           <Column field="Created" width="250px" title="Created Date" filter="date" format={MyGridStrings.DateFilter} />
           <Column field="Customer.Customer_x0020_Name" width="250px" title="Customer" />
           <Column field="Invoice_x0020_Status" width="250px" title="Status" />
           <Column field="Date" title="Date" width="250px" filter="date" format={MyGridStrings.DateFilter} />
-          {/* <Column field="Type_x0020_of_x0020_Request" width="250px" title="Type" /> */}
 
           <Column cell={this.CommandCell} width={"120px"} locked={true} resizable={false} filterable={false} sortable={false} />
 
         </Grid>
         {
-          this.state.productInEdit ?
-            <DepartmentGridEditDialogContainer
-              context={this.props.context}
-              dataItem={this.state.productInEdit}
-              customers={this.props.customers}
-              siteUsers={this.props.siteUsers}
-              currentUser={this.state.currentUser}
-              saveResult={this.state.saveResult}
-              onSubmit={this.handleSubmit}
-              onRelatedAttachmentAdd={this.updateRelatedAttachments}
-              onRelatedAttachmentRemove={this.removeRelatedAttachments}
-              updateAccountDetails={(e) => {
-                // e will be a list of all the accounts.              
-                let invoiceIndex = this.state.data.data.findIndex(f => f.Id === this.state.productInEdit.ID);
-                let dataState = this.state.data.data;
-                dataState[invoiceIndex].AccountDetails = [...e];
-                this.setState({
-                  data: {
-                    data: dataState
-                  },
-                  productInEdit: { ...this.state.productInEdit, AccountDetails: [...e] }
-                });
-              }}
-              onCustomCustomerChange={this.onCustomCustomerChange}
-              onAddNewApproval={(e) =>
-                this.setState({
-                  requestingApprovalFor: this.state.productInEdit
-                })
-              }
-              cancel={this.cancel}
-            />
-            : this.state.productInCancel ?
-              <MyCancelDialogContainer
-                dataItem={this.state.productInCancel}
-                save={this.sendCancelRequest}
-                cancel={() => { this.setState({ productInCancel: undefined }); }}
-              />
-              : null
+          this.state.productInEdit &&
+          <DepartmentGridEditDialogContainer
+            context={this.props.context}
+            dataItem={this.state.productInEdit}
+            customers={this.props.customers}
+            siteUsers={this.props.siteUsers}
+            currentUser={this.state.currentUser}
+            saveResult={this.state.saveResult}
+            onSubmit={this.handleSubmit}
+            onRelatedAttachmentAdd={this.updateRelatedAttachments}
+            onRelatedAttachmentRemove={this.removeRelatedAttachments}
+            updateAccountDetails={e => {
+              // e will be a list of all the accounts.              
+              let invoiceIndex = this.state.data.data.findIndex(f => f.Id === this.state.productInEdit.ID);
+              let dataState = this.state.data.data;
+              dataState[invoiceIndex].AccountDetails = [...e];
+              this.setState({
+                data: {
+                  data: dataState
+                },
+                productInEdit: { ...this.state.productInEdit, AccountDetails: [...e] }
+              });
+            }}
+            onCustomCustomerChange={this.onCustomCustomerChange}
+            onAddNewApproval={() => this.setState({ requestingApprovalFor: this.state.productInEdit })}
+            cancel={this.cancel}
+          />
         }
         {
           this.state.productInApproval &&
@@ -801,7 +744,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
             onResponseSent={this.approvalResponseSent}
             onRelatedAttachmentAdd={this.updateRelatedAttachments}
             onRelatedAttachmentRemove={this.removeRelatedAttachments}
-            cancel={() => { this.setState({ productInApproval: undefined }); }}
+            cancel={this.cancel}
           />
         }
         {
@@ -809,13 +752,15 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
           <RequestApprovalDialogComponent
             context={this.props.context}
             dataItem={this.state.requestingApprovalFor}
+            requestType={this.state.requestType ? this.state.requestType : undefined}
+            requestOptions={[
+              { key: InvoiceActionRequestTypes.DepartmentApprovalRequired, text: InvoiceActionRequestTypes.DepartmentApprovalRequired },
+              { key: InvoiceActionRequestTypes.EditRequired, text: InvoiceActionRequestTypes.EditRequired },
+              { key: InvoiceActionRequestTypes.CancelRequest, text: InvoiceActionRequestTypes.CancelRequest }
+            ]}
             currentUser={this.state.currentUser}
             onSave={this.onApprovalRequestSave}
-            onDismiss={(e) =>
-              this.setState({
-                requestingApprovalFor: undefined
-              })
-            }
+            onDismiss={this.cancel}
           />
         }
         <InvoiceDataProvider
@@ -839,6 +784,16 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
 
 
 export function MyCommandCell({ edit, cancel, approvalResponse, requestApproval, currentUser }) {
+
+  /**
+   * Defines the text that can be used in the SplitButton of this component. 
+   */
+  enum MyCommandCellOptions {
+    Edit = 'Edit',
+    Cancel = 'Cancel',
+    RequestUserAction = 'Request User Action'
+  }
+
   return class extends GridCell {
     constructor(props) {
       super(props);
@@ -848,17 +803,19 @@ export function MyCommandCell({ edit, cancel, approvalResponse, requestApproval,
       const { dataItem } = this.props;
       const needsApproval: Boolean = dataItem.Actions.some(y => y.Response_x0020_Status === InvoiceActionResponseStatus.Waiting && y.AssignedToId === currentUser.Id);
 
-      const isNewItem = dataItem.ID === undefined;
-
-      const onItemClick = (e) => {
-        switch (e.item.text.toLowerCase()) {
-          case "edit":
+      /**
+       * When a SplitButton is clicked. 
+       * @param e SplitButtonItemClickEvent
+       */
+      const onItemClick = e => {
+        switch (e.item.text) {
+          case MyCommandCellOptions.Edit:
             edit(dataItem);
             break;
-          case "cancel":
+          case MyCommandCellOptions.Cancel:
             cancel(dataItem);
             break;
-          case "request approval":
+          case MyCommandCellOptions.RequestUserAction:
             requestApproval(dataItem);
             break;
           default:
@@ -866,23 +823,19 @@ export function MyCommandCell({ edit, cancel, approvalResponse, requestApproval,
         }
       };
 
+      // This is is how we define which buttons are available in the SplitButton component. 
       const iconItems = [
-        { text: "Edit", icon: "edit" },
-        { text: "Cancel", icon: "cancel" },
-        { text: "Request Approval", icon: "check" }
-      ];
-
-      const approveDenyItems = [
-        { text: "Approve", icon: "check-outline" },
-        { text: "Deny", icon: "close-outline" }
+        { text: MyCommandCellOptions.Edit, icon: "edit" },
+        { text: MyCommandCellOptions.RequestUserAction, icon: "check" },
+        { text: MyCommandCellOptions.Cancel, icon: "cancel" },
       ];
 
       return (
         <td className={this.props.className + " k-command-cell"} style={this.props.style}>
-          <SplitButton items={iconItems} text={'Edit'} icon={'edit'} look="flat" onButtonClick={e => edit(dataItem)} onItemClick={(e) => onItemClick(e)} />
+          <SplitButton items={iconItems} text={'Edit'} icon={'edit'} look="flat" onButtonClick={() => edit(dataItem)} onItemClick={e => onItemClick(e)} />
           {
             needsApproval &&
-            <Button style={{ marginTop: '4px', marginBottom: '4px' }} primary={true} onClick={(e) => approvalResponse(dataItem)}>Approve/Deny</Button>
+            <Button style={{ marginTop: '4px', marginBottom: '4px' }} primary={true} onClick={() => approvalResponse(dataItem)}>Approve/Deny</Button>
           }
         </td>
       );

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as ReactDom from 'react-dom';
+import * as ReactDOM from 'react-dom';
 
 import { Stepper, Step, CardSubtitle } from '@progress/kendo-react-layout';
 import { Card, CardTitle, CardBody, CardActions } from '@progress/kendo-react-layout';
@@ -13,6 +13,7 @@ import { InvoiceActionResponseStatus, InvoiceActionRequestTypes } from './enums/
 
 import { PersonaComponent } from './PersonaComponent';
 import { PersonaSize } from '@fluentui/react';
+
 
 interface IActionStepsComponentProps {
     actions: Array<IInvoiceAction>;
@@ -50,37 +51,63 @@ const parseActionType = (action) => {
     return output;
 };
 
-const CustomStep = (props) => {
+const CustomActionCard = (props) => {
+    const [ShowMore, setShowMore] = React.useState(false);
+
     return (
-        <Step {...props}>
-            <span className="k-step-indicator" title={props.Request_x0020_Type}>
-                <span className={`k-step-indicator-icon k-icon ${parseActionType(props)}`}></span>
-            </span>
-            <Card
-                style={{ marginBottom: '5px' }}
-                type={
-                    props.Response_x0020_Status === InvoiceActionResponseStatus.Waiting ? 'info' :
-                        props.Response_x0020_Status === InvoiceActionResponseStatus.Approved ? 'success' :
-                            props.Response_x0020_Status === InvoiceActionResponseStatus.Denied || props.Response_x0020_Status === InvoiceActionResponseStatus.Rejected ? 'error' :
-                                ''
-                }>
-                <ActivityItem
-                    {
-                    ...{
-                        label: props.Request_x0020_Type,
-                        isValid: props.Response_x0020_Status === InvoiceActionResponseStatus.Denied ? false : true,
-                        activityDescription: [
-                            <span>{props.Response_x0020_Status === InvoiceActionResponseStatus.Waiting ? `Waiting for ` : `${props.Response_x0020_Status} by `}</span>,
-                            <PersonaComponent userEmail={props.AssignedTo.EMail} personaSize={PersonaSize.size24} />
-                        ],
-                        comments: props.Response_x0020_Message ? props.Response_x0020_Message : '',
-                        timeStamp: <div style={{ paddingTop: '5px' }}><span title='Created'><Moment format="MM/DD/YYYY">{props.Created}</Moment></span> | <span title='Modified'><Moment format="MM/DD/YYYY">{props.Modified}</Moment></span></div>
-                    }
-                    }
-                    key={props.ID}
-                />
-            </Card>
-        </Step>
+        <Card style={{ marginBottom: '5px' }}>
+            <CardBody className={
+                props.Response_x0020_Status === InvoiceActionResponseStatus.Waiting ? 'k-state-info' :
+                    props.Response_x0020_Status === InvoiceActionResponseStatus.Approved ? 'k-state-success' :
+                        props.Response_x0020_Status === InvoiceActionResponseStatus.Denied || props.Response_x0020_Status === InvoiceActionResponseStatus.Rejected ? 'k-state-error' :
+                            ''
+            }>
+                <CardSubtitle>
+                    <b title={props.Response_x0020_Status}><span className={`k-icon ${parseActionType(props)}`}></span> | {props.Request_x0020_Type}</b>
+                </CardSubtitle>
+            </CardBody>
+            <CardBody style={{ wordWrap: 'break-word' }}>
+                <div>
+                    {props.Response_x0020_Status === InvoiceActionResponseStatus.Waiting ? `Waiting for ` : `${props.Response_x0020_Status} by `}
+                    <b>{props.AssignedTo.Title} </b> 
+                    <Moment
+                        className={'k-card-subtitle'}
+                        date={props.Modified}      // The date to be used.
+                        format={'MM/DD/YYYY'}       // Date format. 
+                        withTitle={true}            // Show Title on hover.
+                        titleFormat={'D MMM YYYY'}  // Title format
+                        fromNow={true}              // Display number of hours since date.
+                        fromNowDuring={7200000}    // Only display fromNow if it is less than the milliseconds provided here. 7200000 = 2 hours.
+                    />
+                </div>
+                {
+                    props.Response_x0020_Message && <div>{props.Response_x0020_Message}</div>
+                }
+            </CardBody>
+            {
+                ShowMore &&
+                <CardBody style={{ wordWrap: 'break-word' }}>
+                    <div>
+                        Requested by <b>{props.Author.Title.includes('Chorkawy') ? 'SP Systems' : props.author.Title} </b> 
+                        <Moment
+                            className={'k-card-subtitle'}
+                            date={props.Created}        // The date to be used.
+                            format={'MM/DD/YYYY'}       // Date format. 
+                            withTitle={true}            // Show Title on hover.
+                            titleFormat={'D MMM YYYY'}  // Title format
+                            fromNow={true}              // Display number of hours since date.
+                            fromNowDuring={7200000}     // Only display fromNow if it is less than the milliseconds provided here. 7200000 = 2 hours.
+                        />
+                    </div>
+                    <div>
+                        {props.Body}
+                    </div>
+                </CardBody>
+            }
+            <CardActions orientation='vertical'>
+                <Button look='flat' onClick={e => setShowMore(!ShowMore)}>{ShowMore ? 'Hide' : 'Show More'}</Button>
+            </CardActions>
+        </Card >
     );
 };
 
@@ -93,14 +120,13 @@ export class ActionStepsComponent extends React.Component<IActionStepsComponentP
     public render() {
         return (
             <div>
-                <Stepper
-                    items={this.props.actions}
-                    item={CustomStep}
-                    value={
-                        this.props.actions.map(el => el.Response_x0020_Status).lastIndexOf(InvoiceActionResponseStatus.Approved)
-                    }
-                    orientation={'vertical'}
-                />
+                {
+                    this.props.onAddNewApproval &&
+                    <Button onClick={this.props.onAddNewApproval} icon={'check'}>Request Approval</Button>
+                }
+                {this.props.actions.map(action => {
+                    return (<CustomActionCard {...action} />);
+                })}
                 {
                     this.props.onAddNewApproval &&
                     <Button onClick={this.props.onAddNewApproval} icon={'check'}>Request Approval</Button>
