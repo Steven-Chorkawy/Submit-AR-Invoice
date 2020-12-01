@@ -27,8 +27,6 @@ import { Shimmer } from 'office-ui-fabric-react/lib/Shimmer';
 import { QueryInvoiceData2 } from '../InvoiceDataProvider';
 
 
-
-
 interface IInvoiceListViewState {
 	// Data that we want visible.
 	data?: any[];
