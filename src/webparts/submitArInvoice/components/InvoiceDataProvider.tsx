@@ -16,7 +16,7 @@ import { IFile } from '@pnp/sp/files';
 import { MyLists } from './enums/MyLists';
 import { filter } from '@progress/kendo-data-query/dist/npm/transducers';
 import { MyContentTypes } from './enums/MyEnums';
-import { IInvoiceItem } from './interface/MyInterfaces';
+import { IInvoiceItem, IInvoiceQueryItem2 } from './interface/MyInterfaces';
 
 /** End PnP Imports */
 
@@ -79,7 +79,12 @@ class LoadingPanel extends React.Component {
   }
 }
 
-export const QueryInvoiceData2 = (e, callBack: Function) => {
+/**
+ * 
+ * @param e object input
+ * @param callBack IInvoiceQueryItem2[]
+ */
+export const QueryInvoiceData2 = (e, callBack: Function)  => {
   const includeString = `*,
   Requested_x0020_By/Id,
   Requested_x0020_By/Title,
@@ -95,14 +100,20 @@ export const QueryInvoiceData2 = (e, callBack: Function) => {
   RequiresAccountingClerkTwoApprov/EMail,
   RelatedAttachments/Title,
   RelatedAttachments/Id,
-  RelatedAttachments/ID`;
+  RelatedAttachments/ID,
+  Customer/Id,
+  Customer/Title,
+  Customer/Company,
+  Customer/Customer_x0020_Name`;
+  //Customer/WorkAddress`; // ! Cannot query this??
 
   const expandString = `
   Requested_x0020_By,
   Requires_x0020_Department_x0020_,
   Requires_x0020_Accountant_x0020_,
   RequiresAccountingClerkTwoApprov,
-  RelatedAttachments`;
+  RelatedAttachments,
+  Customer`;
 
   sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.select(includeString).expand(expandString).getAll().then(async response => {
     callBack(response);

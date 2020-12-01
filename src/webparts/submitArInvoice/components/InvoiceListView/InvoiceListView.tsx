@@ -25,6 +25,7 @@ import { Shimmer } from 'office-ui-fabric-react/lib/Shimmer';
 
 // My Imports
 import { QueryInvoiceData2 } from '../InvoiceDataProvider';
+import { IInvoiceQueryItem2 } from '../interface/MyInterfaces';
 
 
 interface IInvoiceListViewState {
@@ -119,7 +120,7 @@ class InvoiceListViewItemRender extends React.Component<any, any> {
 	}
 
 	private ViewBody = (props?: any) => {
-		const item = this.props.dataItem;
+		const item: IInvoiceQueryItem2 = this.props.dataItem;
 
 		const iconItems = [
 			{ text: "Edit", icon: "edit" },
@@ -148,11 +149,29 @@ class InvoiceListViewItemRender extends React.Component<any, any> {
 				<div className='k-hbox k-justify-content-between k-flex-wrap'>
 					<div style={{ width: '90%', padding: '5 0' }}>
 						<CardTitle style={{ fontSize: 16 }}>
-							{item.Urgent && <span className={'k-icon k-i-warning'}></span>} <span>{item.ID}</span> | {item.Invoice_x0020_Status} | {item.Title}
+							{
+								item.Urgent &&
+								<span className={'k-icon k-i-warning'}></span>
+							}
+							<span>{item.ID}</span> | {item.Invoice_x0020_Status}
 						</CardTitle>
-						<CardSubtitle>
-							sub title here
-						</CardSubtitle>
+						<CardBody>
+							<Card>
+								<CardBody>
+									{
+										item.Customer
+											? <div>
+												<h3 style={{ margin: 0 }}>{item.Customer.Company}</h3>
+												<CardSubtitle>{item.Customer.Customer_x0020_Name}</CardSubtitle>
+											</div>
+											: <div>
+												<h3 style={{ margin: 0 }}>{item.MiscCustomerName}</h3>
+												<CardSubtitle>{item.MiscCustomerDetails}</CardSubtitle>
+											</div>
+									}
+								</CardBody>
+							</Card>
+						</CardBody>
 					</div>
 					<div style={{ width: '10%', padding: '5 0' }}>
 						<SplitButton items={iconItems} text={'Edit'} icon={'edit'} look="flat" onButtonClick={this.enterEdit} onItemClick={(e) => onItemClick(e)} />
