@@ -79,7 +79,7 @@ class LoadingPanel extends React.Component {
   }
 }
 
-const QueryInvoiceData2 = (e, callBack: Function) => {
+export const QueryInvoiceData2 = (e, callBack: Function) => {
   const includeString = `*,
   Requested_x0020_By/Id,
   Requested_x0020_By/Title,
@@ -107,7 +107,7 @@ const QueryInvoiceData2 = (e, callBack: Function) => {
   sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.select(includeString).expand(expandString).getAll().then(async response => {
     callBack(response);
   });
-}
+};
 
 // TODO: Test that this function works by calling it in another method.
 // TODO: Replace the logic in the original calling method with this function.

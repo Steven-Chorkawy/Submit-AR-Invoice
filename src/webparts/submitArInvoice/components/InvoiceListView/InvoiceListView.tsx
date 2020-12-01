@@ -39,8 +39,6 @@ interface IInvoiceListViewState {
 	// All Invoices
 	allInvoices?: any[];
 
-
-
 	filter?: any;
 	/**
 	 * *    Filter Example.
@@ -61,7 +59,6 @@ interface IInvoiceListViewState {
 	//         }
 	//     ]
 	// }
-
 }
 
 /**
