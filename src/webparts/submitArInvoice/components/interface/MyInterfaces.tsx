@@ -120,6 +120,47 @@ export interface IInvoiceQueryItem {
     Requires_x0020_Department_x0020_Id: Array<number>;
 }
 
+export interface IInvoiceQueryItem2 {
+    Id: number;
+    ID: number;
+    Requested_x0020_By: IPersonField;
+    CustomerId: number;
+    Customer: any; // ? Is there a Customer object
+    Customer_x0020_PO_x0020_Number?: any;
+    Invoice_x0020_Details?: string; // Description
+    Requires_x0020_Department_x0020_: IPersonField;
+    RelatedAttachments: any[]; // ? Is there an attachment object?
+    ContentTypeId: string;
+    Title: string; // GUID
+    Type_x0020_of_x0020_Request: string; // Choice column.
+    Invoice_x0020_Number?: any; // int or string?
+    Department: any;
+    Date: string; // string to be safe but this is a string.
+    Requested_x0020_ById: number;
+    Urgent: boolean;
+    Accountant_x0020_ApprovalId?: number;
+    Requires_x0020_Accountant_x0020_Id?: number;
+    Completed_x0020_ApprovalId?: number;
+    Requires_x0020_Completed_x0020_AId?: number;
+    Invoice_x0020_Status: any; // There has to be an invoice status type somewhere.
+    Standard_x0020_Terms: string;
+    AccountDetailsId: any[];
+    MiscCustomerName?: string;
+    MiscCustomerDetails?: string;
+    Requires_x0020_Department_x0020_Id: number[];
+    Batch_x0020_Number?: string;
+    // ! AR_x0020_InvoiceId // THIS WILL BE GONE SOON :)
+    RelatedAttachmentsId: any[];
+    RequiresAccountingClerkTwoApprovId?: any;
+    Sign_x002d_off_x0020_status?: any;
+
+    Modified: string;
+    Created: string;
+    AuthorId: number;
+    EditorId: number;
+    GUID: string;
+}
+
 /**
  * This is the result that we will be returning to be used through out the app.
  */
