@@ -26,6 +26,7 @@ import { Shimmer } from 'office-ui-fabric-react/lib/Shimmer';
 // My Imports
 import { QueryInvoiceData2 } from '../InvoiceDataProvider';
 import { IInvoiceQueryItem2 } from '../interface/MyInterfaces';
+import { GLAccountsListView } from '../MyFinanceGLAccounts';
 
 
 interface IInvoiceListViewState {
@@ -59,6 +60,7 @@ interface IInvoiceListViewState {
 	//     ]
 	// }
 }
+
 
 /**
  * An Item in the InvoiceListView list. 
@@ -144,45 +146,45 @@ class InvoiceListViewItemRender extends React.Component<any, any> {
 					break;
 			}
 		};
+
 		return (
 			<CardBody>
 				<div className='k-hbox k-justify-content-between k-flex-wrap'>
 					<div style={{ width: '90%', padding: '5 0' }}>
 						<CardTitle style={{ fontSize: 16 }}>
-							{
-								item.Urgent &&
-								<span className={'k-icon k-i-warning'}></span>
-							}
+							{item.Urgent && <span className={'k-icon k-i-warning'}></span>}
 							<span>{item.ID}</span> | {item.Invoice_x0020_Status}
 						</CardTitle>
 						<CardBody>
 							<Card>
 								<CardBody>
-									{
-										item.Customer
-											? <div>
-												<h3 style={{ margin: 0 }}>{item.Customer.Company}</h3>
-												<CardSubtitle>{item.Customer.Customer_x0020_Name}</CardSubtitle>
-											</div>
-											: <div>
-												<h3 style={{ margin: 0 }}>{item.MiscCustomerName}</h3>
-												<CardSubtitle>{item.MiscCustomerDetails}</CardSubtitle>
-											</div>
-									}
+									<div className='row'>
+										<div className='col-xs-12 col-sm-6 col-md-6 col-lg-6'>
+											{
+												item.Customer
+													? <div>
+														<h3 style={{ margin: 0 }}>{item.Customer.Company}</h3>
+														<CardSubtitle>{item.Customer.Customer_x0020_Name}</CardSubtitle>
+													</div>
+													: <div>
+														<h3 style={{ margin: 0 }}>{item.MiscCustomerName}</h3>
+														<CardSubtitle>{item.MiscCustomerDetails}</CardSubtitle>
+													</div>
+											}
+										</div>
+										<div className='col-xs-12 col-sm-6 col-md-6 col-lg-6'>
+											{
+												item.AccountDetails &&
+												item.AccountDetails.map(account => {
+													debugger;
+													return <div>{account.Account_x0020_Code} | {account.Total_x0020_Invoice}</div>
+												})
+											}
+											<GLAccountsListView value={item.AccountDetails} />
+										</div>
+									</div>
 								</CardBody>
 							</Card>
-							{
-								item.AccountDetails &&
-								<Card>
-									<CardBody>
-										{
-											item.AccountDetails.map(account => {
-												return <div>{account.Account_x0020_Code} | {account.Total_x0020_Invoice}</div>
-											})
-										}
-									</CardBody>
-								</Card>
-							}
 						</CardBody>
 					</div>
 					<div style={{ width: '10%', padding: '5 0' }}>
