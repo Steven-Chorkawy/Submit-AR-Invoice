@@ -116,20 +116,25 @@ export const QueryInvoiceData2 = (e, callBack: Function) => {
   Customer`;
 
   // ! I don't like doing this. It feels wrong.
-  sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.select(includeString).expand(expandString).getAll().then(async response => {
+  sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.select(includeString).expand(expandString).getAll().then(async response => {        
+    /**
+     *  This sets the AccountDetails property of IInvoiceQueryItem2.
+     */
     let accountsList = sp.web.lists.getByTitle(MyLists["AR Invoice Accounts"]);
     for (let index = 0; index < response.length; index++) {
       const invoice = response[index];
-      accountsList.items.filter(`AR_x0020_Invoice_x0020_Request/ID eq ${invoice.ID}`).getAll().then(accountResponse => {
+      await accountsList.items.filter(`AR_x0020_Invoice_x0020_Request/ID eq ${invoice.ID}`).getAll().then(accountResponse => {
         console.log(index);
         console.log(accountResponse);
         response[index].AccountDetails = accountResponse;
       });
     }
-
     callBack(response);
   });
 };
+
+
+
 
 // TODO: Test that this function works by calling it in another method.
 // TODO: Replace the logic in the original calling method with this function.
