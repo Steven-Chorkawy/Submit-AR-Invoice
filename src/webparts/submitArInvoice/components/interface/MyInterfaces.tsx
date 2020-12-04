@@ -121,7 +121,7 @@ export interface IInvoiceQueryItem {
 }
 
 /**
- * This is the result that we will be returning to be used through out the app.
+ * This is the result that we will be returning to be used through out the app..
  */
 export interface IInvoiceItem extends IInvoiceQueryItem {
 
