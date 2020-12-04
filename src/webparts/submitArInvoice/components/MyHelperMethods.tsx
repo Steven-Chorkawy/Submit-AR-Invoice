@@ -175,7 +175,6 @@ export const GetURLForNewAttachment = (element: any, invoiceId: number, invoices
     .getAll()
     .then(newestMetadata => {
       BuildURLToDocument(element.name).then(url => {
-        debugger;
         let thisNewFileMetadata = newestMetadata.find(f => f.Title === element.name);
         // ! Important !
         // * This is why this method is here.
@@ -192,7 +191,7 @@ export const GetURLForNewAttachment = (element: any, invoiceId: number, invoices
         callBack(dataState);
       });
     });
-}
+};
 
 //#region Get User Methods
 export const GetUserByEmail = async (email: string): Promise<ISPUser> => {
