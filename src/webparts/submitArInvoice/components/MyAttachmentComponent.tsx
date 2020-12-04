@@ -264,7 +264,6 @@ export class MyAttachmentComponent extends React.Component<IMyAttachmentComponen
                         listItemUI={this.MyItemRender}
                         myOnAdd={this._onAdd}
                         myOnRemove={this._onRemove}
-                        // {...this.props}
                     />
                 </CardBody>
             </Card>
