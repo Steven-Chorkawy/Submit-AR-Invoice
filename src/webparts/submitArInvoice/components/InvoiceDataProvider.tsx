@@ -17,6 +17,8 @@ import { MyLists } from './enums/MyLists';
 import { filter } from '@progress/kendo-data-query/dist/npm/transducers';
 import { MyContentTypes } from './enums/MyEnums';
 import { IInvoiceItem } from './interface/MyInterfaces';
+import { context } from '@progress/kendo-licensing/dist/validate-package';
+import { IWebInfo } from '@pnp/sp/webs';
 
 /** End PnP Imports */
 
@@ -43,25 +45,14 @@ interface IProcessedResponse {
   data: Array<IInvoiceItem>;
 }
 
-
-/***********************************
- *
- * 0 = G/L Accounts.
- * 1 = Approval Responses.
- * 2 = Related Attachments.
- * 3 = Files from RelatedAttachments.
- *      This is used to get the URL to the files.
- * 4 = Cancel Requests.
- * 5 = AR Invoice Documents.
- *
- ***********************************/
 enum ARLoadQuery {
-  GLAccounts = 0,
-  InvoiceActions = 1,
-  RelatedAttachments = 2,
-  FilesRelatedAttachments = 3,
-  ARInvoiceDocuments = 4,
-  ARInvoiceLink = 5,
+  GLAccounts = 0,               // G/L Accounts.
+  InvoiceActions = 1,           // Approval Responses.
+  RelatedAttachments = 2,       // Related Attachments.
+  // ? Maybe we can remove this as well?
+  FilesRelatedAttachments = 3,  // Files from RelatedAttachments.
+  ARInvoiceLink = 4,            // AR Invoice Documents.
+  SPWeb = 5                     // sp.web.get() data.
 }
 
 class LoadingPanel extends React.Component {
@@ -145,7 +136,6 @@ export const QueryInvoiceData = ({ filterState, dataState }, callBack: Function)
       var invoiceIds = [];                // filter for accounts
       var idsForARDocuments = [];
 
-
       // Iterate through processedResponse instead of response because if you don't this will generate a URL that over
       // 2000 characters long.
       // That is too big for SharePoint to handle.
@@ -170,58 +160,38 @@ export const QueryInvoiceData = ({ filterState, dataState }, callBack: Function)
       }
 
       Promise.all([
+        //ARLoadQuery.GLAccounts = 0
         sp.web.lists.getByTitle(MyLists["AR Invoice Accounts"])
           .items
           .filter(invoiceIds.join(' or '))
           .get(),
+        //ARLoadQuery.InvoiceActions = 1
         sp.web.lists.getByTitle(MyLists.InvoiceActionRequired)
           .items
           .select('*, AssignedTo/EMail, AssignedTo/Title, Author/EMail, Author/Title')
           .expand('AssignedTo, Author')
           .filter(invoiceIds.join(' or '))
           .get(),
+        //ARLoadQuery.RelatedAttachments = 2
         sp.web.lists.getByTitle('RelatedInvoiceAttachments')
           .items
           .filter(invoiceIds.join(' or '))
           .getAll(),
         //TODO: How can I filter these results? I don't need every file.
+        //ARLoadQuery.FilesRelatedAttachments = 3
         sp.web.getFolderByServerRelativePath(MyLists["Related Invoice Attachments"])
           .files(),
-        sp.web.lists.getByTitle(MyLists["AR Invoices"])
-          .items
-          .select(includeARDocumentString)
-          .expand(expandStringARDocumentString)
-          .filter(idsForARDocuments.join(' or '))
-          .getAll(),
+        //ARLoadQuery.ARInvoiceLink = 4
         sp.web.getFolderByServerRelativePath(MyLists["AR Invoices"]).files(),
-        sp.web.lists.getByTitle(MyLists.ReceiveARInvoiceRequest).items.getAll(),
+        //ARLoadQuery.SPWeb = 5
+        sp.web.get()
       ])
         .then(async (values) => {
           console.log('Raw Query Res');
           console.log(values);
 
-          /***********************************
-           *
-           * 0 = G/L Accounts.
-           * 1 = Approval Responses.
-           * 2 = Related Attachments.
-           * 3 = Files from RelatedAttachments.
-           *      This is used to get the URL to the files.
-           * 4 = Cancel Requests.
-           * 5 = AR Invoice Documents.
-           * 6 = Get links to AR Invoice Documents
-           * 7 = Freshly submitted AR Requests before they are converted into 'AR Invoice Requests'.
-           ***********************************/
           // Using each of the accounts that we found we will not attach them to the invoice object.
           for (let index = 0; index < processedResponse.data.length; index++) {
-            // Replace a request record with an AR Invoice record.
-            if (values[ARLoadQuery.ARInvoiceDocuments].filter(f => Number(f.AR_x0020_RequestId) === processedResponse.data[index].ID).length > 0) {
-              processedResponse.data[index] = values[ARLoadQuery.ARInvoiceDocuments].filter(f => Number(f.AR_x0020_RequestId) === processedResponse.data[index].ID)[0];
-              let url = values[ARLoadQuery.ARInvoiceLink].find(f => f.Title === processedResponse.data[index].Title).ServerRelativeUrl;
-              processedResponse.data[index].ServerRedirectedEmbedUrl = url;
-              processedResponse.data[index].ServerRedirectedEmbedUri = url;
-            }
-
             processedResponse.data[index].AccountDetails = values[ARLoadQuery.GLAccounts]
               .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === processedResponse.data[index].ID) || [];
 
@@ -231,14 +201,16 @@ export const QueryInvoiceData = ({ filterState, dataState }, callBack: Function)
             processedResponse.data[index].RelatedAttachments = values[ARLoadQuery.RelatedAttachments]
               .filter(f => Number(f.AR_x0020_Invoice_x0020_RequestId) === processedResponse.data[index].ID) || [];
 
-            // Add ServerDirectUrl if required.
-            processedResponse.data[index].RelatedAttachments.map(relatedAttachments => {
-              if (relatedAttachments.ServerRedirectedEmbedUrl === "") {
-                var url = values[ARLoadQuery.FilesRelatedAttachments].find(f => f.Title === relatedAttachments.Title).ServerRelativeUrl;
-                relatedAttachments.ServerRedirectedEmbedUrl = url;
-                relatedAttachments.ServerRedirectedEmbedUri = url;
-              }
-            });
+            // * !!! Important !!!
+            // * This is how we get our links to documents. 
+            if (processedResponse.data[index].RelatedAttachments && processedResponse.data[index].RelatedAttachments.length > 0) {
+              let spWeb: IWebInfo = values[ARLoadQuery.SPWeb];
+              processedResponse.data[index].RelatedAttachments.map(relatedAttachments => {
+                let documentUrl = `${spWeb.Url}/${MyLists["Related Invoice Attachments"]}/${encodeURI(relatedAttachments.Title)}?csf=1&web=1`;
+                relatedAttachments.ServerRedirectedEmbedUrl = documentUrl;
+                relatedAttachments.ServerRedirectedEmbedUri = documentUrl;
+              });
+            }
 
             // Add the customer data.
             // The reason I'm doing this here and not in the extend is because some fields from the customer list weren't working!!!
@@ -292,7 +264,6 @@ export class InvoiceDataProvider extends React.Component<IInvoiceDataProviderPro
   }
 
   public requestStatusData = () => {
-
     if (this.props.statusDataState.length > 0) {
       return;
     }
