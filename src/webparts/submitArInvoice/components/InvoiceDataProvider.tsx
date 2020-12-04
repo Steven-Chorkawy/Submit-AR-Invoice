@@ -19,6 +19,7 @@ import { MyContentTypes } from './enums/MyEnums';
 import { IInvoiceItem } from './interface/MyInterfaces';
 import { context } from '@progress/kendo-licensing/dist/validate-package';
 import { IWebInfo } from '@pnp/sp/webs';
+import { BuildURLToDocument } from './MyHelperMethods';
 
 /** End PnP Imports */
 
@@ -51,8 +52,7 @@ enum ARLoadQuery {
   RelatedAttachments = 2,       // Related Attachments.
   // ? Maybe we can remove this as well?
   FilesRelatedAttachments = 3,  // Files from RelatedAttachments.
-  ARInvoiceLink = 4,            // AR Invoice Documents.
-  SPWeb = 5                     // sp.web.get() data.
+  ARInvoiceLink = 4             // AR Invoice Documents.
 }
 
 class LoadingPanel extends React.Component {
@@ -182,9 +182,7 @@ export const QueryInvoiceData = ({ filterState, dataState }, callBack: Function)
         sp.web.getFolderByServerRelativePath(MyLists["Related Invoice Attachments"])
           .files(),
         //ARLoadQuery.ARInvoiceLink = 4
-        sp.web.getFolderByServerRelativePath(MyLists["AR Invoices"]).files(),
-        //ARLoadQuery.SPWeb = 5
-        sp.web.get()
+        sp.web.getFolderByServerRelativePath(MyLists["AR Invoices"]).files()
       ])
         .then(async (values) => {
           console.log('Raw Query Res');
@@ -203,13 +201,12 @@ export const QueryInvoiceData = ({ filterState, dataState }, callBack: Function)
 
             // * !!! Important !!!
             // * This is how we get our links to documents. 
-            if (processedResponse.data[index].RelatedAttachments && processedResponse.data[index].RelatedAttachments.length > 0) {
-              let spWeb: IWebInfo = values[ARLoadQuery.SPWeb];
-              processedResponse.data[index].RelatedAttachments.map(relatedAttachments => {
-                let documentUrl = `${spWeb.Url}/${MyLists["Related Invoice Attachments"]}/${encodeURI(relatedAttachments.Title)}?csf=1&web=1`;
-                relatedAttachments.ServerRedirectedEmbedUrl = documentUrl;
-                relatedAttachments.ServerRedirectedEmbedUri = documentUrl;
-              });
+            if (processedResponse.data[index].RelatedAttachments && processedResponse.data[index].RelatedAttachments.length > 0) {           
+              for (let relatedAttachmentsIndex = 0; relatedAttachmentsIndex < processedResponse.data[index].RelatedAttachments.length; relatedAttachmentsIndex++) {
+                let documentUrl = await BuildURLToDocument(processedResponse.data[index].RelatedAttachments[relatedAttachmentsIndex].Title);
+                processedResponse.data[index].RelatedAttachments[relatedAttachmentsIndex].ServerRedirectedEmbedUrl = documentUrl;
+                processedResponse.data[index].RelatedAttachments[relatedAttachmentsIndex].ServerRedirectedEmbedUri = documentUrl;
+              }
             }
 
             // Add the customer data.
