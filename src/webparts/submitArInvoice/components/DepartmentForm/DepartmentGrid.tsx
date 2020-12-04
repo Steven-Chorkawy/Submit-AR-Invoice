@@ -28,7 +28,7 @@ import { ApprovalDialogContainer } from '../ApprovalDialogContainer';
 import { RequestApprovalDialogComponent } from '../RequestApprovalDialogComponent';
 import { InvoiceDataProvider } from '../InvoiceDataProvider';
 import { InvoiceActionRequestTypes, InvoiceActionResponseStatus, InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
-import { ConvertQueryParamsToKendoFilter, UpdateAccountDetails, GetDepartments } from '../MyHelperMethods';
+import { ConvertQueryParamsToKendoFilter, UpdateAccountDetails, GetDepartments, GetURLForNewAttachment } from '../MyHelperMethods';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { MyContentTypes } from '../enums/MyEnums';
@@ -237,30 +237,14 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
   }
 
   public updateRelatedAttachments = (element, invoiceId) => {
-    sp.web.lists.getByTitle('RelatedInvoiceAttachments')
-      .items
-      .filter(`AR_x0020_Invoice_x0020_Request/ID eq ${invoiceId}`)
-      .getAll()
-      .then(newestMetadata => {
-        sp.web.getFolderByServerRelativePath(MyLists["Related Invoice Attachments"])
-          .files()
-          .then(docFromSP => {
-            let thisNewFile = docFromSP.find(f => f.Title === element.name);
-            let thisNewFileMetadata = newestMetadata.find(f => f.Title === element.name);
-
-            thisNewFileMetadata.ServerRedirectedEmbedUrl = thisNewFile.ServerRelativeUrl;
-
-            let invoiceIndex = this.state.data.data.findIndex(f => f.Id === invoiceId);
-            let dataState = this.state.data.data;
-            dataState[invoiceIndex].RelatedAttachments.push(thisNewFileMetadata);
-
-            this.setState({
-              data: {
-                data: dataState,
-                total: dataState.length
-              }
-            });
-          });
+    GetURLForNewAttachment(
+      element,
+      invoiceId,
+      this.state.data.data,
+      invoices => {
+        this.setState({
+          data: { data: invoices, total: invoices.length }
+        });
       });
   }
 

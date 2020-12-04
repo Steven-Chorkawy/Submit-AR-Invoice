@@ -56,7 +56,6 @@ export const BuildGUID = () => {
   return (S4() + S4() + "-" + S4() + "-4" + S4().substr(0, 3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
 };
 
-
 /**
  * Create a task for an invoice.
  * @param assignedToId Users who's approval is required.
@@ -143,11 +142,50 @@ export const SendApprovalResponse = async (response: string, comment: string, in
   }
 };
 
-
 export const GetDepartments = async (): Promise<any[]> => {
   let field: any = await sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).fields.getByTitle('Department').select('Choices').get();
   return field.Choices;
 };
+
+/**
+ * Get a URL to a newly uploaded file. 
+ * @param element IFile object from the upload component.
+ * @param invoiceId ID of the invoice to add an attachment to.
+ * @param invoices A list of all invoices found in the components state.
+ * @param callBack Takes an updated version of invoices as it's only parameter.
+ */
+export const GetURLForNewAttachment = (element: any, invoiceId: number, invoices: any[], callBack: Function): void => {
+  const ALERT_MESSAGE = 'Cannot upload your attachment at this moment.  Please contact helpdesk@clarington.net';
+  if (!element || !invoiceId || !invoices || !callBack) {
+    alert(ALERT_MESSAGE);
+  }
+
+  sp.web.lists.getByTitle(MyLists["Related Invoice Attachments"])
+    .items
+    .filter(`AR_x0020_Invoice_x0020_Request/ID eq ${invoiceId}`)
+    .getAll()
+    .then(newestMetadata => {
+      sp.web.getFolderByServerRelativePath(MyLists["Related Invoice Attachments"])
+        .files()
+        .then(docFromSP => {
+          let thisNewFile = docFromSP.find(f => f.Title === element.name);
+          let thisNewFileMetadata = newestMetadata.find(f => f.Title === element.name);
+
+          // ! Important !
+          // * This is why this method is here.
+          // * This line is how we get a URL to a newly uploaded document.
+          thisNewFileMetadata.ServerRedirectedEmbedUrl = thisNewFile.ServerRelativeUrl;
+
+          let invoiceIndex = invoices.findIndex(f => f.Id === invoiceId);
+          let dataState = invoices;
+
+          dataState[invoiceIndex].RelatedAttachments.push(thisNewFileMetadata);
+
+          // Pass the entire invoice state (with the new attachment) back to the parent method. 
+          callBack(dataState);
+        });
+    });
+}
 
 //#region Get User Methods
 export const GetUserByEmail = async (email: string): Promise<ISPUser> => {

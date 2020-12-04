@@ -22,7 +22,7 @@ import { InvoiceDataProvider, QueryInvoiceData } from '../InvoiceDataProvider';
 import { MyCommandCell } from './MyCommandCell';
 import { filterBy } from '@progress/kendo-data-query';
 import { InvoiceStatus, MyGridStrings, MyContentTypes } from '../enums/MyEnums';
-import { ConvertQueryParamsToKendoFilter, BuildGUID, CreateInvoiceAction, GetUserByLoginName, GetUserByEmail } from '../MyHelperMethods';
+import { ConvertQueryParamsToKendoFilter, BuildGUID, CreateInvoiceAction, GetUserByLoginName, GetUserByEmail, GetURLForNewAttachment } from '../MyHelperMethods';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { InvoiceActionRequestTypes } from '../enums/MyEnums';
@@ -258,6 +258,18 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
   }
 
   public updateRelatedAttachments = (element, invoiceId) => {
+    GetURLForNewAttachment(
+      element,
+      invoiceId,
+      this.state.invoices.data,
+      invoices => {
+        this.setState({
+          invoices: { data: invoices, total: invoices.length }
+        });
+      }
+    );
+
+
     sp.web.lists.getByTitle('RelatedInvoiceAttachments')
       .items
       .filter(`AR_x0020_Invoice_x0020_Request/ID eq ${invoiceId}`)
@@ -303,7 +315,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
     });
   }
 
-  public onApproverChange = e => {    
+  public onApproverChange = e => {
     this.setState({
       newApproval: { ...this.state.newApproval, Users: e }
     });
@@ -418,7 +430,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
     };
 
     sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(productInEditId).update(updateProperties).then(value => {
-      allInvoices[invoiceIndex] = { ...allInvoices[invoiceIndex], ...updateProperties };  
+      allInvoices[invoiceIndex] = { ...allInvoices[invoiceIndex], ...updateProperties };
       // If all goes well we can remove the product in edit. 
       this.setState({
         invoices: {
