@@ -148,6 +148,15 @@ export const GetDepartments = async (): Promise<any[]> => {
 };
 
 /**
+ * Build a URL to access a document. 
+ * @param documentTitle Title of the document.
+ * @param documentLibrary Name of the Document Library.  Default MyLists["Related Invoice Attachments"].
+ */
+export const BuildURLToDocument = async (documentTitle: string, documentLibrary: string = MyLists["Related Invoice Attachments"]): Promise<string> => {
+  return `${await (await sp.web.get()).Url}/${documentLibrary}/${encodeURI(documentTitle)}?csf=1&web=1`;
+};
+
+/**
  * Get a URL to a newly uploaded file. 
  * @param element IFile object from the upload component.
  * @param invoiceId ID of the invoice to add an attachment to.
@@ -165,25 +174,23 @@ export const GetURLForNewAttachment = (element: any, invoiceId: number, invoices
     .filter(`AR_x0020_Invoice_x0020_Request/ID eq ${invoiceId}`)
     .getAll()
     .then(newestMetadata => {
-      sp.web.getFolderByServerRelativePath(MyLists["Related Invoice Attachments"])
-        .files()
-        .then(docFromSP => {
-          let thisNewFile = docFromSP.find(f => f.Title === element.name);
-          let thisNewFileMetadata = newestMetadata.find(f => f.Title === element.name);
+      BuildURLToDocument(element.name).then(url => {
+        debugger;
+        let thisNewFileMetadata = newestMetadata.find(f => f.Title === element.name);
+        // ! Important !
+        // * This is why this method is here.
+        // * This line is how we get a URL to a newly uploaded document.
+        thisNewFileMetadata.ServerRedirectedEmbedUrl = url;
+        thisNewFileMetadata.ServerRedirectedEmbedUri = url;
+        
+        let invoiceIndex = invoices.findIndex(f => f.Id === invoiceId);
+        let dataState = invoices;
 
-          // ! Important !
-          // * This is why this method is here.
-          // * This line is how we get a URL to a newly uploaded document.
-          thisNewFileMetadata.ServerRedirectedEmbedUrl = thisNewFile.ServerRelativeUrl;
+        dataState[invoiceIndex].RelatedAttachments.push(thisNewFileMetadata);
 
-          let invoiceIndex = invoices.findIndex(f => f.Id === invoiceId);
-          let dataState = invoices;
-
-          dataState[invoiceIndex].RelatedAttachments.push(thisNewFileMetadata);
-
-          // Pass the entire invoice state (with the new attachment) back to the parent method. 
-          callBack(dataState);
-        });
+        // Pass the entire invoice state (with the new attachment) back to the parent method. 
+        callBack(dataState);
+      });
     });
 }
 
