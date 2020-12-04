@@ -9,6 +9,7 @@ import { UploadFileStatus } from '@progress/kendo-react-upload';
 import * as MyFormComponents from './MyFormComponents';
 import { MyLists } from './enums/MyLists.js';
 import { BooleanFilter } from '@progress/kendo-react-data-tools';
+import { BuildURLToDocument } from './MyHelperMethods';
 
 
 interface IMyAttachmentComponentProps {
@@ -134,68 +135,57 @@ export class MyAttachmentComponent extends React.Component<IMyAttachmentComponen
             const element = e.affectedFiles[index];
             // Upload the document to the Related Invoice Attachments Document Library. 
             sp.web.getFolderByServerRelativeUrl(`${this.props.context.pageContext.web.serverRelativeUrl}/${MyLists['Related Invoice Attachments']}`)
-                .files
-                .add(element.name, element.getRawFile(), true)
-                .then(fileRes => {
+                .files.add(element.name, element.getRawFile(), true).then(fileRes => {
                     this._updateFileProgress(element.uid, 25);
                     // After the document has been uploaded, we can get it's metadata like so...
                     fileRes.file.getItem().then(item => {
                         this._updateFileProgress(element.uid, 50);
                         const itemProxy: any = Object.assign({}, item);
                         // Update the metadata of the document that has just been uploaded to record which invoice request it belongs to & give it a title that can be used later. 
-                        sp.web.lists.getByTitle(MyLists['Related Invoice Attachments'])
-                            .items.getById(itemProxy.ID)
+                        sp.web.lists.getByTitle(MyLists['Related Invoice Attachments']).items.getById(itemProxy.ID)
                             .update({ AR_x0020_Invoice_x0020_RequestId: this.props.productInEdit.Id, Title: element.name })
                             .then(rAttachmentRes => {
                                 this._updateFileProgress(element.uid, 75);
                                 // This gets the requests existing related attachments.
                                 // This needs to be done so we can see a list of all the related attachments as a column. 
-                                let currentRAttachmentIds = this.props.productInEdit.RelatedAttachments
-                                    .filter(fromRelatedAttachments => fromRelatedAttachments.hasOwnProperty('Id'))
+                                let currentRAttachmentIds = this.props.productInEdit.RelatedAttachments.filter(fromRelatedAttachments => fromRelatedAttachments.hasOwnProperty('Id'))
                                     .map(fromRelatedAttachmentsMap => fromRelatedAttachmentsMap.Id);
                                 // After we've added all the existing documents we can append this newest document.
                                 currentRAttachmentIds.push(itemProxy.ID);
                                 // Update the invoice request with a list of all it's related documents. 
-                                sp.web.lists.getByTitle(MyLists['AR Invoice Requests'])
-                                    .items.getById(this.props.productInEdit.Id)
-                                    .update({
-                                        RelatedAttachmentsId: {
-                                            results: currentRAttachmentIds
-                                        }
-                                    })
-                                    .then(done => {
-                                        this._updateFileProgress(element.uid, 85);
-                                        // After everything is done, query the file from SharePoint to get it's ServerRedirectedEmbedUrl
-                                        sp.web.lists.getByTitle('RelatedInvoiceAttachments')
-                                            .items
-                                            .filter(`AR_x0020_Invoice_x0020_Request/ID eq ${this.props.productInEdit.Id}`)
-                                            .getAll()
-                                            .then(newestMetadata => {
-                                                sp.web.getFolderByServerRelativePath(MyLists["Related Invoice Attachments"])
-                                                    .files().then(docFromSP => {
-                                                        let thisNewFile = docFromSP.find(f => f.Title === element.name);
-                                                        let thisNewFileMetadata = newestMetadata.find(f => f.Title === element.name);
+                                sp.web.lists.getByTitle(MyLists['AR Invoice Requests']).items.getById(this.props.productInEdit.Id).update({
+                                    RelatedAttachmentsId: { results: currentRAttachmentIds }
+                                }).then(done => {
+                                    this._updateFileProgress(element.uid, 85);
+                                    // After everything is done, query the file from SharePoint to get it's ServerRedirectedEmbedUrl
+                                    sp.web.lists.getByTitle('RelatedInvoiceAttachments')
+                                        .items.filter(`AR_x0020_Invoice_x0020_Request/ID eq ${this.props.productInEdit.Id}`)
+                                        .getAll().then(newestMetadata => {
+                                            let thisNewFileMetadata = newestMetadata.find(f => f.Title === element.name);
 
-                                                        let oldFileState = this.state.defaultFiles;
-                                                        let oldFileStateIndex = oldFileState.findIndex(f => f.name === element.name);
-                                                        let oldFileStateMetadata = oldFileState[oldFileStateIndex];
-                                                        oldFileStateMetadata = {
-                                                            ...oldFileState[oldFileState.findIndex(f => f.name === element.name)],
-                                                            ServerRedirectedEmbedUrl: thisNewFile.ServerRelativeUrl,
-                                                            id: thisNewFileMetadata.ID,
-                                                            status: UploadFileStatus.Uploaded,
-                                                            progress: 100
-                                                        };
-                                                        oldFileState[oldFileStateIndex] = oldFileStateMetadata;
+                                            let oldFileState = this.state.defaultFiles;
+                                            let oldFileStateIndex = oldFileState.findIndex(f => f.name === element.name);
+                                            let oldFileStateMetadata = oldFileState[oldFileStateIndex];
 
-                                                        this.props.onAdd(oldFileStateMetadata, this.props.productInEdit.Id);
+                                            BuildURLToDocument(element.name).then(url => {
+                                                oldFileStateMetadata = {
+                                                    ...oldFileState[oldFileState.findIndex(f => f.name === element.name)],
+                                                    id: thisNewFileMetadata.ID,
+                                                    status: UploadFileStatus.Uploaded,
+                                                    progress: 100,
+                                                    ServerRedirectedEmbedUrl: url
+                                                };
 
-                                                        this.setState({
-                                                            defaultFiles: [...oldFileState]
-                                                        });
-                                                    });
+                                                oldFileState[oldFileStateIndex] = oldFileStateMetadata;
+
+                                                this.props.onAdd(oldFileStateMetadata, this.props.productInEdit.Id);
+
+                                                this.setState({
+                                                    defaultFiles: [...oldFileState]
+                                                });
                                             });
-                                    });
+                                        });
+                                });
                             });
                     });
                 });
