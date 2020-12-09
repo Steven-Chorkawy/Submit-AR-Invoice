@@ -32,12 +32,14 @@ import { IDCell } from '../IDCell';
 import { IMySaveResult, IInvoiceUpdateItem } from '../interface/MyInterfaces';
 import { QuickFilterButtonGroup } from '../QuickFilterButtonGroup';
 import { INewApproval } from '../RequestApprovalDialogComponent';
+import { ApprovalDialogContainer } from '../ApprovalDialogContainer';
 
 interface IFinanceGridState {
   invoices: IInvoicesDataState;
   receivedData: IInvoicesDataState;
   dataState: any;
   productInEdit: any;
+  productInApproval: any;
   statusData: any;
   siteUsersData: any;
   filter: any;
@@ -86,6 +88,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
         ],
       },
       productInEdit: undefined,
+      productInApproval: undefined,
       statusData: [],
       siteUsersData: [],
       filter: {
@@ -103,14 +106,18 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
       }
     };
 
-    this.CommandCell = MyCommandCell({
-      edit: this.edit,
-      remove: null,
-      add: null,
-      discard: null,
-      update: null,
-      cancel: this.cancel,
-      editField: this._editField
+    sp.web.currentUser.get().then(user => {
+      this.CommandCell = MyCommandCell({
+        edit: this.edit,
+        approvalResponse: this.onApprovalResponse,
+        remove: null,
+        add: null,
+        discard: null,
+        update: null,
+        cancel: this.cancel,
+        editField: this._editField,
+        currentUser: user
+      });
     });
   }
 
@@ -351,6 +358,48 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
   }
 
   /**
+   * When a user clicks Approve/Deny.
+   * @param dataItem Item user wants to approve.
+   */
+  public onApprovalResponse = dataItem => {
+    this.setState({
+      productInApproval: Object.assign({}, dataItem)
+    });
+  }
+
+  /**
+   * When a user submits an approval response. 
+   * @param dataItem Approval Modified.
+   */
+  public approvalResponseSent = approvalItem => {
+    // This is the invoice that we will need to update in state.data.data
+    let allInvoices = this.state.invoices.data;
+    const invoiceIndex = allInvoices.findIndex(a => a.ID === this.state.productInApproval.ID);
+    let invoice = allInvoices[invoiceIndex];
+
+    // Update the approval action item in the productInApproval state. 
+    const approvalActionIndex = invoice.Actions.findIndex(a => a.ID === approvalItem.ID);
+
+    // Store all the approval actions here so we can edit them. 
+    let allApprovalActions = invoice.Actions;
+
+    // Update the approval using the index that we previously found. 
+    allApprovalActions[approvalActionIndex] = approvalItem;
+
+    invoice.Actions = allApprovalActions;
+
+    allInvoices[invoiceIndex] = { ...invoice };
+
+    this.setState({
+      invoices: {
+        data: allInvoices,
+        total: allInvoices.length
+      },
+      productInApproval: undefined
+    });
+  }
+
+  /**
    * onSubmit
    */
   public handleSubmit = e => {
@@ -456,9 +505,12 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
         ...this.state.invoices,
         data: data
       },
-      productInEdit: undefined
+      productInEdit: undefined,
     });
   }
+
+  // Close the approval dialog container. 
+  public cancelApproval = () => { this.setState({ productInApproval: undefined }); }
 
   public cancelEditForm = () => {
     this.setState({ productInEdit: undefined });
@@ -538,7 +590,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
           <GridColumn field="Batch_x0020_Number" title="Batch #" width={this._columnWidth} />
           <GridColumn field="Urgent" title="Urgent" width={this._columnWidth} cell={this.MyCustomUrgentCell} />
 
-          <GridColumn cell={this.CommandCell} width={"110px"} locked={true} resizable={false} filterable={false} sortable={false} />
+          <GridColumn cell={this.CommandCell} width={"120px"} locked={true} resizable={false} filterable={false} sortable={false} />
         </Grid>
 
         {
@@ -570,6 +622,32 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
             onRelatedAttachmentRemove={this.removeRelatedAttachments}
             GPAttachmentWidgetProps={this.state.gpAttachmentProps}
             context={this.props.context}
+          />
+        }
+
+        {
+          this.state.productInApproval &&
+          <ApprovalDialogContainer
+            context={this.props.context}
+            dataItem={this.state.productInApproval}
+            currentUser={this.state.currentUser}
+            updateAccountDetails={e => {
+              // e will be a list of all the accounts.              
+              let invoiceIndex = this.state.invoices.data.findIndex(f => f.Id === this.state.productInApproval.ID);
+              let dataState = this.state.invoices.data;
+              dataState[invoiceIndex].AccountDetails = [...e];
+              this.setState({
+                invoices: {
+                  data: dataState,
+                  total: dataState.length
+                },
+                productInApproval: { ...this.state.productInApproval, AccountDetails: [...e] }
+              });
+            }}
+            onResponseSent={this.approvalResponseSent}
+            onRelatedAttachmentAdd={this.updateRelatedAttachments}
+            onRelatedAttachmentRemove={this.removeRelatedAttachments}
+            cancel={this.cancelApproval}
           />
         }
 
