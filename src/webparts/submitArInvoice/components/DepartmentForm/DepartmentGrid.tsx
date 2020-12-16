@@ -766,7 +766,6 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
   }
 }
 
-
 export function MyCommandCell({ edit, cancel, approvalResponse, requestApproval, currentUser }) {
 
   /**
