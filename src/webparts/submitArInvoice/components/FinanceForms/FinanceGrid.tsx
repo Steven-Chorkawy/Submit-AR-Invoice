@@ -143,6 +143,15 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
   private MyCustomUrgentCell = (props) => <CustomUrgentCell {...props} />;
 
   public MyCustomCell = (props) => <FileRefCell {...props} />;
+
+  public RowRender(trElement, props) {
+    // Set the rows background color to red if status is cancelled. 
+    return React.cloneElement(
+      trElement,
+      props.dataItem.Invoice_x0020_Status === InvoiceStatus.Cancelled ? { style: { backgroundColor: "rgb(243, 23, 0, 0.32)" } } : {},
+      trElement.props.children
+    );
+  }
   //#endregion
 
   //#region Methods
@@ -549,6 +558,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
           detail={InvoiceGridDetailComponent}
           expandField="expanded"
           onExpandChange={this.expandChange}
+          rowRender={this.RowRender}
 
           style={{ minHeight: '520px', maxHeight: '700px' }}
         >
