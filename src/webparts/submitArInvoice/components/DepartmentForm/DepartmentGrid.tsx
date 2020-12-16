@@ -622,7 +622,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
     // Set the rows background color to red if status is cancelled. 
     return React.cloneElement(
       trElement,
-      props.dataItem.Status === InvoiceStatus.Cancelled ? { style: { backgroundColor: "rgb(243, 23, 0, 0.32)" } } : {},
+      props.dataItem.Invoice_x0020_Status === InvoiceStatus.Cancelled ? { style: { backgroundColor: "rgb(243, 23, 0, 0.32)" } } : {},
       trElement.props.children
     );
   }
@@ -765,7 +765,6 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
     );
   }
 }
-
 
 export function MyCommandCell({ edit, cancel, approvalResponse, requestApproval, currentUser }) {
 
