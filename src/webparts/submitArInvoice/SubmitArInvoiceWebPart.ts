@@ -23,7 +23,6 @@ import './MyO365.scss';
 import './custom.css';
 
 
-// ? What is this for ?
 import * as strings from 'SubmitArInvoiceWebPartStrings';
 
 import { SubmitARInvoiceForm, IMyFormProps } from './components/SubmitARInvoiceForm';

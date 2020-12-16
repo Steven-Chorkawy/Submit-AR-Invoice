@@ -24,6 +24,7 @@ import { SendApprovalResponse } from './MyHelperMethods';
 import { ActionResponseComponent } from './ActionResponseComponent';
 import { PersonaComponent } from './PersonaComponent';
 import Moment from 'react-moment';
+import { ActionStepsComponent } from './ActionStepsComponent';
 
 
 
@@ -160,11 +161,21 @@ export class ApprovalDialogContainer extends React.Component<any, IApprovalDialo
                             <CardBody>
                                 <CardTitle><b>Request Details</b></CardTitle>
                                 <Label>Requested By:</Label>
-                                {this.state.approvalRequest && <PersonaComponent userEmail={this.state.approvalRequest.Author.EMail} />}
+                                {
+                                    this.state.approvalRequest.Author.EMail === 'SChorkawy@clarington.net' ?
+                                        <p>SPSystems</p> :
+                                        <PersonaComponent userEmail={this.state.approvalRequest.Author.EMail} />
+                                }
                                 <Label>Date:</Label>
                                 <p>{this.state.approvalRequest && <Moment format="D MMM YYYY">{this.state.approvalRequest.Created}</Moment>}</p>
                                 <Label>Note:</Label>
                                 <p>{this.state.approvalRequest.Body}</p>
+                            </CardBody>
+                        </Card>
+
+                        <Card style={{ width: '100%', marginTop: '10px' }}>
+                            <CardBody>
+                                <ActionStepsComponent actions={this.props.dataItem.Actions} />
                             </CardBody>
                         </Card>
                     </div>
@@ -177,6 +188,14 @@ export class ApprovalDialogContainer extends React.Component<any, IApprovalDialo
                                     initialValues={{ ...this.props.dataItem }}
                                     render={(formRenderProps) => (
                                         <FormElement>
+                                            <div style={formRowStyle}>
+                                                <Label>Description</Label>
+                                                <div className='row'>
+                                                    <div className='col-sm-12'>
+                                                        <span>{this.props.dataItem.Invoice_x0020_Details}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <div style={formRowStyle}>
                                                 <Label>Customer</Label>
                                                 <div className='row'>
