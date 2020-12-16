@@ -32,7 +32,7 @@ import { ActionStepsComponent } from './ActionStepsComponent';
 interface IApprovalDialogContainerState {
     approvalRequest: IInvoiceAction;
     response?: string;
-    responseRequired: boolean;
+    responseRequired: boolean;  // True if user has not selected a status. 
     comment?: string;
     commentRequired: boolean;
     submitFailed: boolean;
@@ -54,8 +54,18 @@ export class ApprovalDialogContainer extends React.Component<any, IApprovalDialo
     }
 
 
-    private _allowSubmit = () => {
-        return (!this.state.responseRequired && !this.state.commentRequired && this.props.dataItem.AccountDetails.length < 1);
+    /**
+     * This determines if the submit button is enabled or disabled. 
+     * TRUE     = Button disabled.
+     * FALSE    = Button enabled. 
+     */
+    private _DisableSubmitButton = () => {
+        // If any of these conditions are TRUE then the button will be disabled. 
+        return (
+            this.state.responseRequired ||
+            this.state.commentRequired ||
+            (this.props.dataItem.AccountDetails.length < 1 && this.state.response !== InvoiceActionResponseStatus.Denied)
+        );
     }
 
     private _validateSubmit = (): boolean => {
@@ -108,8 +118,8 @@ export class ApprovalDialogContainer extends React.Component<any, IApprovalDialo
                         <CardBody>
                             <CardTitle><b>Respond</b></CardTitle>
                             {
-                                this.props.dataItem.AccountDetails.length < 1 &&
-                                <Error>* Please enter a G/L Account</Error>
+                                this.props.dataItem.AccountDetails.length < 1 && this.state.response !== InvoiceActionResponseStatus.Denied &&
+                                <Error>* Please enter a G/L Account to approve this invoice.</Error>
                             }
                             {
                                 this.state.submitFailed &&
@@ -123,7 +133,7 @@ export class ApprovalDialogContainer extends React.Component<any, IApprovalDialo
                                         this.setState({
                                             response: e.target.value,
                                             responseRequired: false,
-                                            commentRequired: e.target.value === InvoiceActionResponseStatus.Denied
+                                            commentRequired: e.target.value === InvoiceActionResponseStatus.Denied && !this.state.comment
                                         })
                                     }
                                     required={this.state.responseRequired}
@@ -140,7 +150,7 @@ export class ApprovalDialogContainer extends React.Component<any, IApprovalDialo
                                     onChange={(e) =>
                                         this.setState({
                                             comment: e.value.toString(),
-                                            commentRequired: false
+                                            commentRequired: e.value.toString().length <= 0 && this.state.response === InvoiceActionResponseStatus.Denied
                                         })
                                     }
                                     value={this.state.comment && this.state.comment}
@@ -240,7 +250,7 @@ export class ApprovalDialogContainer extends React.Component<any, IApprovalDialo
                 </div>
                 <DialogActionsBar>
                     <Button primary={!this.state.submitFailed} icon={!this.state.submitFailed ? 'save' : 'close-outline'}
-                        disabled={this._allowSubmit()}
+                        disabled={this._DisableSubmitButton()}
                         onClick={this._onConfirmClick}
                     >
                         Confirm {this.state.response && this.state.response}
