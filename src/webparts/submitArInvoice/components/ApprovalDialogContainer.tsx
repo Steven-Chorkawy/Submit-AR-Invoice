@@ -108,8 +108,8 @@ export class ApprovalDialogContainer extends React.Component<any, IApprovalDialo
                         <CardBody>
                             <CardTitle><b>Respond</b></CardTitle>
                             {
-                                this.props.dataItem.AccountDetails.length < 1 &&
-                                <Error>* Please enter a G/L Account</Error>
+                                this.props.dataItem.AccountDetails.length < 1 && this.state.response !== InvoiceActionResponseStatus.Denied &&
+                                <Error>* Please enter a G/L Account to approve this invoice.</Error>
                             }
                             {
                                 this.state.submitFailed &&
@@ -123,7 +123,7 @@ export class ApprovalDialogContainer extends React.Component<any, IApprovalDialo
                                         this.setState({
                                             response: e.target.value,
                                             responseRequired: false,
-                                            commentRequired: e.target.value === InvoiceActionResponseStatus.Denied
+                                            commentRequired: e.target.value === InvoiceActionResponseStatus.Denied && !this.state.comment
                                         })
                                     }
                                     required={this.state.responseRequired}
@@ -140,7 +140,7 @@ export class ApprovalDialogContainer extends React.Component<any, IApprovalDialo
                                     onChange={(e) =>
                                         this.setState({
                                             comment: e.value.toString(),
-                                            commentRequired: false
+                                            commentRequired: e.value.toString().length <= 0 && this.state.response === InvoiceActionResponseStatus.Denied
                                         })
                                     }
                                     value={this.state.comment && this.state.comment}
