@@ -230,8 +230,12 @@ export const QueryInvoiceData = ({ filterState, dataState }, callBack: Function)
            * the gird or list only display records that have all their data.
            * 
            */
-          // TODO: Insert processResponse[] into  response[] and pass response[] into the callBack method. 
-          callBack(processedResponse);
+          debugger;
+          processedResponse.data.map(processedItem => {
+            filteredResponse[filteredResponse.indexOf(filteredResponseItem => filteredResponseItem.ID === processedItem.ID)] = processedItem;
+          });
+          debugger;
+          callBack(filteredResponse);
         });
     });
 };
@@ -253,7 +257,7 @@ export class InvoiceDataProvider extends React.Component<IInvoiceDataProviderPro
     }
 
     this.pending = toODataString(this.props.dataState);
-    
+
     QueryInvoiceData(
       {
         filterState: this.props.filterState,

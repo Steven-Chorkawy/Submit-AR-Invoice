@@ -8,6 +8,9 @@ import {
   GridToolbar
 } from '@progress/kendo-react-grid';
 import { Button } from '@progress/kendo-react-buttons';
+import { toODataString, process, filterBy } from '@progress/kendo-data-query';
+
+
 //PnPjs Imports
 import { sp } from "@pnp/sp";
 import { Web } from "@pnp/sp/webs";
@@ -20,7 +23,6 @@ import "@pnp/sp/items";
 // Custom Imports
 import { InvoiceDataProvider, QueryInvoiceData } from '../InvoiceDataProvider';
 import { MyCommandCell } from './MyCommandCell';
-import { filterBy } from '@progress/kendo-data-query';
 import { InvoiceStatus, MyGridStrings, MyContentTypes } from '../enums/MyEnums';
 import { ConvertQueryParamsToKendoFilter, BuildGUID, CreateInvoiceAction, GetUserByLoginName, GetUserByEmail, GetURLForNewAttachment } from '../MyHelperMethods';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
@@ -183,14 +185,12 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
   }
 
   public arDataReceived = (invoices) => {
+    let d = process(invoices, this.state.dataState);
+    debugger;
     var dataHolder: any = filterBy(invoices.data, this.state.filter);
 
     this.setState({
-      ...this.state,
-      invoices: {
-        data: dataHolder,
-        total: invoices.total
-      },
+      invoices: { ...process(invoices, this.state.dataState) },
       receivedData: invoices
     });
   }
