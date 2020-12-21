@@ -26,7 +26,7 @@ import { BuildURLToDocument } from './MyHelperMethods';
 interface IInvoiceDataProviderProps {
   dataState: any;
   filterState?: any;
-  
+
   onARRequestDataReceived: any;
 
   statusDataState: any;
@@ -125,7 +125,6 @@ export const QueryInvoiceData = ({ filterState, dataState }, callBack: Function)
     .then(async response => {
       console.log('raw Res');
       console.log(response);
-      debugger;
       let filteredResponse = filterBy(response, filterState);
 
       // Apply Kendo grids filters.
@@ -222,7 +221,14 @@ export const QueryInvoiceData = ({ filterState, dataState }, callBack: Function)
 
           // Process data once more to place the ID's in the correct order.
           var outputProcessedResponse = process(processedResponse.data, dataState);
-          debugger;
+          
+          // processedResponse contains the correct total.  
+          // outputProcessedResponse only does not contain the correct total, but it does order and do other stuff... I think. 
+          // So to fix this may I present to you.....
+          outputProcessedResponse.total = processedResponse.total; 
+          // That's it.
+
+          
           callBack(outputProcessedResponse);
         });
     });
