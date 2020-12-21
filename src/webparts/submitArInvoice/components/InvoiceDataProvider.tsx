@@ -199,7 +199,7 @@ export const QueryInvoiceData = ({ filterState, dataState }, callBack: Function)
 
             // * !!! Important !!!
             // * This is how we get our links to documents. 
-            if (processedResponse.data[index].RelatedAttachments && processedResponse.data[index].RelatedAttachments.length > 0) {           
+            if (processedResponse.data[index].RelatedAttachments && processedResponse.data[index].RelatedAttachments.length > 0) {
               for (let relatedAttachmentsIndex = 0; relatedAttachmentsIndex < processedResponse.data[index].RelatedAttachments.length; relatedAttachmentsIndex++) {
                 let documentUrl = await BuildURLToDocument(processedResponse.data[index].RelatedAttachments[relatedAttachmentsIndex].Title);
                 processedResponse.data[index].RelatedAttachments[relatedAttachmentsIndex].ServerRedirectedEmbedUrl = documentUrl;
@@ -218,18 +218,8 @@ export const QueryInvoiceData = ({ filterState, dataState }, callBack: Function)
             processedResponse.data[index].Date = new Date(processedResponse.data[index].Date);
             processedResponse.data[index].Created = new Date(processedResponse.data[index].Created);
           }
-
-          // Process data once more to place the ID's in the correct order.
-          var outputProcessedResponse = process(processedResponse.data, dataState);
           
-          // processedResponse contains the correct total.  
-          // outputProcessedResponse only does not contain the correct total, but it does order and do other stuff... I think. 
-          // So to fix this may I present to you.....
-          outputProcessedResponse.total = processedResponse.total; 
-          // That's it.
-
-          
-          callBack(outputProcessedResponse);
+          callBack(processedResponse);
         });
     });
 };
@@ -251,7 +241,7 @@ export class InvoiceDataProvider extends React.Component<IInvoiceDataProviderPro
     }
 
     this.pending = toODataString(this.props.dataState);
-
+    
     QueryInvoiceData(
       {
         filterState: this.props.filterState,
