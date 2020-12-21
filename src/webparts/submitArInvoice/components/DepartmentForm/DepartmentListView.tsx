@@ -144,9 +144,7 @@ class DepartmentListView extends React.Component<any, any> {
 
         <InvoiceDataProvider
           dataState={this.state.dataState}
-          onDataReceived={this.dataReceived}
           onARRequestDataReceived={this.arDataReceived}
-
 
           statusDataState={this.state.statusData}
           onStatusDataReceived={this.statusDataReceived}
