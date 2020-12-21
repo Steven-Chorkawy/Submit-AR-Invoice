@@ -230,7 +230,7 @@ export const QueryInvoiceData = ({ filterState, dataState }, callBack: Function)
            * the gird or list only display records that have all their data.
            * 
            */
-          
+          // TODO: Insert processResponse[] into  response[] and pass response[] into the callBack method. 
           callBack(processedResponse);
         });
     });
