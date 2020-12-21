@@ -665,7 +665,6 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
           dataState={this.state.dataState}
           filterState={this._NoSubmittedInvoiceFilter}
 
-          onDataReceived={this.dataReceived}
           onARRequestDataReceived={this.arDataReceived}
           statusDataState={this.state.statusData}
           onStatusDataReceived={this.statusDataReceived}

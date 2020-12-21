@@ -154,22 +154,10 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
     });
   }
 
-  public dataReceived = (invoices) => {
-    var fData = this._filterMyData(invoices.data, this.state.filter);
-
-    this.setState({
-      ...this.state,
-      data: {
-        data: fData,
-        total: fData.length
-      },
-      receivedData: invoices.data
-    });
-  }
-
   public arDataReceived = (invoices) => {
+    debugger;
     var fData = this._filterMyData(invoices.data, this.state.filter);
-
+    debugger;
     this.setState({
       ...this.state,
       data: {
@@ -749,7 +737,6 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
         }
         <InvoiceDataProvider
           dataState={this.state.dataState}
-          onDataReceived={this.dataReceived}
           onARRequestDataReceived={this.arDataReceived}
 
           statusDataState={this.state.statusData}
