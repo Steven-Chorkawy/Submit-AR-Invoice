@@ -155,14 +155,12 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
   }
 
   public arDataReceived = (invoices) => {
-    debugger;
     var fData = this._filterMyData(invoices.data, this.state.filter);
-    debugger;
     this.setState({
       ...this.state,
       data: {
         data: fData,
-        total: fData.length
+        total: invoices.length
       },
       receivedData: invoices.data
     });
@@ -623,7 +621,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
         <Grid
           filterable={true}
           sortable={true}
-          pageable={{ buttonCount: 4, pageSizes: true }}
+          pageable={{ buttonCount: 4, pageSizes: true, info: true }}
           resizable={true}
 
           {...this.state.dataState}

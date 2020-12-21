@@ -543,7 +543,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
         <Grid
           filterable={true}
           sortable={true}
-          pageable={{ buttonCount: 4, pageSizes: true }}
+          pageable={{ buttonCount: 4, pageSizes: true, info: true }}
           resizable={true}
 
           {...this.state.dataState}
