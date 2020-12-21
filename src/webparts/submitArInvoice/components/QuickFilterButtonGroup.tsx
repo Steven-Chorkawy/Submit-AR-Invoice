@@ -45,6 +45,7 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
         { text: "For You", getData: this._invoicesForCurrentUser },
         { text: "Urgent", getData: this._urgentInvoices },
         { text: "Approved", getData: this._approvedInvoices },
+        { text: 'Completed', getData: () => alert('clicked!') },
         { text: "Waiting Approval", getData: this._waitingApproval },
       ]
     };
@@ -59,7 +60,7 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
 
   //#region Filter Invoice Methods
   private _allInvoices = () => {
-    return  this.props.invoices ? this.props.invoices : null;
+    return this.props.invoices ? this.props.invoices : null;
   }
 
   private _urgentInvoices = () => {
@@ -119,7 +120,7 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
           {this.state.filterButtons.map((button, index) => {
             let buttonDataLength = 0;
 
-            if(button.getData()) {
+            if (button.getData()) {
               buttonDataLength = button.getData().length;
             }
 
