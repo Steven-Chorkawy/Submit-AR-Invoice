@@ -164,7 +164,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
     this.setState({
       invoices: {
         data: showTheseInvoices,
-        total: showTheseInvoices.length
+        total: this.state.invoices.total
       }
     });
   }

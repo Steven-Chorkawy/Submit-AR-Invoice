@@ -129,7 +129,7 @@ export const QueryInvoiceData = ({ filterState, dataState }, callBack: Function)
 
       // Apply Kendo grids filters.
       let processedResponse = process(filteredResponse, dataState);
-
+      debugger;
       // Hold the list of invoice IDs that will be used to pull related accounts.
       var invoiceIds = [];                // filter for accounts
       var idsForARDocuments = [];
@@ -218,6 +218,18 @@ export const QueryInvoiceData = ({ filterState, dataState }, callBack: Function)
             processedResponse.data[index].Date = new Date(processedResponse.data[index].Date);
             processedResponse.data[index].Created = new Date(processedResponse.data[index].Created);
           }
+
+          /**
+           * Here we want to return all the invoices that we queried. 
+           * That includes the 'processed' ones and non 'processed' ones. 
+           * 
+           * The processed ones have links to their documents and account codes 
+           * where as the non processed ones only have the invoice metadata. 
+           * 
+           * The callBack method will then need to process our whatever we send them one more time to ensure 
+           * the gird or list only display records that have all their data.
+           * 
+           */
           
           callBack(processedResponse);
         });
