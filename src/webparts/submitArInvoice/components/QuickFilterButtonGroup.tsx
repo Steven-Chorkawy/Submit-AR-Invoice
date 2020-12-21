@@ -45,7 +45,7 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
         { text: "For You", getData: this._invoicesForCurrentUser },
         { text: "Urgent", getData: this._urgentInvoices },
         { text: "Approved", getData: this._approvedInvoices },
-        { text: 'Completed', getData: () => alert('clicked!') },
+        { text: 'Completed', getData: this._completedInvoices },
         { text: "Waiting Approval", getData: this._waitingApproval },
       ]
     };
@@ -59,6 +59,12 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
   }
 
   //#region Filter Invoice Methods
+  private _completedInvoices = () => {
+    return this.props.invoices ?
+      this.props.invoices.filter(f => f.Invoice_x0020_Status === InvoiceStatus.Completed) :
+      null;
+  }
+
   private _allInvoices = () => {
     return this.props.invoices ? this.props.invoices : null;
   }
@@ -79,10 +85,9 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
 
   // return invoices that have all actions with a status of approved.
   private _approvedInvoices = () => {
-    return this.props.invoices ? this.props.invoices
-      .filter(
-        f => f.Actions.filter(ff => ff.Response_x0020_Status === InvoiceActionResponseStatus.Approved)
-          .length === f.Actions.length && f.Actions.length > 0
+    return this.props.invoices ?
+      this.props.invoices.filter(
+        f => f.Actions.filter(ff => ff.Response_x0020_Status === InvoiceActionResponseStatus.Approved).length === f.Actions.length && f.Actions.length > 0
       ) : null;
   }
 
