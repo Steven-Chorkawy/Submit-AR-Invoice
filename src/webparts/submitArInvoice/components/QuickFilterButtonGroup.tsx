@@ -86,9 +86,7 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
   // return invoices that have all actions with a status of approved.
   private _approvedInvoices = () => {
     return this.props.invoices ?
-      this.props.invoices.filter(
-        f => f.Actions.filter(ff => ff.Response_x0020_Status === InvoiceActionResponseStatus.Approved).length === f.Actions.length && f.Actions.length > 0
-      ) : null;
+      this.props.invoices.filter(f => f.Invoice_x0020_Status === InvoiceStatus.Approved) : null;
   }
 
   private _waitingApproval = () => {
