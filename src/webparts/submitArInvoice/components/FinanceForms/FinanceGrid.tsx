@@ -31,14 +31,14 @@ import { InvoiceActionRequestTypes } from '../enums/MyEnums';
 import { FinanceGridEditForm, IGPAttachmentProps } from './FinanceGridEditForm';
 import { FileRefCell } from '../FileRefCell';
 import { IDCell } from '../IDCell';
-import { IMySaveResult, IInvoiceUpdateItem } from '../interface/MyInterfaces';
+import { IMySaveResult, IInvoiceUpdateItem, IInvoiceItem } from '../interface/MyInterfaces';
 import { QuickFilterButtonGroup } from '../QuickFilterButtonGroup';
 import { INewApproval } from '../RequestApprovalDialogComponent';
 import { ApprovalDialogContainer } from '../ApprovalDialogContainer';
 
 interface IFinanceGridState {
   data: IInvoicesDataState;
-  receivedData: IInvoicesDataState;
+  receivedData: IInvoiceItem[];
   dataState: any;
   productInEdit: any;
   productInApproval: any;
@@ -89,7 +89,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
     this.state = {
       data: { data: [], total: 0 },
       // Same as invoices but this object is used to restore data to it's original state.
-      receivedData: { data: [], total: 0 },
+      receivedData: [],
       dataState: DEFAULT_DATA_STATE,
       productInEdit: undefined,
       productInApproval: undefined,
@@ -259,7 +259,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
   }
 
   public onFilterChange = e => {
-    var newData = filterBy(this.state.receivedData.data, e.filter);
+    var newData = filterBy(this.state.receivedData, e.filter);
     newData.map(invoice => invoice.expanded = this.state.allRowsExpanded);
     var newStateData = {
       data: newData,
@@ -514,7 +514,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
    * @param dataItem Invoice item that we are no longer editing.
    */
   public cancel = (dataItem) => {
-    const originalItem = this.state.receivedData.data.find(p => p.ID === dataItem.ID);
+    const originalItem = this.state.receivedData.find(p => p.ID === dataItem.ID);
     const data = this.state.data.data.map(item => item.ID === originalItem.ID ? originalItem : item);
     this.setState({
       data: {
@@ -538,7 +538,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
   public cancelCurrentChanges = () => {
     // reset everything back.
     this.setState({
-      data: { ...this.state.receivedData }
+      data: { ...process(this.state.receivedData, this.state.dataState) }
     });
   }
   //#endregion end CRUD Methods
@@ -587,7 +587,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
               >Clear All Filters</Button>
             )}
 
-            <QuickFilterButtonGroup invoices={this.state.receivedData.data} onButtonClick={this.onFilterButtonClick} />
+            <QuickFilterButtonGroup invoices={this.state.receivedData} onButtonClick={this.onFilterButtonClick} />
 
             {hasEditedItem && (
               <Button
