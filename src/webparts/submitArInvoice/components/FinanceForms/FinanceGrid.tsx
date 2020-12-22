@@ -574,21 +574,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
               className="k-button"
               icon="plus"
               onClick={this.expandAllRows}>Toggle All Rows</Button>
-            {this.state.filter && this.state.filter.filters.length > 0 && (
-              <Button
-                title="Clear All Filters"
-                className="k-button"
-                icon="filter-clear"
-                onClick={
-                  _ => {
-                    this.onFilterChange({ filter: { ...this.state.filter, filters: [] } });
-                  }
-                }
-              >Clear All Filters</Button>
-            )}
-
             <QuickFilterButtonGroup invoices={this.state.receivedData} onButtonClick={this.onFilterButtonClick} />
-
             {hasEditedItem && (
               <Button
                 title="Cancel current changes"
