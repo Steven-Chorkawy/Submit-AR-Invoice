@@ -75,7 +75,7 @@ class LoadingPanel extends React.Component {
  * Run the query that populate all the invoices.
  */
 export const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
-
+  
   const includeString = `*,
     Requested_x0020_By/Id,
     Requested_x0020_By/Title,
@@ -129,7 +129,7 @@ export const QueryInvoiceData = ({ filterState, dataState }, callBack: Function)
 
       // Apply Kendo grids filters.
       let processedResponse = process(filteredResponse, dataState);
-      debugger;
+
       // Hold the list of invoice IDs that will be used to pull related accounts.
       var invoiceIds = [];                // filter for accounts
       var idsForARDocuments = [];
@@ -236,7 +236,7 @@ export const QueryInvoiceData = ({ filterState, dataState }, callBack: Function)
               filteredResponse[filteredResponseIndex] = processedItem;
             }
           });
-          
+
           callBack(filteredResponse);
         });
     });

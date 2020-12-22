@@ -9,7 +9,7 @@ import {
   GridToolbar,
 } from '@progress/kendo-react-grid';
 import { Button, SplitButton, DropDownButton } from '@progress/kendo-react-buttons';
-
+import { toODataString, process, filterBy } from '@progress/kendo-data-query';
 
 //PnPjs Imports
 import { sp } from "@pnp/sp";
@@ -22,13 +22,12 @@ import "@pnp/sp/items";
 
 // Import my stuff.
 import IARInvoice from '../IARInvoice';
-import { filterBy, orderBy, groupBy } from '@progress/kendo-data-query';
 import { DepartmentGridEditDialogContainer } from './DepartmentGridEditDialogContainer';
 import { ApprovalDialogContainer } from '../ApprovalDialogContainer';
 import { RequestApprovalDialogComponent } from '../RequestApprovalDialogComponent';
-import { InvoiceDataProvider } from '../InvoiceDataProvider';
+import { InvoiceDataProvider, QueryInvoiceData } from '../InvoiceDataProvider';
 import { InvoiceActionRequestTypes, InvoiceActionResponseStatus, InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
-import { ConvertQueryParamsToKendoFilter, UpdateAccountDetails, GetDepartments, GetURLForNewAttachment } from '../MyHelperMethods';
+import { ConvertQueryParamsToKendoFilter, UpdateAccountDetails, GetDepartments, GetURLForNewAttachment, BuildFilterForInvoiceID } from '../MyHelperMethods';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { MyContentTypes } from '../enums/MyEnums';
@@ -63,6 +62,14 @@ type DepartmentGridState = {
   departments: any[];
 };
 
+const DEFAULT_DATA_STATE = {
+  take: 20,
+  skip: 0,
+  sort: [
+    { field: 'ID', dir: 'desc' }
+  ],
+};
+
 export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
   constructor(props) {
     super(props);
@@ -83,13 +90,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
       requestType: undefined,
       productInApproval: undefined,
       requestingApprovalFor: undefined,
-      dataState: {
-        take: 20,
-        skip: 0,
-        sort: [
-          { field: 'ID', dir: 'desc' }
-        ],
-      }
+      dataState: DEFAULT_DATA_STATE
     };
 
     GetDepartments().then(value => {
@@ -155,14 +156,9 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
   }
 
   public arDataReceived = (invoices) => {
-    var fData = this._filterMyData(invoices.data, this.state.filter);
     this.setState({
-      ...this.state,
-      data: {
-        data: fData,
-        total: invoices.length
-      },
-      receivedData: invoices.data
+      data: { ...process(invoices, this.state.dataState) },
+      receivedData: invoices
     });
   }
 
@@ -190,12 +186,21 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
    * @param showTheseInvoices The invoices that we want to display
    */
   public onFilterButtonClick = (e, showTheseInvoices) => {
-    this.setState({
-      data: {
-        data: showTheseInvoices,
-        total: showTheseInvoices.length
+    this.setState(
+      {
+        filter: BuildFilterForInvoiceID(showTheseInvoices),
+        data: undefined,
+        dataState: DEFAULT_DATA_STATE
+      },
+      () => {
+        QueryInvoiceData(
+          { filterState: this.state.filter, dataState: this.state.dataState },
+          (invoices) => {
+            this.setState({ data: process(invoices, this.state.dataState) });
+          }
+        )
       }
-    });
+    );
   }
   //#endregion
 
@@ -619,7 +624,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
     return (
       <div>
         <Grid
-          filterable={true}
+          filterable={false}
           sortable={true}
           pageable={{ buttonCount: 4, pageSizes: true, info: true }}
           resizable={true}

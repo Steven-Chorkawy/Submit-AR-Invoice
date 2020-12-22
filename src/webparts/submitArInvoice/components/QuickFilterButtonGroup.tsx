@@ -13,6 +13,7 @@ import { Button, ButtonGroup } from '@progress/kendo-react-buttons';
 import { IInvoiceItem } from './interface/MyInterfaces';
 import { InvoiceStatus, InvoiceActionResponseStatus } from './enums/MyEnums';
 import { ISiteUserInfo } from '@pnp/sp/site-users/types';
+import { MyLists } from './enums/MyLists';
 
 interface IQuickFilterButtonGroupProps {
   invoices: Array<IInvoiceItem>;
@@ -21,8 +22,9 @@ interface IQuickFilterButtonGroupProps {
 
 interface IQuickFilterButtonGroupState {
   currentUser: ISiteUserInfo;
-  filterButtons: Array<IQuickFilterButton>;
+  filterButtons: IQuickFilterButton[];
   selected: number;
+  invoicesForCurrentUser?: any[];
 }
 
 /**
@@ -40,20 +42,35 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
     this.state = {
       currentUser: null,
       selected: 0,  // Select the first button by default.
-      filterButtons: [
-        { text: "Show Active", getData: this._allInvoices },
-        { text: "For You", getData: this._invoicesForCurrentUser },
-        { text: "Urgent", getData: this._urgentInvoices },
-        { text: "Approved", getData: this._approvedInvoices },
-        { text: 'Completed', getData: this._completedInvoices },
-        { text: "Waiting Approval", getData: this._waitingApproval },
-      ]
+      filterButtons: []
     };
 
     sp.web.currentUser.get()
       .then(user => {
         this.setState({
           currentUser: user
+        }, () => {
+          // Get the invoices that require this users attention. 
+          sp.web.lists.getByTitle(MyLists.InvoiceActionRequired).items.getAll().then(values => {
+
+            // First set all the 
+            let output = values.filter(value => value.AssignedToId === this.state.currentUser.Id && value.Response_x0020_Status === InvoiceActionResponseStatus.Waiting)
+              .map(value => { return { ID: value.AR_x0020_Invoice_x0020_RequestId } });
+            debugger;
+
+            this.setState({
+              invoicesForCurrentUser: output,
+              selected: 0,  // Select the first button by default.
+              filterButtons: [
+                { text: "Show Active", getData: this._allInvoices },
+                { text: "For You", getData: this._invoicesForCurrentUser },
+                { text: "Urgent", getData: this._urgentInvoices },
+                { text: "Approved", getData: this._approvedInvoices },
+                { text: 'Completed', getData: this._completedInvoices },
+                { text: "Waiting Approval", getData: this._waitingApproval },
+              ]
+            });
+          });
         });
       });
   }
@@ -75,12 +92,7 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
 
   // Get invoices that have actions assigned to this user with a status of Waiting.
   private _invoicesForCurrentUser = () => {
-    return this.props.invoices ? this.props.invoices.filter(x =>
-      x.Actions.some(y =>
-        y.Response_x0020_Status === InvoiceActionResponseStatus.Waiting
-        && y.AssignedToId === this.state.currentUser.Id
-      )
-    ) : null;
+    return this.state.invoicesForCurrentUser ? this.state.invoicesForCurrentUser : [];
   }
 
   // return invoices that have all actions with a status of approved.
@@ -91,7 +103,7 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
 
   private _waitingApproval = () => {
     return this.props.invoices ? this.props.invoices.filter(x =>
-      x.Actions.some(y =>
+      x.Actions && x.Actions.some(y =>
         y.Response_x0020_Status === InvoiceActionResponseStatus.Waiting
       )
     ) : null;
@@ -103,6 +115,7 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
     this.setState({
       selected: parseInt(e.target.id)
     });
+
     this.props.onButtonClick(e, this.state.filterButtons[parseInt(e.target.id)].getData());
   }
 
@@ -118,13 +131,17 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
 
   public render() {
     return (
-      this.state.currentUser && <div>
+      (this.state.currentUser && this.state.invoicesForCurrentUser) ?
         <ButtonGroup>
           {this.state.filterButtons.map((button, index) => {
             let buttonDataLength = 0;
+            let buttonData = button.getData();
+            if (button.text === 'For You') {
+              debugger;
+            }
 
-            if (button.getData()) {
-              buttonDataLength = button.getData().length;
+            if (buttonData) {
+              buttonDataLength = buttonData.length;
             }
 
             return (
@@ -135,12 +152,13 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
                 selected={this._isSelected(index)}
                 onClick={this._filterButtonClickEvent}
               >
-                {button.text} {buttonDataLength > 0 && `(${button.getData().length})`}
+                {button.text} {buttonDataLength > 0 && `(${buttonDataLength})`}
               </Button>
             );
+
           })}
-        </ButtonGroup>
-      </div>
+        </ButtonGroup> :
+        null
     );
   }
 }

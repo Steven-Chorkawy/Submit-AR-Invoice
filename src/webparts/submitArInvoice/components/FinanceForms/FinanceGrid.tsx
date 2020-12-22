@@ -185,10 +185,6 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
   }
 
   public arDataReceived = (invoices) => {
-    let d = process(invoices, this.state.dataState);
-    debugger;
-    var dataHolder: any = filterBy(invoices.data, this.state.filter);
-
     this.setState({
       invoices: { ...process(invoices, this.state.dataState) },
       receivedData: invoices
@@ -519,7 +515,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
   }
 
   // Close the approval dialog container. 
-  public cancelApproval = () => { this.setState({ productInApproval: undefined }); }
+  public cancelApproval = () => { this.setState({ productInApproval: undefined }); };
 
   public cancelEditForm = () => {
     this.setState({ productInEdit: undefined });
