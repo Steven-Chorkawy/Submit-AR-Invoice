@@ -544,11 +544,11 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
   //#endregion end CRUD Methods
 
   public render() {
-    const hasEditedItem = this.state.data.data.some(p => p.inEdit);
+    const hasEditedItem = this.state.data ? this.state.data.data.some(p => p.inEdit) : false;
     return (
       <div>
         <Grid
-          filterable={true}
+          filterable={false}
           sortable={true}
           pageable={{ buttonCount: 4, pageSizes: true, info: true }}
           resizable={true}
@@ -609,7 +609,6 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
 
           <GridColumn cell={this.CommandCell} width={"120px"} locked={true} resizable={false} filterable={false} sortable={false} />
         </Grid>
-
         {
           this.state.productInEdit &&
           <FinanceGridEditForm
