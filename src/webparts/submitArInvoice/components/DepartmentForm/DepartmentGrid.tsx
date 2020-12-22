@@ -198,7 +198,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
           (invoices) => {
             this.setState({ data: process(invoices, this.state.dataState) });
           }
-        )
+        );
       }
     );
   }

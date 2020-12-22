@@ -177,7 +177,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
           (invoices) => {
             this.setState({ data: process(invoices, this.state.dataState) });
           }
-        )
+        );
       }
     );
   }

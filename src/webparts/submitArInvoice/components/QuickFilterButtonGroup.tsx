@@ -55,7 +55,7 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
 
             // First set all the 
             let output = values.filter(value => value.AssignedToId === this.state.currentUser.Id && value.Response_x0020_Status === InvoiceActionResponseStatus.Waiting)
-              .map(value => { return { ID: value.AR_x0020_Invoice_x0020_RequestId } });
+              .map(value => { return { ID: value.AR_x0020_Invoice_x0020_RequestId }; });
             debugger;
 
             this.setState({
@@ -137,7 +137,7 @@ class QuickFilterButtonGroup extends React.Component<IQuickFilterButtonGroupProp
             let buttonDataLength = 0;
             let buttonData = button.getData();
             debugger;
-            
+
             if (buttonData) {
               buttonDataLength = buttonData.length;
             }
