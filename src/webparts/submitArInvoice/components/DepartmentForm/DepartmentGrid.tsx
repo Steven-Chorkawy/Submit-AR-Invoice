@@ -646,14 +646,6 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
           rowRender={this.RowRender}
         >
           <GridToolbar>
-            {this.state.filter && this.state.filter.filters.length > 0 && (
-              <Button
-                title="Clear All Filters"
-                className="k-button"
-                icon="filter-clear"
-                onClick={() => { this.onFilterChange({ filter: { ...this.state.filter, filters: [] } }); }}
-              >Clear All Filters</Button>
-            )}
             <QuickFilterButtonGroup
               invoices={this.state.receivedData}
               onButtonClick={this.onFilterButtonClick}
