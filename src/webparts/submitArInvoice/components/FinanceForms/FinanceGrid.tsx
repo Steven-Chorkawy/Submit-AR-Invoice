@@ -257,20 +257,6 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
       this.expandChange({ dataItem: invoice });
     });
   }
-
-  public onFilterChange = e => {
-    var newData = filterBy(this.state.receivedData, e.filter);
-    newData.map(invoice => invoice.expanded = this.state.allRowsExpanded);
-    var newStateData = {
-      data: newData,
-      total: newData.length
-    };
-
-    this.setState({
-      filter: e.filter,
-      data: newStateData
-    });
-  }
   //#endregion End Methods
 
   //#region Update Methods
@@ -552,21 +538,16 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
           sortable={true}
           pageable={{ buttonCount: 4, pageSizes: true, info: true }}
           resizable={true}
-
           {...this.state.dataState}
           {...this.state.data}
-
           onDataStateChange={this.dataStateChange}
           onItemChange={this.itemChange}
           editField={this._editField}
           filter={this.state.filter}
-          onFilterChange={this.onFilterChange}
-
           detail={InvoiceGridDetailComponent}
           expandField="expanded"
           onExpandChange={this.expandChange}
           rowRender={this.RowRender}
-
           style={{ minHeight: '520px', maxHeight: '700px' }}
         >
           <GridToolbar>

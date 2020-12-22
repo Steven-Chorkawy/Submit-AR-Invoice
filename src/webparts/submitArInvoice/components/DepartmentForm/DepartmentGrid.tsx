@@ -162,24 +162,6 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
     });
   }
 
-  public onFilterChange = e => {
-    var newData = this._filterMyData(this.state.receivedData, e.filter);
-
-    var newStateData = {
-      data: newData,
-      total: newData.length
-    };
-
-    this.setState({
-      filter: e.filter,
-      data: newStateData
-    });
-  }
-
-  private _filterMyData(data, filter) {
-    return filterBy(data, filter);
-  }
-
   /**
    * Filter Invoices by a single click of a button.
    * @param e Button click event
@@ -628,20 +610,13 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
           sortable={true}
           pageable={{ buttonCount: 4, pageSizes: true, info: true }}
           resizable={true}
-
           {...this.state.dataState}
           {...this.state.data}
-
           onDataStateChange={this.dataStateChange}
-
           filter={this.state.filter}
-          onFilterChange={this.onFilterChange}
-
           style={{ minHeight: '520px', maxHeight: '700px' }}
-
           onExpandChange={this.expandChange}
           expandField="expanded"
-
           detail={InvoiceGridDetailComponent}
           rowRender={this.RowRender}
         >
