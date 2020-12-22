@@ -230,11 +230,13 @@ export const QueryInvoiceData = ({ filterState, dataState }, callBack: Function)
            * the gird or list only display records that have all their data.
            * 
            */
-          debugger;
           processedResponse.data.map(processedItem => {
-            filteredResponse[filteredResponse.indexOf(filteredResponseItem => filteredResponseItem.ID === processedItem.ID)] = processedItem;
+            let filteredResponseIndex = filteredResponse.indexOf(filteredResponseItem => filteredResponseItem.ID === processedItem.ID);
+            if (filteredResponseIndex >= 0) {
+              filteredResponse[filteredResponseIndex] = processedItem;
+            }
           });
-          debugger;
+          
           callBack(filteredResponse);
         });
     });
