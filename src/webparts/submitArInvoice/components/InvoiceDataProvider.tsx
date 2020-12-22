@@ -27,7 +27,6 @@ interface IInvoiceDataProviderProps {
   dataState: any;
   filterState?: any;
 
-  onDataReceived: any;
   onARRequestDataReceived: any;
 
   statusDataState: any;
@@ -76,7 +75,7 @@ class LoadingPanel extends React.Component {
  * Run the query that populate all the invoices.
  */
 export const QueryInvoiceData = ({ filterState, dataState }, callBack: Function) => {
-
+  
   const includeString = `*,
     Requested_x0020_By/Id,
     Requested_x0020_By/Title,
@@ -126,7 +125,6 @@ export const QueryInvoiceData = ({ filterState, dataState }, callBack: Function)
     .then(async response => {
       console.log('raw Res');
       console.log(response);
-
       let filteredResponse = filterBy(response, filterState);
 
       // Apply Kendo grids filters.
@@ -201,7 +199,7 @@ export const QueryInvoiceData = ({ filterState, dataState }, callBack: Function)
 
             // * !!! Important !!!
             // * This is how we get our links to documents. 
-            if (processedResponse.data[index].RelatedAttachments && processedResponse.data[index].RelatedAttachments.length > 0) {           
+            if (processedResponse.data[index].RelatedAttachments && processedResponse.data[index].RelatedAttachments.length > 0) {
               for (let relatedAttachmentsIndex = 0; relatedAttachmentsIndex < processedResponse.data[index].RelatedAttachments.length; relatedAttachmentsIndex++) {
                 let documentUrl = await BuildURLToDocument(processedResponse.data[index].RelatedAttachments[relatedAttachmentsIndex].Title);
                 processedResponse.data[index].RelatedAttachments[relatedAttachmentsIndex].ServerRedirectedEmbedUrl = documentUrl;
@@ -221,10 +219,25 @@ export const QueryInvoiceData = ({ filterState, dataState }, callBack: Function)
             processedResponse.data[index].Created = new Date(processedResponse.data[index].Created);
           }
 
-          // Process data once more to place the ID's in the correct order.
-          var outputProcessedResponse = process(processedResponse.data, dataState);
+          /**
+           * Here we want to return all the invoices that we queried. 
+           * That includes the 'processed' ones and non 'processed' ones. 
+           * 
+           * The processed ones have links to their documents and account codes 
+           * where as the non processed ones only have the invoice metadata. 
+           * 
+           * The callBack method will then need to process our whatever we send them one more time to ensure 
+           * the gird or list only display records that have all their data.
+           * 
+           */
+          processedResponse.data.map(processedItem => {
+            let filteredResponseIndex = filteredResponse.indexOf(filteredResponseItem => filteredResponseItem.ID === processedItem.ID);
+            if (filteredResponseIndex >= 0) {
+              filteredResponse[filteredResponseIndex] = processedItem;
+            }
+          });
 
-          callBack(outputProcessedResponse);
+          callBack(filteredResponse);
         });
     });
 };

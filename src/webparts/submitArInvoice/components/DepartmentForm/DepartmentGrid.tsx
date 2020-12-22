@@ -9,7 +9,7 @@ import {
   GridToolbar,
 } from '@progress/kendo-react-grid';
 import { Button, SplitButton, DropDownButton } from '@progress/kendo-react-buttons';
-
+import { toODataString, process, filterBy } from '@progress/kendo-data-query';
 
 //PnPjs Imports
 import { sp } from "@pnp/sp";
@@ -22,13 +22,12 @@ import "@pnp/sp/items";
 
 // Import my stuff.
 import IARInvoice from '../IARInvoice';
-import { filterBy, orderBy, groupBy } from '@progress/kendo-data-query';
 import { DepartmentGridEditDialogContainer } from './DepartmentGridEditDialogContainer';
 import { ApprovalDialogContainer } from '../ApprovalDialogContainer';
 import { RequestApprovalDialogComponent } from '../RequestApprovalDialogComponent';
-import { InvoiceDataProvider } from '../InvoiceDataProvider';
+import { InvoiceDataProvider, QueryInvoiceData } from '../InvoiceDataProvider';
 import { InvoiceActionRequestTypes, InvoiceActionResponseStatus, InvoiceStatus, MyGridStrings } from '../enums/MyEnums';
-import { ConvertQueryParamsToKendoFilter, UpdateAccountDetails, GetDepartments, GetURLForNewAttachment } from '../MyHelperMethods';
+import { ConvertQueryParamsToKendoFilter, UpdateAccountDetails, GetDepartments, GetURLForNewAttachment, BuildFilterForInvoiceID } from '../MyHelperMethods';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { MyContentTypes } from '../enums/MyEnums';
@@ -39,7 +38,7 @@ import { QuickFilterButtonGroup } from '../QuickFilterButtonGroup';
 
 type DepartmentGridState = {
   data: any;
-  receivedData: Array<IInvoiceItem>;
+  receivedData: IInvoiceItem[];
   filter: any;
   result?: any;
   dataState?: any;
@@ -63,6 +62,14 @@ type DepartmentGridState = {
   departments: any[];
 };
 
+const DEFAULT_DATA_STATE = {
+  take: 20,
+  skip: 0,
+  sort: [
+    { field: 'ID', dir: 'desc' }
+  ],
+};
+
 export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
   constructor(props) {
     super(props);
@@ -83,13 +90,7 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
       requestType: undefined,
       productInApproval: undefined,
       requestingApprovalFor: undefined,
-      dataState: {
-        take: 20,
-        skip: 0,
-        sort: [
-          { field: 'ID', dir: 'desc' }
-        ],
-      }
+      dataState: DEFAULT_DATA_STATE
     };
 
     GetDepartments().then(value => {
@@ -154,48 +155,11 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
     });
   }
 
-  public dataReceived = (invoices) => {
-    var fData = this._filterMyData(invoices.data, this.state.filter);
-
-    this.setState({
-      ...this.state,
-      data: {
-        data: fData,
-        total: fData.length
-      },
-      receivedData: invoices.data
-    });
-  }
-
   public arDataReceived = (invoices) => {
-    var fData = this._filterMyData(invoices.data, this.state.filter);
-
     this.setState({
-      ...this.state,
-      data: {
-        data: fData,
-        total: fData.length
-      },
-      receivedData: invoices.data
+      data: { ...process(invoices, this.state.dataState) },
+      receivedData: invoices
     });
-  }
-
-  public onFilterChange = e => {
-    var newData = this._filterMyData(this.state.receivedData, e.filter);
-
-    var newStateData = {
-      data: newData,
-      total: newData.length
-    };
-
-    this.setState({
-      filter: e.filter,
-      data: newStateData
-    });
-  }
-
-  private _filterMyData(data, filter) {
-    return filterBy(data, filter);
   }
 
   /**
@@ -204,12 +168,21 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
    * @param showTheseInvoices The invoices that we want to display
    */
   public onFilterButtonClick = (e, showTheseInvoices) => {
-    this.setState({
-      data: {
-        data: showTheseInvoices,
-        total: showTheseInvoices.length
+    this.setState(
+      {
+        filter: BuildFilterForInvoiceID(showTheseInvoices),
+        data: undefined,
+        dataState: DEFAULT_DATA_STATE
+      },
+      () => {
+        QueryInvoiceData(
+          { filterState: this.state.filter, dataState: this.state.dataState },
+          (invoices) => {
+            this.setState({ data: process(invoices, this.state.dataState) });
+          }
+        );
       }
-    });
+    );
   }
   //#endregion
 
@@ -633,36 +606,21 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
     return (
       <div>
         <Grid
-          filterable={true}
+          filterable={false}
           sortable={true}
-          pageable={{ buttonCount: 4, pageSizes: true }}
+          pageable={{ buttonCount: 4, pageSizes: true, info: true }}
           resizable={true}
-
           {...this.state.dataState}
           {...this.state.data}
-
           onDataStateChange={this.dataStateChange}
-
           filter={this.state.filter}
-          onFilterChange={this.onFilterChange}
-
           style={{ minHeight: '520px', maxHeight: '700px' }}
-
           onExpandChange={this.expandChange}
           expandField="expanded"
-
           detail={InvoiceGridDetailComponent}
           rowRender={this.RowRender}
         >
           <GridToolbar>
-            {this.state.filter && this.state.filter.filters.length > 0 && (
-              <Button
-                title="Clear All Filters"
-                className="k-button"
-                icon="filter-clear"
-                onClick={() => { this.onFilterChange({ filter: { ...this.state.filter, filters: [] } }); }}
-              >Clear All Filters</Button>
-            )}
             <QuickFilterButtonGroup
               invoices={this.state.receivedData}
               onButtonClick={this.onFilterButtonClick}
@@ -749,7 +707,6 @@ export class DepartmentGrid extends React.Component<any, DepartmentGridState> {
         }
         <InvoiceDataProvider
           dataState={this.state.dataState}
-          onDataReceived={this.dataReceived}
           onARRequestDataReceived={this.arDataReceived}
 
           statusDataState={this.state.statusData}

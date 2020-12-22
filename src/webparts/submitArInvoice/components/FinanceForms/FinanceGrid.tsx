@@ -8,6 +8,9 @@ import {
   GridToolbar
 } from '@progress/kendo-react-grid';
 import { Button } from '@progress/kendo-react-buttons';
+import { toODataString, process, filterBy } from '@progress/kendo-data-query';
+
+
 //PnPjs Imports
 import { sp } from "@pnp/sp";
 import { Web } from "@pnp/sp/webs";
@@ -20,23 +23,22 @@ import "@pnp/sp/items";
 // Custom Imports
 import { InvoiceDataProvider, QueryInvoiceData } from '../InvoiceDataProvider';
 import { MyCommandCell } from './MyCommandCell';
-import { filterBy } from '@progress/kendo-data-query';
 import { InvoiceStatus, MyGridStrings, MyContentTypes } from '../enums/MyEnums';
-import { ConvertQueryParamsToKendoFilter, BuildGUID, CreateInvoiceAction, GetUserByLoginName, GetUserByEmail, GetURLForNewAttachment } from '../MyHelperMethods';
+import { ConvertQueryParamsToKendoFilter, BuildGUID, CreateInvoiceAction, GetUserByLoginName, GetUserByEmail, GetURLForNewAttachment, BuildFilterForInvoiceID } from '../MyHelperMethods';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { InvoiceActionRequestTypes } from '../enums/MyEnums';
 import { FinanceGridEditForm, IGPAttachmentProps } from './FinanceGridEditForm';
 import { FileRefCell } from '../FileRefCell';
 import { IDCell } from '../IDCell';
-import { IMySaveResult, IInvoiceUpdateItem } from '../interface/MyInterfaces';
+import { IMySaveResult, IInvoiceUpdateItem, IInvoiceItem } from '../interface/MyInterfaces';
 import { QuickFilterButtonGroup } from '../QuickFilterButtonGroup';
 import { INewApproval } from '../RequestApprovalDialogComponent';
 import { ApprovalDialogContainer } from '../ApprovalDialogContainer';
 
 interface IFinanceGridState {
-  invoices: IInvoicesDataState;
-  receivedData: IInvoicesDataState;
+  data: IInvoicesDataState;
+  receivedData: IInvoiceItem[];
   dataState: any;
   productInEdit: any;
   productInApproval: any;
@@ -70,6 +72,14 @@ class CustomUrgentCell extends React.Component<any, any> {
   }
 }
 
+const DEFAULT_DATA_STATE = {
+  take: 20,
+  skip: 0,
+  sort: [
+    { field: 'ID', dir: 'desc' }
+  ],
+};
+
 class FinanceGrid extends React.Component<any, IFinanceGridState> {
   constructor(props) {
     super(props);
@@ -77,16 +87,10 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
     let defaultFilters = ConvertQueryParamsToKendoFilter([{ FilterField: 'FILTERFIELD1', FilterValue: 'FILTERVALUE1' }]);
 
     this.state = {
-      invoices: { data: [], total: 0 },
+      data: { data: [], total: 0 },
       // Same as invoices but this object is used to restore data to it's original state.
-      receivedData: { data: [], total: 0 },
-      dataState: {
-        take: 20,
-        skip: 0,
-        sort: [
-          { field: 'ID', dir: 'desc' }
-        ],
-      },
+      receivedData: [],
+      dataState: DEFAULT_DATA_STATE,
       productInEdit: undefined,
       productInApproval: undefined,
       statusData: [],
@@ -161,12 +165,21 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
    * @param showTheseInvoices The invoices that we want to display
    */
   public onFilterButtonClick = (e, showTheseInvoices) => {
-    this.setState({
-      invoices: {
-        data: showTheseInvoices,
-        total: showTheseInvoices.length
+    this.setState(
+      {
+        filter: BuildFilterForInvoiceID(showTheseInvoices),
+        data: undefined,
+        dataState: DEFAULT_DATA_STATE
+      },
+      () => {
+        QueryInvoiceData(
+          { filterState: this.state.filter, dataState: this.state.dataState },
+          (invoices) => {
+            this.setState({ data: process(invoices, this.state.dataState) });
+          }
+        );
       }
-    });
+    );
   }
 
   public dataReceived = (invoices) => {
@@ -174,7 +187,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
 
     this.setState({
       ...this.state,
-      invoices: {
+      data: {
         data: dataHolder,
         total: invoices.total
       },
@@ -183,14 +196,8 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
   }
 
   public arDataReceived = (invoices) => {
-    var dataHolder: any = filterBy(invoices.data, this.state.filter);
-
     this.setState({
-      ...this.state,
-      invoices: {
-        data: dataHolder,
-        total: invoices.total
-      },
+      data: { ...process(invoices, this.state.dataState) },
       receivedData: invoices
     });
   }
@@ -245,31 +252,17 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
       allRowsExpanded: !this.state.allRowsExpanded
     });
     // loop over this.state.invoices.data
-    this.state.invoices.data.map(invoice => {
+    this.state.data.data.map(invoice => {
       invoice.expanded = this.state.allRowsExpanded;
       this.expandChange({ dataItem: invoice });
-    });
-  }
-
-  public onFilterChange = e => {
-    var newData = filterBy(this.state.receivedData.data, e.filter);
-    newData.map(invoice => invoice.expanded = this.state.allRowsExpanded);
-    var newStateData = {
-      data: newData,
-      total: newData.length
-    };
-
-    this.setState({
-      filter: e.filter,
-      invoices: newStateData
     });
   }
   //#endregion End Methods
 
   //#region Update Methods
   public removeRelatedAttachments = (element, invoiceId) => {
-    let invoiceIndex = this.state.invoices.data.findIndex(f => f.Id === invoiceId);
-    let dataState = this.state.invoices.data;
+    let invoiceIndex = this.state.data.data.findIndex(f => f.Id === invoiceId);
+    let dataState = this.state.data.data;
     dataState[invoiceIndex].RelatedAttachments = dataState[invoiceIndex].RelatedAttachments.filter(f => { return f.Id !== element.id; });
   }
 
@@ -277,10 +270,10 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
     GetURLForNewAttachment(
       element,
       invoiceId,
-      this.state.invoices.data,
+      this.state.data.data,
       invoices => {
         this.setState({
-          invoices: { data: invoices, total: invoices.length }
+          data: { data: invoices, total: invoices.length }
         });
       }
     );
@@ -299,12 +292,12 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
 
             thisNewFileMetadata.ServerRedirectedEmbedUrl = thisNewFile.ServerRelativeUrl;
 
-            let invoiceIndex = this.state.invoices.data.findIndex(f => f.Id === invoiceId);
-            let dataState = this.state.invoices.data;
+            let invoiceIndex = this.state.data.data.findIndex(f => f.Id === invoiceId);
+            let dataState = this.state.data.data;
             dataState[invoiceIndex].RelatedAttachments.push(thisNewFileMetadata);
 
             this.setState({
-              invoices: {
+              data: {
                 data: dataState,
                 total: dataState.length
               }
@@ -346,13 +339,13 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
 
   //#region CRUD Methods
   public itemChange = e => {
-    const data = this.state.invoices.data.map(item =>
+    const data = this.state.data.data.map(item =>
       item.ID === e.dataItem.ID ? { ...item, [e.field]: e.value } : item
     );
 
     this.setState({
-      invoices: {
-        ...this.state.invoices,
+      data: {
+        ...this.state.data,
         data: data
       }
     });
@@ -382,7 +375,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
    */
   public approvalResponseSent = approvalItem => {
     // This is the invoice that we will need to update in state.data.data
-    let allInvoices = this.state.invoices.data;
+    let allInvoices = this.state.data.data;
     const invoiceIndex = allInvoices.findIndex(a => a.ID === this.state.productInApproval.ID);
     let invoice = allInvoices[invoiceIndex];
 
@@ -400,7 +393,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
     allInvoices[invoiceIndex] = { ...invoice };
 
     this.setState({
-      invoices: {
+      data: {
         data: allInvoices,
         total: allInvoices.length
       },
@@ -413,7 +406,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
    */
   public handleSubmit = e => {
     // Hold all the invoices, we will use this to update the entire state later. 
-    let allInvoices = this.state.invoices.data;
+    let allInvoices = this.state.data.data;
     // The index of the invoice that is currently in edit.
     const invoiceIndex = allInvoices.findIndex(f => f.ID === this.state.productInEdit.ID);
     const productInEditId = this.state.productInEdit.ID;
@@ -468,7 +461,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
               // Add the new action to the list of existing actions.
               allInvoices[invoiceIndex].Actions = [...allInvoices[invoiceIndex].Actions, actionRes];
               this.setState({
-                invoices: {
+                data: {
                   data: [...allInvoices],
                   total: allInvoices.length
                 }
@@ -491,7 +484,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
       allInvoices[invoiceIndex] = { ...allInvoices[invoiceIndex], ...updateProperties };
       // If all goes well we can remove the product in edit. 
       this.setState({
-        invoices: {
+        data: {
           data: [...allInvoices],
           total: allInvoices.length
         },
@@ -507,11 +500,11 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
    * @param dataItem Invoice item that we are no longer editing.
    */
   public cancel = (dataItem) => {
-    const originalItem = this.state.receivedData.data.find(p => p.ID === dataItem.ID);
-    const data = this.state.invoices.data.map(item => item.ID === originalItem.ID ? originalItem : item);
+    const originalItem = this.state.receivedData.find(p => p.ID === dataItem.ID);
+    const data = this.state.data.data.map(item => item.ID === originalItem.ID ? originalItem : item);
     this.setState({
-      invoices: {
-        ...this.state.invoices,
+      data: {
+        ...this.state.data,
         data: data
       },
       productInEdit: undefined,
@@ -519,7 +512,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
   }
 
   // Close the approval dialog container. 
-  public cancelApproval = () => { this.setState({ productInApproval: undefined }); }
+  public cancelApproval = () => { this.setState({ productInApproval: undefined }); };
 
   public cancelEditForm = () => {
     this.setState({ productInEdit: undefined });
@@ -531,35 +524,30 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
   public cancelCurrentChanges = () => {
     // reset everything back.
     this.setState({
-      invoices: { ...this.state.receivedData }
+      data: { ...process(this.state.receivedData, this.state.dataState) }
     });
   }
   //#endregion end CRUD Methods
 
   public render() {
-    const hasEditedItem = this.state.invoices.data.some(p => p.inEdit);
+    const hasEditedItem = this.state.data ? this.state.data.data.some(p => p.inEdit) : false;
     return (
       <div>
         <Grid
-          filterable={true}
+          filterable={false}
           sortable={true}
-          pageable={{ buttonCount: 4, pageSizes: true }}
+          pageable={{ buttonCount: 4, pageSizes: true, info: true }}
           resizable={true}
-
           {...this.state.dataState}
-          {...this.state.invoices}
-
+          {...this.state.data}
           onDataStateChange={this.dataStateChange}
           onItemChange={this.itemChange}
           editField={this._editField}
           filter={this.state.filter}
-          onFilterChange={this.onFilterChange}
-
           detail={InvoiceGridDetailComponent}
           expandField="expanded"
           onExpandChange={this.expandChange}
           rowRender={this.RowRender}
-
           style={{ minHeight: '520px', maxHeight: '700px' }}
         >
           <GridToolbar>
@@ -567,21 +555,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
               className="k-button"
               icon="plus"
               onClick={this.expandAllRows}>Toggle All Rows</Button>
-            {this.state.filter && this.state.filter.filters.length > 0 && (
-              <Button
-                title="Clear All Filters"
-                className="k-button"
-                icon="filter-clear"
-                onClick={
-                  _ => {
-                    this.onFilterChange({ filter: { ...this.state.filter, filters: [] } });
-                  }
-                }
-              >Clear All Filters</Button>
-            )}
-
-            <QuickFilterButtonGroup invoices={this.state.receivedData.data} onButtonClick={this.onFilterButtonClick} />
-
+            <QuickFilterButtonGroup invoices={this.state.receivedData} onButtonClick={this.onFilterButtonClick} />
             {hasEditedItem && (
               <Button
                 title="Cancel current changes"
@@ -602,7 +576,6 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
 
           <GridColumn cell={this.CommandCell} width={"120px"} locked={true} resizable={false} filterable={false} sortable={false} />
         </Grid>
-
         {
           this.state.productInEdit &&
           <FinanceGridEditForm
@@ -617,11 +590,11 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
             cancel={this.cancelEditForm}
             updateAccountDetails={(e) => {
               // e will be a list of all the accounts.              
-              let invoiceIndex = this.state.invoices.data.findIndex(f => f.Id === this.state.productInEdit.ID);
-              let dataState = this.state.invoices.data;
+              let invoiceIndex = this.state.data.data.findIndex(f => f.Id === this.state.productInEdit.ID);
+              let dataState = this.state.data.data;
               dataState[invoiceIndex].AccountDetails = [...e];
               this.setState({
-                invoices: {
+                data: {
                   data: dataState,
                   total: dataState.length
                 },
@@ -643,11 +616,11 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
             currentUser={this.state.currentUser}
             updateAccountDetails={e => {
               // e will be a list of all the accounts.              
-              let invoiceIndex = this.state.invoices.data.findIndex(f => f.Id === this.state.productInApproval.ID);
-              let dataState = this.state.invoices.data;
+              let invoiceIndex = this.state.data.data.findIndex(f => f.Id === this.state.productInApproval.ID);
+              let dataState = this.state.data.data;
               dataState[invoiceIndex].AccountDetails = [...e];
               this.setState({
-                invoices: {
+                data: {
                   data: dataState,
                   total: dataState.length
                 },
@@ -665,7 +638,6 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
           dataState={this.state.dataState}
           filterState={this._NoSubmittedInvoiceFilter}
 
-          onDataReceived={this.dataReceived}
           onARRequestDataReceived={this.arDataReceived}
           statusDataState={this.state.statusData}
           onStatusDataReceived={this.statusDataReceived}

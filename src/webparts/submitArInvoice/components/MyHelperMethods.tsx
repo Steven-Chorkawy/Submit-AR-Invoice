@@ -45,6 +45,22 @@ export const ConvertQueryParamsToKendoFilter = (fields: IMyQueryParameters[]) =>
   return output;
 };
 
+export const BuildFilterForInvoiceID = (invoices: any[]): any => {
+  let filterObject = { logic: 'or', filters: [] };
+
+  for (let index = 0; index < invoices.length; index++) {
+    const invoice = invoices[index];
+    let filter: IMyKendoFilter = {
+      field:'ID',
+      operator: 'eq',
+      value: invoice.ID
+    };
+    filterObject.filters.push(filter);
+  }
+
+  return filterObject;
+};
+
 const S4 = () => {
   return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
 };
@@ -181,7 +197,7 @@ export const GetURLForNewAttachment = (element: any, invoiceId: number, invoices
         // * This line is how we get a URL to a newly uploaded document.
         thisNewFileMetadata.ServerRedirectedEmbedUrl = url;
         thisNewFileMetadata.ServerRedirectedEmbedUri = url;
-        
+
         let invoiceIndex = invoices.findIndex(f => f.Id === invoiceId);
         let dataState = invoices;
 
