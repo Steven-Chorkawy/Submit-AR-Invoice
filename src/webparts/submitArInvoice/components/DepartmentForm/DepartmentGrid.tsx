@@ -38,7 +38,7 @@ import { QuickFilterButtonGroup } from '../QuickFilterButtonGroup';
 
 type DepartmentGridState = {
   data: any;
-  receivedData: Array<IInvoiceItem>;
+  receivedData: IInvoiceItem[];
   filter: any;
   result?: any;
   dataState?: any;
