@@ -24,7 +24,7 @@ import "@pnp/sp/items";
 import { InvoiceDataProvider, QueryInvoiceData } from '../InvoiceDataProvider';
 import { MyCommandCell } from './MyCommandCell';
 import { InvoiceStatus, MyGridStrings, MyContentTypes } from '../enums/MyEnums';
-import { ConvertQueryParamsToKendoFilter, BuildGUID, CreateInvoiceAction, GetUserByLoginName, GetUserByEmail, GetURLForNewAttachment } from '../MyHelperMethods';
+import { ConvertQueryParamsToKendoFilter, BuildGUID, CreateInvoiceAction, GetUserByLoginName, GetUserByEmail, GetURLForNewAttachment, BuildFilterForInvoiceID } from '../MyHelperMethods';
 import { InvoiceGridDetailComponent } from '../InvoiceGridDetailComponent';
 import { MyLists } from '../enums/MyLists';
 import { InvoiceActionRequestTypes } from '../enums/MyEnums';
@@ -72,6 +72,14 @@ class CustomUrgentCell extends React.Component<any, any> {
   }
 }
 
+const DEFAULT_DATA_STATE = {
+  take: 20,
+  skip: 0,
+  sort: [
+    { field: 'ID', dir: 'desc' }
+  ],
+};
+
 class FinanceGrid extends React.Component<any, IFinanceGridState> {
   constructor(props) {
     super(props);
@@ -82,13 +90,7 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
       invoices: { data: [], total: 0 },
       // Same as invoices but this object is used to restore data to it's original state.
       receivedData: { data: [], total: 0 },
-      dataState: {
-        take: 20,
-        skip: 0,
-        sort: [
-          { field: 'ID', dir: 'desc' }
-        ],
-      },
+      dataState: DEFAULT_DATA_STATE,
       productInEdit: undefined,
       productInApproval: undefined,
       statusData: [],
@@ -163,12 +165,21 @@ class FinanceGrid extends React.Component<any, IFinanceGridState> {
    * @param showTheseInvoices The invoices that we want to display
    */
   public onFilterButtonClick = (e, showTheseInvoices) => {
-    this.setState({
-      invoices: {
-        data: showTheseInvoices,
-        total: this.state.invoices.total
+    this.setState(
+      {
+        filter: BuildFilterForInvoiceID(showTheseInvoices),
+        invoices: undefined,
+        dataState: DEFAULT_DATA_STATE
+      },
+      () => {
+        QueryInvoiceData(
+          { filterState: this.state.filter, dataState: this.state.dataState },
+          (invoices) => {
+            this.setState({ invoices: process(invoices, this.state.dataState) });
+          }
+        )
       }
-    });
+    );
   }
 
   public dataReceived = (invoices) => {
