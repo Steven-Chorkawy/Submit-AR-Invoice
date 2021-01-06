@@ -32,23 +32,64 @@ import { BuildGUID, GetUserByEmail, GetUserById, GetUserByLoginName, GetUsersByL
 
 import './PersonaComponent';
 
-export interface IMyFormProps {
-  siteUsers: any;
-  customerList: any;
-  context: any;
+export interface ICreateARInvoiceFormProps {
+    siteUsers: any;
+    customerList: any;
+    context: any;
 }
 
-export class CreateARInvoiceForm extends React.Component<IMyFormProps, any> {
 
-  constructor(props) {
-    super(props);  
-  }
+export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormProps, any> {
+
+    constructor(props) {
+        super(props);
+
+        // Current user will be used to set default values on the form. 
+        sp.web.currentUser.get().then(user => {
+            GetUserProfile(user.LoginName, e => {
+                this.setState({
+                    currentUser: e
+                });
+            });
+        });
+    }
+
+    //#region Form Submit Method
+    private handleSubmit = (dataItem) => alert(JSON.stringify(dataItem));
+    //#endregion
 
 
-  public render() {
-    return (
-      <h1>Submit Form here.</h1>
-    );
-  }
+    public render() {
+        return (
+            <Form
+                initialValues={{
+                    Date: new Date(),
+                    Urgent: false,
+                    StandardTerms: 'NET 30, 1% INTEREST CHARGED',
+                    GLAccounts: [],
+                    Department: this.state.currentUser && this.state.currentUser.Props['SPS-Department']
+                }}
+                onSubmit={this.handleSubmit}
+                render={(formRenderProps) => (
+                    <FormElement>
+                        {/* <FieldArray
+                            name="users"
+                            component={FormGrid}
+                            validator={arrayLengthValidator}
+                        /> */}
+                        <div className="k-form-buttons">
+                            <button
+                                type={'submit'}
+                                className="k-button"
+                                disabled={!formRenderProps.allowSubmit}
+                            >
+                                Submit
+                    </button>
+                        </div>
+                    </FormElement>
+                )}
+            />
+        );
+    }
 }
 
