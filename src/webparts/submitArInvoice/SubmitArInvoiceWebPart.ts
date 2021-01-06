@@ -25,8 +25,8 @@ import './custom.css';
 
 import * as strings from 'SubmitArInvoiceWebPartStrings';
 
-import { SubmitARInvoiceForm, IMyFormProps } from './components/SubmitARInvoiceForm';
-import { CreateARInvoiceForm } from './components/CreateARInvoiceForm';
+//import { SubmitARInvoiceForm, IMyFormProps } from './components/SubmitARInvoiceForm';
+import { CreateARInvoiceForm, ICreateARInvoiceFormProps } from './components/CreateARInvoiceForm';
 import { FinanceGrid } from './components/FinanceForms/FinanceGrid';
 import { DepartmentGrid } from './components/DepartmentForm/DepartmentGrid';
 import { DepartmentListView } from './components/DepartmentForm/DepartmentListView';
@@ -46,7 +46,7 @@ export enum ActiveDisplay {
 
 
 export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmitArInvoiceWebPartProps> {
-  public myFormProps = {} as IMyFormProps;
+  public myFormProps = {} as ICreateARInvoiceFormProps;
 
   protected async onInit(): Promise<void> {
     await super.onInit()
@@ -125,7 +125,7 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
             this.myFormProps.customerList = values[1];
           })
           .then(_ => {
-            let departmentElement: React.ReactElement<IMyFormProps> = React.createElement(
+            let departmentElement: React.ReactElement<ICreateARInvoiceFormProps> = React.createElement(
               CreateARInvoiceForm,
               { context: this.context, properties: this.properties, ...this.myFormProps }
             );
