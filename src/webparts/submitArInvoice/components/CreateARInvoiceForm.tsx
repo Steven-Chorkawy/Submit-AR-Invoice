@@ -38,7 +38,6 @@ export interface ICreateARInvoiceFormProps {
     context: any;
 }
 
-
 export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormProps, any> {
 
     constructor(props) {
@@ -52,43 +51,185 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                 });
             });
         });
+
+        GetDepartments().then(value => {
+            this.setState({
+                departments: value
+            });
+        });
+
+        this.state = { ...this.props, receivedCustomerList: this.props.customerList };
     }
 
     //#region Form Submit Method
     private handleSubmit = (dataItem) => alert(JSON.stringify(dataItem));
     //#endregion
 
+    //#region Customer Field Methods
+    /**
+     * Render each customer item.
+     * @param li List Item Element
+     * @param itemProps List Item Props
+     */
+    private customerItemRender = (li, itemProps) => {
+        return React.cloneElement(li, li.props, <span>{itemProps.dataItem.Customer_x0020_Name} | {itemProps.dataItem.WorkAddress}</span>);
+    }
+
+    private customerFilterChange = e => {
+        setTimeout(() => {
+            this.setState({
+                customerList: this.filterData(e.filter),
+                loading: false
+            });
+        }, 500);
+    }
+
+    private filterData(filter) {
+        return filterBy(this.state.receivedCustomerList.slice(), filter);
+    }
+    //#endregion
+
+    //#region Private Validation Methods
+    /**
+     * Checks to see if a customer has been selected, or if a misc customer has been entered. 
+     * Customer cannot be undefined or null. 
+     * Customer cannot have an ID property. 
+     * 
+     * When the customer object is set and it does not have an ID property that means we're entering something new. 
+     * @param customer Customer from the input field
+     */
+    private _ShowCustomerDetails = (customer: any): boolean => {
+        let b1 = customer !== undefined, b2 = customer !== null;
+        let b3 = customer ? !customer.hasOwnProperty('ID') : false;
+        return b1 && b2 && b3;
+    }
+    //#endregion
 
     public render() {
         return (
-            <Form
-                initialValues={{
-                    Date: new Date(),
-                    Urgent: false,
-                    StandardTerms: 'NET 30, 1% INTEREST CHARGED',
-                    GLAccounts: [],
-                    Department: this.state.currentUser && this.state.currentUser.Props['SPS-Department']
-                }}
-                onSubmit={this.handleSubmit}
-                render={(formRenderProps) => (
-                    <FormElement>
-                        {/* <FieldArray
+            <div>
+                {
+                    this.state.currentUser &&
+                    <Form
+                        initialValues={{
+                            Date: new Date(),
+                            Urgent: false,
+                            StandardTerms: 'NET 30, 1% INTEREST CHARGED',
+                            GLAccounts: [],
+                            Department: this.state.currentUser && this.state.currentUser.Props['SPS-Department']
+                        }}
+                        onSubmit={this.handleSubmit}
+                        render={(formRenderProps) => (
+                            <FormElement>
+                                <legend className={'k-form-legend'}>ACCOUNTS RECEIVABLE - INVOICE REQUISITION </legend>
+                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <FieldWrapper>
+                                        <Field
+                                            id="Requested_x0020_By"
+                                            name="Requested_x0020_By"
+                                            label="Requested By"
+                                            wrapperStyle={{ width: '100%' }}
+                                            context={this.props.context}
+                                            userEmail={this.props.context.pageContext.user.email}
+                                            component={MyFormComponents.FormPersonaDisplay}
+                                        />
+                                    </FieldWrapper>
+                                    <Field
+                                        id={'Date'}
+                                        name={'Date'}
+                                        label={'* Date'}
+                                        component={MyFormComponents.FormDatePicker}
+                                        validator={MyValidators.dateValidator}
+                                        wrapperStyle={{ width: '50%' }}
+                                    />
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <Field
+                                        id="Department"
+                                        name="Department"
+                                        label="* Department"
+                                        wrapperStyle={{ width: '45%' }}
+                                        data={this.state.departments ? this.state.departments : []}
+                                        validator={MyValidators.departmentValidator}
+                                        component={MyFormComponents.FormDropDownList}
+                                    />
+                                    <Field
+                                        id="Urgent"
+                                        name="Urgent"
+                                        label="Urgent"
+                                        onLabel="Yes"
+                                        offLabel="No"
+                                        wrapperStyle={{ width: '50%' }}
+                                        labelPlacement={'before'}
+                                        component={MyFormComponents.FormCheckbox}
+                                        hint={'Flag emails as high priority.'}
+                                    />
+                                </div>
+                                <FieldWrapper>
+                                    <Field
+                                        id="Customer"
+                                        name="Customer"
+                                        label="* Customer"
+                                        wrapperStyle={{ width: '100%' }}
+                                        data={this.state.customerList}
+                                        dataItemKey="Id"
+                                        textField="Customer_x0020_Name"
+                                        validator={MyValidators.requiresCustomer}
+                                        allowCustom={true}
+                                        itemRender={this.customerItemRender}
+                                        component={MyFormComponents.CustomerComboBox}
+                                        filterable={true}
+                                        suggest={true}
+                                        onFilterChange={this.customerFilterChange}
+                                    />
+                                    {
+                                        this._ShowCustomerDetails(formRenderProps.valueGetter('Customer')) &&
+                                        <Field
+                                            id={'MiscCustomerDetails'}
+                                            name={'MiscCustomerDetails'}
+                                            label={'Enter Additional Customer Details'}
+                                            placeholder={'Address, Postal Code, Contact, etc....'}
+                                            component={MyFormComponents.FormTextArea}
+                                        />
+                                    }
+                                </FieldWrapper>
+                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <Field
+                                        id="Customer_x0020_PO_x0020_Number"
+                                        name="Customer_x0020_PO_x0020_Number"
+                                        label="Customer PO Number"
+                                        //validator={MyValidators.requiresCustomerPONUmber}
+                                        component={MyFormComponents.FormInput}
+                                    />
+
+                                    <Field
+                                        id="Standard_x0020_Terms"
+                                        name="Standard_x0020_Terms"
+                                        label="Standard Terms"
+                                        wrapperStyle={{ width: '50%', marginRight: '18px' }}
+                                        defaultValue='NET 30, 1% INTEREST CHARGED'
+                                        data={
+                                            this.state.standardTerms
+                                                ? this.state.standardTerms
+                                                : []
+                                        }
+                                        component={MyFormComponents.FormDropDownList}
+                                    />
+                                </div>
+
+                                {/* <FieldArray
                             name="users"
                             component={FormGrid}
                             validator={arrayLengthValidator}
                         /> */}
-                        <div className="k-form-buttons">
-                            <button
-                                type={'submit'}
-                                className="k-button"
-                                disabled={!formRenderProps.allowSubmit}
-                            >
-                                Submit
-                    </button>
-                        </div>
-                    </FormElement>
-                )}
-            />
+                                <div className="k-form-buttons">
+                                    <button type={'submit'} className="k-button" disabled={formRenderProps.touched && !formRenderProps.allowSubmit}>Submit</button>
+                                </div>
+                            </ FormElement>
+                        )}
+                    />
+                }
+            </div>
         );
     }
 }
