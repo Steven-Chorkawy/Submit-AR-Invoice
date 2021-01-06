@@ -26,6 +26,7 @@ import './custom.css';
 import * as strings from 'SubmitArInvoiceWebPartStrings';
 
 import { SubmitARInvoiceForm, IMyFormProps } from './components/SubmitARInvoiceForm';
+import { CreateARInvoiceForm } from './components/CreateARInvoiceForm';
 import { FinanceGrid } from './components/FinanceForms/FinanceGrid';
 import { DepartmentGrid } from './components/DepartmentForm/DepartmentGrid';
 import { DepartmentListView } from './components/DepartmentForm/DepartmentListView';
@@ -125,7 +126,7 @@ export default class SubmitArInvoiceWebPart extends BaseClientSideWebPart<ISubmi
           })
           .then(_ => {
             let departmentElement: React.ReactElement<IMyFormProps> = React.createElement(
-              SubmitARInvoiceForm,
+              CreateARInvoiceForm,
               { context: this.context, properties: this.properties, ...this.myFormProps }
             );
             ReactDom.render(departmentElement, this.domElement);
