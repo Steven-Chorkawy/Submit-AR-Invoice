@@ -38,7 +38,7 @@ export interface IMyFormProps {
   context: any;
 }
 
-export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
+export class CreateARInvoiceForm extends React.Component<IMyFormProps, any> {
 
   constructor(props) {
     super(props);  
