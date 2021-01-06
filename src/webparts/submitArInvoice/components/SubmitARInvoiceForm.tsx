@@ -107,6 +107,21 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
     };
   }
 
+  //#region Private Helper Methods
+  /**
+   * Checks to see if a customer has been selected, or if a misc customer has been entered. 
+   * Customer cannot be undefined or null. 
+   * Customer cannot have an ID property. 
+   * 
+   * When the customer object is set and it does not have an ID property that means we're entering something new. 
+   * @param customer Customer from the input field
+   */
+  private _ShowCustomerDetails = (customer: any): boolean => {
+    let b1 = customer !== undefined, b2 = customer !== null;
+    let b3 = customer ? !customer.hasOwnProperty('ID') : false;
+    return b1 && b2 && b3;
+  }
+  //#endregion
 
   /**
    * Form Submit Event
@@ -429,9 +444,7 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
                   onCustomCusteromChange={this.onCustomCustomerChange}
                 />
                 {
-                  formRenderProps.valueGetter('Customer') !== undefined &&
-                  formRenderProps.valueGetter('Customer') !== null &&
-                  formRenderProps.valueGetter('Customer').hasOwnProperty('ID') !== undefined &&
+                  this._ShowCustomerDetails(formRenderProps.valueGetter('Customer')) &&
                   <Field
                     id={'MiscCustomerDetails'}
                     name={'MiscCustomerDetails'}
