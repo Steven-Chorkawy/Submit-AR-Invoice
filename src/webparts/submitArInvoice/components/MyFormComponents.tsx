@@ -828,14 +828,17 @@ export const FormFloatingNumericTextBox = (fieldRenderProps) => {
 
 //#region My Custom Components. 
 export const FormPeoplePicker = (fieldRenderProps) => {
-  const { validationMessage, touched, label, value, id, hint, wrapperStyle, ...others } = fieldRenderProps;
+  const { validationMessage, touched, label, value, id, hint, wrapperStyle, valid, ...others } = fieldRenderProps;
+  const editorRef = React.useRef(null);
+
   const hindId = `${id}_hint`;
   const showValidationMessage = touched && validationMessage;
   const errorId = showValidationMessage ? `${id}_error` : '';
+  const labelId = label ? `${id}_label` : '';
 
   return (
     <FieldWrapper style={wrapperStyle}>
-      <Label>
+      <Label id={labelId} editorRef={editorRef} editorId={id} editorValid={valid}>
         {label}
       </Label>
       <PeoplePicker
@@ -850,7 +853,7 @@ export const FormPeoplePicker = (fieldRenderProps) => {
         defaultSelectedUsers={fieldRenderProps.defaultSelectedUsers}
       />
       {
-        hint &&
+        hint && !showValidationMessage && 
         <Hint id={hindId}>{hint}</Hint>
       }
       {
