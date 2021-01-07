@@ -65,7 +65,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
             this.setState({
                 standardTerms: value
             });
-        })
+        });
 
         this.state = { ...this.props, receivedCustomerList: this.props.customerList };
     }

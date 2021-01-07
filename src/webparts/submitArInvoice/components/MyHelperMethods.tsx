@@ -166,7 +166,7 @@ export const GetDepartments = async (): Promise<any[]> => {
 export const GetStandardTerms = async (): Promise<any[]> => {
   let field: any = await sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).fields.getByInternalNameOrTitle('Standard_x0020_Terms').select('Choices').get();
   return field.Choices;
-}
+};
 
 /**
  * Build a URL to access a document. 
