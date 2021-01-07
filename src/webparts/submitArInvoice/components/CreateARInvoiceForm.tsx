@@ -176,6 +176,30 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                                 </div>
                                 <FieldWrapper>
                                     <Field
+                                        id="RequiresAuthorizationBy"
+                                        name="RequiresAuthorizationBy"
+                                        label="* Requires Authorization By"
+                                        wrapperStyle={{ width: '100%' }}
+                                        dataItemKey="Email"
+                                        textField="Title"
+                                        hint={'Send an approval request to one or more users.'}
+                                        validator={MyValidators.requireOneOrMorePeople}
+                                        personSelectionLimit={10}
+                                        context={this.props.context}
+                                        selectedItems={e => {
+                                            if (e && e.length > 0) {
+                                                GetUsersByLoginName(e).then(res => {
+                                                    console.log('selectedItems');
+                                                    console.log(res);
+                                                    formRenderProps.onChange('RequiresAuthorizationBy', { value: res });
+                                                });
+                                            }
+                                        }}
+                                        component={MyFormComponents.FormPeoplePicker}
+                                    />
+                                </FieldWrapper>
+                                <FieldWrapper>
+                                    <Field
                                         id="Customer"
                                         name="Customer"
                                         label="* Customer"
