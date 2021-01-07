@@ -294,4 +294,3 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
         );
     }
 }
-
