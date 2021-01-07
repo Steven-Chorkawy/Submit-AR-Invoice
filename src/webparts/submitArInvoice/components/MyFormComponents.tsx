@@ -874,9 +874,11 @@ export const FormFloatingNumericTextBox = (fieldRenderProps) => {
 };
 
 export const FormPeoplePicker = (fieldRenderProps) => {
-  const { label, value, id, hint, wrapperStyle, ...others } = fieldRenderProps;
+  const { validationMessage, touched, label, value, id, hint, wrapperStyle, ...others } = fieldRenderProps;
   const hindId = `${id}_hint`;
-
+  const showValidationMessage = touched && validationMessage;
+  const errorId = showValidationMessage ? `${id}_error` : '';
+  
   return (
     <FieldWrapper style={wrapperStyle}>
       <Label>
@@ -896,6 +898,10 @@ export const FormPeoplePicker = (fieldRenderProps) => {
       {
         hint &&
         <Hint id={hindId}>{hint}</Hint>
+      }
+      {
+        showValidationMessage &&
+        <Error id={errorId}>{validationMessage}</Error>
       }
     </FieldWrapper>
   );
