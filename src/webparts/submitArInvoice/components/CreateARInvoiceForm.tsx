@@ -31,6 +31,7 @@ import { MyGLAccountComponent } from './MyGLAccountComponent';
 import { BuildGUID, GetUserByEmail, GetUserById, GetUserByLoginName, GetUsersByLoginName, GetUserProfile, GetDepartments } from './MyHelperMethods';
 
 import './PersonaComponent';
+import { MyLists } from './enums/MyLists';
 
 export interface ICreateARInvoiceFormProps {
     siteUsers: any;
@@ -52,11 +53,20 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
             });
         });
 
+        // Get a list of the departments. This is used to populate the department dropdown list.
         GetDepartments().then(value => {
             this.setState({
                 departments: value
             });
         });
+
+        // Get a list of Standard Terms.  This is used to populate the list of Standard Terms. 
+        sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).fields.getByInternalNameOrTitle('Standard_x0020_Terms')
+            .select('Choices').get().then(res => {
+                this.setState({
+                    standardTerms: res['Choices']
+                });
+            });
 
         this.state = { ...this.props, receivedCustomerList: this.props.customerList };
     }
@@ -216,6 +226,27 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                                         component={MyFormComponents.FormDropDownList}
                                     />
                                 </div>
+                                <FieldWrapper>
+                                    <Field
+                                        id="Invoice_x0020_Details"
+                                        name="Invoice_x0020_Details"
+                                        label="Invoice Details"
+                                        component={MyFormComponents.FormTextArea}
+                                    />
+                                </FieldWrapper>
+                                <FieldWrapper>
+                                    <p>Accounts go here...</p>
+                                </FieldWrapper>
+                                <FieldWrapper>
+                                    <Field
+                                        id="RelatedInvoiceAttachments"
+                                        name="RelatedInvoiceAttachments"
+                                        label="Upload Attachments"
+                                        batch={false}
+                                        multiple={true}
+                                        component={MyFormComponents.FormUpload}
+                                    />
+                                </FieldWrapper>
 
                                 {/* <FieldArray
                             name="users"
@@ -223,7 +254,12 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                             validator={arrayLengthValidator}
                         /> */}
                                 <div className="k-form-buttons">
-                                    <button type={'submit'} className="k-button" disabled={formRenderProps.touched && !formRenderProps.allowSubmit}>Submit</button>
+                                    <Button
+                                        primary={true}
+                                        type={'submit'}
+                                        icon="save"
+                                    >Submit AR Invoice Request</Button>
+                                    <Button onClick={formRenderProps.onFormReset}>Clear</Button>
                                 </div>
                             </ FormElement>
                         )}
