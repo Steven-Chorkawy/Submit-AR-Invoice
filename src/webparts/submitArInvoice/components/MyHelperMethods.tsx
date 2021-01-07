@@ -51,7 +51,7 @@ export const BuildFilterForInvoiceID = (invoices: any[]): any => {
   for (let index = 0; index < invoices.length; index++) {
     const invoice = invoices[index];
     let filter: IMyKendoFilter = {
-      field:'ID',
+      field: 'ID',
       operator: 'eq',
       value: invoice.ID
     };
@@ -162,6 +162,11 @@ export const GetDepartments = async (): Promise<any[]> => {
   let field: any = await sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).fields.getByTitle('Department').select('Choices').get();
   return field.Choices;
 };
+
+export const GetStandardTerms = async (): Promise<any[]> => {
+  let field: any = await sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).fields.getByInternalNameOrTitle('Standard_x0020_Terms').select('Choices').get();
+  return field.Choices;
+}
 
 /**
  * Build a URL to access a document. 

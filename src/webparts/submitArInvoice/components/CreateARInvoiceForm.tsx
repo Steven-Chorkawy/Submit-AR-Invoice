@@ -28,7 +28,7 @@ import { IUploadingFile } from './IMyFormState';
 import * as MyValidators from './validators.jsx';
 import { MyGLAccountComponent } from './MyGLAccountComponent';
 
-import { BuildGUID, GetUserByEmail, GetUserById, GetUserByLoginName, GetUsersByLoginName, GetUserProfile, GetDepartments } from './MyHelperMethods';
+import { BuildGUID, GetUserByEmail, GetUserById, GetUserByLoginName, GetUsersByLoginName, GetUserProfile, GetDepartments, GetStandardTerms } from './MyHelperMethods';
 
 import './PersonaComponent';
 import { MyLists } from './enums/MyLists';
@@ -61,12 +61,11 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
         });
 
         // Get a list of Standard Terms.  This is used to populate the list of Standard Terms. 
-        sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).fields.getByInternalNameOrTitle('Standard_x0020_Terms')
-            .select('Choices').get().then(res => {
-                this.setState({
-                    standardTerms: res['Choices']
-                });
+        GetStandardTerms().then(value => {
+            this.setState({
+                standardTerms: value
             });
+        })
 
         this.state = { ...this.props, receivedCustomerList: this.props.customerList };
     }
