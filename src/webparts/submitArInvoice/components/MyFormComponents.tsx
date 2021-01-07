@@ -62,7 +62,6 @@ export const FormInput = (fieldRenderProps) => {
   );
 };
 
-
 export const FormRadioGroup = (fieldRenderProps) => {
   const { validationMessage, touched, id, label, valid, disabled, hint, ...others } = fieldRenderProps;
 
@@ -539,52 +538,6 @@ export const FormAutoComplete = (fieldRenderProps) => {
   );
 };
 
-
-export const CustomerComboBox = (fieldRenderProps) => {
-  const { validationMessage, touched, label, id, valid, disabled, hint, wrapperStyle, ...others } = fieldRenderProps;
-  const editorRef = React.useRef(null);
-
-  const showValidationMessage = touched && validationMessage;
-  const showHint = !showValidationMessage && hint;
-  const hindId = showHint ? `${id}_hint` : '';
-  const errorId = showValidationMessage ? `${id}_error` : '';
-  const labelId = label ? `${id}_label` : '';
-  const selectedCustomer = fieldRenderProps.value;
-
-  return (
-    <div>
-      <FieldWrapper style={wrapperStyle}>
-        <Label id={labelId} editorRef={editorRef} editorId={id} editorValid={valid} editorDisabled={disabled}>
-          {label}
-        </Label>
-        <ComboBox
-          ariaLabelledBy={labelId}
-          ariaDescribedBy={`${hindId} ${errorId}`}
-          ref={editorRef}
-          valid={valid}
-          id={id}
-          disabled={disabled}
-          onChange={fieldRenderProps.onChange}
-          {...others}
-        />
-        {
-          showHint &&
-          <Hint id={hindId}>{hint}</Hint>
-        }
-        {
-          showValidationMessage &&
-          <Error id={errorId}>{validationMessage}</Error>
-        }
-      </FieldWrapper>
-      <MyCustomerCardComponent
-        selectedCustomer={selectedCustomer}
-        onCustomCustomerChange={fieldRenderProps.onCustomCustomerChange}
-      />
-
-    </div>
-  );
-};
-
 export const FormComboBox = (fieldRenderProps) => {
   const { validationMessage, touched, label, id, valid, disabled, hint, wrapperStyle, ...others } = fieldRenderProps;
   const editorRef = React.useRef(null);
@@ -873,12 +826,13 @@ export const FormFloatingNumericTextBox = (fieldRenderProps) => {
   );
 };
 
+//#region My Custom Components. 
 export const FormPeoplePicker = (fieldRenderProps) => {
   const { validationMessage, touched, label, value, id, hint, wrapperStyle, ...others } = fieldRenderProps;
   const hindId = `${id}_hint`;
   const showValidationMessage = touched && validationMessage;
   const errorId = showValidationMessage ? `${id}_error` : '';
-  
+
   return (
     <FieldWrapper style={wrapperStyle}>
       <Label>
@@ -911,7 +865,6 @@ export const FormPersonaDisplay = (fieldRenderProps) => {
   const { label, value, id, hint, wrapperStyle, context, ...others } = fieldRenderProps;
   const hindId = `${id}_hint`;
 
-
   return (
     <FieldWrapper style={wrapperStyle}>
       <Label>
@@ -921,3 +874,49 @@ export const FormPersonaDisplay = (fieldRenderProps) => {
     </FieldWrapper>
   );
 };
+
+export const CustomerComboBox = (fieldRenderProps) => {
+  const { validationMessage, touched, label, id, valid, disabled, hint, wrapperStyle, ...others } = fieldRenderProps;
+  const editorRef = React.useRef(null);
+
+  const showValidationMessage = touched && validationMessage;
+  const showHint = !showValidationMessage && hint;
+  const hindId = showHint ? `${id}_hint` : '';
+  const errorId = showValidationMessage ? `${id}_error` : '';
+  const labelId = label ? `${id}_label` : '';
+  const selectedCustomer = fieldRenderProps.value;
+
+  return (
+    <div>
+      <FieldWrapper style={wrapperStyle}>
+        <Label id={labelId} editorRef={editorRef} editorId={id} editorValid={valid} editorDisabled={disabled}>
+          {label}
+        </Label>
+        <ComboBox
+          ariaLabelledBy={labelId}
+          ariaDescribedBy={`${hindId} ${errorId}`}
+          ref={editorRef}
+          valid={valid}
+          id={id}
+          disabled={disabled}
+          onChange={fieldRenderProps.onChange}
+          {...others}
+        />
+        {
+          showHint &&
+          <Hint id={hindId}>{hint}</Hint>
+        }
+        {
+          showValidationMessage &&
+          <Error id={errorId}>{validationMessage}</Error>
+        }
+      </FieldWrapper>
+      <MyCustomerCardComponent
+        selectedCustomer={selectedCustomer}
+        onCustomCustomerChange={fieldRenderProps.onCustomCustomerChange}
+      />
+
+    </div>
+  );
+};
+//#endregion
