@@ -71,7 +71,9 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
     }
 
     //#region Form Submit Method
-    private handleSubmit = (dataItem) => alert(JSON.stringify(dataItem));
+    private handleSubmit = (dataItem) => {
+        console.log(dataItem);
+    };
     //#endregion
 
     //#region Customer Field Methods
@@ -176,8 +178,8 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                                 </div>
                                 <FieldWrapper>
                                     <Field
-                                        id="RequiresAuthorizationBy"
-                                        name="RequiresAuthorizationBy"
+                                        id="Requires_x0020_Authorization_x0020_ById"
+                                        name="Requires_x0020_Authorization_x0020_ById"
                                         label="* Requires Authorization By"
                                         wrapperStyle={{ width: '100%' }}
                                         dataItemKey="Email"
@@ -189,9 +191,9 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                                         selectedItems={e => {
                                             if (e && e.length > 0) {
                                                 GetUsersByLoginName(e).then(res => {
-                                                    console.log('selectedItems');
-                                                    console.log(res);
-                                                    formRenderProps.onChange('RequiresAuthorizationBy', { value: res });
+                                                    formRenderProps.onChange('Requires_x0020_Authorization_x0020_ById', {
+                                                        value: { 'results': res.map(user => { return user.Id; }) }
+                                                    });
                                                 });
                                             }
                                         }}
