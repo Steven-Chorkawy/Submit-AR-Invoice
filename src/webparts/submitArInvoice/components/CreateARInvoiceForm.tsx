@@ -141,6 +141,8 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                 // Create the related attachment records if any are present. 
 
                 // Create an approval request for each approver. 
+
+                // Show a message to the user letting them know that their invoice is ready. 
                 alert('Done! It worked!');
             }
             else {
