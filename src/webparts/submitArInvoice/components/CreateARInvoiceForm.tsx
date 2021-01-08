@@ -353,7 +353,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                                         id="Standard_x0020_Terms"
                                         name="Standard_x0020_Terms"
                                         label="Standard Terms"
-                                        wrapperStyle={{ width: '50%', marginRight: '18px' }}
+                                        wrapperStyle={{ width: '50%' }}
                                         defaultValue='NET 30, 1% INTEREST CHARGED'
                                         data={
                                             this.state.Standard_x0020_Terms
