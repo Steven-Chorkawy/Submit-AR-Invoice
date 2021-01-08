@@ -94,9 +94,9 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
     private triggerARInvoiceWorkflow = async (dataItem: any): Promise<number> => {
         const WORKFLOW_API_URL = 'https://prod-27.canadacentral.logic.azure.com:443/workflows/8917a73fd506444ea3af1aa10a300d17/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=9sSEESmcCFhhBgt3I-JXgpqEMEz0MyUxRJ3RCC-PSPA';
 
-        debugger;
         const requestHeaders: Headers = new Headers();
         requestHeaders.append('Content-type', 'application/json');
+
         const httpClientOptions: any = {
             body: JSON.stringify({ UsersWithAccess: [dataItem.Requested_x0020_By, ...dataItem.Requires_x0020_Authorization_x0020_ByEmail.results] }),
             headers: requestHeaders
@@ -104,7 +104,6 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
 
         let response = await this.props.context.httpClient.post(WORKFLOW_API_URL, SPHttpClient.configurations.v1, httpClientOptions)
 
-        debugger;
         if (response.ok === true && response.status === 200) {
             return await response.json();
         }
@@ -120,13 +119,18 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
 
             let arInvoiceProperties = {
                 Title: `${new Date().getFullYear()}-AR-${BuildGUID()}`,
+                Requested_x0020_ById: await (await GetUserByEmail(dataItem.Requested_x0020_By)).Id,
                 ...this.parseCustomerData(dataItem)
             };
+
+            delete arInvoiceProperties.GLAccounts;
+            delete arInvoiceProperties.RelatedInvoiceAttachments;
+            delete arInvoiceProperties.Requires_x0020_Authorization_x0020_ByEmail;
+            delete arInvoiceProperties.Requested_x0020_By;
 
             // Send an HTTP request to a workflow to create the invoice.
             // Create the new AR Invoice and set departments permissions. 
             let arInvoiceId = await this.triggerARInvoiceWorkflow(dataItem);
-            debugger;
 
             if (arInvoiceId !== null) {
                 // Since the workflow only creates the record and sets the permissions, this set the properties of the newly created AR Invoice for the first time.
@@ -137,6 +141,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                 // Create the related attachment records if any are present. 
 
                 // Create an approval request for each approver. 
+                alert('Done! It worked!');
             }
             else {
                 // TODO: Show an error message.
@@ -145,7 +150,6 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
         }
         catch (reason) {
             alert('Something went wrong!  Could not complete this AR Request.');
-
         }
     };
     //#endregion
@@ -253,8 +257,8 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                                 </div>
                                 <FieldWrapper>
                                     <Field
-                                        id="Requires_x0020_Authorization_x0020_ById"
-                                        name="Requires_x0020_Authorization_x0020_ById"
+                                        id="Requires_x0020_Department_x0020_Id"
+                                        name="Requires_x0020_Department_x0020_Id"
                                         label="* Requires Authorization By"
                                         wrapperStyle={{ width: '100%' }}
                                         dataItemKey="Email"
@@ -267,7 +271,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                                             if (e && e.length > 0) {
                                                 GetUsersByLoginName(e).then(res => {
                                                     /// Settings the user IDs here so that we can save them in the List item during the form submit event. 
-                                                    formRenderProps.onChange('Requires_x0020_Authorization_x0020_ById', {
+                                                    formRenderProps.onChange('Requires_x0020_Department_x0020_Id', {
                                                         value: { 'results': res.map(user => { return user.Id; }) }
                                                     });
 
