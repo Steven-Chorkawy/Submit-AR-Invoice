@@ -24,7 +24,6 @@ import { Shimmer } from 'office-ui-fabric-react/lib/Shimmer';
 import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
 import { ProgressIndicator } from 'office-ui-fabric-react/lib/ProgressIndicator';
 
-
 // My custom imports
 import * as MyFormComponents from './MyFormComponents';
 import { IUploadingFile } from './IMyFormState';
@@ -52,7 +51,6 @@ export interface ICreateARInvoiceFormState {
     saveRunning: boolean;
     currentUser?: any;
 }
-
 
 export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormProps, ICreateARInvoiceFormState> {
     constructor(props) {
