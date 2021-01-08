@@ -38,9 +38,23 @@ export interface ICreateARInvoiceFormProps {
     siteUsers: any;
     customerList: any;
     context: any;
+    properties: any;
 }
 
-export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormProps, any> {
+export interface ICreateARInvoiceFormState {
+    context: any;
+    properties: any;
+    siteUsers?: any[];
+    customerList?: any[];
+    receivedCustomerList?: any[];
+    departments?: any[];
+    Standard_x0020_Terms?: any[];
+    saveRunning: boolean;
+    currentUser?: any;
+}
+
+
+export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormProps, ICreateARInvoiceFormState> {
     constructor(props) {
         super(props);
 
@@ -65,8 +79,10 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
 
         this.state = {
             ...this.props,
+            context: this.props.context,
+            properties: this.props.properties,
             receivedCustomerList: this.props.customerList,
-            saveRunning: true
+            saveRunning: false,
         };
     }
 
@@ -178,8 +194,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
     private customerFilterChange = e => {
         setTimeout(() => {
             this.setState({
-                customerList: this.filterData(e.filter),
-                loading: false
+                customerList: this.filterData(e.filter)
             });
         }, 500);
     }
@@ -387,10 +402,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                                 {
                                     this.state.saveRunning &&
                                     <div style={{ marginTop: '5px' }}>
-                                        <ProgressIndicator
-                                            label="Saving your Invoice.  Please do not close the window until the invoice been processed."
-                                            description={<div><ul><li>1</li><li>2</li></ul></div>}
-                                        />
+                                        <ProgressIndicator label="Saving your Invoice.  Please do not close the window until the invoice been processed." />
                                     </div>
                                 }
                             </ FormElement>
