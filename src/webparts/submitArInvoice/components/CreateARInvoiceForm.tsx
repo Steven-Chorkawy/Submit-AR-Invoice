@@ -94,13 +94,17 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
     private triggerARInvoiceWorkflow = async (dataItem: any): Promise<number> => {
         const WORKFLOW_API_URL = 'https://prod-27.canadacentral.logic.azure.com:443/workflows/8917a73fd506444ea3af1aa10a300d17/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=9sSEESmcCFhhBgt3I-JXgpqEMEz0MyUxRJ3RCC-PSPA';
 
+        debugger;
+        const requestHeaders: Headers = new Headers();
+        requestHeaders.append('Content-type', 'application/json');
         const httpClientOptions: any = {
             body: JSON.stringify({ UsersWithAccess: [dataItem.Requested_x0020_By, ...dataItem.Requires_x0020_Authorization_x0020_ByEmail.results] }),
-            headers: new Headers().append('Content-type', 'application/json')
+            headers: requestHeaders
         };
 
         let response = await this.props.context.httpClient.post(WORKFLOW_API_URL, SPHttpClient.configurations.v1, httpClientOptions)
 
+        debugger;
         if (response.ok === true && response.status === 200) {
             return await response.json();
         }
@@ -121,11 +125,12 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
         // Send an HTTP request to a workflow to create the invoice.
         // Create the new AR Invoice and set departments permissions. 
         let arInvoiceId = await this.triggerARInvoiceWorkflow(dataItem);
+        debugger;
 
         if (arInvoiceId !== null) {
             // Since the workflow only creates the record and sets the permissions, this set the properties of the newly created AR Invoice for the first time.
             sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(arInvoiceId).update(arInvoiceProperties);
-            
+
             // Create the account records if any accounts are present. 
 
             // Create the related attachment records if any are present. 
@@ -133,7 +138,8 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
             // Create an approval request for each approver. 
         }
         else {
-            // TODO: Show an error message. 
+            // TODO: Show an error message.
+            alert('Something went wrong!');
         }
     };
     //#endregion
