@@ -58,7 +58,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
 
         // Get a list of Standard Terms.  This is used to populate the list of Standard Terms. 
         GetStandardTerms().then(value => {
-            this.setState({ standardTerms: value });
+            this.setState({ Standard_x0020_Terms: value });
         });
 
         this.state = { ...this.props, receivedCustomerList: this.props.customerList };
@@ -115,31 +115,37 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
     }
 
     private handleSubmit = async dataItem => {
-        let web = Web(this.props.context.pageContext.web.absoluteUrl);
+        try {
+            let web = Web(this.props.context.pageContext.web.absoluteUrl);
 
-        let arInvoiceProperties = {
-            Title: `${new Date().getFullYear()}-AR-${BuildGUID()}`,
-            ...this.parseCustomerData(dataItem)
-        };
+            let arInvoiceProperties = {
+                Title: `${new Date().getFullYear()}-AR-${BuildGUID()}`,
+                ...this.parseCustomerData(dataItem)
+            };
 
-        // Send an HTTP request to a workflow to create the invoice.
-        // Create the new AR Invoice and set departments permissions. 
-        let arInvoiceId = await this.triggerARInvoiceWorkflow(dataItem);
-        debugger;
+            // Send an HTTP request to a workflow to create the invoice.
+            // Create the new AR Invoice and set departments permissions. 
+            let arInvoiceId = await this.triggerARInvoiceWorkflow(dataItem);
+            debugger;
 
-        if (arInvoiceId !== null) {
-            // Since the workflow only creates the record and sets the permissions, this set the properties of the newly created AR Invoice for the first time.
-            sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(arInvoiceId).update(arInvoiceProperties);
+            if (arInvoiceId !== null) {
+                // Since the workflow only creates the record and sets the permissions, this set the properties of the newly created AR Invoice for the first time.
+                sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(arInvoiceId).update(arInvoiceProperties);
 
-            // Create the account records if any accounts are present. 
+                // Create the account records if any accounts are present. 
 
-            // Create the related attachment records if any are present. 
+                // Create the related attachment records if any are present. 
 
-            // Create an approval request for each approver. 
+                // Create an approval request for each approver. 
+            }
+            else {
+                // TODO: Show an error message.
+                alert('Something went wrong!');
+            }
         }
-        else {
-            // TODO: Show an error message.
-            alert('Something went wrong!');
+        catch (reason) {
+            alert('Something went wrong!  Could not complete this AR Request.');
+
         }
     };
     //#endregion
@@ -193,7 +199,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                         initialValues={{
                             Date: new Date(),
                             Urgent: false,
-                            StandardTerms: 'NET 30, 1% INTEREST CHARGED',
+                            Standard_x0020_Terms: 'NET 30, 1% INTEREST CHARGED',
                             GLAccounts: [],
                             Department: this.state.currentUser && this.state.currentUser.Props['SPS-Department'],
                             Requested_x0020_By: this.props.context.pageContext.user.email
@@ -320,8 +326,8 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                                         wrapperStyle={{ width: '50%', marginRight: '18px' }}
                                         defaultValue='NET 30, 1% INTEREST CHARGED'
                                         data={
-                                            this.state.standardTerms
-                                                ? this.state.standardTerms
+                                            this.state.Standard_x0020_Terms
+                                                ? this.state.Standard_x0020_Terms
                                                 : []
                                         }
                                         component={MyFormComponents.FormDropDownList}
