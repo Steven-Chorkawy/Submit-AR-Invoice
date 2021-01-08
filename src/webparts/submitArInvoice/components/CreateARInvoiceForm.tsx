@@ -97,13 +97,10 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
      */
     private triggerARInvoiceWorkflow = async (dataItem: any): Promise<number> => {
         const WORKFLOW_API_URL = 'https://prod-27.canadacentral.logic.azure.com:443/workflows/8917a73fd506444ea3af1aa10a300d17/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=9sSEESmcCFhhBgt3I-JXgpqEMEz0MyUxRJ3RCC-PSPA';
-        let httpBody = JSON.stringify({ UsersWithAccess: [dataItem.Requested_x0020_By, ...dataItem.Requires_x0020_Authorization_x0020_ByEmail.results] });
-        const requestHeaders: Headers = new Headers();
-        requestHeaders.append('Content-type', 'application/json');
-
+            
         const httpClientOptions: any = {
-            body: httpBody,
-            headers: requestHeaders
+            body: JSON.stringify({ UsersWithAccess: [dataItem.Requested_x0020_By, ...dataItem.Requires_x0020_Authorization_x0020_ByEmail.results] }),
+            headers: new Headers().append('Content-type', 'application/json')
         };
 
         let response = await this.props.context.httpClient.post(WORKFLOW_API_URL, SPHttpClient.configurations.v1, httpClientOptions)
