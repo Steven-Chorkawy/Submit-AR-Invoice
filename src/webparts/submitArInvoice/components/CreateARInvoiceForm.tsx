@@ -17,21 +17,18 @@ import "@pnp/sp/folders";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
 import "@pnp/sp/profiles";
-import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
 
-
-// Office UI Imports
+// Office UI & MS Imports Imports
 import { Persona, PersonaSize } from 'office-ui-fabric-react/lib/Persona';
 import { Shimmer } from 'office-ui-fabric-react/lib/Shimmer';
+import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
 
 // My custom imports
 import * as MyFormComponents from './MyFormComponents';
 import { IUploadingFile } from './IMyFormState';
 import * as MyValidators from './validators.jsx';
 import { MyGLAccountComponent } from './MyGLAccountComponent';
-
 import { BuildGUID, GetUserByEmail, GetUserById, GetUserByLoginName, GetUsersByLoginName, GetUserProfile, GetDepartments, GetStandardTerms } from './MyHelperMethods';
-
 import './PersonaComponent';
 import { MyLists } from './enums/MyLists';
 
@@ -42,7 +39,6 @@ export interface ICreateARInvoiceFormProps {
 }
 
 export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormProps, any> {
-
     constructor(props) {
         super(props);
 
@@ -97,7 +93,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
      */
     private triggerARInvoiceWorkflow = async (dataItem: any): Promise<number> => {
         const WORKFLOW_API_URL = 'https://prod-27.canadacentral.logic.azure.com:443/workflows/8917a73fd506444ea3af1aa10a300d17/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=9sSEESmcCFhhBgt3I-JXgpqEMEz0MyUxRJ3RCC-PSPA';
-            
+
         const httpClientOptions: any = {
             body: JSON.stringify({ UsersWithAccess: [dataItem.Requested_x0020_By, ...dataItem.Requires_x0020_Authorization_x0020_ByEmail.results] }),
             headers: new Headers().append('Content-type', 'application/json')
@@ -114,28 +110,26 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
         }
     }
 
-    /**
-     * Set the properties of the newly created AR Invoice for the first time.
-     * @param arInvoiceID ID of the invoice to be updated. 
-     * @param dataItem Properties of the invoice to be updated.
-     */
-    private setARInvoiceProperties = async (arInvoiceID: number, dataItem: any): Promise<any> => {
-
-    }
-
     private handleSubmit = async dataItem => {
         let web = Web(this.props.context.pageContext.web.absoluteUrl);
 
-        // This is what we would have saved into the AR Invoice list. 
-        let myData = {
+        let arInvoiceProperties = {
             Title: `${new Date().getFullYear()}-AR-${BuildGUID()}`,
             ...this.parseCustomerData(dataItem)
         };
 
+        // Send an HTTP request to a workflow to create the invoice.
         // Create the new AR Invoice and set departments permissions. 
         let arInvoiceId = await this.triggerARInvoiceWorkflow(dataItem);
 
-        // Send an HTTP request to a workflow to create the invoice.
+        if (arInvoiceId !== null) {
+            // Since the workflow only creates the record and sets the permissions, this set the properties of the newly created AR Invoice for the first time.
+            sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(arInvoiceId).update(arInvoiceProperties);
+        }
+        else {
+
+        }
+
 
         // TODO: Finish this method!
     };
