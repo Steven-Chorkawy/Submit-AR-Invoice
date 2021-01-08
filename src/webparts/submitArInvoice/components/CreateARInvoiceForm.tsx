@@ -125,13 +125,14 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
         if (arInvoiceId !== null) {
             // Since the workflow only creates the record and sets the permissions, this set the properties of the newly created AR Invoice for the first time.
             sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(arInvoiceId).update(arInvoiceProperties);
+            
+            // Create the account records if any accounts are present. 
+
+            // Create the related attachment records if any are present. 
         }
         else {
-
+            // TODO: Show an error message. 
         }
-
-
-        // TODO: Finish this method!
     };
     //#endregion
 
