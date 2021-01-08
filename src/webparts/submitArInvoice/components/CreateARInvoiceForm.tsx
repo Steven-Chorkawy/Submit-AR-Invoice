@@ -17,6 +17,8 @@ import "@pnp/sp/folders";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
 import "@pnp/sp/profiles";
+import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
+
 
 // Office UI Imports
 import { Persona, PersonaSize } from 'office-ui-fabric-react/lib/Persona';
@@ -89,6 +91,41 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
         return myData;
     }
 
+    /**
+     * Creates an AR Invoice record and sets the permissions.  
+     * @param dataItem Value from the forms submit event.
+     */
+    private triggerARInvoiceWorkflow = async (dataItem: any): Promise<number> => {
+        const WORKFLOW_API_URL = 'https://prod-27.canadacentral.logic.azure.com:443/workflows/8917a73fd506444ea3af1aa10a300d17/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=9sSEESmcCFhhBgt3I-JXgpqEMEz0MyUxRJ3RCC-PSPA';
+        let httpBody = JSON.stringify({ UsersWithAccess: [dataItem.Requested_x0020_By, ...dataItem.Requires_x0020_Authorization_x0020_ByEmail.results] });
+        const requestHeaders: Headers = new Headers();
+        requestHeaders.append('Content-type', 'application/json');
+
+        const httpClientOptions: any = {
+            body: httpBody,
+            headers: requestHeaders
+        };
+
+        let response = await this.props.context.httpClient.post(WORKFLOW_API_URL, SPHttpClient.configurations.v1, httpClientOptions)
+
+        if (response.ok === true && response.status === 200) {
+            return await response.json();
+        }
+        else {
+            // Something went wrong with the workflow. 
+            return null;
+        }
+    }
+
+    /**
+     * Set the properties of the newly created AR Invoice for the first time.
+     * @param arInvoiceID ID of the invoice to be updated. 
+     * @param dataItem Properties of the invoice to be updated.
+     */
+    private setARInvoiceProperties = async (arInvoiceID: number, dataItem: any): Promise<any> => {
+
+    }
+
     private handleSubmit = async dataItem => {
         let web = Web(this.props.context.pageContext.web.absoluteUrl);
 
@@ -98,15 +135,11 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
             ...this.parseCustomerData(dataItem)
         };
 
-        // This is what we are going to save into to Received AR Invoice List. 
-        let arInvoiceRequestListItemData = {
-            ...myData,
-            Requires_x0020_Department_x0020_Id: myData.Requires_x0020_Authorization_x0020_ById
-        };
-        delete arInvoiceRequestListItemData.Requires_x0020_Authorization_x0020_ById;
+        // Create the new AR Invoice and set departments permissions. 
+        let arInvoiceId = await this.triggerARInvoiceWorkflow(dataItem);
 
-        // * Save the AR Request to the SP List.
-        let arInvoiceRequestListItem = await web.lists.getByTitle(MyLists.ReceiveARInvoiceRequest).items.add(arInvoiceRequestListItemData);
+        // Send an HTTP request to a workflow to create the invoice.
+
         // TODO: Finish this method!
     };
     //#endregion
@@ -162,7 +195,8 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                             Urgent: false,
                             StandardTerms: 'NET 30, 1% INTEREST CHARGED',
                             GLAccounts: [],
-                            Department: this.state.currentUser && this.state.currentUser.Props['SPS-Department']
+                            Department: this.state.currentUser && this.state.currentUser.Props['SPS-Department'],
+                            Requested_x0020_By: this.props.context.pageContext.user.email
                         }}
                         onSubmit={this.handleSubmit}
                         render={(formRenderProps) => (
@@ -226,8 +260,15 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                                         selectedItems={e => {
                                             if (e && e.length > 0) {
                                                 GetUsersByLoginName(e).then(res => {
+                                                    /// Settings the user IDs here so that we can save them in the List item during the form submit event. 
                                                     formRenderProps.onChange('Requires_x0020_Authorization_x0020_ById', {
                                                         value: { 'results': res.map(user => { return user.Id; }) }
+                                                    });
+
+                                                    // Setting this email here so it can be passed to a workflow when the form is submitted.
+                                                    // * By setting the users email here it saves us from querying this information during the forms submit event.  
+                                                    formRenderProps.onChange('Requires_x0020_Authorization_x0020_ByEmail', {
+                                                        value: { 'results': res.map(user => { return user.Email }) }
                                                     });
                                                 });
                                             }
