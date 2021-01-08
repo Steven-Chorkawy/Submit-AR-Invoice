@@ -22,6 +22,8 @@ import "@pnp/sp/profiles";
 import { Persona, PersonaSize } from 'office-ui-fabric-react/lib/Persona';
 import { Shimmer } from 'office-ui-fabric-react/lib/Shimmer';
 import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
+import { ProgressIndicator } from 'office-ui-fabric-react/lib/ProgressIndicator';
+
 
 // My custom imports
 import * as MyFormComponents from './MyFormComponents';
@@ -61,7 +63,11 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
             this.setState({ Standard_x0020_Terms: value });
         });
 
-        this.state = { ...this.props, receivedCustomerList: this.props.customerList };
+        this.state = {
+            ...this.props,
+            receivedCustomerList: this.props.customerList,
+            saveRunning: true
+        };
     }
 
     //#region Form Submit Method
@@ -114,6 +120,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
     }
 
     private handleSubmit = async dataItem => {
+        this.setState({ saveRunning: true });
         try {
             let web = Web(this.props.context.pageContext.web.absoluteUrl);
 
@@ -153,6 +160,8 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
         catch (reason) {
             alert('Something went wrong!  Could not complete this AR Request.');
         }
+
+        this.setState({ saveRunning: false });
     };
     //#endregion
 
@@ -370,10 +379,20 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                                     <Button
                                         primary={true}
                                         type={'submit'}
+                                        disabled={this.state.saveRunning}
                                         icon="save"
                                     >Submit AR Invoice Request</Button>
-                                    <Button onClick={formRenderProps.onFormReset}>Clear</Button>
+                                    <Button onClick={formRenderProps.onFormReset} disabled={this.state.saveRunning}>Clear</Button>
                                 </div>
+                                {
+                                    this.state.saveRunning &&
+                                    <div style={{ marginTop: '5px' }}>
+                                        <ProgressIndicator
+                                            label="Saving your Invoice.  Please do not close the window until the invoice been processed."
+                                            description={<div><ul><li>1</li><li>2</li></ul></div>}
+                                        />
+                                    </div>
+                                }
                             </ FormElement>
                         )}
                     />
