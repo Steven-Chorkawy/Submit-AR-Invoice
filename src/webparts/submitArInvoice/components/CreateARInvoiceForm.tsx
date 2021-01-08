@@ -129,6 +129,8 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
             // Create the account records if any accounts are present. 
 
             // Create the related attachment records if any are present. 
+
+            // Create an approval request for each approver. 
         }
         else {
             // TODO: Show an error message. 
