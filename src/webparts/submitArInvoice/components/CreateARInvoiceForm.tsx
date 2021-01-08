@@ -55,24 +55,59 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
 
         // Get a list of the departments. This is used to populate the department dropdown list.
         GetDepartments().then(value => {
-            this.setState({
-                departments: value
-            });
+            this.setState({ departments: value });
         });
 
         // Get a list of Standard Terms.  This is used to populate the list of Standard Terms. 
         GetStandardTerms().then(value => {
-            this.setState({
-                standardTerms: value
-            });
+            this.setState({ standardTerms: value });
         });
 
         this.state = { ...this.props, receivedCustomerList: this.props.customerList };
     }
 
     //#region Form Submit Method
-    private handleSubmit = (dataItem) => {
-        console.log(dataItem);
+    /**
+     * Checks if the user has entered a Misc customer or if they've selected one from the list.
+     * @param dataItem Object from that was sent from the form.
+     * @returns dataItem without the Customer property.
+     */
+    private parseCustomerData = dataItem => {
+        let myData = { ...dataItem };
+
+        // Before we can save this invoice we must first parse the customer data from the form. 
+        if (myData.Customer.ID === undefined) {
+            // If there is no customer ID that means there is misc customer. 
+            myData['MiscCustomerName'] = myData.Customer.Customer_x0020_Name;
+        }
+        else {
+            myData['CustomerId'] = myData.Customer.ID;
+        }
+
+        delete myData.Customer;
+
+        return myData;
+    }
+
+    private handleSubmit = async dataItem => {
+        let web = Web(this.props.context.pageContext.web.absoluteUrl);
+
+        // This is what we would have saved into the AR Invoice list. 
+        let myData = {
+            Title: `${new Date().getFullYear()}-AR-${BuildGUID()}`,
+            ...this.parseCustomerData(dataItem)
+        };
+
+        // This is what we are going to save into to Received AR Invoice List. 
+        let arInvoiceRequestListItemData = {
+            ...myData,
+            Requires_x0020_Department_x0020_Id: myData.Requires_x0020_Authorization_x0020_ById
+        };
+        delete arInvoiceRequestListItemData.Requires_x0020_Authorization_x0020_ById;
+
+        // * Save the AR Request to the SP List.
+        let arInvoiceRequestListItem = await web.lists.getByTitle(MyLists.ReceiveARInvoiceRequest).items.add(arInvoiceRequestListItemData);
+        // TODO: Finish this method!
     };
     //#endregion
 
