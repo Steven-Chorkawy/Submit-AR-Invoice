@@ -288,7 +288,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
 
     public render() {
         return (
-            <div key={this.state.formKey} >
+            <div key={this.state.formKey} style={{ maxWidth: '1200px', marginRight: 'auto', marginLeft: 'auto' }}>
                 {
                     this.state.currentUser &&
                     <Form
