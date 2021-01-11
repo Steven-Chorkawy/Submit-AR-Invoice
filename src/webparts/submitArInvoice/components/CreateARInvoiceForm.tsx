@@ -32,6 +32,7 @@ import { MyGLAccountComponent } from './MyGLAccountComponent';
 import { BuildGUID, GetUserByEmail, GetUserById, GetUserByLoginName, GetUsersByLoginName, GetUserProfile, GetDepartments, GetStandardTerms } from './MyHelperMethods';
 import './PersonaComponent';
 import { MyLists } from './enums/MyLists';
+import { GLAccountsListViewComponent } from './MyFinanceGLAccounts';
 
 export interface ICreateARInvoiceFormProps {
     siteUsers: any;
@@ -139,6 +140,8 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
 
     private handleSubmit = async dataItem => {
         this.setState({ saveRunning: true });
+        console.log('handleSubmit');
+        console.log(dataItem);
         try {
             let web = Web(this.props.context.pageContext.web.absoluteUrl);
 
@@ -380,7 +383,14 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                                     />
                                 </FieldWrapper>
                                 <FieldWrapper>
-                                    <p>Accounts go here...</p>
+                                    <FieldArray
+                                        name="GLAccounts"
+                                        label="Accounts"
+                                        component={GLAccountsListViewComponent}
+                                        //updateAccountDetails={this.props.updateAccountDetails}
+                                        //productInEdit={this.props.dataItem}
+                                        //value={this.props.dataItem.AccountDetails}
+                                    />
                                 </FieldWrapper>
                                 <FieldWrapper>
                                     <Field
