@@ -137,6 +137,32 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
         }
     }
 
+
+    /**
+     * Create account code for the invoice. 
+     * @param arInvoiceId ID of the invoice that has already been created by a workflow. 
+     * @param dataItem AR Invoice Object.
+     * @throws An error message if this anything goes wrong.
+     */
+    private createAccounts = async (arInvoiceId: number, dataItem: any): Promise<void> => {
+        for (let index = 0; index < dataItem.GLAccounts.length; index++) {
+            const glAccount = dataItem.GLAccounts[index];
+            debugger;
+            await sp.web.lists.getByTitle(MyLists["AR Invoice Accounts"]).items.add({
+                AR_x0020_Invoice_x0020_RequestId: arInvoiceId,
+                Account_x0020_Code: glAccount.GLCode,
+                HST_x0020_Taxable: glAccount.HSTTaxable,
+                Amount: glAccount.Amount
+            });
+        }
+
+        debugger;
+    }
+
+    /**
+     * Creates a new AR Invoice.
+     * @param dataItem AR Invoice Object.
+     */
     private handleSubmit = async dataItem => {
         this.setState({ saveRunning: true });
         console.log('handleSubmit');
@@ -163,7 +189,8 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                 // Since the workflow only creates the record and sets the permissions, this set the properties of the newly created AR Invoice for the first time.
                 sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(arInvoiceId).update(arInvoiceProperties);
 
-                // Create the account records if any accounts are present. 
+                // Create the account records if any accounts are present.
+                await this.createAccounts(arInvoiceId, dataItem);
 
                 // Create the related attachment records if any are present. 
 
@@ -232,7 +259,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
 
     public render() {
         return (
-            <div key={this.state.formKey}>
+            <div key={this.state.formKey} >
                 {
                     this.state.currentUser &&
                     <Form
