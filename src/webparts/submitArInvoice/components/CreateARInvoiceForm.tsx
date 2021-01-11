@@ -28,7 +28,7 @@ import { ProgressIndicator } from 'office-ui-fabric-react/lib/ProgressIndicator'
 import * as MyFormComponents from './MyFormComponents';
 import { IUploadingFile } from './IMyFormState';
 import * as MyValidators from './validators.jsx';
-import { MyGLAccountComponent } from './MyGLAccountComponent';
+import { NewInvoiceAccountComponent } from './MyGLAccountComponent';
 import { BuildGUID, GetUserByEmail, GetUserById, GetUserByLoginName, GetUsersByLoginName, GetUserProfile, GetDepartments, GetStandardTerms } from './MyHelperMethods';
 import './PersonaComponent';
 import { MyLists } from './enums/MyLists';
@@ -385,7 +385,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                                     <FieldArray
                                         name="GLAccounts"
                                         label="G/L Accounts"
-                                        component={MyGLAccountComponent}
+                                        component={NewInvoiceAccountComponent}
                                     />
                                 </FieldWrapper>
                                 <FieldWrapper>

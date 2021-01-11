@@ -132,9 +132,8 @@ const commandCell = (onRemove) => (props) => {
 };
 
 
-export const MyGLAccountComponent = (fieldArrayRenderProps) => {
+export const NewInvoiceAccountComponent = (fieldArrayRenderProps) => {
   const { validationMessage, visited, label } = fieldArrayRenderProps;
-
 
   const onAdd = React.useCallback(
     (e) => {

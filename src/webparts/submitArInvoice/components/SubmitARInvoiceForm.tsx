@@ -26,7 +26,7 @@ import { Shimmer } from 'office-ui-fabric-react/lib/Shimmer';
 import * as MyFormComponents from './MyFormComponents';
 import { IUploadingFile } from './IMyFormState';
 import * as MyValidators from './validators.jsx';
-import { MyGLAccountComponent } from './MyGLAccountComponent';
+import { NewInvoiceAccountComponent } from './MyGLAccountComponent';
 
 import { BuildGUID, GetUserByEmail, GetUserById, GetUserByLoginName, GetUsersByLoginName, GetUserProfile, GetDepartments } from './MyHelperMethods';
 
@@ -488,7 +488,7 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
                   <FieldArray
                     name="GLAccounts"
                     label="G/L Accounts"
-                    component={MyGLAccountComponent}
+                    component={NewInvoiceAccountComponent}
                   />
                 </div>
 
