@@ -258,6 +258,8 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
     for (let index = 0; index < inputData.RelatedAttachments.length; index++) {
       const element = inputData.RelatedAttachments[index];
 
+      // TODO: Use this instead of hard coding the URL.
+      //.getFolderByServerRelativeUrl(`${this.props.context.pageContext.web.serverRelativeUrl}/${MyLists["Related Invoice Attachments"]}`)
       let uploadRes = await web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/')
         .files
         .add(element.name, element.getRawFile(), true)
