@@ -28,7 +28,7 @@ export class MyCustomerCardComponent extends React.Component<any, any> {
     else if (this.state.selectedCustomer.hasOwnProperty('ID')) {
       return (
         // TODO: Design this better! This is just for the first round of review.
-        <Card key={this.state.selectedCustomer.ID} type="info">
+        <Card key={this.state.selectedCustomer.ID}>
           <CardBody>
             <CardTitle>{this.state.selectedCustomer.Customer_x0020_Name}</CardTitle>
             <p>Mailing Address: {this.state.selectedCustomer.WorkAddress}</p>
