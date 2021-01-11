@@ -48,7 +48,7 @@ class GLAccountsListViewItemRender extends React.Component<any, any> {
     }
   }
   public enterEdit = () => {
-    this.setState({ item: { ...this.state.item, edit: true  } });
+    this.setState({ item: { ...this.state.item, edit: true } });
   }
   public cancelEdit = () => {
     this.setState({ item: { ...this.state.item, edit: false } });
@@ -209,11 +209,12 @@ export class GLAccountsListView extends React.Component<any, any> {
       <ListViewHeader style={{ color: 'rgb(160, 160, 160)', fontSize: 14 }} className='pl-3 pb-2 pt-2'>
         {
           this.state.editable &&
-          <Button primary={true} icon={'plus'} onClick={(e) =>
+          <Button primary={true} icon={'plus'} onClick={e => {
+            e.preventDefault();
             this.setState({
               value: [...this.state.value, { edit: true, newAccountGuid: BuildGUID(), HST_x0020_Taxable: false }]
-            })
-          }>Add New Account</Button>
+            });
+          }}>Add New Account</Button>
         }
       </ListViewHeader>
     );
