@@ -416,33 +416,33 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                                         disabled={this.state.saveRunning}
                                     >Clear</Button>
                                 </div>
-                                {
-                                    this.state.saveRunning &&
-                                    <div style={{ marginTop: '5px' }}>
+                                <div style={{ marginTop: '5px' }}>
+                                    {
+                                        this.state.saveRunning &&
                                         <ProgressIndicator label="Saving your Invoice.  Please do not close the window until the invoice been processed." />
-                                    </div>
-                                }
-                                {
-                                    this.state.successMessage && !this.state.saveRunning &&
-                                    <Card type='success'>
-                                        <CardBody>
-                                            <CardTitle>Success!</CardTitle>
-                                            <CardSubtitle>Invoice request you submitted has been sent out for approval. To review the submitted request please use the link below.</CardSubtitle>
-                                            <p>{this.state.successMessage}</p>
-                                            <a target='_blank' href={`${this.props.context.pageContext.web.absoluteUrl}/SitePages/Department-AR-Search-Page.aspx`}>Click Here to View AR Invoices</a>
-                                        </CardBody>
-                                    </Card>
-                                }
-                                {
-                                    this.state.errorMessage && !this.state.saveRunning &&
-                                    <Card type='error'>
-                                        <CardBody>
-                                            <CardTitle>Something went wrong!</CardTitle>
-                                            <p>{this.state.errorMessage}</p>
-                                            <a href="mailto:helpdesk@clarington.net?subject = Cannot Submit AR Invoice">Please Contact helpdesk@clarington.net</a>
-                                        </CardBody>
-                                    </Card>
-                                }
+                                    }
+                                    {
+                                        this.state.successMessage && !this.state.saveRunning &&
+                                        <Card type='success'>
+                                            <CardBody>
+                                                <CardTitle>Success!</CardTitle>
+                                                <CardSubtitle>Invoice request you submitted has been sent out for approval. To review the submitted request please use the link below.</CardSubtitle>
+                                                <p>{this.state.successMessage}</p>
+                                                <a target='_blank' href={`${this.props.context.pageContext.web.absoluteUrl}/SitePages/Department-AR-Search-Page.aspx`}>Click Here to View AR Invoices</a>
+                                            </CardBody>
+                                        </Card>
+                                    }
+                                    {
+                                        this.state.errorMessage && !this.state.saveRunning &&
+                                        <Card type='error'>
+                                            <CardBody>
+                                                <CardTitle>Something went wrong!</CardTitle>
+                                                <p>{this.state.errorMessage}</p>
+                                                <a href="mailto:helpdesk@clarington.net?subject = Cannot Submit AR Invoice">Please Contact helpdesk@clarington.net</a>
+                                            </CardBody>
+                                        </Card>
+                                    }
+                                </div>
                             </ FormElement>
                         )}
                     />
