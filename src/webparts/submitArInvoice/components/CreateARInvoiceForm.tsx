@@ -126,7 +126,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
             headers: requestHeaders
         };
 
-        let response = await this.props.context.httpClient.post(WORKFLOW_API_URL, SPHttpClient.configurations.v1, httpClientOptions)
+        let response = await this.props.context.httpClient.post(WORKFLOW_API_URL, SPHttpClient.configurations.v1, httpClientOptions);
 
         if (response.ok === true && response.status === 200) {
             return await response.json();
@@ -177,7 +177,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                 });
             }
             else {
-                throw 'Could not update AR Invoice'
+                throw 'Could not update AR Invoice';
             }
         }
         catch (reason) {
@@ -186,7 +186,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
         }
 
         this.setState({ saveRunning: false });
-    };
+    }
     //#endregion
 
     //#region Customer Field Methods
@@ -312,7 +312,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                                                     // Setting this email here so it can be passed to a workflow when the form is submitted.
                                                     // * By setting the users email here it saves us from querying this information during the forms submit event.  
                                                     formRenderProps.onChange('Requires_x0020_Authorization_x0020_ByEmail', {
-                                                        value: { 'results': res.map(user => { return user.Email }) }
+                                                        value: { 'results': res.map(user => { return user.Email; }) }
                                                     });
                                                 });
                                             }
