@@ -146,17 +146,13 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
      */
     private createAccounts = async (arInvoiceId: number, dataItem: any): Promise<void> => {
         for (let index = 0; index < dataItem.GLAccounts.length; index++) {
-            const glAccount = dataItem.GLAccounts[index];
-            debugger;
             await sp.web.lists.getByTitle(MyLists["AR Invoice Accounts"]).items.add({
                 AR_x0020_Invoice_x0020_RequestId: arInvoiceId,
-                Account_x0020_Code: glAccount.GLCode,
-                HST_x0020_Taxable: glAccount.HSTTaxable,
-                Amount: glAccount.Amount
+                Account_x0020_Code: dataItem.GLAccounts[index].GLCode,
+                HST_x0020_Taxable: dataItem.GLAccounts[index].HSTTaxable,
+                Amount: dataItem.GLAccounts[index].Amount
             });
         }
-
-        debugger;
     }
 
     /**
