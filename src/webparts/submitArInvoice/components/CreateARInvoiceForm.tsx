@@ -32,7 +32,6 @@ import { MyGLAccountComponent } from './MyGLAccountComponent';
 import { BuildGUID, GetUserByEmail, GetUserById, GetUserByLoginName, GetUsersByLoginName, GetUserProfile, GetDepartments, GetStandardTerms } from './MyHelperMethods';
 import './PersonaComponent';
 import { MyLists } from './enums/MyLists';
-import { GLAccountsListViewComponent } from './MyFinanceGLAccounts';
 
 export interface ICreateARInvoiceFormProps {
     siteUsers: any;
@@ -385,11 +384,8 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                                 <FieldWrapper>
                                     <FieldArray
                                         name="GLAccounts"
-                                        label="Accounts"
-                                        component={GLAccountsListViewComponent}
-                                        //updateAccountDetails={this.props.updateAccountDetails}
-                                        //productInEdit={this.props.dataItem}
-                                        //value={this.props.dataItem.AccountDetails}
+                                        label="G/L Accounts"
+                                        component={MyGLAccountComponent}
                                     />
                                 </FieldWrapper>
                                 <FieldWrapper>
@@ -402,12 +398,6 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                                         component={MyFormComponents.FormUpload}
                                     />
                                 </FieldWrapper>
-
-                                {/* <FieldArray
-                            name="users"
-                            component={FormGrid}
-                            validator={arrayLengthValidator}
-                        /> */}
                                 <div className="k-form-buttons">
                                     <Button
                                         primary={true}
