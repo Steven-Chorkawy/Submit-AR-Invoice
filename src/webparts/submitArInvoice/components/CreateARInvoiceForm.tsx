@@ -51,6 +51,7 @@ export interface ICreateARInvoiceFormState {
     saveRunning: boolean;
     currentUser?: any;
     errorMessage?: string;
+    formKey: number;
 }
 
 export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormProps, ICreateARInvoiceFormState> {
@@ -82,6 +83,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
             properties: this.props.properties,
             receivedCustomerList: this.props.customerList,
             saveRunning: false,
+            formKey: 0
         };
     }
 
@@ -166,6 +168,9 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
 
                 // Show a message to the user letting them know that their invoice is ready. 
                 alert('Done! It worked!');
+                
+                // Updating the formKey property will force the form to re-render.  This is what resets the form.
+                this.setState({ formKey: this.state.formKey + 1 });
             }
             else {
                 throw 'Could not update AR Invoice'
@@ -221,7 +226,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
 
     public render() {
         return (
-            <div>
+            <div key={this.state.formKey}>
                 {
                     this.state.currentUser &&
                     <Form
