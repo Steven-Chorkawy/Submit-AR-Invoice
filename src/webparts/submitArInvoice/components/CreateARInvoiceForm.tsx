@@ -228,9 +228,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                 // Create an approval request for each approver. 
                 await this.createApprovalRequests(arInvoiceId, dataItem);
 
-                // Show a message to the user letting them know that their invoice is ready. 
-                alert('Done! It worked!');
-
+                // Show a message to the user letting them know that their invoice is ready.
                 // Updating the formKey property will force the form to re-render.  This is what resets the form.
                 this.setState({
                     formKey: this.state.formKey + 1,
