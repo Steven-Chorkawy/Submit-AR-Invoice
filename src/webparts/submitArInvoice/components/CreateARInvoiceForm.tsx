@@ -137,7 +137,6 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
         }
     }
 
-
     /**
      * Create account code for the invoice. 
      * @param arInvoiceId ID of the invoice that has already been created by a workflow. 
@@ -209,7 +208,6 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
             console.log(reason);
             this.setState({ errorMessage: 'Could not complete AR Request.' });
         }
-
         this.setState({ saveRunning: false });
     }
     //#endregion
