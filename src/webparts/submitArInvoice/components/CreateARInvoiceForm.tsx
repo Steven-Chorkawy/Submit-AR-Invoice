@@ -51,6 +51,7 @@ export interface ICreateARInvoiceFormState {
     saveRunning: boolean;
     currentUser?: any;
     errorMessage?: string;
+    successMessage?: string;
     formKey: number;
 }
 
@@ -168,9 +169,12 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
 
                 // Show a message to the user letting them know that their invoice is ready. 
                 alert('Done! It worked!');
-                
+
                 // Updating the formKey property will force the form to re-render.  This is what resets the form.
-                this.setState({ formKey: this.state.formKey + 1 });
+                this.setState({
+                    formKey: this.state.formKey + 1,
+                    successMessage: 'The AR Invoice as been saved.'
+                });
             }
             else {
                 throw 'Could not update AR Invoice'
@@ -410,10 +414,21 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                                     </div>
                                 }
                                 {
+                                    this.state.successMessage && !this.state.saveRunning &&
+                                    <Card type='success'>
+                                        <CardBody>
+                                            <CardTitle>Success!</CardTitle>
+                                            <CardSubtitle>Invoice request you submitted has been sent out for approval. If you need to review the submitted request you can use the link below.</CardSubtitle>
+                                            <p>{this.state.successMessage}</p>
+                                            <a target='_blank' href={`${this.props.context.pageContext.web.absoluteUrl}/SitePages/Department-AR-Search-Page.aspx`}>Click Here to View AR Invoices</a>
+                                        </CardBody>
+                                    </Card>
+                                }
+                                {
                                     this.state.errorMessage && !this.state.saveRunning &&
                                     <Card type='error'>
                                         <CardBody>
-                                            <CardTitle>Card Title</CardTitle>
+                                            <CardTitle>Something went wrong!</CardTitle>
                                             <p>{this.state.errorMessage}</p>
                                             <a href="mailto:helpdesk@clarington.net?subject = Cannot Submit AR Invoice">Please Contact helpdesk@clarington.net</a>
                                         </CardBody>
