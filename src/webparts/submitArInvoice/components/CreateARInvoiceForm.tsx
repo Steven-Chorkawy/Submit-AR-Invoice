@@ -405,7 +405,16 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                                         disabled={this.state.saveRunning}
                                         icon="save"
                                     >Submit AR Invoice Request</Button>
-                                    <Button onClick={formRenderProps.onFormReset} disabled={this.state.saveRunning}>Clear</Button>
+                                    <Button
+                                        onClick={() => {
+                                            formRenderProps.onFormReset();
+                                            this.setState({
+                                                errorMessage: undefined,
+                                                successMessage: undefined
+                                            });
+                                        }}
+                                        disabled={this.state.saveRunning}
+                                    >Clear</Button>
                                 </div>
                                 {
                                     this.state.saveRunning &&
@@ -418,7 +427,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                                     <Card type='success'>
                                         <CardBody>
                                             <CardTitle>Success!</CardTitle>
-                                            <CardSubtitle>Invoice request you submitted has been sent out for approval. If you need to review the submitted request you can use the link below.</CardSubtitle>
+                                            <CardSubtitle>Invoice request you submitted has been sent out for approval. To review the submitted request please use the link below.</CardSubtitle>
                                             <p>{this.state.successMessage}</p>
                                             <a target='_blank' href={`${this.props.context.pageContext.web.absoluteUrl}/SitePages/Department-AR-Search-Page.aspx`}>Click Here to View AR Invoices</a>
                                         </CardBody>
