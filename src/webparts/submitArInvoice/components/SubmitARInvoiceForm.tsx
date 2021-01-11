@@ -26,7 +26,7 @@ import { Shimmer } from 'office-ui-fabric-react/lib/Shimmer';
 import * as MyFormComponents from './MyFormComponents';
 import { IUploadingFile } from './IMyFormState';
 import * as MyValidators from './validators.jsx';
-import { MyGLAccountComponent } from './MyGLAccountComponent';
+import { NewInvoiceAccountComponent } from './MyGLAccountComponent';
 
 import { BuildGUID, GetUserByEmail, GetUserById, GetUserByLoginName, GetUsersByLoginName, GetUserProfile, GetDepartments } from './MyHelperMethods';
 
@@ -258,6 +258,8 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
     for (let index = 0; index < inputData.RelatedAttachments.length; index++) {
       const element = inputData.RelatedAttachments[index];
 
+      // TODO: Use this instead of hard coding the URL.
+      //.getFolderByServerRelativeUrl(`${this.props.context.pageContext.web.serverRelativeUrl}/${MyLists["Related Invoice Attachments"]}`)
       let uploadRes = await web.getFolderByServerRelativeUrl('/sites/FinanceTest/ARTest/RelatedInvoiceAttachments/')
         .files
         .add(element.name, element.getRawFile(), true)
@@ -488,7 +490,7 @@ export class SubmitARInvoiceForm extends React.Component<IMyFormProps, any> {
                   <FieldArray
                     name="GLAccounts"
                     label="G/L Accounts"
-                    component={MyGLAccountComponent}
+                    component={NewInvoiceAccountComponent}
                   />
                 </div>
 

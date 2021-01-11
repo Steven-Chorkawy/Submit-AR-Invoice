@@ -56,6 +56,10 @@ export const requiresApprovalFrom = (value) => {
 export const requiresCustomer = (value) => value ? "" : "Customer is required";
 export const requiresCustomerPONUmber = (value) => value ? '' : "Customer PO Number is required";
 
+// People Picker Validator. 
+export const requireOneOrMorePeople = (value) => value ? '' : 'Send an approval request to one or more users.';
+
+
 // GL/Accounts
 /**
  * 'value' is the masked input from the form.

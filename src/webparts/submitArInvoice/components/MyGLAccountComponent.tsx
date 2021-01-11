@@ -132,9 +132,8 @@ const commandCell = (onRemove) => (props) => {
 };
 
 
-export const MyGLAccountComponent = (fieldArrayRenderProps) => {
+export const NewInvoiceAccountComponent = (fieldArrayRenderProps) => {
   const { validationMessage, visited, label } = fieldArrayRenderProps;
-
 
   const onAdd = React.useCallback(
     (e) => {
@@ -165,10 +164,9 @@ export const MyGLAccountComponent = (fieldArrayRenderProps) => {
         resizable={true}
       >
         <GridToolbar>
-          <Button title="Add new"
-            className="k-button k-primary"
+          <Button title="Add New Account"
             icon="plus"
-            onClick={onAdd} >Add new Account</Button>
+            onClick={onAdd} >Add New Account</Button>
         </GridToolbar>
 
         <GridColumn
