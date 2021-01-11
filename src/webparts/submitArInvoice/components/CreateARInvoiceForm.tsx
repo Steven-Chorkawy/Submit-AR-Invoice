@@ -4,7 +4,7 @@ import * as ReactDom from 'react-dom';
 // Kendo Imports
 import { Form, Field, FormElement, FieldWrapper, FieldArray } from '@progress/kendo-react-form';
 import { Button } from '@progress/kendo-react-buttons';
-import { Card, CardTitle, CardBody, CardActions } from '@progress/kendo-react-layout';
+import { Card, CardTitle, CardBody, CardActions, CardSubtitle } from '@progress/kendo-react-layout';
 import { filterBy } from '@progress/kendo-data-query';
 import { Label } from '@progress/kendo-react-labels';
 
@@ -50,6 +50,7 @@ export interface ICreateARInvoiceFormState {
     Standard_x0020_Terms?: any[];
     saveRunning: boolean;
     currentUser?: any;
+    errorMessage?: string;
 }
 
 export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormProps, ICreateARInvoiceFormState> {
@@ -129,7 +130,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
         }
         else {
             // Something went wrong with the workflow. 
-            return null;
+            throw 'Something went wrong, workflow failed!  Could not create an AR Invoice.';
         }
     }
 
@@ -153,7 +154,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
             // Create the new AR Invoice and set departments permissions. 
             let arInvoiceId = await this.triggerARInvoiceWorkflow(dataItem);
 
-            if (arInvoiceId !== null) {
+            if (arInvoiceId !== null && Number.isInteger(arInvoiceId)) {
                 // Since the workflow only creates the record and sets the permissions, this set the properties of the newly created AR Invoice for the first time.
                 sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(arInvoiceId).update(arInvoiceProperties);
 
@@ -167,12 +168,12 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                 alert('Done! It worked!');
             }
             else {
-                // TODO: Show an error message.
-                alert('Something went wrong!');
+                throw 'Could not update AR Invoice'
             }
         }
         catch (reason) {
-            alert('Something went wrong!  Could not complete this AR Request.');
+            console.log(reason);
+            this.setState({ errorMessage: 'Could not complete AR Request.' });
         }
 
         this.setState({ saveRunning: false });
@@ -402,6 +403,16 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                                     <div style={{ marginTop: '5px' }}>
                                         <ProgressIndicator label="Saving your Invoice.  Please do not close the window until the invoice been processed." />
                                     </div>
+                                }
+                                {
+                                    this.state.errorMessage && !this.state.saveRunning &&
+                                    <Card type='error'>
+                                        <CardBody>
+                                            <CardTitle>Card Title</CardTitle>
+                                            <p>{this.state.errorMessage}</p>
+                                            <a href="mailto:helpdesk@clarington.net?subject = Cannot Submit AR Invoice">Please Contact helpdesk@clarington.net</a>
+                                        </CardBody>
+                                    </Card>
                                 }
                             </ FormElement>
                         )}
