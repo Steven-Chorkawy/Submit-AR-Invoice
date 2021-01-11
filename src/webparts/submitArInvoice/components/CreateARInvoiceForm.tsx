@@ -29,9 +29,11 @@ import * as MyFormComponents from './MyFormComponents';
 import { IUploadingFile } from './IMyFormState';
 import * as MyValidators from './validators.jsx';
 import { NewInvoiceAccountComponent } from './MyGLAccountComponent';
-import { BuildGUID, GetUserByEmail, GetUserById, GetUserByLoginName, GetUsersByLoginName, GetUserProfile, GetDepartments, GetStandardTerms } from './MyHelperMethods';
+import { BuildGUID, GetUserByEmail, GetUserById, GetUserByLoginName, GetUsersByLoginName, GetUserProfile, GetDepartments, GetStandardTerms, CreateInvoiceAction } from './MyHelperMethods';
 import './PersonaComponent';
 import { MyLists } from './enums/MyLists';
+import { IFile } from '@pnp/sp/files';
+import { InvoiceActionRequestTypes } from './enums/MyEnums';
 
 export interface ICreateARInvoiceFormProps {
     siteUsers: any;
@@ -154,17 +156,37 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
         }
     }
 
+    /**
+     * Upload related attachments that the user provided.  This method also sets the files lookup column that related it to the AR Invoice. 
+     * @param arInvoiceId ID of the invoice that has already been created by a workflow. 
+     * @param dataItem AR Invoice Object.
+     */
     private uploadRelatedAttachments = async (arInvoiceId: number, dataItem: any): Promise<void> => {
-        for (let index = 0; index < dataItem.RelatedInvoiceAttachments.length; index++) {
-            const attachment = dataItem.RelatedInvoiceAttachments[index];
-            debugger;
-            await sp.web.getFolderByServerRelativeUrl(`${this.props.context.pageContext.web.serverRelativeUrl}/${MyLists["Related Invoice Attachments"]}`)
-                .files.add(attachment.name, attachment.getRawFile(), true).then((item: any) => {
-                    item.update({ AR_x0020_Invoice_x0020_RequestId: arInvoiceId, Title: attachment.name });
-                });
+        if (dataItem.RelatedInvoiceAttachments) {
+            for (let index = 0; index < dataItem.RelatedInvoiceAttachments.length; index++) {
+                const attachment = dataItem.RelatedInvoiceAttachments[index];
+                await sp.web.getFolderByServerRelativeUrl(`${this.props.context.pageContext.web.serverRelativeUrl}/${MyLists["Related Invoice Attachments"]}`)
+                    .files.add(attachment.name, attachment.getRawFile(), true).then(({ file }) => {
+                        file.getItem().then((item: any) => {
+                            const itemProxy: any = Object.assign({}, item);
+                            sp.web.lists.getByTitle(MyLists["Related Invoice Attachments"]).items.getById(itemProxy.ID).update({
+                                AR_x0020_Invoice_x0020_RequestId: arInvoiceId,
+                                Title: attachment.name
+                            });
+                        });
+                    });
+            }
         }
+    }
 
-        debugger;
+    private createApprovalRequests = async (arInvoiceId: number, dataItem: any): Promise<void> => {
+        for (let index = 0; index < dataItem.Requires_x0020_Department_x0020_Id.results.length; index++) {
+            await CreateInvoiceAction(
+                dataItem.Requires_x0020_Department_x0020_Id.results[index],
+                InvoiceActionRequestTypes.DepartmentApprovalRequired,
+                arInvoiceId
+            );
+        }
     }
 
     /**
@@ -204,7 +226,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                 await this.uploadRelatedAttachments(arInvoiceId, dataItem);
 
                 // Create an approval request for each approver. 
-                
+                await this.createApprovalRequests(arInvoiceId, dataItem);
 
                 // Show a message to the user letting them know that their invoice is ready. 
                 alert('Done! It worked!');
