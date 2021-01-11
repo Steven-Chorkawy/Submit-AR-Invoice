@@ -154,6 +154,19 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
         }
     }
 
+    private uploadRelatedAttachments = async (arInvoiceId: number, dataItem: any): Promise<void> => {
+        for (let index = 0; index < dataItem.RelatedInvoiceAttachments.length; index++) {
+            const attachment = dataItem.RelatedInvoiceAttachments[index];
+            debugger;
+            await sp.web.getFolderByServerRelativeUrl(`${this.props.context.pageContext.web.serverRelativeUrl}/${MyLists["Related Invoice Attachments"]}`)
+                .files.add(attachment.name, attachment.getRawFile(), true).then((item: any) => {
+                    item.update({ AR_x0020_Invoice_x0020_RequestId: arInvoiceId, Title: attachment.name });
+                });
+        }
+
+        debugger;
+    }
+
     /**
      * Creates a new AR Invoice.
      * @param dataItem AR Invoice Object.
@@ -188,8 +201,10 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
                 await this.createAccounts(arInvoiceId, dataItem);
 
                 // Create the related attachment records if any are present. 
+                await this.uploadRelatedAttachments(arInvoiceId, dataItem);
 
                 // Create an approval request for each approver. 
+                
 
                 // Show a message to the user letting them know that their invoice is ready. 
                 alert('Done! It worked!');
