@@ -25,7 +25,6 @@ import * as MyFormComponents from './MyFormComponents';
 import { MyCommandCell } from './FinanceForms/MyCommandCell';
 import { MyLists } from './enums/MyLists.js';
 import { MyContentTypes } from './enums/MyEnums.js';
-import { IARAccountDetails } from './SubmitARInvoiceForm.js';
 import { IARInvoiceAccount } from './interface/MyInterfaces';
 import { BuildGUID } from './MyHelperMethods';
 
