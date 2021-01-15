@@ -60,39 +60,6 @@ interface IFinanceGridEditFormProps {
   onRelatedAttachmentRemove: Function;
 }
 
-// function GridButtons({ cancel, saveResult }) {
-//   return (
-//     <div>
-//       {saveResult && saveResult.success === false &&
-//         <div>
-//           <Card style={{ width: 600 }} type={'error'}>
-//             <CardBody>
-//               <CardTitle>Something went wrong!</CardTitle>
-//               <hr />
-//               <p>{saveResult.message}</p>
-//             </CardBody>
-//           </Card>
-//         </div>}
-//       <div className="k-form-buttons">
-//         <Button
-//           type={"submit"}
-//           disabled={!this.state.allowSubmit}
-//           style={{ width: '50%' }}
-//           primary={true}
-//           icon="save"
-//         >Save</Button>
-//         <Button
-//           // type={"submit"}
-//           style={{ width: '50%' }}
-//           className="k-button"
-//           onClick={cancel}
-//           icon="cancel"
-//         >Cancel</Button>
-//       </div>
-//     </div>
-//   );
-// }
-
 export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormProps, any> {
   constructor(props) {
     super(props);
