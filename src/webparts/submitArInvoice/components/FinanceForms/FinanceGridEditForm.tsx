@@ -89,9 +89,8 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
   }
 
   private onApproverChange = e => {
-    if (e.length === 0) {
-      this.setState({ allowSubmit: false });
-    }
+    debugger;
+    this.setState({ allowSubmit: !(e.length === 0) })
     this.props.onApproverChange(e);
   }
 
@@ -149,6 +148,10 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                       label={'Status'}
                       data={this.props.statusData}
                       component={MyFormComponents.FormDropDownList}
+                      onChange={e => {
+                        this.setState({ allowSubmit: true });
+                        formRenderProps.onChange('Invoice_x0020_Status', { value: e.value });
+                      }}
                     />
                     {
                       /**
