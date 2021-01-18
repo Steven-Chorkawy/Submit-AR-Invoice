@@ -44,6 +44,16 @@ export interface INewApproval {
     RequestType: InvoiceActionRequestTypes;
     Description: string;
 }
+
+/**
+ * Check to see if the array of users is valid.
+ * @param users Users that are present in the calling classes state.
+ * @returns TRUE: Users are valid.  False: Users are not valid. 
+ */
+const IS_USER_SELECTED = (users: any[]): boolean => {
+    return users && (users.length < 1);
+};
+
 export class RequestApprovalCardComponent extends React.Component<IRequestApprovalCardComponentProps, any> {
     constructor(props) {
         super(props);
@@ -110,7 +120,7 @@ export class RequestApprovalCardComponent extends React.Component<IRequestApprov
                                     : <Error>... Something went wrong ...</Error>
                         }
                         {
-                            this.state.Users && (this.state.Users.length < 1) &&
+                            IS_USER_SELECTED(this.state.Users) &&
                             <Error>Please Select one or more users.</Error>
                         }
                     </div>
@@ -162,7 +172,7 @@ export class RequestApprovalDialogComponent extends React.Component<any, any> {
     //#region Render Methods
     private onRenderFooterContent = (props) => (
         <div>
-            <PrimaryButton onClick={(e) => this.props.onSave(this.state)} styles={buttonStyles}>Save</PrimaryButton>
+            <PrimaryButton disabled={IS_USER_SELECTED(this.state.Users)} onClick={(e) => this.props.onSave(this.state)} styles={buttonStyles}>Save</PrimaryButton>
             <DefaultButton onClick={this.props.onDismiss}>Cancel</DefaultButton>
         </div>
     )
