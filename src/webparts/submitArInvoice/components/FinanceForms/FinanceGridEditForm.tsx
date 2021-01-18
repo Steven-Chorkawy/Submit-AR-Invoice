@@ -26,14 +26,14 @@ import "@pnp/sp/items";
 // Custom Imports
 import * as MyFormComponents from '../MyFormComponents';
 import { GLAccountsListViewComponent } from '../MyFinanceGLAccounts';
-import { InvoiceActionRequestTypes, InvoiceStatus, MyContentTypes } from '../enums/MyEnums';
+import { InvoiceActionRequestTypes, InvoiceActionResponseStatus, InvoiceStatus, MyContentTypes } from '../enums/MyEnums';
 import { GetUsersByLoginName } from '../MyHelperMethods';
 import { MyLists } from '../enums/MyLists';
 import { IInvoiceItem } from '../interface/MyInterfaces';
 import { MyAttachmentComponent } from '../MyAttachmentComponent';
 import { RequestApprovalCardComponent } from '../RequestApprovalDialogComponent';
 import { ActionStepsComponent } from '../ActionStepsComponent';
-import { Label } from '@progress/kendo-react-labels';
+import { Hint, Label } from '@progress/kendo-react-labels';
 
 export interface IGPAttachmentProps {
   type: string;
@@ -91,6 +91,13 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
   private onApproverChange = e => {
     this.setState({ allowSubmit: !(e.length === 0) });
     this.props.onApproverChange(e);
+  }
+
+  /**
+   * @returns TRUE: If there are pending approvals. 
+   */
+  private _areApprovalsPending = (): boolean => {
+    return this.props.dataItem.Actions && this.props.dataItem.Actions.some(f => f.Response_x0020_Status === InvoiceActionResponseStatus.Waiting);
   }
 
   private _statusValue = null;
@@ -156,7 +163,13 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                         });
                         formRenderProps.onChange('Invoice_x0020_Status', { value: e.value });
                       }}
+                      disabled={this._areApprovalsPending()}
                     />
+                    {
+                      this._areApprovalsPending() && 
+                      <Hint id='InvoiceStatusHint'>Cannot change the Invoice Status while there are pending approvals.</Hint>
+                    }
+
                     {
                       /**
                        * * Note: This is not a form component!  
