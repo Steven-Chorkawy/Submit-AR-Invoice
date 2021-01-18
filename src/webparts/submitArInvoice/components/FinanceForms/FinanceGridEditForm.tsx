@@ -60,45 +60,14 @@ interface IFinanceGridEditFormProps {
   onRelatedAttachmentRemove: Function;
 }
 
-function GridButtons({ cancel, saveResult }) {
-  return (
-    <div>
-      {saveResult && saveResult.success === false &&
-        <div>
-          <Card style={{ width: 600 }} type={'error'}>
-            <CardBody>
-              <CardTitle>Something went wrong!</CardTitle>
-              <hr />
-              <p>{saveResult.message}</p>
-            </CardBody>
-          </Card>
-        </div>}
-      <div className="k-form-buttons">
-        <Button
-          type={"submit"}
-          style={{ width: '50%' }}
-          primary={true}
-          icon="save"
-        >Save</Button>
-        <Button
-          // type={"submit"}
-          style={{ width: '50%' }}
-          className="k-button"
-          onClick={cancel}
-          icon="cancel"
-        >Cancel</Button>
-      </div>
-    </div>
-  );
-}
-
 export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormProps, any> {
   constructor(props) {
     super(props);
     this.state = {
       productInEdit: this.props.dataItem || null,
       visible: false,
-      approvalRequestError: false
+      approvalRequestError: false,
+      allowSubmit: true
     };
   }
 
@@ -119,7 +88,46 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
     });
   }
 
+  private onApproverChange = e => {
+    this.setState({ allowSubmit: !(e.length === 0) });
+    this.props.onApproverChange(e);
+  }
+
   private _statusValue = null;
+
+
+  public GridButtons({ cancel, saveResult }) {
+    return (
+      <div>
+        {saveResult && saveResult.success === false &&
+          <div>
+            <Card style={{ width: 600 }} type={'error'}>
+              <CardBody>
+                <CardTitle>Something went wrong!</CardTitle>
+                <hr />
+                <p>{saveResult.message}</p>
+              </CardBody>
+            </Card>
+          </div>}
+        <div className="k-form-buttons">
+          <Button
+            type={"submit"}
+            disabled={!this.state.allowSubmit}
+            style={{ width: '50%' }}
+            primary={true}
+            icon="save"
+          >Save</Button>
+          <Button
+            // type={"submit"}
+            style={{ width: '50%' }}
+            className="k-button"
+            onClick={cancel}
+            icon="cancel"
+          >Cancel</Button>
+        </div>
+      </div>
+    );
+  }
 
   public render() {
     return (
@@ -129,7 +137,7 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
           initialValues={{ ...this.state.productInEdit }}
           render={(formRenderProps) => (
             <FormElement style={{ width: '100%' }}>
-              {GridButtons({ cancel: this.props.cancel, saveResult: this.props.saveResult })}
+              {this.GridButtons({ cancel: this.props.cancel, saveResult: this.props.saveResult })}
               <div className='row'>
                 <div className='col-sm-8'>
                   <div style={{ marginBottom: "2px" }}>
@@ -139,6 +147,15 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                       label={'Status'}
                       data={this.props.statusData}
                       component={MyFormComponents.FormDropDownList}
+                      onChange={e => {
+                        // Only prevent the submit button when the status is one of the following. 
+                        // TODO: Update the validation logic to use a Kendo Form. 
+                        this.setState({
+                          allowSubmit: !(e.value === InvoiceStatus["Accountant Approval Required"] ||
+                            e.value === InvoiceStatus["Entered into GP"])
+                        });
+                        formRenderProps.onChange('Invoice_x0020_Status', { value: e.value });
+                      }}
                     />
                     {
                       /**
@@ -157,7 +174,7 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                           onRequestTypeChange={e => { }}
                           requestOptions={[{ key: InvoiceActionRequestTypes.EditRequired, text: InvoiceActionRequestTypes.EditRequired }]}
                           requestType={InvoiceActionRequestTypes.EditRequired}
-                          onPeoplePickerChange={this.props.onApproverChange}
+                          onPeoplePickerChange={this.onApproverChange}
                           onDescriptionChange={this.props.onNoteChange}
                         />
                       </div>
@@ -172,7 +189,7 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                         onRequestTypeChange={e => { }}
                         requestOptions={[{ key: InvoiceActionRequestTypes.AccountantApprovalRequired, text: InvoiceActionRequestTypes.AccountantApprovalRequired }]}
                         requestType={InvoiceActionRequestTypes.AccountantApprovalRequired}
-                        onPeoplePickerChange={this.props.onApproverChange}
+                        onPeoplePickerChange={this.onApproverChange}
                         onDescriptionChange={this.props.onNoteChange}
                       />
                     </div>
@@ -188,8 +205,7 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                         onRequestTypeChange={e => { }}
                         requestOptions={[{ key: InvoiceActionRequestTypes.AccountingClerkApprovalRequired, text: InvoiceActionRequestTypes.AccountingClerkApprovalRequired }]}
                         requestType={InvoiceActionRequestTypes.AccountingClerkApprovalRequired}
-
-                        onPeoplePickerChange={this.props.onApproverChange}
+                        onPeoplePickerChange={this.onApproverChange}
                         onDescriptionChange={this.props.onNoteChange}
                       />
                     </div>
@@ -238,7 +254,7 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                   <ActionStepsComponent actions={this.props.dataItem.Actions} />
                 </div>
               </div>
-              {GridButtons({ cancel: this.props.cancel, saveResult: this.props.saveResult })}
+              {this.GridButtons({ cancel: this.props.cancel, saveResult: this.props.saveResult })}
             </FormElement>
           )}
         />
