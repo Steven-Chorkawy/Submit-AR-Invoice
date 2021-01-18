@@ -89,8 +89,7 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
   }
 
   private onApproverChange = e => {
-    debugger;
-    this.setState({ allowSubmit: !(e.length === 0) })
+    this.setState({ allowSubmit: !(e.length === 0) });
     this.props.onApproverChange(e);
   }
 
@@ -149,7 +148,12 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                       data={this.props.statusData}
                       component={MyFormComponents.FormDropDownList}
                       onChange={e => {
-                        this.setState({ allowSubmit: true });
+                        // Only prevent the submit button when the status is one of the following. 
+                        // TODO: Update the validation logic to use a Kendo Form. 
+                        this.setState({
+                          allowSubmit: !(e.value === InvoiceStatus["Accountant Approval Required"] ||
+                            e.value === InvoiceStatus["Entered into GP"])
+                        });
                         formRenderProps.onChange('Invoice_x0020_Status', { value: e.value });
                       }}
                     />
@@ -201,7 +205,6 @@ export class FinanceGridEditForm extends React.Component<IFinanceGridEditFormPro
                         onRequestTypeChange={e => { }}
                         requestOptions={[{ key: InvoiceActionRequestTypes.AccountingClerkApprovalRequired, text: InvoiceActionRequestTypes.AccountingClerkApprovalRequired }]}
                         requestType={InvoiceActionRequestTypes.AccountingClerkApprovalRequired}
-
                         onPeoplePickerChange={this.onApproverChange}
                         onDescriptionChange={this.props.onNoteChange}
                       />
