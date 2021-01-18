@@ -99,7 +99,7 @@ export class RequestApprovalCardComponent extends React.Component<IRequestApprov
                         />
                     </div>
                     <div style={{ marginBottom: '15px' }}>
-                        <Label>* Requires Approval From</Label>
+                        <Label>* Requires Approval/Edit From</Label>
                         {
                             this.props.onPeoplePickerChange
                                 ? <PeoplePicker
@@ -185,7 +185,7 @@ export class RequestApprovalDialogComponent extends React.Component<any, any> {
                 onDismiss={this.props.onDismiss}
                 type={PanelType.medium}
                 closeButtonAriaLabel="Close"
-                headerText="Request Approval for Invoice"
+                headerText="Request Approval/Edit for Invoice"
                 onRenderFooterContent={this.onRenderFooterContent}
                 isFooterAtBottom={true}
             >
