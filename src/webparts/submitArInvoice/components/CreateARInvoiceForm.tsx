@@ -118,7 +118,7 @@ export class CreateARInvoiceForm extends React.Component<ICreateARInvoiceFormPro
      * @param dataItem Value from the forms submit event.
      */
     private triggerARInvoiceWorkflow = async (dataItem: any): Promise<number> => {
-        const WORKFLOW_API_URL = 'https://prod-27.canadacentral.logic.azure.com:443/workflows/8917a73fd506444ea3af1aa10a300d17/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=9sSEESmcCFhhBgt3I-JXgpqEMEz0MyUxRJ3RCC-PSPA';
+        const WORKFLOW_API_URL = 'https://prod-13.canadacentral.logic.azure.com:443/workflows/e8a780c57e024fc6be700f7d5db87999/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=SVssCg8jTOpmrjBrrUS63aHQujTuMvZgRxvcRvHTWaY';
 
         const requestHeaders: Headers = new Headers();
         requestHeaders.append('Content-type', 'application/json');
