@@ -6,7 +6,7 @@ import { sp } from "@pnp/sp";
 import { Dialog } from '@progress/kendo-react-dialogs';
 import { Form, FormElement, Field, FieldArray } from '@progress/kendo-react-form';
 import { Button } from '@progress/kendo-react-buttons';
-import { Card, CardTitle, CardBody } from '@progress/kendo-react-layout';
+import { Card, CardTitle, CardBody, CardSubtitle } from '@progress/kendo-react-layout';
 import { filterBy } from '@progress/kendo-data-query';
 import { Label } from '@progress/kendo-react-labels';
 
@@ -29,7 +29,7 @@ interface IDepartmentGridEditDialogContainerState {
   loading?: boolean;
   standardTerms: Array<any>;
   departments: any[];
-  hasEditPermissions: boolean;
+  hasEditPermissions?: boolean;
 }
 
 function GridButtons({ cancel, saveResult }, hasEditPermissions: boolean) {
@@ -76,7 +76,7 @@ export class DepartmentGridEditDialogContainer extends React.Component<any, IDep
       receivedCustomerList: this.props.customers,
       standardTerms: [],
       departments: this.props.departments ? [...this.props.departments] : [],
-      hasEditPermissions: false
+      // hasEditPermissions: false
     };
 
     sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(this.props.dataItem.ID).currentUserHasPermissions(PermissionKind.EditListItems).then(hasEditPermissions => {
@@ -139,6 +139,15 @@ export class DepartmentGridEditDialogContainer extends React.Component<any, IDep
   public render() {
     return (
       <Dialog onClose={this.props.cancel} title={"Edit AR Invoice Request"} minWidth="200px" width="80%" height="80%">
+        {
+          this.state.hasEditPermissions === false &&
+          <Card type='warning'>
+            <CardBody>
+              <CardTitle><span className={'k-icon k-i-warning'}></span> | Cannot Edit Invoice.</CardTitle>
+              <p>You do not have the required permissions to edit this invoice.  Please contact <b>helpdesk@clarington.net</b> if you are required to edit this invoice.</p>
+            </CardBody>
+          </Card>
+        }
         <Form
           onSubmit={this.props.onSubmit}
           initialValues={{ ...this.state.productInEdit }}
