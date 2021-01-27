@@ -256,7 +256,7 @@ export class DepartmentGridEditDialogContainer extends React.Component<any, IDep
                   component={GLAccountsListViewComponent}
                   updateAccountDetails={this.props.updateAccountDetails}
                   productInEdit={this.state.productInEdit}
-                  editable={this.state.hasEditPermissions}
+                  editable={this.state.hasEditPermissions === true}
                   value={this.state.productInEdit.AccountDetails}
                 />
               </div>
