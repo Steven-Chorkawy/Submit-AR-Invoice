@@ -165,7 +165,7 @@ class GLAccountsListViewItemRender extends React.Component<any, any> {
                     </div>
                   </div>
                   {
-                    this.props.editable &&
+                    this.props.editable !== false &&
                     <div className={'col-md-2'}>
                       <Button primary={true} look={'flat'} title={'Edit'} icon={'edit'} style={{ marginRight: 5 }} onClick={this.enterEdit}></Button>
                       <Button icon={'trash'} look={'flat'} title={'Delete'} onClick={this.handleDelete}></Button>
@@ -191,13 +191,13 @@ export class GLAccountsListView extends React.Component<any, any> {
     // IF props is null or undefined  : true
     // IF props is true               : true
     // IF props is false              : false
-    editable: this.props.editable ? true : this.props.editable === false ? false : true,
+    // editable: this.props.editable ? this.props.editable : true,
     displayMode: this.props.displayMode ? this.props.displayMode : GLAccountsListViewDisplayMode.horizontal
   };
 
   public MyCustomItem = props => <GLAccountsListViewItemRender
     {...props}
-    editable={this.state.editable}
+    editable={this.props.editable}
     displayMode={this.state.displayMode}
     saveItem={this.saveAccount}
     deleteItem={this.deleteAccount}
@@ -207,7 +207,7 @@ export class GLAccountsListView extends React.Component<any, any> {
     return (
       <ListViewHeader style={{ color: 'rgb(160, 160, 160)', fontSize: 14 }} className='pl-3 pb-2 pt-2'>
         {
-          this.state.editable &&
+          this.props.editable &&
           <Button primary={true} icon={'plus'} onClick={e => {
             e.preventDefault();
             this.setState({
