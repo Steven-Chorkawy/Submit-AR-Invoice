@@ -6,7 +6,7 @@ import { sp } from "@pnp/sp";
 import { Dialog } from '@progress/kendo-react-dialogs';
 import { Form, FormElement, Field, FieldArray } from '@progress/kendo-react-form';
 import { Button } from '@progress/kendo-react-buttons';
-import { Card, CardTitle, CardBody } from '@progress/kendo-react-layout';
+import { Card, CardTitle, CardBody, CardSubtitle } from '@progress/kendo-react-layout';
 import { filterBy } from '@progress/kendo-data-query';
 import { Label } from '@progress/kendo-react-labels';
 
@@ -19,6 +19,7 @@ import { GetDepartments } from '../MyHelperMethods';
 
 import { IInvoiceItem } from '../interface/MyInterfaces';
 import { MyLists } from '../enums/MyLists';
+import { PermissionKind } from '@pnp/sp/security';
 
 interface IDepartmentGridEditDialogContainerState {
   productInEdit: IInvoiceItem;
@@ -28,9 +29,10 @@ interface IDepartmentGridEditDialogContainerState {
   loading?: boolean;
   standardTerms: Array<any>;
   departments: any[];
+  hasEditPermissions?: boolean;
 }
 
-function GridButtons({ cancel, saveResult }) {
+function GridButtons({ cancel, saveResult }, hasEditPermissions: boolean) {
   return (
     <div>
       {saveResult && saveResult.success === false &&
@@ -49,6 +51,8 @@ function GridButtons({ cancel, saveResult }) {
           style={{ width: '50%' }}
           className="k-button k-primary"
           icon="save"
+          disabled={!hasEditPermissions}
+          title={hasEditPermissions ? 'Save Changes.' : 'Cannot Save Changes. Insufficient Permissions'}
         >Save</Button>
         <Button
           style={{ width: '50%' }}
@@ -71,8 +75,18 @@ export class DepartmentGridEditDialogContainer extends React.Component<any, IDep
       customerList: this.props.customers,
       receivedCustomerList: this.props.customers,
       standardTerms: [],
-      departments: this.props.departments ? [...this.props.departments] : []
+      departments: this.props.departments ? [...this.props.departments] : [],
+      // hasEditPermissions: false
     };
+
+    sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).items.getById(this.props.dataItem.ID).currentUserHasPermissions(PermissionKind.EditListItems).then(hasEditPermissions => {
+      // hasEditPermissions === true if user has edit permissions. 
+      // hasEditPermissions === false if user does not have edit permissions
+      this.setState({ hasEditPermissions: hasEditPermissions });
+    }).catch(reason => {
+      console.log(reason);
+      alert('Something went wrong.  Please contact helpdesk@clarington.net');
+    });
 
     sp.web.lists.getByTitle(MyLists["AR Invoice Requests"]).fields
       .getByInternalNameOrTitle('Standard_x0020_Terms')
@@ -125,12 +139,21 @@ export class DepartmentGridEditDialogContainer extends React.Component<any, IDep
   public render() {
     return (
       <Dialog onClose={this.props.cancel} title={"Edit AR Invoice Request"} minWidth="200px" width="80%" height="80%">
+        {
+          this.state.hasEditPermissions === false &&
+          <Card type='warning'>
+            <CardBody>
+              <CardTitle><span className={'k-icon k-i-warning'}></span> | Cannot Edit Invoice.</CardTitle>
+              <p>You do not have the required permissions to edit this invoice.  Please contact <b>helpdesk@clarington.net</b> if you are required to edit this invoice.</p>
+            </CardBody>
+          </Card>
+        }
         <Form
           onSubmit={this.props.onSubmit}
           initialValues={{ ...this.state.productInEdit }}
           render={(formRenderProps) => (
             <FormElement>
-              {GridButtons({ cancel: this.props.cancel, saveResult: this.props.saveResult })}
+              {GridButtons({ cancel: this.props.cancel, saveResult: this.props.saveResult }, this.state.hasEditPermissions)}
               <div className={'row'}>
                 <div className={'col-sm-6'}>
                   <div style={{ display: 'block', justifyContent: 'space-between' }}>
@@ -172,7 +195,7 @@ export class DepartmentGridEditDialogContainer extends React.Component<any, IDep
                 </div>
                 <div className={'col-sm-6'}>
                   <Label>Approval Requests</Label>
-                  <ActionStepsComponent actions={this.props.dataItem.Actions} onAddNewApproval={this.props.onAddNewApproval} />
+                  <ActionStepsComponent actions={this.props.dataItem.Actions} onAddNewApproval={this.state.hasEditPermissions ? this.props.onAddNewApproval : null} />
                 </div>
               </div>
               <Field
@@ -233,6 +256,7 @@ export class DepartmentGridEditDialogContainer extends React.Component<any, IDep
                   component={GLAccountsListViewComponent}
                   updateAccountDetails={this.props.updateAccountDetails}
                   productInEdit={this.state.productInEdit}
+                  editable={this.state.hasEditPermissions === true}
                   value={this.state.productInEdit.AccountDetails}
                 />
               </div>
@@ -250,7 +274,7 @@ export class DepartmentGridEditDialogContainer extends React.Component<any, IDep
                 onRemove={this.props.onRelatedAttachmentRemove}
               />
 
-              {GridButtons({ cancel: this.props.cancel, saveResult: this.props.saveResult })}
+              {GridButtons({ cancel: this.props.cancel, saveResult: this.props.saveResult }, this.state.hasEditPermissions)}
             </FormElement>
           )}
         >

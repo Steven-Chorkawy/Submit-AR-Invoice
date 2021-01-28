@@ -88,7 +88,7 @@ const CustomActionCard = (props) => {
                 ShowMore &&
                 <CardBody style={{ wordWrap: 'break-word' }}>
                     <div>
-                        Requested by <b>{props.Author.Title.includes('Chorkawy') ? 'SP Systems' : props.author.Title} </b> 
+                        Requested by <b>{props.Author.Title} </b> 
                         <Moment
                             className={'k-card-subtitle'}
                             date={props.Created}        // The date to be used.
