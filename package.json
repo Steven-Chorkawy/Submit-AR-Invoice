@@ -26,7 +26,7 @@
     "@pnp/spfx-controls-react": "1.19.0",
     "@progress/kendo-data-query": "^1.5.4",
     "@progress/kendo-drawing": "^1.9.1",
-    "@progress/kendo-licensing": "^1.0.2",
+    "@progress/kendo-licensing": "^1.3.1",
     "@progress/kendo-react-data-tools": "^3.16.0",
     "@progress/kendo-react-dateinputs": "^3.16.0",
     "@progress/kendo-react-dialogs": "^3.16.0",
